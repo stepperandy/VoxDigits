@@ -53,7 +53,7 @@ export default function Pricing() {
   const [yearly, setYearly] = useState(false);
 
   return (
-    <section id="pricing" className="bg-slate-950 py-20 px-4 sm:px-6 lg:px-8">
+    <section id="pricing" className="bg-slate-950 py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <motion.div

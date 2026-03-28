@@ -3,7 +3,7 @@ import { Shield, CheckCircle } from 'lucide-react';
 
 export default function Hero() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Grid background */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
