@@ -16,6 +16,16 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Missing plan or priceId' }, { status: 400 });
     }
 
+    // Admins get free access, skip Stripe checkout
+    if (user.role === 'admin') {
+      const setupToken = crypto.randomUUID();
+      return Response.json({
+        sessionId: setupToken,
+        url: `${Deno.env.get('APP_URL')}/setup?token=${setupToken}`,
+        freeAccess: true,
+      });
+    }
+
     const stripe = await import('npm:stripe@14.0.0');
     const stripeClient = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY'));
 
