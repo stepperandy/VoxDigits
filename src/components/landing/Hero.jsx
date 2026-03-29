@@ -151,13 +151,13 @@ export default function Hero() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 text-xs font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-              10,000+ users protected worldwide
+              Premium VPN Infrastructure
             </div>
 
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.05] tracking-tight">
-              Your Privacy,{' '}
+              Secure every{' '}
               <span className="relative inline-block text-cyan-400 italic">
-                Our Priority.
+                device.
                 {/* Curved underline */}
                 <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 320 12" fill="none" preserveAspectRatio="none">
                   <path d="M4 9 Q80 2 160 7 Q240 12 316 4" stroke="#22d3ee" strokeWidth="3.5" strokeLinecap="round" fill="none" opacity="0.9"/>
@@ -166,20 +166,20 @@ export default function Hero() {
             </h1>
 
             <p className="text-slate-400 text-base leading-relaxed max-w-md">
-              VoxVPN encrypts your connection, hides your identity, and unlocks the internet — on every device, everywhere in the world.
+              Launch a premium VPN brand with your own servers, branded setup flow, customer dashboard, and admin controls. Built for speed, privacy, and global reach.
             </p>
 
             <div className="flex flex-wrap gap-3 pt-1">
               <button className="px-7 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full text-sm transition-all shadow-lg shadow-cyan-500/25">
-                Get Protected Now
+                Connect through VoxVPN
               </button>
               <button className="px-7 py-3 border border-white/15 hover:border-cyan-500/50 text-white font-semibold rounded-full text-sm transition-all">
-                See How It Works
+                View Platform
               </button>
             </div>
 
             <div className="flex flex-wrap gap-5 pt-1">
-              {['No-Logs Policy', 'Blazing Fast', '10+ Locations', 'AES-256 Bit'].map((f) => (
+              {['No-logs architecture', 'One-click setup flow', 'Global server routing'].map((f) => (
                 <div key={f} className="flex items-center gap-2">
                   <CheckCircle size={14} className="text-cyan-400 flex-shrink-0" />
                   <span className="text-slate-400 text-sm">{f}</span>
