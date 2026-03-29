@@ -29,7 +29,7 @@ export default function ActivityLog({ activities }) {
               className="flex items-center gap-4 p-4 rounded-lg hover:bg-slate-800/50 transition-colors"
             >
               <div className="p-2 rounded-lg bg-slate-800">
-                <Icon size={18} className="text-cyan-400" />
+                <Icon size={18} className="text-violet-400" />
               </div>
               <div className="flex-1">
                 <p className="text-white font-medium">{activity.action}</p>

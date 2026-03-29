@@ -24,7 +24,7 @@ export default function Navbar() {
           {/* CTA Button */}
           <div className="hidden md:flex items-center gap-4">
             <button className="text-slate-300 hover:text-white transition-colors">Log In</button>
-            <button className="px-6 py-2 bg-cyan-500 text-slate-950 font-semibold rounded-full hover:bg-cyan-400 transition-colors">
+            <button className="px-6 py-2 bg-gradient-to-r from-violet-600 to-cyan-500 text-white font-semibold rounded-full hover:opacity-90 transition-all">
               Get Protected
             </button>
           </div>
@@ -44,7 +44,7 @@ export default function Navbar() {
             <a href="#features" className="block text-slate-300 hover:text-white transition-colors">Features</a>
             <a href="#servers" className="block text-slate-300 hover:text-white transition-colors">Servers</a>
             <a href="#pricing" className="block text-slate-300 hover:text-white transition-colors">Pricing</a>
-            <button className="w-full px-4 py-2 bg-cyan-500 text-slate-950 font-semibold rounded-lg hover:bg-cyan-400 transition-colors">
+            <button className="w-full px-4 py-2 bg-gradient-to-r from-violet-600 to-cyan-500 text-white font-semibold rounded-lg hover:opacity-90 transition-all">
               Get Protected
             </button>
           </div>

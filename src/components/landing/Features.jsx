@@ -74,11 +74,11 @@ export default function Features() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
                 viewport={{ once: true }}
-                className="group p-6 rounded-xl border border-slate-800 bg-slate-900/50 hover:border-cyan-500/50 hover:bg-slate-900/80 transition-all duration-300"
+                className="group p-6 rounded-xl border border-slate-800 bg-slate-900/50 hover:border-violet-500/50 hover:bg-slate-900/80 transition-all duration-300"
               >
                 <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-lg bg-cyan-500/10 group-hover:bg-cyan-500/20 transition-colors">
-                    <Icon size={24} className="text-cyan-400" />
+                  <div className="p-3 rounded-lg bg-violet-500/10 group-hover:bg-violet-500/20 transition-colors">
+                    <Icon size={24} className="text-violet-400" />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-white mb-2">

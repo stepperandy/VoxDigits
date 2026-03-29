@@ -43,10 +43,10 @@ export default function UsersTable({ users }) {
                 <td className="px-6 py-4 text-slate-400">{user.email}</td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
-                    {user.role === 'admin' && <Shield size={16} className="text-cyan-400" />}
+                    {user.role === 'admin' && <Shield size={16} className="text-violet-400" />}
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                       user.role === 'admin'
-                        ? 'bg-cyan-500/20 text-cyan-400'
+                        ? 'bg-violet-500/20 text-violet-400'
                         : 'bg-slate-700 text-slate-300'
                     }`}>
                       {user.role}

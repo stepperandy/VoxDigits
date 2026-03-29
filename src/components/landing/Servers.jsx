@@ -37,7 +37,7 @@ export default function Servers() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
               viewport={{ once: true }}
-              className="p-6 rounded-xl border border-slate-800 bg-slate-900/50 hover:border-cyan-500/50 transition-all duration-300"
+              className="p-6 rounded-xl border border-slate-800 bg-slate-900/50 hover:border-violet-500/50 transition-all duration-300"
             >
               {/* Status Indicator */}
               <div className="flex items-center justify-between mb-4">
@@ -54,7 +54,7 @@ export default function Servers() {
 
               {/* Latency */}
               <div className="flex items-center gap-2 pt-3 border-t border-slate-800">
-                <Signal size={14} className="text-cyan-400" />
+                <Signal size={14} className="text-violet-400" />
                 <span className="text-slate-300 text-sm">{server.latency}</span>
               </div>
             </motion.div>

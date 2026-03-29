@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 export default function MetricCard({ icon: Icon, label, value, trend, color = 'cyan' }) {
   const colorClasses = {
-    cyan: 'text-cyan-400 bg-cyan-500/10',
+    cyan: 'text-violet-400 bg-violet-500/10',
     emerald: 'text-emerald-400 bg-emerald-500/10',
     purple: 'text-purple-400 bg-purple-500/10',
     rose: 'text-rose-400 bg-rose-500/10'

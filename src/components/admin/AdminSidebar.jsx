@@ -47,7 +47,7 @@ export default function AdminSidebar({ onLogout }) {
                 onClick={() => setOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                   isActive
-                    ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50'
+                    ? 'bg-violet-500/20 text-violet-400 border border-violet-500/50'
                     : 'text-slate-400 hover:text-white hover:bg-slate-800'
                 }`}
               >

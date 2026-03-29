@@ -12,7 +12,7 @@ export default function AdminHeader() {
         <input
           type="text"
           placeholder="Search..."
-          className="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-900 border border-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50"
+          className="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-900 border border-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500/50"
         />
       </div>
 
@@ -26,7 +26,7 @@ export default function AdminHeader() {
         </button>
         <button className="p-2 hover:bg-slate-900 rounded-lg text-slate-400 hover:text-white transition-colors relative">
           <Bell size={20} />
-          <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-cyan-500" />
+          <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-violet-500" />
         </button>
         <button className="p-2 hover:bg-slate-900 rounded-lg text-slate-400 hover:text-white transition-colors">
           <User size={20} />

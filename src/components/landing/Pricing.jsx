@@ -77,7 +77,7 @@ export default function Pricing() {
             <button
               onClick={() => setYearly(!yearly)}
               className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                yearly ? 'bg-cyan-500' : 'bg-slate-700'
+                yearly ? 'bg-gradient-to-r from-violet-600 to-cyan-500' : 'bg-slate-700'
               }`}
             >
               <span
@@ -87,7 +87,7 @@ export default function Pricing() {
               />
             </button>
             <span className={`text-sm font-medium ${yearly ? 'text-white' : 'text-slate-400'}`}>
-              Yearly <span className="text-cyan-400">Save 17%</span>
+              Yearly <span className="text-violet-400">Save 17%</span>
             </span>
           </div>
         </motion.div>
@@ -103,7 +103,7 @@ export default function Pricing() {
               viewport={{ once: true }}
               className={`relative rounded-2xl transition-all duration-300 ${
                 plan.popular
-                  ? 'border-2 border-cyan-500 bg-slate-900 shadow-xl shadow-cyan-500/20 md:scale-105'
+                  ? 'border-2 border-violet-500 bg-slate-900 shadow-xl shadow-violet-500/20 md:scale-105'
                   : 'border border-slate-800 bg-slate-900/50 hover:border-slate-700'
               }`}
             >
@@ -140,8 +140,8 @@ export default function Pricing() {
                 <button
                   className={`w-full py-3 rounded-lg font-semibold transition-all mb-8 ${
                     plan.popular
-                      ? 'bg-cyan-500 text-slate-950 hover:bg-cyan-400'
-                      : 'border border-slate-700 text-white hover:border-cyan-500 hover:text-cyan-400'
+                      ? 'bg-gradient-to-r from-violet-600 to-cyan-500 text-white hover:opacity-90'
+                      : 'border border-slate-700 text-white hover:border-violet-500 hover:text-violet-400'
                   }`}
                 >
                   Get {plan.name}
@@ -151,7 +151,7 @@ export default function Pricing() {
                 <div className="space-y-4">
                   {plan.features.map((feature, fidx) => (
                     <div key={fidx} className="flex items-center gap-3">
-                      <Check size={18} className="text-cyan-400 flex-shrink-0" />
+                      <Check size={18} className="text-violet-400 flex-shrink-0" />
                       <span className="text-slate-300 text-sm">{feature}</span>
                     </div>
                   ))}

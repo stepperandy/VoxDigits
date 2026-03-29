@@ -21,7 +21,7 @@ export default function Stats() {
               viewport={{ once: true }}
               className="text-center"
             >
-              <div className="text-3xl sm:text-4xl font-bold text-cyan-400 mb-2">
+              <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent mb-2">
                 {stat.number}
               </div>
               <div className="text-slate-400 text-sm sm:text-base">{stat.label}</div>

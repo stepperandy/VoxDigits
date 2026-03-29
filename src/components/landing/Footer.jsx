@@ -19,10 +19,10 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4">Product</h4>
             <ul className="space-y-2 text-slate-400 text-sm">
-              <li><a href="#" className="hover:text-cyan-400 transition-colors">Features</a></li>
-              <li><a href="#" className="hover:text-cyan-400 transition-colors">Servers</a></li>
-              <li><a href="#" className="hover:text-cyan-400 transition-colors">Pricing</a></li>
-              <li><a href="#" className="hover:text-cyan-400 transition-colors">Downloads</a></li>
+              <li><a href="#" className="hover:text-violet-400 transition-colors">Features</a></li>
+              <li><a href="#" className="hover:text-violet-400 transition-colors">Servers</a></li>
+              <li><a href="#" className="hover:text-violet-400 transition-colors">Pricing</a></li>
+              <li><a href="#" className="hover:text-violet-400 transition-colors">Downloads</a></li>
             </ul>
           </div>
 
@@ -30,10 +30,10 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4">Company</h4>
             <ul className="space-y-2 text-slate-400 text-sm">
-              <li><a href="#" className="hover:text-cyan-400 transition-colors">About</a></li>
-              <li><a href="#" className="hover:text-cyan-400 transition-colors">Blog</a></li>
-              <li><a href="#" className="hover:text-cyan-400 transition-colors">Privacy</a></li>
-              <li><a href="#" className="hover:text-cyan-400 transition-colors">Terms</a></li>
+              <li><a href="#" className="hover:text-violet-400 transition-colors">About</a></li>
+              <li><a href="#" className="hover:text-violet-400 transition-colors">Blog</a></li>
+              <li><a href="#" className="hover:text-violet-400 transition-colors">Privacy</a></li>
+              <li><a href="#" className="hover:text-violet-400 transition-colors">Terms</a></li>
             </ul>
           </div>
 
@@ -42,13 +42,13 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4">Contact</h4>
             <ul className="space-y-3 text-slate-400 text-sm">
               <li className="flex items-center gap-2">
-                <Mail size={16} className="text-cyan-400" />
-                <a href="mailto:support@voxvpn.net" className="hover:text-cyan-400 transition-colors">
+                <Mail size={16} className="text-violet-400" />
+                <a href="mailto:support@voxvpn.net" className="hover:text-violet-400 transition-colors">
                   support@voxvpn.net
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <Phone size={16} className="text-cyan-400" />
+                <Phone size={16} className="text-violet-400" />
                 <span>+1 (555) 123-4567</span>
               </li>
             </ul>
@@ -60,8 +60,8 @@ export default function Footer() {
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-400 text-sm">
             <p>&copy; 2024 VoxVPN. All rights reserved.</p>
             <div className="flex gap-6">
-              <a href="#" className="hover:text-cyan-400 transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-cyan-400 transition-colors">Terms of Service</a>
+              <a href="#" className="hover:text-violet-400 transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-violet-400 transition-colors">Terms of Service</a>
             </div>
           </div>
         </div>
