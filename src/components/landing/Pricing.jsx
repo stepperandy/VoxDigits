@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 
 const plans = [
@@ -8,7 +7,6 @@ const plans = [
     price: 9.99,
     yearly: 5.00,
     popular: false,
-    row: 1,
     features: ['2 Devices', '50+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption'],
   },
   {
@@ -16,7 +14,6 @@ const plans = [
     price: 14.99,
     yearly: 10.00,
     popular: false,
-    row: 2,
     features: ['3 Devices', 'All Locations', 'Unlimited Bandwidth', 'AES-256 Encryption', 'Priority Support'],
   },
   {
@@ -24,7 +21,6 @@ const plans = [
     price: 19.99,
     yearly: 14.99,
     popular: true,
-    row: 1,
     features: ['5 Devices', 'All 12 Locations', 'Unlimited Bandwidth', 'AES-256 Encryption', 'Priority Support', 'Split Tunneling'],
   },
   {
@@ -32,7 +28,6 @@ const plans = [
     price: 29.99,
     yearly: 24.99,
     popular: false,
-    row: 2,
     features: ['7 Devices', 'All Premium Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', '24/7 Support', 'Dedicated IP'],
   },
   {
@@ -40,29 +35,17 @@ const plans = [
     price: 39.99,
     yearly: 18.00,
     popular: false,
-    row: 2,
     features: ['10 Devices', 'All Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', '24/7 Priority Support', 'Dedicated IP', 'Kill Switch'],
   },
 ];
 
-export default function Pricing() {
-  const [yearly, setYearly] = useState(false);
-
-  const row1 = plans.filter((_, i) => i === 0 || i === 2); // Basic + Premium
-  const row2 = plans.filter((_, i) => i === 1 || i === 3 || i === 4); // Standard + Advanced + Enterprise
-
-  const PlanCard = ({ plan, idx }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ delay: idx * 0.08 }}
-      viewport={{ once: true }}
-      className={`relative rounded-xl p-6 flex flex-col ${
-        plan.popular
-          ? 'border-2 border-cyan-500 bg-[#0d1a20] shadow-lg shadow-cyan-500/10'
-          : 'border border-white/5 bg-[#0d1120]'
-      }`}
-    >
+function PlanCard({ plan, yearly }) {
+  return (
+    <div className={`relative rounded-xl p-6 flex flex-col ${
+      plan.popular
+        ? 'border-2 border-cyan-500 bg-[#0d1a20] shadow-lg shadow-cyan-500/10'
+        : 'border border-white/5 bg-[#0d1120]'
+    }`}>
       {plan.popular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
           <span className="px-3 py-1 bg-cyan-500 text-black text-xs font-bold rounded-full">Most Popular</span>
@@ -88,23 +71,21 @@ export default function Pricing() {
           </li>
         ))}
       </ul>
-    </motion.div>
+    </div>
   );
+}
+
+export default function Pricing() {
+  const [yearly, setYearly] = useState(false);
 
   return (
     <section id="pricing" className="bg-[#080c18] py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
+        <div className="text-center mb-12">
           <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-3">Pricing</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Simple, Transparent Pricing</h2>
           <p className="text-slate-400 text-sm mb-8">All plans include AES-256 encryption and no-log policy</p>
 
-          {/* Toggle */}
           <div className="flex items-center justify-center gap-4">
             <span className={`text-sm font-medium ${!yearly ? 'text-white' : 'text-slate-500'}`}>Monthly</span>
             <button
@@ -117,16 +98,16 @@ export default function Pricing() {
               Yearly <span className="text-cyan-400">Save 30%</span>
             </span>
           </div>
-        </motion.div>
+        </div>
 
         {/* Row 1: Basic + Premium */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 max-w-2xl mx-auto">
-          {[plans[0], plans[2]].map((plan, idx) => <PlanCard key={plan.name} plan={plan} idx={idx} />)}
+          {[plans[0], plans[2]].map((plan) => <PlanCard key={plan.name} plan={plan} yearly={yearly} />)}
         </div>
 
         {/* Row 2: Standard + Advanced + Enterprise */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[plans[1], plans[3], plans[4]].map((plan, idx) => <PlanCard key={plan.name} plan={plan} idx={idx} />)}
+          {[plans[1], plans[3], plans[4]].map((plan) => <PlanCard key={plan.name} plan={plan} yearly={yearly} />)}
         </div>
       </div>
     </section>

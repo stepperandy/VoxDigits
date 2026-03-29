@@ -1,4 +1,4 @@
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Shield } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -17,6 +17,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [activeHash, setActiveHash] = useState('');
+  const [announcementVisible, setAnnouncementVisible] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
@@ -48,26 +49,21 @@ export default function Navbar() {
   return (
     <header className="fixed top-0 w-full z-50">
       {/* Main nav */}
-      <nav className="bg-[#0a0e1c] border-b border-white/8">
+      <nav className="bg-[#080c18]/95 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-14 gap-6">
-            {/* Logo */}
-            <Link to="/" className="flex-shrink-0">
-              <img
-                src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/60e9935e0_b1efe46e-2927-4692-89eb-53a6f756c8a6.png"
-                alt="VoxVPN"
-                className="h-8 w-auto"
-              />
+          <div className="flex items-center h-14 gap-4">
+            {/* Logo pill */}
+            <Link to="/" className="flex-shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-cyan-500/30 transition-all">
+              <Shield size={16} className="text-cyan-400" />
+              <span className="text-white font-bold text-sm"><span className="text-slate-300 font-medium">Vox</span>VPN</span>
             </Link>
 
             {/* Desktop nav — centered */}
             <div className="hidden md:flex items-center justify-center gap-1 flex-1">
               {navLinks.map((link) => {
                 const active = isActive(link.href);
-                const cls = `px-3 py-1.5 rounded text-sm font-semibold transition-all ${
-                  active
-                    ? 'text-cyan-400 underline underline-offset-4 decoration-cyan-400'
-                    : 'text-slate-300 hover:text-cyan-400'
+                const cls = `px-3 py-1.5 text-sm font-medium transition-all ${
+                  active ? 'text-white' : 'text-slate-400 hover:text-white'
                 }`;
                 if (link.href.startsWith('/') && !link.href.startsWith('#')) {
                   return <Link key={link.label} to={link.href} className={cls}>{link.label}</Link>;
@@ -89,7 +85,7 @@ export default function Navbar() {
                   onClick={() => base44.auth.redirectToLogin()}
                   className="text-slate-300 hover:text-white text-sm transition-colors"
                 >
-                  Log in
+                  Log In
                 </button>
               )}
               <a
@@ -114,23 +110,15 @@ export default function Navbar() {
                 const active = isActive(link.href);
                 if (link.href.startsWith('/') && !link.href.startsWith('#')) {
                   return (
-                    <Link
-                      key={link.label}
-                      to={link.href}
-                      onClick={() => setMobileOpen(false)}
-                      className={`block px-3 py-2 rounded text-sm font-medium transition-colors ${active ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'}`}
-                    >
+                    <Link key={link.label} to={link.href} onClick={() => setMobileOpen(false)}
+                      className={`block px-3 py-2 rounded text-sm font-medium transition-colors ${active ? 'text-cyan-400' : 'text-slate-300 hover:text-white'}`}>
                       {link.label}
                     </Link>
                   );
                 }
                 return (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    onClick={() => handleNavClick(link.href)}
-                    className={`block px-3 py-2 rounded text-sm font-medium transition-colors ${active ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'}`}
-                  >
+                  <a key={link.label} href={link.href} onClick={() => handleNavClick(link.href)}
+                    className={`block px-3 py-2 rounded text-sm font-medium transition-colors ${active ? 'text-cyan-400' : 'text-slate-300 hover:text-white'}`}>
                     {link.label}
                   </a>
                 );
@@ -142,6 +130,26 @@ export default function Navbar() {
           )}
         </div>
       </nav>
+
+      {/* Announcement bar — below nav */}
+      {announcementVisible && (
+        <div className="bg-[#0a1a1f] border-b border-cyan-500/20 py-2 px-4 flex items-center justify-center gap-2 text-xs text-slate-300 relative">
+          <span className="text-base">🌐</span>
+          <span className="hidden sm:inline text-slate-400">📱</span>
+          <span>
+            <span className="text-white font-semibold">Global Communication, Simplified</span>
+            {' · '}Get your eSIM &amp; Virtual Numbers at{' '}
+            <a href="#esim" onClick={() => handleNavClick('#esim')} className="text-cyan-400 hover:underline font-medium">voxdigits.com</a>
+            {' '}✕
+          </span>
+          <button
+            onClick={() => setAnnouncementVisible(false)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors text-base leading-none"
+          >
+            ×
+          </button>
+        </div>
+      )}
     </header>
   );
 }

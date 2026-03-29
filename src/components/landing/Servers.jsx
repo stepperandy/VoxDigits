@@ -46,7 +46,7 @@ export default function Servers() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.1 }}
           className="text-center mb-14"
         >
           <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-3">Our Network</p>
@@ -93,7 +93,7 @@ export default function Servers() {
                     initial={{ opacity: 0, x: -10 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ delay: idx * 0.07 }}
-                    viewport={{ once: true }}
+                    viewport={{ once: true, amount: 0.1 }}
                     className="grid grid-cols-2 md:grid-cols-5 gap-4 items-center px-4 py-4 rounded-xl border border-white/5 bg-[#0d1120] hover:border-cyan-500/20 transition-all"
                   >
                     <div className="flex items-center gap-3">
