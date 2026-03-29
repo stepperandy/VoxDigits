@@ -155,8 +155,8 @@ export default function Hero() {
             </div>
 
             <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black text-white leading-[1.05] tracking-tight">
-              <span className="relative inline-block text-cyan-400">
-                Secure Every Device.
+              <span className="relative inline-block text-cyan-400 font-black">
+                Secure every device.
                 {/* Curved underline */}
                 <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 320 12" fill="none" preserveAspectRatio="none">
                   <path d="M4 9 Q80 2 160 7 Q240 12 316 4" stroke="#22d3ee" strokeWidth="3.5" strokeLinecap="round" fill="none" opacity="0.9"/>
@@ -170,7 +170,7 @@ export default function Hero() {
 
             <div className="flex flex-wrap gap-3 pt-1">
               <button className="px-7 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full text-sm transition-all shadow-lg shadow-cyan-500/25">
-                Connect through VoxVPN
+                Connect through VoxVPN.
               </button>
               <button className="px-7 py-3 border border-white/15 hover:border-cyan-500/50 text-white font-semibold rounded-full text-sm transition-all">
                 View Platform
