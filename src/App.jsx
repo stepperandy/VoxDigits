@@ -42,6 +42,8 @@ import TermsOfService from './pages/legal/TermsOfService.jsx';
 import CookiePolicy from './pages/legal/CookiePolicy.jsx';
 import RefundPolicy from './pages/legal/RefundPolicy.jsx';
 import ContactUs from './pages/help/ContactUs.jsx';
+import StatusPage from './pages/help/StatusPage.jsx';
+import BugBounty from './pages/help/BugBounty.jsx';
 import SetupPortal from './pages/SetupPortal.jsx';
 
 const AuthenticatedApp = () => {
@@ -107,6 +109,8 @@ const AuthenticatedApp = () => {
       <Route path="/cookie-policy" element={<CookiePolicy />} />
       <Route path="/refund-policy" element={<RefundPolicy />} />
       <Route path="/contact" element={<ContactUs />} />
+      <Route path="/status" element={<StatusPage />} />
+      <Route path="/bug-bounty" element={<BugBounty />} />
       <Route path="/setup" element={<SetupPortal />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
