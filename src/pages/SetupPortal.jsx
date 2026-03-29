@@ -39,7 +39,7 @@ const osIcon = (os) => {
 };
 
 const demoProfiles = [
-  { os: 'windows', fileName: 'VoxVPN-Windows-Setup.conf',     downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN New York 01' },
+  { os: 'windows', fileName: 'VoxVPN-Windows-Setup.bat',      downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN New York 01' },
   { os: 'macos',   fileName: 'VoxVPN-macOS-Setup.conf',       downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN London 01' },
   { os: 'linux',   fileName: 'VoxVPN-Linux-Setup.conf',       downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN Frankfurt 01' },
   { os: 'android', fileName: 'VoxVPN-Android-Setup.conf',     downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN Toronto 01' },
@@ -101,7 +101,12 @@ function ProfileCard({ profile, liveMode }) {
         )}
       </div>
 
-      <p className="text-[#a9b7c9] text-sm leading-relaxed m-0">{guideText[profile.os]}</p>
+      <p className="text-[#a9b7c9] text-sm leading-relaxed m-0">
+        {profile.os === 'windows' 
+          ? 'Download and run the VoxVPN Windows installer (.bat file) with administrator privileges. The installer will automatically configure your VPN connection and create a Start Menu shortcut for quick access.'
+          : guideText[profile.os]
+        }
+      </p>
 
       {/* Benefits */}
       <div className="rounded-xl bg-[#0b1a2c] border border-[#24415f] px-4 py-3">
