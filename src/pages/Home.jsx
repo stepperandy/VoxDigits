@@ -1,5 +1,5 @@
-import Navbar from '@/components/landing/Navbar';
-import Hero from '@/components/landing/Hero';
+import Navbar from '@/components/landing/Navbar.jsx';
+import Hero from '@/components/landing/Hero.jsx';
 import Stats from '@/components/landing/Stats';
 import Features from '@/components/landing/Features';
 import Servers from '@/components/landing/Servers';
