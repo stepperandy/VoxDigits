@@ -154,10 +154,9 @@ export default function Hero() {
               Premium VPN Infrastructure
             </div>
 
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.05] tracking-tight">
-              Secure every{' '}
-              <span className="relative inline-block text-cyan-400 italic">
-                device.
+            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black text-white leading-[1.05] tracking-tight">
+              <span className="relative inline-block text-cyan-400">
+                Secure Every Device.
                 {/* Curved underline */}
                 <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 320 12" fill="none" preserveAspectRatio="none">
                   <path d="M4 9 Q80 2 160 7 Q240 12 316 4" stroke="#22d3ee" strokeWidth="3.5" strokeLinecap="round" fill="none" opacity="0.9"/>
@@ -165,8 +164,8 @@ export default function Hero() {
               </span>
             </h1>
 
-            <p className="text-slate-400 text-base leading-relaxed max-w-lg">
-              Launch a premium VPN brand with your own private servers, fully branded setup flow, customer dashboard, and comprehensive admin controls. Built for speed, privacy, and global reach. Protect every device on the planet with enterprise-grade encryption, no-logs architecture, and seamless cross-platform support. Deploy your own VPN infrastructure in minutes and scale to thousands of users worldwide.
+            <p className="text-slate-400 text-lg leading-relaxed max-w-2xl">
+              Launch your own premium VPN brand with private infrastructure, full customer control, and white-label capabilities. Deploy enterprise-grade security across Windows, macOS, Linux, iOS, Android, and router platforms. Our platform provides everything you need: branded setup portal, automated profile delivery, customer dashboard with server selection, comprehensive admin controls, and Vultr integration for global server management. Protect millions of devices with military-grade AES-256 encryption, zero-knowledge architecture, and blazing-fast performance. Scale from startup to enterprise with built-in payment processing, user analytics, and dedicated support.
             </p>
 
             <div className="flex flex-wrap gap-3 pt-1">
