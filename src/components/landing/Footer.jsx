@@ -1,5 +1,5 @@
 import { Mail, Phone } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const footerSections = [
   {
@@ -60,10 +60,10 @@ const footerSections = [
   {
     title: 'Payment',
     links: [
-      { label: 'Credit Card', to: '/#pricing' },
-      { label: 'PayPal', to: '/#pricing' },
-      { label: 'Crypto', to: '/#pricing' },
-      { label: 'Bank Transfer', to: '/#pricing' },
+      { label: 'Credit Card', to: '/', hash: 'pricing' },
+      { label: 'PayPal', to: '/', hash: 'pricing' },
+      { label: 'Crypto', to: '/', hash: 'pricing' },
+      { label: 'Bank Transfer', to: '/', hash: 'pricing' },
     ],
   },
   {
@@ -88,6 +88,18 @@ const footerSections = [
 ];
 
 export default function Footer() {
+  const navigate = useNavigate();
+
+  const handleLink = (link) => {
+    if (link.hash) {
+      navigate(link.to);
+      setTimeout(() => {
+        const el = document.getElementById(link.hash);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  };
+
   return (
     <footer className="bg-[#060910] border-t border-white/5 pt-16 pb-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
@@ -122,7 +134,11 @@ export default function Footer() {
               <ul className="space-y-2">
                 {section.links.map((link) => (
                   <li key={link.label}>
-                    <Link to={link.to} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link.label}</Link>
+                    {link.hash ? (
+                      <button onClick={() => handleLink(link)} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors text-left">{link.label}</button>
+                    ) : (
+                      <Link to={link.to} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link.label}</Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -138,7 +154,11 @@ export default function Footer() {
               <ul className="space-y-2">
                 {section.links.map((link) => (
                   <li key={link.label}>
-                    <Link to={link.to} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link.label}</Link>
+                    {link.hash ? (
+                      <button onClick={() => handleLink(link)} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors text-left">{link.label}</button>
+                    ) : (
+                      <Link to={link.to} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link.label}</Link>
+                    )}
                   </li>
                 ))}
               </ul>
