@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Plus, Pencil, Trash2, Check, X, ExternalLink, Loader2, Link } from 'lucide-react';
+import { Plus, Pencil, Trash2, Check, X, ExternalLink, Loader2, Link, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const PLATFORMS = ['Windows', 'macOS', 'Linux', 'iOS', 'Android', 'Router'];
@@ -214,11 +214,17 @@ export default function SetupsView() {
                   {d.is_active ? 'Active' : 'Inactive'}
                 </span>
 
-                {/* Link button */}
-                <a href={d.file_url} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-1.5 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold hover:bg-cyan-500/20 transition-all">
-                  <ExternalLink size={12} /> Open Portal
-                </a>
+                {/* Buttons */}
+                <div className="flex gap-2">
+                  <a href={d.file_url} target="_blank" rel="noopener noreferrer"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold hover:bg-cyan-500/20 transition-all">
+                    <ExternalLink size={12} /> Open Portal
+                  </a>
+                  <a href={`/api/functions/generateSetupFiles?platform=${d.platform.toLowerCase()}`}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold hover:bg-emerald-500/20 transition-all">
+                    <Download size={12} /> Download
+                  </a>
+                </div>
 
                 {/* Notes */}
                 {d.notes && (
