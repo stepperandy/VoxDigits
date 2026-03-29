@@ -1,144 +1,145 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, Shield, Lock, Globe, Zap, Wifi, Key, Eye, AlertCircle } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { CheckCircle, Wifi, Lock, Radio, Globe, Zap, MessageSquare, Phone, Signal } from 'lucide-react';
 
-const featureCards = [
-  {
-    icon: Shield,
-    color: '#22d3ee',
-    title: 'AES-256 Encryption',
-    description: 'Military-grade encryption protects every byte of your data.',
-  },
-  {
-    icon: Eye,
-    color: '#a78bfa',
-    title: 'No-Logs Policy',
-    description: 'We never record your browsing activity or IP address.',
-  },
-  {
-    icon: Zap,
-    color: '#34d399',
-    title: 'Lightning Fast',
-    description: 'Optimized routing ensures minimal speed loss globally.',
-  },
-  {
-    icon: Globe,
-    color: '#f472b6',
-    title: 'Global Servers',
-    description: 'Connect through 10+ locations across 4 continents.',
-  },
-  {
-    icon: Key,
-    color: '#fbbf24',
-    title: 'Kill Switch',
-    description: 'Instantly cuts internet if your VPN drops — always safe.',
-  },
+const orbitIcons = [
+  { Icon: Wifi,         angle: 0,   radius: 145, color: '#22d3ee' },
+  { Icon: Lock,         angle: 45,  radius: 145, color: '#a78bfa' },
+  { Icon: Globe,        angle: 90,  radius: 145, color: '#34d399' },
+  { Icon: Radio,        angle: 135, radius: 145, color: '#f472b6' },
+  { Icon: Zap,          angle: 180, radius: 145, color: '#fbbf24' },
+  { Icon: MessageSquare,angle: 225, radius: 145, color: '#22d3ee' },
+  { Icon: Phone,        angle: 270, radius: 145, color: '#c084fc' },
+  { Icon: Signal,       angle: 315, radius: 145, color: '#6ee7b7' },
 ];
 
-// Mini floating icon cards positioned around the shield
-const floatingItems = [
-  { icon: Wifi,        color: '#22d3ee', x: -130, y: -80,  delay: 0 },
-  { icon: Shield,      color: '#a78bfa', x:  110, y: -100, delay: 0.3 },
-  { icon: Lock,        color: '#34d399', x:  130, y:   40, delay: 0.6 },
-  { icon: Globe,       color: '#f472b6', x:  -60, y:  120, delay: 0.9 },
-  { icon: Zap,         color: '#fbbf24', x: -140, y:   50, delay: 1.2 },
-  { icon: AlertCircle, color: '#c084fc', x:   30, y: -130, delay: 1.5 },
-  { icon: Key,         color: '#6ee7b7', x:   90, y:  110, delay: 1.8 },
-];
-
-function ShieldCard({ activeIdx }) {
-  const card = featureCards[activeIdx];
-  const Icon = card.icon;
-
+function ShieldViz() {
   return (
-    <div className="relative flex items-center justify-center" style={{ width: 420, height: 420 }}>
-      {/* Outer dark circle bg */}
-      <div className="absolute inset-0 rounded-full border border-white/5" style={{ background: 'radial-gradient(circle, #0d1a24 0%, #080c18 70%)' }} />
+    <div className="relative flex items-center justify-center w-[320px] h-[320px] sm:w-[420px] sm:h-[420px]">
 
-      {/* Concentric rings */}
-      {[180, 140, 100].map((r, i) => (
+      {/* Galaxy rings */}
+      {[160, 132, 104].map((r, i) => (
         <motion.div
           key={i}
-          className="absolute rounded-full border border-cyan-500/10"
+          className="absolute rounded-full border border-cyan-400/15"
           style={{ width: r * 2, height: r * 2 }}
           animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
-          transition={{ duration: 25 + i * 8, repeat: Infinity, ease: 'linear' }}
-        />
-      ))}
-
-      {/* Floating mini icon badges */}
-      {floatingItems.map(({ icon: FIcon, color, x, y, delay }, idx) => (
-        <motion.div
-          key={idx}
-          className="absolute flex items-center justify-center w-10 h-10 rounded-xl bg-[#0d1624] border border-white/10"
-          style={{
-            left: `calc(50% + ${x}px - 20px)`,
-            top: `calc(50% + ${y}px - 20px)`,
-            boxShadow: `0 0 14px ${color}44`,
-          }}
-          animate={{ y: [0, -6, 0] }}
-          transition={{ duration: 3 + delay, repeat: Infinity, ease: 'easeInOut', delay }}
+          transition={{ duration: 16 + i * 6, repeat: Infinity, ease: 'linear' }}
         >
-          <FIcon size={18} color={color} />
+          {/* Dot on ring */}
+          <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full blur-[1px] ${
+            i === 0 ? 'bg-cyan-400' : i === 1 ? 'bg-violet-400' : 'bg-pink-400'
+          }`} />
         </motion.div>
       ))}
 
-      {/* Central card */}
-      <div className="relative z-10 w-56 rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #0f2535 0%, #0a1a28 100%)', border: '1px solid rgba(34,211,238,0.2)', boxShadow: '0 0 60px rgba(34,211,238,0.1), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
-        {/* Card header glow */}
-        <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, transparent, ${card.color}, transparent)` }} />
-
-        <div className="p-6 flex flex-col items-center text-center gap-4">
-          {/* Shield icon with glow */}
-          <motion.div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center"
-            style={{ background: `${card.color}15`, border: `1px solid ${card.color}40`, boxShadow: `0 0 30px ${card.color}30` }}
-            animate={{ scale: [1, 1.06, 1] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <Icon size={32} color={card.color} />
-          </motion.div>
-
-          <AnimatePresence mode="wait">
+      {/* Orbiting communication icons */}
+      <motion.div
+        className="absolute w-full h-full"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+      >
+        {orbitIcons.map(({ Icon, angle, color }, idx) => {
+          const rad = (angle * Math.PI) / 180;
+          const r = 145;
+          const x = r * Math.cos(rad);
+          const y = r * Math.sin(rad);
+          return (
             <motion.div
-              key={activeIdx}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.4 }}
+              key={idx}
+              className="absolute flex items-center justify-center w-10 h-10 rounded-xl bg-[#0a0f1e] border border-white/10"
+              style={{
+                left: `calc(50% + ${x}px - 20px)`,
+                top: `calc(50% + ${y}px - 20px)`,
+                boxShadow: `0 0 12px ${color}55`,
+              }}
+              animate={{ rotate: -360 }}
+              transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
             >
-              <p className="text-white font-bold text-sm mb-1" style={{ color: card.color }}>{card.title}</p>
-              <p className="text-slate-400 text-xs leading-relaxed">{card.description}</p>
+              <Icon size={17} color={color} />
             </motion.div>
-          </AnimatePresence>
-        </div>
-      </div>
+          );
+        })}
+      </motion.div>
+
+      {/* Pulse rings emitting from shield */}
+      {[0, 1, 2].map((i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full border border-cyan-400/40"
+          style={{ width: 90, height: 90 }}
+          animate={{ scale: [1, 3.2], opacity: [0.7, 0] }}
+          transition={{ duration: 2.8, repeat: Infinity, ease: 'easeOut', delay: i * 0.9 }}
+        />
+      ))}
+
+      {/* Shield glow blob */}
+      <motion.div
+        className="absolute rounded-full blur-3xl"
+        style={{ width: 180, height: 180, background: 'radial-gradient(circle, rgba(34,211,238,0.35) 0%, transparent 70%)' }}
+        animate={{ scale: [1, 1.6, 1], opacity: [0.6, 1, 0.6] }}
+        transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+      />
+
+      {/* Shield SVG — expanding with light */}
+      <motion.div
+        className="relative z-10"
+        animate={{
+          scale: [1, 1.12, 1],
+          filter: [
+            'drop-shadow(0 0 10px #22d3ee) drop-shadow(0 0 30px #22d3ee44)',
+            'drop-shadow(0 0 32px #22d3ee) drop-shadow(0 0 80px #22d3eeaa)',
+            'drop-shadow(0 0 10px #22d3ee) drop-shadow(0 0 30px #22d3ee44)',
+          ],
+        }}
+        transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <svg width="130" height="148" viewBox="0 0 88 100" fill="none">
+          <path
+            d="M44 2L6 16V46C6 68 24 88 44 98C64 88 82 68 82 46V16L44 2Z"
+            fill="url(#shieldGrad)"
+            stroke="#22d3ee"
+            strokeWidth="1.5"
+          />
+          <path
+            d="M44 10L12 22V46C12 65 28 83 44 91C60 83 76 65 76 46V22L44 10Z"
+            fill="url(#shieldInner)"
+            opacity="0.5"
+          />
+          {/* Lock body */}
+          <rect x="33" y="46" width="22" height="17" rx="3" fill="#22d3ee" opacity="0.95" />
+          <path d="M37 46V40C37 36.7 40.1 34 44 34C47.9 34 51 36.7 51 40V46" stroke="#22d3ee" strokeWidth="3" strokeLinecap="round" fill="none" />
+          <circle cx="44" cy="55" r="2.5" fill="#080c18" />
+          <defs>
+            <linearGradient id="shieldGrad" x1="44" y1="2" x2="44" y2="98" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#0e2a3a" />
+              <stop offset="100%" stopColor="#051020" />
+            </linearGradient>
+            <linearGradient id="shieldInner" x1="44" y1="10" x2="44" y2="91" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#22d3ee" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </motion.div>
     </div>
   );
 }
 
 export default function Hero() {
-  const [activeCard, setActiveCard] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => setActiveCard((i) => (i + 1) % featureCards.length), 3000);
-    return () => clearInterval(t);
-  }, []);
-
   return (
-    <div className="bg-[#080c18] pt-28 pb-6 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="bg-[#080c18] pt-28 pb-4 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Grid bg */}
       <div className="absolute inset-0 opacity-[0.04]" style={{
         backgroundImage: 'linear-gradient(rgba(34,211,238,1) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,1) 1px, transparent 1px)',
-        backgroundSize: '60px 60px'
+        backgroundSize: '60px 60px',
       }} />
 
       {/* Glow blobs */}
-      <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 left-1/3 w-72 h-72 bg-violet-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 right-1/3 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 left-1/4 w-80 h-80 bg-violet-500/5 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto relative z-10 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="max-w-7xl mx-auto relative z-10 w-full py-6 sm:py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
 
           {/* Left */}
           <motion.div
@@ -155,7 +156,13 @@ export default function Hero() {
 
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.05] tracking-tight">
               Your Privacy,{' '}
-              <span className="text-cyan-400">Our Priority.</span>
+              <span className="relative inline-block text-cyan-400 italic">
+                Our Priority.
+                {/* Curved underline */}
+                <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 320 12" fill="none" preserveAspectRatio="none">
+                  <path d="M4 9 Q80 2 160 7 Q240 12 316 4" stroke="#22d3ee" strokeWidth="3.5" strokeLinecap="round" fill="none" opacity="0.9"/>
+                </svg>
+              </span>
             </h1>
 
             <p className="text-slate-400 text-base leading-relaxed max-w-md">
@@ -181,14 +188,14 @@ export default function Hero() {
             </div>
           </motion.div>
 
-          {/* Right — Shield Card Viz */}
+          {/* Right — Shield Viz */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.92 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.2 }}
             className="flex items-center justify-center"
           >
-            <ShieldCard activeIdx={activeCard} />
+            <ShieldViz />
           </motion.div>
         </div>
       </div>
