@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 
 const plans = [
   {
@@ -8,6 +9,8 @@ const plans = [
     yearly: 5.00,
     popular: false,
     features: ['2 Devices', '50+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption'],
+    priceIdMonthly: 'price_1QsgL0EiNNFb5ydcXxxxx',
+    priceIdYearly: 'price_1QsgL0EiNNFb5ydcYyyyy',
   },
   {
     name: 'Standard',
@@ -15,6 +18,8 @@ const plans = [
     yearly: 10.00,
     popular: false,
     features: ['3 Devices', 'All Locations', 'Unlimited Bandwidth', 'AES-256 Encryption', 'Priority Support'],
+    priceIdMonthly: 'price_1QsgL0EiNNFb5ydcZzzzz',
+    priceIdYearly: 'price_1QsgL0EiNNFb5ydcAaaaa',
   },
   {
     name: 'Premium',
@@ -22,6 +27,8 @@ const plans = [
     yearly: 14.99,
     popular: true,
     features: ['5 Devices', 'All 12 Locations', 'Unlimited Bandwidth', 'AES-256 Encryption', 'Priority Support', 'Split Tunneling'],
+    priceIdMonthly: 'price_1QsgL0EiNNFb5ydcBbbbb',
+    priceIdYearly: 'price_1QsgL0EiNNFb5ydcCcccc',
   },
   {
     name: 'Advanced',
@@ -29,6 +36,8 @@ const plans = [
     yearly: 24.99,
     popular: false,
     features: ['7 Devices', 'All Premium Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', '24/7 Support', 'Dedicated IP'],
+    priceIdMonthly: 'price_1QsgL0EiNNFb5ydcDdddd',
+    priceIdYearly: 'price_1QsgL0EiNNFb5ydcEeeee',
   },
   {
     name: 'Enterprise',
@@ -36,10 +45,33 @@ const plans = [
     yearly: 18.00,
     popular: false,
     features: ['10 Devices', 'All Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', '24/7 Priority Support', 'Dedicated IP', 'Kill Switch'],
+    priceIdMonthly: 'price_1QsgL0EiNNFb5ydcFffff',
+    priceIdYearly: 'price_1QsgL0EiNNFb5ydcGgggg',
   },
 ];
 
 function PlanCard({ plan, yearly }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleCheckout = async () => {
+    setLoading(true);
+    try {
+      const priceId = yearly ? plan.priceIdYearly : plan.priceIdMonthly;
+      const res = await base44.functions.invoke('createStripeCheckout', {
+        plan: plan.name,
+        priceId: priceId,
+      });
+      if (res.data?.url) {
+        window.location.href = res.data.url;
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert('Error starting checkout. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className={`relative rounded-xl p-6 flex flex-col ${
       plan.popular
@@ -56,12 +88,12 @@ function PlanCard({ plan, yearly }) {
         <span className="text-3xl font-extrabold text-white">${yearly ? plan.yearly : plan.price}</span>
         <span className="text-slate-500 text-xs">/month</span>
       </div>
-      <button className={`w-full py-2.5 rounded text-sm font-bold mb-5 transition-all ${
+      <button onClick={handleCheckout} disabled={loading} className={`w-full py-2.5 rounded text-sm font-bold mb-5 transition-all disabled:opacity-50 ${
         plan.popular
           ? 'bg-cyan-500 hover:bg-cyan-400 text-black'
           : 'border border-slate-700 hover:border-cyan-500 text-white hover:text-cyan-400'
       }`}>
-        Get {plan.name}
+        {loading ? 'Processing...' : `Get ${plan.name}`}
       </button>
       <ul className="space-y-2.5 flex-1">
         {plan.features.map((f, fi) => (

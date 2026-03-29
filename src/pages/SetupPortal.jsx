@@ -159,11 +159,11 @@ export default function SetupPortal() {
       const mapped = (data.profiles || []).map(p => ({
         os: p.os,
         fileName: p.fileName || `VoxVPN-${p.os}-Setup.conf`,
-        downloadUrl: p.downloadUrl,
+        downloadUrl: `/api/setup/download/${token}?os=${p.os}`,
         serverName: p.serverName || 'VoxVPN Private Server',
-        qrUrl: (p.os === 'android' || p.os === 'ios') && p.qrToken
-          ? `/api/setup/qr/${p.qrToken}`
-          : (p.qrUrl || ''),
+        qrUrl: (p.os === 'android' || p.os === 'ios')
+          ? `/api/setup/qr/${token}?os=${p.os}`
+          : '',
       }));
       setWelcomeText(`Setup ready for ${data.email || 'buyer'}${data.orderId ? ` · Order: ${data.orderId}` : ''}`);
       setProfiles(mapped);
