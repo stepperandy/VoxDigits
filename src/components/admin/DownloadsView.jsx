@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Plus, Pencil, Trash2, Download, DollarSign, Check, X, ExternalLink, Loader2, Monitor, Apple, Terminal, Smartphone, Wifi, Router } from 'lucide-react';
+import { Plus, Pencil, Trash2, Download, DollarSign, Check, X, ExternalLink, Loader2, Monitor, Apple, Terminal, Smartphone, Wifi, Router, Link } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const platformIcons = {
@@ -18,10 +18,13 @@ const platformColors = {
 };
 
 const PLATFORMS = ['Windows', 'macOS', 'Linux', 'iOS', 'Android', 'Router'];
+const TYPES = ['setup', 'download'];
+const typeLabels = { setup: 'Setup Portal', download: 'Direct Download' };
 
 const emptyForm = {
   name: '', description: '', platform: 'Windows', version: '',
   file_url: '', price: 0, is_free: false, is_active: true, payment_link: '', notes: '',
+  type: 'download',
 };
 
 function DownloadForm({ initial, onSave, onCancel, saving }) {
@@ -34,18 +37,25 @@ function DownloadForm({ initial, onSave, onCancel, saving }) {
       <h3 className="text-white font-semibold">{initial?.id ? 'Edit Download' : 'New Download'}</h3>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="text-slate-500 text-xs uppercase tracking-wider mb-1.5 block">Name *</label>
-          <input value={form.name} onChange={e => set('name', e.target.value)} placeholder="VoxVPN Windows Setup"
-            className="w-full px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50" />
-        </div>
-        <div>
-          <label className="text-slate-500 text-xs uppercase tracking-wider mb-1.5 block">Platform *</label>
-          <select value={form.platform} onChange={e => set('platform', e.target.value)}
-            className="w-full px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50">
-            {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
-          </select>
-        </div>
+         <div>
+           <label className="text-slate-500 text-xs uppercase tracking-wider mb-1.5 block">Name *</label>
+           <input value={form.name} onChange={e => set('name', e.target.value)} placeholder="VoxVPN Windows Setup"
+             className="w-full px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50" />
+         </div>
+         <div>
+           <label className="text-slate-500 text-xs uppercase tracking-wider mb-1.5 block">Type *</label>
+           <select value={form.type} onChange={e => set('type', e.target.value)}
+             className="w-full px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50">
+             {TYPES.map(t => <option key={t} value={t}>{typeLabels[t]}</option>)}
+           </select>
+         </div>
+         <div>
+           <label className="text-slate-500 text-xs uppercase tracking-wider mb-1.5 block">Platform *</label>
+           <select value={form.platform} onChange={e => set('platform', e.target.value)}
+             className="w-full px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50">
+             {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
+           </select>
+         </div>
         <div>
           <label className="text-slate-500 text-xs uppercase tracking-wider mb-1.5 block">Version</label>
           <input value={form.version} onChange={e => set('version', e.target.value)} placeholder="2.1.0"
@@ -57,8 +67,9 @@ function DownloadForm({ initial, onSave, onCancel, saving }) {
             className="w-full px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50" />
         </div>
         <div className="sm:col-span-2">
-          <label className="text-slate-500 text-xs uppercase tracking-wider mb-1.5 block">Download URL</label>
-          <input value={form.file_url} onChange={e => set('file_url', e.target.value)} placeholder="https://cdn.example.com/voxvpn-setup.exe"
+          <label className="text-slate-500 text-xs uppercase tracking-wider mb-1.5 block">{form.type === 'setup' ? 'Setup Portal URL' : 'Download URL'}</label>
+          <input value={form.file_url} onChange={e => set('file_url', e.target.value)} 
+            placeholder={form.type === 'setup' ? 'https://app.example.com/setup?token=ABC123' : 'https://cdn.example.com/voxvpn-setup.exe'}
             className="w-full px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50" />
         </div>
         <div className="sm:col-span-2">
@@ -210,7 +221,7 @@ export default function DownloadsView() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.map((d, idx) => {
-            const Icon = platformIcons[d.platform] || Download;
+            const Icon = d.type === 'setup' ? Link : platformIcons[d.platform] || Download;
             const colorCls = platformColors[d.platform] || 'text-slate-400 bg-white/5 border-white/10';
             return (
               <motion.div key={d.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
@@ -222,12 +233,12 @@ export default function DownloadsView() {
                 {/* Header */}
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl border flex items-center justify-center flex-shrink-0 ${colorCls}`}>
+                    <div className={`w-10 h-10 rounded-xl border flex items-center justify-center flex-shrink-0 ${d.type === 'setup' ? 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20' : colorCls}`}>
                       <Icon size={18} />
                     </div>
                     <div>
                       <p className="text-white font-semibold text-sm leading-tight">{d.name}</p>
-                      <p className="text-slate-500 text-[11px]">{d.platform} {d.version && `· v${d.version}`}</p>
+                      <p className="text-slate-500 text-[11px]">{d.platform} · {typeLabels[d.type] || 'Download'} {d.version && `· v${d.version}`}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
