@@ -133,6 +133,23 @@ export default function SetupsView() {
     }
   };
 
+  const handleDownloadSetup = async (platform) => {
+    try {
+      const res = await base44.functions.invoke('generateSetupFiles', { platform: platform.toLowerCase() });
+      // Create a blob and trigger download
+      const blob = new Blob([res.data], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `VoxVPN-${platform}-Setup.conf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Failed to download setup file');
+    }
+  };
+
   return (
     <div className="space-y-5">
       {/* Stats */}
@@ -241,10 +258,11 @@ export default function SetupsView() {
                     className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold hover:bg-cyan-500/20 transition-all">
                     <ExternalLink size={12} /> Open Portal
                   </a>
-                  <a href={`/api/functions/generateSetupFiles?platform=${d.platform.toLowerCase()}`}
+                  <button
+                    onClick={() => handleDownloadSetup(d.platform)}
                     className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold hover:bg-emerald-500/20 transition-all">
                     <Download size={12} /> Download
-                  </a>
+                  </button>
                 </div>
 
                 {/* Notes */}
