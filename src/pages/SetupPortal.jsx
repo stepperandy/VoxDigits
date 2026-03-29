@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Download, QrCode, Monitor, Apple, Terminal, Smartphone, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import { Download, QrCode, Monitor, Terminal, Smartphone, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 
 const guideText = {
-  windows: 'Download the setup file, install the VPN client on Windows, then import the downloaded configuration.',
-  macos: 'Download the setup file, install the VPN client on macOS, then import and activate your connection.',
-  linux: 'Download the configuration and import it into your Linux VPN client or supported command-line workflow.',
-  android: 'Download the file on your Android device or scan the QR code from another screen, then import it in the app.',
-  ios: 'Open this setup page on your iPhone or iPad or scan the QR code, then import the profile in the app.',
+  windows: 'Download your VoxVPN Windows profile, install the required client, import setup, and connect to your assigned VoxVPN server.',
+  macos: 'Use the branded guide, import your VoxVPN macOS profile, and activate your secure connection.',
+  linux: 'Import your VoxVPN Linux configuration and connect to your assigned private server location.',
+  android: 'Download the VoxVPN Android profile on your device or scan the QR code for instant import.',
+  ios: 'Open this setup center on your iPhone or iPad, or scan the QR code using the VPN app\'s import feature.',
 };
 
 const osLabel = (os) => {
@@ -18,17 +18,17 @@ const osLabel = (os) => {
 
 const osIcon = (os) => {
   if (os === 'windows') return <Monitor size={18} className="text-blue-400" />;
-  if (os === 'macos') return <Apple size={18} className="text-slate-300" />;
+  if (os === 'macos') return <Monitor size={18} className="text-slate-300" />;
   if (os === 'linux') return <Terminal size={18} className="text-orange-400" />;
   return <Smartphone size={18} className="text-cyan-400" />;
 };
 
 const demoProfiles = [
   { os: 'windows', fileName: 'voxvpn-windows.conf', downloadUrl: '#', qrUrl: '' },
-  { os: 'macos', fileName: 'voxvpn-macos.conf', downloadUrl: '#', qrUrl: '' },
-  { os: 'linux', fileName: 'voxvpn-linux.conf', downloadUrl: '#', qrUrl: '' },
+  { os: 'macos',   fileName: 'voxvpn-macos.conf',   downloadUrl: '#', qrUrl: '' },
+  { os: 'linux',   fileName: 'voxvpn-linux.conf',   downloadUrl: '#', qrUrl: '' },
   { os: 'android', fileName: 'voxvpn-android.conf', downloadUrl: '#', qrUrl: '' },
-  { os: 'ios', fileName: 'voxvpn-ios.conf', downloadUrl: '#', qrUrl: '' },
+  { os: 'ios',     fileName: 'voxvpn-ios.conf',     downloadUrl: '#', qrUrl: '' },
 ];
 
 function ProfileCard({ profile, liveMode }) {
@@ -36,50 +36,53 @@ function ProfileCard({ profile, liveMode }) {
   const isMobile = profile.os === 'android' || profile.os === 'ios';
 
   return (
-    <div className="rounded-2xl border border-white/5 bg-[#0d1120] p-5 flex flex-col gap-4">
+    <div className="rounded-[18px] border border-[#223654] bg-[rgba(6,14,26,0.45)] p-5 flex flex-col gap-3">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-[#0b1a2c] border border-[#24415f] flex items-center justify-center flex-shrink-0">
           {osIcon(profile.os)}
         </div>
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-cyan-400/70">{osLabel(profile.os)}</span>
-          <p className="text-white font-semibold text-sm">{osLabel(profile.os)} Setup</p>
+          <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#4fd1ff] bg-[#0b1a2c] border border-[#24415f] rounded-full px-2.5 py-1">
+            {osLabel(profile.os)}
+          </span>
         </div>
       </div>
 
-      <p className="text-slate-500 text-xs font-mono">{profile.fileName}</p>
-      <p className="text-slate-400 text-xs leading-relaxed">{guideText[profile.os]}</p>
+      <h3 className="text-white font-bold text-lg m-0">VoxVPN for {osLabel(profile.os)}</h3>
+      <p className="text-[#a9b7c9] text-xs font-mono m-0">{profile.fileName}</p>
+      <p className="text-[#a9b7c9] text-sm leading-relaxed m-0">{guideText[profile.os]}</p>
 
-      <div className="flex flex-wrap gap-2 mt-auto">
+      <div className="flex flex-wrap gap-2 mt-1">
         <a
           href={liveMode ? profile.downloadUrl : '#'}
           onClick={!liveMode ? (e) => e.preventDefault() : undefined}
-          className="flex items-center gap-1.5 px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold rounded-xl transition-all"
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-extrabold text-sm text-[#02111d] transition-all"
+          style={{ background: 'linear-gradient(135deg,#0ea5ff,#4fd1ff)' }}
         >
           <Download size={13} /> Download Setup
         </a>
         {isMobile && (
           <button
             onClick={() => setShowQr(!showQr)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-semibold rounded-xl transition-all"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-[#0b1627] text-[#4fd1ff] border border-[#28425f] text-sm font-bold rounded-xl transition-all hover:bg-[#0d1e38]"
           >
             <QrCode size={13} />
-            {showQr ? 'Hide QR' : 'Show QR'}
+            {showQr ? 'Hide QR' : 'Mobile QR'}
             {showQr ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
           </button>
         )}
       </div>
 
       {isMobile && showQr && (
-        <div className="border border-dashed border-white/10 rounded-xl p-4 text-center bg-white/2">
+        <div className="border border-dashed border-[#315172] rounded-[14px] p-4 text-center bg-[#0b1524]">
           {profile.qrUrl ? (
             <img src={profile.qrUrl} alt={`${osLabel(profile.os)} QR`} className="w-40 h-40 mx-auto rounded-xl bg-white p-2 mb-2" />
           ) : (
-            <div className="w-40 h-40 mx-auto rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-2">
-              <QrCode size={48} className="text-slate-600" />
+            <div className="w-40 h-40 mx-auto rounded-xl bg-[#0d1e38] border border-[#223654] flex items-center justify-center mb-2">
+              <QrCode size={48} className="text-[#315172]" />
             </div>
           )}
-          <p className="text-slate-500 text-xs">Use your mobile VPN app to scan and import.</p>
+          <p className="text-[#a9b7c9] text-xs">Scan with your VoxVPN mobile app to import instantly.</p>
         </div>
       )}
     </div>
@@ -88,8 +91,8 @@ function ProfileCard({ profile, liveMode }) {
 
 export default function SetupPortal() {
   const [profiles, setProfiles] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ok | demo
-  const [welcomeText, setWelcomeText] = useState('Loading your setup details...');
+  const [status, setStatus] = useState('loading');
+  const [welcomeText, setWelcomeText] = useState('Loading your secure setup details.');
   const [tokenInput, setTokenInput] = useState('');
   const [liveMode, setLiveMode] = useState(false);
 
@@ -139,72 +142,84 @@ export default function SetupPortal() {
   };
 
   return (
-    <div className="min-h-screen bg-[#060910] text-white">
+    <div className="min-h-screen text-[#f4f8fc]" style={{ background: 'linear-gradient(180deg,#081120,#0d1b2f)', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+
       {/* Hero */}
-      <header className="bg-gradient-to-br from-[#0a1e3a] to-[#0e2d56] border-b border-white/5 px-4 sm:px-6 lg:px-8 py-14">
+      <header className="px-4 sm:px-6 lg:px-8 pt-14 pb-8 border-b border-white/5"
+        style={{ background: 'radial-gradient(circle at top right, rgba(79,209,255,.15), transparent 30%), radial-gradient(circle at top left, rgba(14,165,255,.18), transparent 24%)' }}>
         <div className="max-w-6xl mx-auto">
-          <p className="text-cyan-400 text-xs font-bold uppercase tracking-widest mb-3">VoxVPN</p>
-          <h1 className="text-4xl sm:text-5xl font-black text-white mb-4">Your VPN Setup Portal</h1>
-          <p className="text-slate-300 text-base max-w-2xl leading-relaxed">
-            Download your secure VPN configuration, follow setup steps for every operating system, and access your mobile QR code from one place.
+          <div className="flex items-center gap-4 mb-5">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-[#00101f] font-black text-xl shadow-lg"
+              style={{ background: 'linear-gradient(135deg,#0ea5ff,#4fd1ff)', boxShadow: '0 10px 25px rgba(14,165,255,.25)' }}>
+              V
+            </div>
+            <div>
+              <p className="text-[#4fd1ff] text-sm font-bold uppercase tracking-[1.8px] m-0">VoxVPN Secure Network</p>
+              <p className="text-[#a9b7c9] text-sm m-0">Powered by VoxVPN private infrastructure</p>
+            </div>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-black text-white mb-3 leading-tight">Set Up VoxVPN On Any Device</h1>
+          <p className="text-[#a9b7c9] text-base max-w-3xl leading-relaxed">
+            Download your <span className="text-[#4fd1ff] font-bold">VoxVPN</span> connection profile, follow branded installation steps, and connect to our own secure server locations using the VoxVPN customer setup portal.
           </p>
         </div>
       </header>
 
-      <main className="px-4 sm:px-6 lg:px-8 py-10 max-w-6xl mx-auto">
+      <main className="px-4 sm:px-6 lg:px-8 py-8 pb-20 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
-          {/* Main content */}
-          <div className="lg:col-span-2 space-y-6">
+          {/* Main */}
+          <div className="lg:col-span-2 space-y-5">
 
-            {/* Status + token input */}
-            <div className="rounded-2xl border border-white/5 bg-[#0d1120] p-6 space-y-4">
-              <div className="flex items-center gap-3 flex-wrap justify-between">
+            {/* Status + token */}
+            <div className="rounded-[20px] border border-[#223654] p-6 space-y-4"
+              style={{ background: 'linear-gradient(180deg,#101d31,#13243d)', boxShadow: '0 20px 50px rgba(0,0,0,.35)' }}>
+              <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    {status === 'loading' && <Loader2 size={14} className="animate-spin text-cyan-400" />}
-                    <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-                      status === 'ok' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                      status === 'loading' ? 'bg-white/5 text-slate-400 border border-white/10' :
-                      'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                    }`}>
-                      {status === 'ok' ? '✓ Secure setup loaded' : status === 'loading' ? 'Checking setup portal…' : 'Demo mode active'}
-                    </span>
-                  </div>
-                  <h2 className="text-white font-bold text-lg">Buyer Access</h2>
-                  <p className="text-slate-400 text-sm">{welcomeText}</p>
+                  <span className={`inline-block text-xs font-bold px-3 py-1.5 rounded-full mb-2 ${
+                    status === 'ok'
+                      ? 'bg-[#123824] border border-[#38c172] text-[#bbf7d0]'
+                      : status === 'loading'
+                      ? 'bg-[#17263d] border border-[#324e74] text-[#c7d7ea]'
+                      : 'bg-[#4f3b12] border border-[#f6c453] text-[#fde68a]'
+                  }`}>
+                    {status === 'loading' && <Loader2 size={11} className="inline animate-spin mr-1" />}
+                    {status === 'ok' ? '✓ VoxVPN setup loaded' : status === 'loading' ? 'Checking your VoxVPN setup…' : 'Demo mode active'}
+                  </span>
+                  <h2 className="text-white font-bold text-xl m-0">VoxVPN Setup Center</h2>
+                  <p className="text-[#a9b7c9] text-sm mt-1 m-0">{welcomeText}</p>
                 </div>
-                <p className="text-slate-600 text-xs">Supports <span className="text-slate-400">Windows · macOS · Linux · Android · iPhone/iPad</span></p>
+                <p className="text-[#a9b7c9] text-xs mt-1">Supports <strong className="text-[#f4f8fc]">Windows · macOS · Linux · Android · iPhone/iPad</strong></p>
               </div>
 
               <div className="flex gap-3 flex-wrap">
                 <input
                   type="text"
-                  placeholder="Paste portal token here if needed"
+                  placeholder="Paste your secure VoxVPN access token"
                   value={tokenInput}
                   onChange={(e) => setTokenInput(e.target.value)}
-                  className="flex-1 min-w-0 px-4 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white placeholder-slate-600 text-sm focus:outline-none focus:border-cyan-500/50"
+                  className="flex-1 min-w-0 px-4 py-3 rounded-xl border border-[#223654] bg-[#091423] text-white placeholder-[#4a5e75] text-sm focus:outline-none focus:border-[#0ea5ff]"
                 />
                 <button
                   onClick={reloadWithToken}
-                  className="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-sm font-semibold rounded-xl transition-all"
+                  className="px-5 py-3 bg-[#0b1627] text-[#4fd1ff] border border-[#28425f] text-sm font-bold rounded-xl transition-all hover:bg-[#0d1e38]"
                 >
-                  Load Token
+                  Load Setup
                 </button>
               </div>
 
               {status === 'demo' && (
-                <div className="p-3 rounded-xl bg-amber-500/5 border border-amber-500/20 text-amber-300 text-xs">
-                  Demo mode is active. Connect your backend endpoints to load real buyer downloads and QR codes.
+                <div className="p-4 rounded-[14px] bg-[#17263d] border border-[#324e74] text-[#c7d7ea] text-sm">
+                  Demo mode is active. Connect your backend to load real buyer downloads, mobile QR import, assigned servers, and secure profile delivery.
                 </div>
               )}
             </div>
 
             {/* Profiles */}
             {status === 'loading' ? (
-              <div className="flex items-center justify-center py-24 gap-2 text-slate-400">
-                <Loader2 size={20} className="animate-spin text-cyan-400" />
-                <span className="text-sm">Loading setup profiles...</span>
+              <div className="flex items-center justify-center py-24 gap-2 text-[#a9b7c9]">
+                <Loader2 size={20} className="animate-spin text-[#0ea5ff]" />
+                <span className="text-sm">Loading VoxVPN profiles...</span>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -214,81 +229,90 @@ export default function SetupPortal() {
               </div>
             )}
 
-            {/* How it works + endpoints */}
+            {/* Flow + endpoints */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="rounded-2xl border border-white/5 bg-[#0d1120] p-5">
-                <h3 className="text-cyan-400 font-bold text-sm mb-3 uppercase tracking-wider">How It Works</h3>
-                <ol className="space-y-2 text-slate-400 text-sm list-decimal list-inside">
-                  {['Customer completes payment.','Backend provisions VPN profile(s).','Email sent with secure setup link.','Buyer opens portal and downloads setup.','Buyer follows installation guide for their device.'].map((s, i) => (
-                    <li key={i}>{s}</li>
-                  ))}
+              <div className="rounded-[16px] border border-[#223654] p-5 bg-[rgba(7,15,28,0.55)]">
+                <h3 className="text-white font-bold text-sm mb-3">Branded Customer Flow</h3>
+                <ol className="space-y-2 text-[#a9b7c9] text-sm list-decimal list-inside m-0 p-0">
+                  {[
+                    'Buyer completes payment for a VoxVPN plan.',
+                    'Backend provisions a secure VoxVPN profile on your own servers.',
+                    'Buyer receives a VoxVPN email with secure access link.',
+                    'Buyer opens this VoxVPN setup center.',
+                    'Buyer downloads the correct setup profile for their OS.',
+                    'Buyer follows VoxVPN-branded installation instructions.',
+                  ].map((s, i) => <li key={i}>{s}</li>)}
                 </ol>
               </div>
-              <div className="rounded-2xl border border-white/5 bg-[#0d1120] p-5">
-                <h3 className="text-cyan-400 font-bold text-sm mb-3 uppercase tracking-wider">Backend Endpoints</h3>
-                <p className="text-slate-500 text-xs mb-3">This page expects these live endpoints:</p>
-                <ol className="space-y-2 list-decimal list-inside">
-                  {['GET /api/setup/portal?token=...','GET /api/setup/download/:token','GET /api/setup/qr/:token'].map((e, i) => (
-                    <li key={i}><code className="text-xs bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg text-slate-300 font-mono">{e}</code></li>
+              <div className="rounded-[16px] border border-[#223654] p-5 bg-[rgba(7,15,28,0.55)]">
+                <h3 className="text-white font-bold text-sm mb-3">Required Live Endpoints</h3>
+                <ol className="space-y-2 list-decimal list-inside m-0 p-0">
+                  {['/api/setup/portal?token=...', '/api/setup/download/:token', '/api/setup/qr/:token'].map((e, i) => (
+                    <li key={i}><code className="text-xs bg-[#091423] border border-[#223654] px-2 py-0.5 rounded-lg text-[#4fd1ff] font-mono">{e}</code></li>
                   ))}
                 </ol>
+                <p className="text-[#a9b7c9] text-xs mt-3 m-0">These should return real setup files and QR imports from your VoxVPN infrastructure.</p>
               </div>
             </div>
 
             {/* Email preview */}
-            <div className="rounded-2xl border border-white/5 bg-[#0d1120] p-6">
-              <h3 className="text-white font-bold text-sm mb-4 uppercase tracking-wider">Buyer Email Preview</h3>
-              <div className="rounded-xl overflow-hidden border border-white/10">
-                <div className="bg-gradient-to-r from-[#0a1e3a] to-[#0e2d56] px-5 py-4">
-                  <p className="text-white font-bold text-base">Your VoxVPN setup is ready</p>
+            <div className="rounded-[16px] border border-[#223654] p-5 bg-[#0b1627]">
+              <h3 className="text-white font-bold text-sm mb-4">VoxVPN Buyer Email Preview</h3>
+              <div className="rounded-[16px] border border-[#27405e] overflow-hidden bg-[#0d1728]">
+                <div className="px-5 py-4 font-black text-lg text-[#041321]"
+                  style={{ background: 'linear-gradient(135deg,#0ea5ff,#4fd1ff)' }}>
+                  Your VoxVPN setup is ready
                 </div>
-                <div className="bg-[#090d18] p-6 space-y-3 text-slate-300 text-sm leading-relaxed">
-                  <p>Hello,</p>
-                  <p>Thank you for your purchase. Your VPN access has been provisioned successfully.</p>
-                  <p>You can now open your secure setup portal to download your VPN setup for all supported devices.</p>
+                <div className="px-6 py-5 text-[#e8eef7] text-sm leading-relaxed space-y-3">
+                  <p className="m-0">Hello,</p>
+                  <p className="m-0">Thank you for your purchase. Your <strong>VoxVPN</strong> account has been provisioned successfully on our secure server network.</p>
+                  <p className="m-0">You can now open your secure setup center to download your VoxVPN connection for all supported devices.</p>
                   <div>
-                    <span className="inline-block px-5 py-2.5 bg-cyan-500 text-black text-xs font-bold rounded-xl">Open My Setup Portal</span>
+                    <span className="inline-block px-5 py-2.5 rounded-xl font-extrabold text-sm text-[#02111d]"
+                      style={{ background: 'linear-gradient(135deg,#0ea5ff,#4fd1ff)' }}>
+                      Open My VoxVPN Setup
+                    </span>
                   </div>
-                  <p>Inside the portal, you will find:</p>
-                  <ul className="space-y-1.5 ml-4">
-                    {['Windows setup','macOS setup','Linux setup','Android setup','iPhone / iPad setup','Quick installation guidelines'].map(item => (
-                      <li key={item} className="flex items-center gap-2 text-slate-400"><span className="w-1.5 h-1.5 bg-cyan-400 rounded-full flex-shrink-0" />{item}</li>
+                  <p className="m-0">Inside the portal, you will find:</p>
+                  <ul className="space-y-1.5 ml-4 m-0">
+                    {['VoxVPN for Windows','VoxVPN for macOS','VoxVPN for Linux','VoxVPN for Android','VoxVPN for iPhone / iPad','Quick branded setup guides','Mobile QR import for easy activation'].map(item => (
+                      <li key={item} className="flex items-center gap-2 text-[#a9b7c9]">
+                        <span className="w-1.5 h-1.5 bg-[#4fd1ff] rounded-full flex-shrink-0" />{item}
+                      </li>
                     ))}
                   </ul>
-                  <p>If you need support, reply to this email.</p>
-                  <p className="font-bold text-white">VoxVPN Team</p>
+                  <p className="m-0">If you need support, reply to this email.</p>
+                  <p className="m-0 font-bold text-white">VoxVPN Team</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Sidebar */}
-          <aside className="rounded-2xl border border-white/5 bg-[#0d1120] p-6 space-y-4">
-            <h3 className="text-white font-bold">Support & Setup Tips</h3>
-            <p className="text-slate-500 text-xs leading-relaxed">Use the correct app on each OS, then import the downloaded configuration file or scan the QR code on mobile.</p>
-
+          <aside className="rounded-[20px] border border-[#223654] p-6 space-y-4"
+            style={{ background: 'linear-gradient(180deg,#101d31,#13243d)', boxShadow: '0 20px 50px rgba(0,0,0,.35)' }}>
+            <h3 className="text-white font-bold m-0">VoxVPN Installation Interfaces</h3>
             {[
-              { label: 'Windows', desc: 'Install the VPN client, open it, and import the downloaded setup file.' },
-              { label: 'macOS', desc: 'Install the client, import your config, then activate the tunnel.' },
-              { label: 'Linux', desc: 'Import the config into your preferred client or use command line setup.' },
-              { label: 'Android', desc: 'Download the file directly on the phone or scan the QR code from a desktop screen.' },
-              { label: 'iPhone / iPad', desc: 'Open this page on the device or scan the QR code using the VPN app\'s import feature.' },
+              { label: 'VoxVPN for Windows', desc: 'Download your VoxVPN Windows profile, install the required client, import setup, and connect to your assigned VoxVPN server.' },
+              { label: 'VoxVPN for macOS', desc: 'Use the branded guide, import your VoxVPN macOS profile, and activate your secure connection.' },
+              { label: 'VoxVPN for Linux', desc: 'Import your VoxVPN Linux configuration and connect to your assigned private server location.' },
+              { label: 'VoxVPN for Android', desc: 'Download the VoxVPN Android profile or scan the QR code for instant import.' },
+              { label: 'VoxVPN for iPhone / iPad', desc: 'Open this setup center on your device or scan the QR code using the VPN app\'s import feature.' },
             ].map(({ label, desc }) => (
-              <div key={label} className="p-4 rounded-xl bg-white/3 border border-white/5">
-                <p className="text-white text-sm font-semibold mb-1">{label}</p>
-                <p className="text-slate-500 text-xs leading-relaxed">{desc}</p>
+              <div key={label} className="rounded-[14px] border border-[#223654] p-4 bg-[rgba(7,15,28,0.55)]">
+                <p className="text-white text-sm font-bold mb-1 m-0">{label}</p>
+                <p className="text-[#a9b7c9] text-xs leading-relaxed m-0">{desc}</p>
               </div>
             ))}
-
-            <div className="p-4 rounded-xl bg-cyan-500/5 border border-cyan-500/15">
-              <p className="text-cyan-400 text-sm font-semibold mb-1">Support Email</p>
-              <a href="mailto:support@voxdigits.com" className="text-slate-400 text-xs hover:text-cyan-400 transition-colors">support@voxdigits.com</a>
+            <div className="rounded-[14px] border border-[#234a69] p-4 bg-[#0d2638]">
+              <p className="text-[#4fd1ff] text-sm font-bold mb-1 m-0">Support</p>
+              <a href="mailto:support@voxdigits.com" className="text-[#a9b7c9] text-xs hover:text-[#4fd1ff] transition-colors">support@voxdigits.com</a>
             </div>
           </aside>
         </div>
       </main>
 
-      <footer className="text-center py-8 text-slate-600 text-xs border-t border-white/5 mt-6">
+      <footer className="text-center py-8 text-[#a9b7c9] text-sm border-t border-[#223654]">
         © 2026 VoxVPN / VoxDigits. Secure setup delivery portal.
       </footer>
     </div>
