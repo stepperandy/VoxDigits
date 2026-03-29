@@ -5,6 +5,7 @@ import AdminHeader from '@/components/admin/AdminHeader';
 import DashboardView from '@/components/admin/DashboardView';
 import UsersView from '@/components/admin/UsersView';
 import ServersView from '@/components/admin/ServersView';
+import DownloadsView from '@/components/admin/DownloadsView';
 
 export default function Admin() {
   const [activePage, setActivePage] = useState('dashboard');
@@ -17,6 +18,7 @@ export default function Admin() {
     switch (activePage) {
       case 'users': return <UsersView />;
       case 'servers': return <ServersView />;
+      case 'downloads': return <DownloadsView />;
       default: return <DashboardView />;
     }
   };

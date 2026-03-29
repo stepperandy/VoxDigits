@@ -1,0 +1,60 @@
+{
+  "name": "Download",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Setup file name (e.g. VoxVPN Windows Setup)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Short description of the download"
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "Windows",
+        "macOS",
+        "Linux",
+        "iOS",
+        "Android",
+        "Router"
+      ],
+      "description": "Target platform"
+    },
+    "version": {
+      "type": "string",
+      "description": "Version string e.g. 2.1.0"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "Direct download URL"
+    },
+    "price": {
+      "type": "number",
+      "description": "Price in USD (0 = free)"
+    },
+    "is_free": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether download is free"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Visible to users"
+    },
+    "payment_link": {
+      "type": "string",
+      "description": "External payment link (e.g. Stripe, PayPal)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Internal admin notes"
+    }
+  },
+  "required": [
+    "name",
+    "platform"
+  ]
+}
