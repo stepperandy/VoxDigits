@@ -24,11 +24,11 @@ const osIcon = (os) => {
 };
 
 const demoProfiles = [
-  { os: 'windows', fileName: 'voxvpn-windows.conf', downloadUrl: '#', qrUrl: '' },
-  { os: 'macos',   fileName: 'voxvpn-macos.conf',   downloadUrl: '#', qrUrl: '' },
-  { os: 'linux',   fileName: 'voxvpn-linux.conf',   downloadUrl: '#', qrUrl: '' },
-  { os: 'android', fileName: 'voxvpn-android.conf', downloadUrl: '#', qrUrl: '' },
-  { os: 'ios',     fileName: 'voxvpn-ios.conf',     downloadUrl: '#', qrUrl: '' },
+  { os: 'windows', fileName: 'VoxVPN-Windows-Setup.conf',     downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN New York 01' },
+  { os: 'macos',   fileName: 'VoxVPN-macOS-Setup.conf',       downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN London 01' },
+  { os: 'linux',   fileName: 'VoxVPN-Linux-Setup.conf',       downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN Frankfurt 01' },
+  { os: 'android', fileName: 'VoxVPN-Android-Setup.conf',     downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN Toronto 01' },
+  { os: 'ios',     fileName: 'VoxVPN-iPhone-iPad-Setup.conf', downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN Amsterdam 01' },
 ];
 
 function ProfileCard({ profile, liveMode }) {
@@ -50,6 +50,9 @@ function ProfileCard({ profile, liveMode }) {
 
       <h3 className="text-white font-bold text-lg m-0">VoxVPN for {osLabel(profile.os)}</h3>
       <p className="text-[#a9b7c9] text-xs font-mono m-0">{profile.fileName}</p>
+      {profile.serverName && (
+        <p className="text-[#4fd1ff] text-xs font-semibold m-0">📡 {profile.serverName}</p>
+      )}
       <p className="text-[#a9b7c9] text-sm leading-relaxed m-0">{guideText[profile.os]}</p>
 
       <div className="flex flex-wrap gap-2 mt-1">
@@ -114,8 +117,9 @@ export default function SetupPortal() {
       const data = res.data;
       const mapped = (data.profiles || []).map(p => ({
         os: p.os,
-        fileName: p.fileName || `${p.os}.conf`,
+        fileName: p.fileName || `VoxVPN-${p.os}-Setup.conf`,
         downloadUrl: p.downloadUrl,
+        serverName: p.serverName || 'VoxVPN Private Server',
         qrUrl: (p.os === 'android' || p.os === 'ios') && p.qrToken
           ? `/api/setup/qr/${p.qrToken}`
           : (p.qrUrl || ''),
