@@ -155,9 +155,9 @@ export default function Hero() {
             </div>
 
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.05] tracking-tight">
-              Your Privacy,{' '}
+              Secure every device.{' '}
               <span className="relative inline-block text-cyan-400 italic">
-                Our Priority.
+                Connect through VoxVPN.
                 {/* Curved underline */}
                 <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 320 12" fill="none" preserveAspectRatio="none">
                   <path d="M4 9 Q80 2 160 7 Q240 12 316 4" stroke="#22d3ee" strokeWidth="3.5" strokeLinecap="round" fill="none" opacity="0.9"/>
