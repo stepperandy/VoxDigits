@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Signal, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import WorldMap from './WorldMap';
 
 const regionNames = {
   lhr: { name: 'London', country: 'United Kingdom', flag: '🇬🇧' },
@@ -69,6 +70,16 @@ export default function Servers() {
 
         {!loading && !error && (
           <>
+            {/* Interactive World Map */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
+              className="mb-10"
+            >
+              <WorldMap servers={servers} />
+            </motion.div>
+
             {/* Table header */}
             <div className="hidden md:grid grid-cols-5 gap-4 px-4 mb-3 text-xs text-slate-600 uppercase tracking-wider">
               <span>Location</span>
