@@ -169,19 +169,11 @@ export default function Footer() {
         {/* App store badges */}
         <div className="border-t border-white/5 pt-8 flex flex-col sm:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-3">
-            <a href="#" className="flex items-center gap-2 px-4 py-2 bg-[#0d1120] border border-white/10 rounded-lg hover:border-cyan-500/30 transition-colors">
-              <span className="text-lg">🍎</span>
-              <div>
-                <div className="text-slate-500 text-[9px]">Download on the</div>
-                <div className="text-white text-xs font-semibold">App Store</div>
-              </div>
+            <a href="#" className="hover:opacity-90 transition-opacity">
+              <img src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-example-preferred_ko.png" alt="Apple App Store" className="h-10 w-auto" />
             </a>
-            <a href="#" className="flex items-center gap-2 px-4 py-2 bg-[#0d1120] border border-white/10 rounded-lg hover:border-cyan-500/30 transition-colors">
-              <span className="text-lg">🤖</span>
-              <div>
-                <div className="text-slate-500 text-[9px]">Get it on</div>
-                <div className="text-white text-xs font-semibold">Google Play</div>
-              </div>
+            <a href="#" className="hover:opacity-90 transition-opacity">
+              <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Google Play Store" className="h-10 w-auto" />
             </a>
           </div>
 
