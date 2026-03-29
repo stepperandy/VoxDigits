@@ -1,54 +1,51 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Home, Zap, DollarSign, User } from 'lucide-react';
+import { useTabContext } from '@/mobile/MobileTabContext';
 
 const tabs = [
-  { id: 'home', label: 'Home', icon: Home, path: '/' },
+  { id: 'home', label: 'Home', icon: Home, path: '/features-mobile' },
   { id: 'features', label: 'Features', icon: Zap, path: '/features-mobile' },
   { id: 'pricing', label: 'Pricing', icon: DollarSign, path: '/pricing-mobile' },
   { id: 'account', label: 'Account', icon: User, path: '/account-mobile' },
 ];
 
 export default function MobileBottomNav() {
-  const navigate = useNavigate();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { activeTab, setActiveTab, saveScrollPosition } = useTabContext();
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
-  const handleTabPress = (path, tabId) => {
-    if (location.pathname === path) {
-      // Reset to root of stack if re-selecting
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      navigate(path);
+  if (!isMobile) return null;
+
+  const handleTabChange = (tab) => {
+    const mainContent = document.querySelector('main');
+    if (mainContent) {
+      saveScrollPosition(activeTab, mainContent.scrollTop);
     }
+    setActiveTab(tab.id);
+    navigate(tab.path);
   };
 
   return (
-    <nav
-      className="fixed bottom-0 left-0 right-0 z-50 bg-[#080c18] border-t border-white/5 flex justify-around items-center h-20"
-      style={{
-        paddingBottom: 'env(safe-area-inset-bottom)',
-      }}
-    >
-      {tabs.map((tab) => {
-        const Icon = tab.icon;
-        const isActive = location.pathname === tab.path;
-
-        return (
-          <button
-            key={tab.id}
-            onClick={() => handleTabPress(tab.path, tab.id)}
-            className={`flex flex-col items-center justify-center w-16 h-16 transition-colors user-select-none ${
-              isActive
-                ? 'text-cyan-400'
-                : 'text-slate-500 active:text-cyan-400'
-            }`}
-            aria-label={tab.label}
-            aria-current={isActive ? 'page' : undefined}
-          >
-            <Icon size={24} strokeWidth={1.5} />
-            <span className="text-xs mt-1 font-medium">{tab.label}</span>
-          </button>
-        );
-      })}
+    <nav className="fixed bottom-0 left-0 right-0 border-t border-white/5 bg-[#060910] z-40">
+      <div className="flex items-center justify-around h-16 safe-area-bottom">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => handleTabChange(tab)}
+              className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+                isActive ? 'text-cyan-400' : 'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              <Icon size={24} />
+              <span className="text-[10px] mt-1 font-medium">{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
     </nav>
   );
 }

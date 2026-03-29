@@ -33,7 +33,7 @@ const plans = [
   },
 ];
 
-function PlanCard({ plan, yearly, onCheckout }) {
+function PlanCard({ plan, yearly, onCheckout, isLoading }) {
   return (
     <div
       className={`p-4 rounded-xl border transition-all ${
@@ -52,7 +52,8 @@ function PlanCard({ plan, yearly, onCheckout }) {
       </div>
       <button
         onClick={() => onCheckout(plan, yearly)}
-        className="w-full mt-4 py-3 rounded-lg font-bold text-sm transition-all touch-target"
+        disabled={isLoading}
+        className="w-full mt-4 py-3 rounded-lg font-bold text-sm transition-all touch-target disabled:opacity-60"
         style={{
           background: plan.popular
             ? 'linear-gradient(135deg, #0ea5ff, #4fd1ff)'
@@ -61,7 +62,7 @@ function PlanCard({ plan, yearly, onCheckout }) {
           border: plan.popular ? 'none' : '1px solid #223654',
         }}
       >
-        Choose Plan
+        {isLoading ? 'Processing...' : 'Choose Plan'}
       </button>
       <ul className="mt-4 space-y-2">
         {plan.features.map((f, i) => (
@@ -78,8 +79,10 @@ function PlanCard({ plan, yearly, onCheckout }) {
 export default function PricingMobile() {
   const [yearly, setYearly] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingPlan, setLoadingPlan] = useState(null);
 
   const handleCheckout = async (plan, isYearly) => {
+    setLoadingPlan(plan.name);
     setLoading(true);
     try {
       const priceId = isYearly ? plan.priceIdYearly : plan.priceIdMonthly;
@@ -92,7 +95,7 @@ export default function PricingMobile() {
       }
     } catch (error) {
       console.error('Checkout error:', error);
-    } finally {
+      setLoadingPlan(null);
       setLoading(false);
     }
   };
@@ -139,6 +142,7 @@ export default function PricingMobile() {
                 plan={plan}
                 yearly={yearly}
                 onCheckout={handleCheckout}
+                isLoading={loading && loadingPlan === plan.name}
               />
             ))}
           </div>

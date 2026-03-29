@@ -2,11 +2,12 @@ import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import ThemeProvider from '@/lib/ThemeProvider';
+import { TabProvider } from '@/mobile/MobileTabContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 
 // Lazy-loaded pages
@@ -65,7 +66,7 @@ const PageTransition = ({ children }) => (
   </motion.div>
 );
 
-const AuthenticatedApp = () => {
+const AuthenticatedApp = ({ isMobileDevice }) => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
   // Show loading spinner while checking app public settings or auth
@@ -93,7 +94,7 @@ const AuthenticatedApp = () => {
     <AnimatePresence mode="wait">
       <Suspense fallback={<div className="fixed inset-0 flex items-center justify-center"><div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div></div>}>
         <Routes>
-          <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+          <Route path="/" element={<PageTransition>{isMobileDevice ? <FeaturesMobile /> : <Home />}</PageTransition>} />
           <Route path="/admin" element={<PageTransition><Admin /></PageTransition>} />
           <Route path="/vpn-for-usa" element={<PageTransition><VpnUSA /></PageTransition>} />
           <Route path="/vpn-for-uk" element={<PageTransition><VpnUK /></PageTransition>} />
@@ -145,18 +146,36 @@ const AuthenticatedApp = () => {
 
 
 function App() {
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const isMobile = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobileDevice(isMobile);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <QueryClientProvider client={queryClientInstance}>
-          <Router>
-            <AuthenticatedApp />
-          </Router>
-          <Toaster />
-        </QueryClientProvider>
-      </AuthProvider>
+      <TabProvider>
+        <AuthProvider>
+          <QueryClientProvider client={queryClientInstance}>
+            <Router>
+              <AuthenticatedAppWrapper isMobileDevice={isMobileDevice} />
+            </Router>
+            <Toaster />
+          </QueryClientProvider>
+        </AuthProvider>
+      </TabProvider>
     </ThemeProvider>
   )
+}
+
+function AuthenticatedAppWrapper({ isMobileDevice }) {
+  return <AuthenticatedApp isMobileDevice={isMobileDevice} />
 }
 
 export default App

@@ -70,7 +70,14 @@ export default function FeaturesMobile() {
             })}
           </div>
 
-          <button className="w-full mt-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-lg transition-colors">
+          <button 
+            onClick={() => {
+              const nav = document.querySelector('nav');
+              const pricingBtn = Array.from(nav?.querySelectorAll('button') || []).find(btn => btn.textContent.includes('Pricing'));
+              pricingBtn?.click();
+            }}
+            className="w-full mt-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-lg transition-colors"
+          >
             Get Protected
           </button>
         </div>

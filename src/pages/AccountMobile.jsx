@@ -14,6 +14,7 @@ export default function AccountMobile() {
   }, []);
 
   const handleLogout = () => {
+    setUser(null);
     base44.auth.logout('/');
   };
 
@@ -23,15 +24,17 @@ export default function AccountMobile() {
       return;
     }
 
+    const prevUser = user;
+    setUser(null);
     setDeleting(true);
     try {
-      // Call backend function to delete user account
       await base44.functions.invoke('deleteUserAccount', {});
       base44.auth.logout('/');
     } catch (error) {
-      console.error('Delete error:', error);
-      alert('Failed to delete account. Please try again.');
+      setUser(prevUser);
+      setShowDeleteConfirm(false);
       setDeleting(false);
+      alert('Failed to delete account. Please try again.');
     }
   };
 
