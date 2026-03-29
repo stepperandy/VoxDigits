@@ -2,52 +2,68 @@ import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
+import ThemeProvider from '@/lib/ThemeProvider';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-import Home from './pages/Home';
-import Admin from './pages/Admin.jsx';
-import VpnUSA from './pages/vpn-countries/VpnUSA.jsx';
-import VpnUK from './pages/vpn-countries/VpnUK.jsx';
-import VpnCanada from './pages/vpn-countries/VpnCanada.jsx';
-import VpnAustralia from './pages/vpn-countries/VpnAustralia.jsx';
-import VpnGermany from './pages/vpn-countries/VpnGermany.jsx';
-import VpnFrance from './pages/vpn-countries/VpnFrance.jsx';
-import VpnJapan from './pages/vpn-countries/VpnJapan.jsx';
-import WindowsVPN from './pages/vpn-os/WindowsVPN.jsx';
-import MacVPN from './pages/vpn-os/MacVPN.jsx';
-import LinuxVPN from './pages/vpn-os/LinuxVPN.jsx';
-import iOSVPN from './pages/vpn-os/iOSVPN.jsx';
-import AndroidVPN from './pages/vpn-os/AndroidVPN.jsx';
-import RouterVPN from './pages/vpn-os/RouterVPN.jsx';
-import ChromeExtension from './pages/vpn-os/ChromeExtension.jsx';
-import NoLogsPolicy from './pages/features/NoLogsPolicy.jsx';
-import KillSwitch from './pages/features/KillSwitch.jsx';
-import SplitTunneling from './pages/features/SplitTunneling.jsx';
-import AES256 from './pages/features/AES256.jsx';
-import DNSLeakProtection from './pages/features/DNSLeakProtection.jsx';
-import IPv6LeakProtection from './pages/features/IPv6LeakProtection.jsx';
-import VpnStreaming from './pages/solutions/VpnStreaming.jsx';
-import VpnGaming from './pages/solutions/VpnGaming.jsx';
-import VpnTorrenting from './pages/solutions/VpnTorrenting.jsx';
-import VpnBusiness from './pages/solutions/VpnBusiness.jsx';
-import VpnTravel from './pages/solutions/VpnTravel.jsx';
-import WhatIsVPN from './pages/about/WhatIsVPN.jsx';
-import HowVPNWorks from './pages/about/HowVPNWorks.jsx';
-import VPNProtocols from './pages/about/VPNProtocols.jsx';
-import WireGuardVPN from './pages/about/WireGuardVPN.jsx';
-import OpenVPN from './pages/about/OpenVPN.jsx';
-import PrivacyPolicy from './pages/legal/PrivacyPolicy.jsx';
-import TermsOfService from './pages/legal/TermsOfService.jsx';
-import CookiePolicy from './pages/legal/CookiePolicy.jsx';
-import RefundPolicy from './pages/legal/RefundPolicy.jsx';
-import ContactUs from './pages/help/ContactUs.jsx';
-import StatusPage from './pages/help/StatusPage.jsx';
-import BugBounty from './pages/help/BugBounty.jsx';
-import SetupPortal from './pages/SetupPortal.jsx';
-import FeaturesMobile from './pages/FeaturesMobile.jsx';
-import PricingMobile from './pages/PricingMobile.jsx';
-import AccountMobile from './pages/AccountMobile.jsx';
+
+// Lazy-loaded pages
+const Home = lazy(() => import('./pages/Home'));
+const Admin = lazy(() => import('./pages/Admin.jsx'));
+const VpnUSA = lazy(() => import('./pages/vpn-countries/VpnUSA.jsx'));
+const VpnUK = lazy(() => import('./pages/vpn-countries/VpnUK.jsx'));
+const VpnCanada = lazy(() => import('./pages/vpn-countries/VpnCanada.jsx'));
+const VpnAustralia = lazy(() => import('./pages/vpn-countries/VpnAustralia.jsx'));
+const VpnGermany = lazy(() => import('./pages/vpn-countries/VpnGermany.jsx'));
+const VpnFrance = lazy(() => import('./pages/vpn-countries/VpnFrance.jsx'));
+const VpnJapan = lazy(() => import('./pages/vpn-countries/VpnJapan.jsx'));
+const WindowsVPN = lazy(() => import('./pages/vpn-os/WindowsVPN.jsx'));
+const MacVPN = lazy(() => import('./pages/vpn-os/MacVPN.jsx'));
+const LinuxVPN = lazy(() => import('./pages/vpn-os/LinuxVPN.jsx'));
+const iOSVPN = lazy(() => import('./pages/vpn-os/iOSVPN.jsx'));
+const AndroidVPN = lazy(() => import('./pages/vpn-os/AndroidVPN.jsx'));
+const RouterVPN = lazy(() => import('./pages/vpn-os/RouterVPN.jsx'));
+const ChromeExtension = lazy(() => import('./pages/vpn-os/ChromeExtension.jsx'));
+const NoLogsPolicy = lazy(() => import('./pages/features/NoLogsPolicy.jsx'));
+const KillSwitch = lazy(() => import('./pages/features/KillSwitch.jsx'));
+const SplitTunneling = lazy(() => import('./pages/features/SplitTunneling.jsx'));
+const AES256 = lazy(() => import('./pages/features/AES256.jsx'));
+const DNSLeakProtection = lazy(() => import('./pages/features/DNSLeakProtection.jsx'));
+const IPv6LeakProtection = lazy(() => import('./pages/features/IPv6LeakProtection.jsx'));
+const VpnStreaming = lazy(() => import('./pages/solutions/VpnStreaming.jsx'));
+const VpnGaming = lazy(() => import('./pages/solutions/VpnGaming.jsx'));
+const VpnTorrenting = lazy(() => import('./pages/solutions/VpnTorrenting.jsx'));
+const VpnBusiness = lazy(() => import('./pages/solutions/VpnBusiness.jsx'));
+const VpnTravel = lazy(() => import('./pages/solutions/VpnTravel.jsx'));
+const WhatIsVPN = lazy(() => import('./pages/about/WhatIsVPN.jsx'));
+const HowVPNWorks = lazy(() => import('./pages/about/HowVPNWorks.jsx'));
+const VPNProtocols = lazy(() => import('./pages/about/VPNProtocols.jsx'));
+const WireGuardVPN = lazy(() => import('./pages/about/WireGuardVPN.jsx'));
+const OpenVPN = lazy(() => import('./pages/about/OpenVPN.jsx'));
+const PrivacyPolicy = lazy(() => import('./pages/legal/PrivacyPolicy.jsx'));
+const TermsOfService = lazy(() => import('./pages/legal/TermsOfService.jsx'));
+const CookiePolicy = lazy(() => import('./pages/legal/CookiePolicy.jsx'));
+const RefundPolicy = lazy(() => import('./pages/legal/RefundPolicy.jsx'));
+const ContactUs = lazy(() => import('./pages/help/ContactUs.jsx'));
+const StatusPage = lazy(() => import('./pages/help/StatusPage.jsx'));
+const BugBounty = lazy(() => import('./pages/help/BugBounty.jsx'));
+const SetupPortal = lazy(() => import('./pages/SetupPortal.jsx'));
+const FeaturesMobile = lazy(() => import('./pages/FeaturesMobile.jsx'));
+const PricingMobile = lazy(() => import('./pages/PricingMobile.jsx'));
+const AccountMobile = lazy(() => import('./pages/AccountMobile.jsx'));
+
+const PageTransition = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0, x: 20 }}
+    animate={{ opacity: 1, x: 0 }}
+    exit={{ opacity: 0, x: -20 }}
+    transition={{ duration: 0.3 }}
+  >
+    {children}
+  </motion.div>
+);
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -74,67 +90,72 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/admin" element={<Admin />} />
-      <Route path="/vpn-for-usa" element={<VpnUSA />} />
-      <Route path="/vpn-for-uk" element={<VpnUK />} />
-      <Route path="/vpn-for-canada" element={<VpnCanada />} />
-      <Route path="/vpn-for-australia" element={<VpnAustralia />} />
-      <Route path="/vpn-for-germany" element={<VpnGermany />} />
-      <Route path="/vpn-for-france" element={<VpnFrance />} />
-      <Route path="/vpn-for-japan" element={<VpnJapan />} />
-      <Route path="/windows-vpn" element={<WindowsVPN />} />
-      <Route path="/mac-vpn" element={<MacVPN />} />
-      <Route path="/linux-vpn" element={<LinuxVPN />} />
-      <Route path="/ios-vpn" element={<iOSVPN />} />
-      <Route path="/android-vpn" element={<AndroidVPN />} />
-      <Route path="/router-vpn" element={<RouterVPN />} />
-      <Route path="/chrome-extension" element={<ChromeExtension />} />
-      <Route path="/no-logs-policy" element={<NoLogsPolicy />} />
-      <Route path="/kill-switch" element={<KillSwitch />} />
-      <Route path="/split-tunneling" element={<SplitTunneling />} />
-      <Route path="/aes-256-encryption" element={<AES256 />} />
-      <Route path="/dns-leak-protection" element={<DNSLeakProtection />} />
-      <Route path="/ipv6-leak-protection" element={<IPv6LeakProtection />} />
-      <Route path="/vpn-for-streaming" element={<VpnStreaming />} />
-      <Route path="/vpn-for-gaming" element={<VpnGaming />} />
-      <Route path="/vpn-for-torrenting" element={<VpnTorrenting />} />
-      <Route path="/vpn-for-business" element={<VpnBusiness />} />
-      <Route path="/vpn-for-travel" element={<VpnTravel />} />
-      <Route path="/what-is-a-vpn" element={<WhatIsVPN />} />
-      <Route path="/how-vpn-works" element={<HowVPNWorks />} />
-      <Route path="/vpn-protocols" element={<VPNProtocols />} />
-      <Route path="/wireguard-vpn" element={<WireGuardVPN />} />
-      <Route path="/openvpn" element={<OpenVPN />} />
-      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-      <Route path="/terms-of-service" element={<TermsOfService />} />
-      <Route path="/cookie-policy" element={<CookiePolicy />} />
-      <Route path="/refund-policy" element={<RefundPolicy />} />
-      <Route path="/contact" element={<ContactUs />} />
-      <Route path="/status" element={<StatusPage />} />
-      <Route path="/bug-bounty" element={<BugBounty />} />
-      <Route path="/setup" element={<SetupPortal />} />
-      <Route path="/features-mobile" element={<FeaturesMobile />} />
-      <Route path="/pricing-mobile" element={<PricingMobile />} />
-      <Route path="/account-mobile" element={<AccountMobile />} />
-      <Route path="*" element={<PageNotFound />} />
-    </Routes>
+    <AnimatePresence mode="wait">
+      <Suspense fallback={<div className="fixed inset-0 flex items-center justify-center"><div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div></div>}>
+        <Routes>
+          <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+          <Route path="/admin" element={<PageTransition><Admin /></PageTransition>} />
+          <Route path="/vpn-for-usa" element={<PageTransition><VpnUSA /></PageTransition>} />
+          <Route path="/vpn-for-uk" element={<PageTransition><VpnUK /></PageTransition>} />
+          <Route path="/vpn-for-canada" element={<PageTransition><VpnCanada /></PageTransition>} />
+          <Route path="/vpn-for-australia" element={<PageTransition><VpnAustralia /></PageTransition>} />
+          <Route path="/vpn-for-germany" element={<PageTransition><VpnGermany /></PageTransition>} />
+          <Route path="/vpn-for-france" element={<PageTransition><VpnFrance /></PageTransition>} />
+          <Route path="/vpn-for-japan" element={<PageTransition><VpnJapan /></PageTransition>} />
+          <Route path="/windows-vpn" element={<PageTransition><WindowsVPN /></PageTransition>} />
+          <Route path="/mac-vpn" element={<PageTransition><MacVPN /></PageTransition>} />
+          <Route path="/linux-vpn" element={<PageTransition><LinuxVPN /></PageTransition>} />
+          <Route path="/ios-vpn" element={<PageTransition><iOSVPN /></PageTransition>} />
+          <Route path="/android-vpn" element={<PageTransition><AndroidVPN /></PageTransition>} />
+          <Route path="/router-vpn" element={<PageTransition><RouterVPN /></PageTransition>} />
+          <Route path="/chrome-extension" element={<PageTransition><ChromeExtension /></PageTransition>} />
+          <Route path="/no-logs-policy" element={<PageTransition><NoLogsPolicy /></PageTransition>} />
+          <Route path="/kill-switch" element={<PageTransition><KillSwitch /></PageTransition>} />
+          <Route path="/split-tunneling" element={<PageTransition><SplitTunneling /></PageTransition>} />
+          <Route path="/aes-256-encryption" element={<PageTransition><AES256 /></PageTransition>} />
+          <Route path="/dns-leak-protection" element={<PageTransition><DNSLeakProtection /></PageTransition>} />
+          <Route path="/ipv6-leak-protection" element={<PageTransition><IPv6LeakProtection /></PageTransition>} />
+          <Route path="/vpn-for-streaming" element={<PageTransition><VpnStreaming /></PageTransition>} />
+          <Route path="/vpn-for-gaming" element={<PageTransition><VpnGaming /></PageTransition>} />
+          <Route path="/vpn-for-torrenting" element={<PageTransition><VpnTorrenting /></PageTransition>} />
+          <Route path="/vpn-for-business" element={<PageTransition><VpnBusiness /></PageTransition>} />
+          <Route path="/vpn-for-travel" element={<PageTransition><VpnTravel /></PageTransition>} />
+          <Route path="/what-is-a-vpn" element={<PageTransition><WhatIsVPN /></PageTransition>} />
+          <Route path="/how-vpn-works" element={<PageTransition><HowVPNWorks /></PageTransition>} />
+          <Route path="/vpn-protocols" element={<PageTransition><VPNProtocols /></PageTransition>} />
+          <Route path="/wireguard-vpn" element={<PageTransition><WireGuardVPN /></PageTransition>} />
+          <Route path="/openvpn" element={<PageTransition><OpenVPN /></PageTransition>} />
+          <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+          <Route path="/terms-of-service" element={<PageTransition><TermsOfService /></PageTransition>} />
+          <Route path="/cookie-policy" element={<PageTransition><CookiePolicy /></PageTransition>} />
+          <Route path="/refund-policy" element={<PageTransition><RefundPolicy /></PageTransition>} />
+          <Route path="/contact" element={<PageTransition><ContactUs /></PageTransition>} />
+          <Route path="/status" element={<PageTransition><StatusPage /></PageTransition>} />
+          <Route path="/bug-bounty" element={<PageTransition><BugBounty /></PageTransition>} />
+          <Route path="/setup" element={<PageTransition><SetupPortal /></PageTransition>} />
+          <Route path="/features-mobile" element={<PageTransition><FeaturesMobile /></PageTransition>} />
+          <Route path="/pricing-mobile" element={<PageTransition><PricingMobile /></PageTransition>} />
+          <Route path="/account-mobile" element={<PageTransition><AccountMobile /></PageTransition>} />
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+      </Suspense>
+    </AnimatePresence>
   );
 };
 
 
 function App() {
-
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <AuthenticatedApp />
-        </Router>
-        <Toaster />
-      </QueryClientProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <QueryClientProvider client={queryClientInstance}>
+          <Router>
+            <AuthenticatedApp />
+          </Router>
+          <Toaster />
+        </QueryClientProvider>
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
 

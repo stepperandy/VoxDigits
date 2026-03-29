@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Download, QrCode, Monitor, Terminal, Smartphone, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import MobileSelectSheet from '@/mobile/MobileSelectSheet';
 
 const guideText = {
   windows: 'Download your VoxVPN setup file for Windows, open the recommended VPN client, import your profile, and connect to your selected VoxVPN server in seconds.',
@@ -46,7 +48,9 @@ const demoProfiles = [
 
 function ProfileCard({ profile, liveMode }) {
   const [showQr, setShowQr] = useState(false);
+  const [serverOpen, setServerOpen] = useState(false);
   const isMobile = profile.os === 'android' || profile.os === 'ios';
+  const isSmallScreen = useIsMobile();
 
   return (
     <div className="rounded-[18px] border border-[#223654] bg-[rgba(6,14,26,0.45)] p-5 flex flex-col gap-3">
@@ -70,10 +74,31 @@ function ProfileCard({ profile, liveMode }) {
       {/* Server location selector */}
       <div>
         <label className="text-[#a9b7c9] text-xs font-semibold block mb-1.5">More Server Locations</label>
-        <select className="w-full px-3 py-2 rounded-xl bg-[#0b1a2c] border border-[#24415f] text-[#f4f8fc] text-sm focus:outline-none focus:border-[#0ea5ff]">
-          <option value="">{profile.serverName || 'Select a server'}</option>
-          {extraServers.map(s => <option key={s} value={s}>{s}</option>)}
-        </select>
+        {isSmallScreen ? (
+          <>
+            <button
+              onClick={() => setServerOpen(true)}
+              className="w-full px-3 py-2 rounded-xl bg-[#0b1a2c] border border-[#24415f] text-[#f4f8fc] text-sm text-left font-medium hover:border-[#0ea5ff] transition-colors"
+            >
+              {profile.serverName || 'Select a server'}
+            </button>
+            <MobileSelectSheet
+              open={serverOpen}
+              onOpenChange={setServerOpen}
+              label="Server Location"
+              options={extraServers.map(s => ({ value: s, label: s }))}
+              value={profile.serverName}
+              onSelect={(value) => {
+                setServerOpen(false);
+              }}
+            />
+          </>
+        ) : (
+          <select className="w-full px-3 py-2 rounded-xl bg-[#0b1a2c] border border-[#24415f] text-[#f4f8fc] text-sm focus:outline-none focus:border-[#0ea5ff]">
+            <option value="">{profile.serverName || 'Select a server'}</option>
+            {extraServers.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+        )}
       </div>
 
       <p className="text-[#a9b7c9] text-sm leading-relaxed m-0">{guideText[profile.os]}</p>

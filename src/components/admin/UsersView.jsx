@@ -30,20 +30,32 @@ export default function UsersView() {
   });
 
   const handleInvite = async (e) => {
-    e.preventDefault();
-    if (!inviteEmail) return;
-    setInviting(true);
-    setInviteMsg({ type: '', text: '' });
-    try {
-      await base44.users.inviteUser(inviteEmail, inviteRole);
-      setInviteMsg({ type: 'success', text: `Invitation sent to ${inviteEmail}` });
-      setInviteEmail('');
-      loadUsers();
-    } catch (err) {
-      setInviteMsg({ type: 'error', text: 'Failed: ' + err.message });
-    } finally {
-      setInviting(false);
-    }
+   e.preventDefault();
+   if (!inviteEmail) return;
+   setInviting(true);
+   setInviteMsg({ type: '', text: '' });
+   try {
+     await base44.users.inviteUser(inviteEmail, inviteRole);
+     setInviteMsg({ type: 'success', text: `Invitation sent to ${inviteEmail}` });
+     setInviteEmail('');
+     setTimeout(() => loadUsers(), 500);
+   } catch (err) {
+     setInviteMsg({ type: 'error', text: 'Failed: ' + err.message });
+   } finally {
+     setInviting(false);
+   }
+  };
+
+  const handlePromoteAdmin = async (id, name) => {
+   if (!window.confirm(`Make ${name} an admin?`)) return;
+   const prevUsers = users;
+   setUsers(users.map(u => u.id === id ? { ...u, role: 'admin' } : u));
+   try {
+     await base44.entities.User.update(id, { role: 'admin' });
+   } catch {
+     setUsers(prevUsers);
+     alert('Failed to update user');
+   }
   };
 
   const toggleSelect = (id) => {
@@ -224,7 +236,7 @@ export default function UsersView() {
                         </button>
                         {u.role !== 'admin' && (
                           <button
-                            onClick={() => { if (window.confirm(`Make ${u.full_name} an admin?`)) base44.entities.User.update(u.id, { role: 'admin' }).then(loadUsers); }}
+                            onClick={() => handlePromoteAdmin(u.id, u.full_name)}
                             title="Promote to admin"
                             className="p-1.5 rounded-lg hover:bg-white/5 text-slate-600 hover:text-violet-400 transition-colors"
                           >

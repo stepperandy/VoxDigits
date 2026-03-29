@@ -133,21 +133,35 @@ export default function DownloadsView() {
 
   const handleSave = async (form) => {
     setSaving(true);
-    if (editing?.id) {
-      await base44.entities.Download.update(editing.id, form);
-    } else {
-      await base44.entities.Download.create(form);
+    const prevDownloads = downloads;
+    try {
+      if (editing?.id) {
+        setDownloads(downloads.map(d => d.id === editing.id ? { ...d, ...form } : d));
+        await base44.entities.Download.update(editing.id, form);
+      } else {
+        await base44.entities.Download.create(form);
+      }
+      setShowForm(false);
+      setEditing(null);
+      setTimeout(() => load(), 300);
+    } catch (err) {
+      setDownloads(prevDownloads);
+      alert('Failed to save: ' + err.message);
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
-    setShowForm(false);
-    setEditing(null);
-    load();
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this download?')) return;
-    await base44.entities.Download.delete(id);
-    load();
+    const prevDownloads = downloads;
+    setDownloads(downloads.filter(d => d.id !== id));
+    try {
+      await base44.entities.Download.delete(id);
+    } catch {
+      setDownloads(prevDownloads);
+      alert('Failed to delete');
+    }
   };
 
   const handleEdit = (d) => { setEditing(d); setShowForm(true); };
