@@ -1,37 +1,89 @@
 import { Mail, Phone } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const footerSections = [
   {
     title: 'VPN for Countries',
-    links: ['VPN for USA', 'VPN for UK', 'VPN for Canada', 'VPN for Australia', 'VPN for Germany', 'VPN for France', 'VPN for Japan'],
+    links: [
+      { label: 'VPN for USA', to: '/vpn-for-usa' },
+      { label: 'VPN for UK', to: '/vpn-for-uk' },
+      { label: 'VPN for Canada', to: '/vpn-for-canada' },
+      { label: 'VPN for Australia', to: '/vpn-for-australia' },
+      { label: 'VPN for Germany', to: '/vpn-for-germany' },
+      { label: 'VPN for France', to: '/vpn-for-france' },
+      { label: 'VPN for Japan', to: '/vpn-for-japan' },
+    ],
   },
   {
     title: 'VPN Download by OS',
-    links: ['Windows VPN', 'Mac VPN', 'Linux VPN', 'iOS VPN', 'Android VPN', 'Router VPN', 'Chrome Extension'],
+    links: [
+      { label: 'Windows VPN', to: '/windows-vpn' },
+      { label: 'Mac VPN', to: '/mac-vpn' },
+      { label: 'Linux VPN', to: '/linux-vpn' },
+      { label: 'iOS VPN', to: '/ios-vpn' },
+      { label: 'Android VPN', to: '/android-vpn' },
+      { label: 'Router VPN', to: '/router-vpn' },
+      { label: 'Chrome Extension', to: '/chrome-extension' },
+    ],
   },
   {
     title: 'Features',
-    links: ['No-Logs Policy', 'Kill Switch', 'Split Tunneling', 'AES-256 Encryption', 'DNS Leak Protection', 'IPv6 Leak Protection'],
+    links: [
+      { label: 'No-Logs Policy', to: '/no-logs-policy' },
+      { label: 'Kill Switch', to: '/kill-switch' },
+      { label: 'Split Tunneling', to: '/split-tunneling' },
+      { label: 'AES-256 Encryption', to: '/aes-256-encryption' },
+      { label: 'DNS Leak Protection', to: '/dns-leak-protection' },
+      { label: 'IPv6 Leak Protection', to: '/ipv6-leak-protection' },
+    ],
   },
   {
     title: 'Solutions',
-    links: ['VPN for Streaming', 'VPN for Gaming', 'VPN for Torrenting', 'VPN for Business', 'VPN for Travel'],
+    links: [
+      { label: 'VPN for Streaming', to: '/vpn-for-streaming' },
+      { label: 'VPN for Gaming', to: '/vpn-for-gaming' },
+      { label: 'VPN for Torrenting', to: '/vpn-for-torrenting' },
+      { label: 'VPN for Business', to: '/vpn-for-business' },
+      { label: 'VPN for Travel', to: '/vpn-for-travel' },
+    ],
   },
   {
     title: 'About VPN',
-    links: ['What is a VPN?', 'How VPN Works', 'VPN Protocols', 'WireGuard VPN', 'OpenVPN'],
+    links: [
+      { label: 'What is a VPN?', to: '/what-is-a-vpn' },
+      { label: 'How VPN Works', to: '/how-vpn-works' },
+      { label: 'VPN Protocols', to: '/vpn-protocols' },
+      { label: 'WireGuard VPN', to: '/wireguard-vpn' },
+      { label: 'OpenVPN', to: '/openvpn' },
+    ],
   },
   {
     title: 'Payment',
-    links: ['Credit Card', 'PayPal', 'Crypto', 'Bank Transfer'],
+    links: [
+      { label: 'Credit Card', to: '/#pricing' },
+      { label: 'PayPal', to: '/#pricing' },
+      { label: 'Crypto', to: '/#pricing' },
+      { label: 'Bank Transfer', to: '/#pricing' },
+    ],
   },
   {
     title: 'Get Help',
-    links: ['Support Center', 'Live Chat', 'Contact Us', 'Status Page', 'Bug Bounty'],
+    links: [
+      { label: 'Support Center', to: '/contact' },
+      { label: 'Live Chat', to: '/contact' },
+      { label: 'Contact Us', to: '/contact' },
+      { label: 'Status Page', to: '/contact' },
+      { label: 'Bug Bounty', to: '/contact' },
+    ],
   },
   {
     title: 'Legal Offers',
-    links: ['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'Refund Policy'],
+    links: [
+      { label: 'Privacy Policy', to: '/privacy-policy' },
+      { label: 'Terms of Service', to: '/terms-of-service' },
+      { label: 'Cookie Policy', to: '/cookie-policy' },
+      { label: 'Refund Policy', to: '/refund-policy' },
+    ],
   },
 ];
 
@@ -69,8 +121,8 @@ export default function Footer() {
               <h4 className="text-white text-xs font-bold mb-4 uppercase tracking-wider">{section.title}</h4>
               <ul className="space-y-2">
                 {section.links.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link}</a>
+                  <li key={link.label}>
+                    <Link to={link.to} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link.label}</Link>
                   </li>
                 ))}
               </ul>
@@ -85,8 +137,8 @@ export default function Footer() {
               <h4 className="text-white text-xs font-bold mb-4 uppercase tracking-wider">{section.title}</h4>
               <ul className="space-y-2">
                 {section.links.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link}</a>
+                  <li key={link.label}>
+                    <Link to={link.to} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link.label}</Link>
                   </li>
                 ))}
               </ul>
@@ -125,8 +177,8 @@ export default function Footer() {
         <div className="mt-6 text-center text-slate-600 text-xs flex flex-col sm:flex-row justify-between">
           <span>© 2024 VoxVPN. All rights reserved.</span>
           <div className="flex gap-4 justify-center mt-2 sm:mt-0">
-            <a href="#" className="hover:text-cyan-400 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-cyan-400 transition-colors">Terms of Service</a>
+            <Link to="/privacy-policy" className="hover:text-cyan-400 transition-colors">Privacy Policy</Link>
+            <Link to="/terms-of-service" className="hover:text-cyan-400 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>
