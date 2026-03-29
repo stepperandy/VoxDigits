@@ -107,9 +107,8 @@ export default function SetupPortal() {
     }
     setTokenInput(token);
     try {
-      const res = await fetch(`/api/setup/portal?token=${encodeURIComponent(token)}`);
-      if (!res.ok) throw new Error('Portal fetch failed');
-      const data = await res.json();
+      const res = await base44.functions.invoke('setupPortal', { token });
+      const data = res.data;
       const mapped = (data.profiles || []).map(p => ({
         os: p.os,
         fileName: p.fileName || `${p.os}.conf`,
