@@ -93,6 +93,7 @@ export default function SetupsView() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
 
   const load = () => {
     setLoading(true);
@@ -122,6 +123,16 @@ export default function SetupsView() {
 
   const handleEdit = (d) => { setEditing(d); setShowForm(true); };
 
+  const handleGenerateSetups = async () => {
+    setGenerating(true);
+    try {
+      await base44.functions.invoke('generateSetups', {});
+      load();
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   return (
     <div className="space-y-5">
       {/* Stats */}
@@ -139,14 +150,24 @@ export default function SetupsView() {
       </div>
 
       {/* Top controls */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center gap-3">
         <h2 className="text-white font-semibold">Setup Portals</h2>
-        <button
-          onClick={() => { setEditing(null); setShowForm(true); }}
-          className="flex items-center gap-2 px-4 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-black text-sm font-bold rounded-xl transition-all flex-shrink-0"
-        >
-          <Plus size={15} /> Add Setup
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleGenerateSetups}
+            disabled={generating}
+            className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-500/50 text-black text-sm font-bold rounded-xl transition-all flex-shrink-0"
+          >
+            {generating ? <Loader2 size={15} className="animate-spin" /> : '✓'}
+            Generate All
+          </button>
+          <button
+            onClick={() => { setEditing(null); setShowForm(true); }}
+            className="flex items-center gap-2 px-4 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-black text-sm font-bold rounded-xl transition-all flex-shrink-0"
+          >
+            <Plus size={15} /> Add Setup
+          </button>
+        </div>
       </div>
 
       {/* Form */}
