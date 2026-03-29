@@ -151,12 +151,13 @@ export default function Hero() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 text-xs font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-              Premium VPN Infrastructure
+              10,000+ users protected worldwide
             </div>
 
-            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black text-white leading-[1.05] tracking-tight">
-              <span className="relative inline-block text-cyan-400 font-black">
-                Secure every device.
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.05] tracking-tight">
+              Your Privacy,{' '}
+              <span className="relative inline-block text-cyan-400 italic">
+                Our Priority.
                 {/* Curved underline */}
                 <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 320 12" fill="none" preserveAspectRatio="none">
                   <path d="M4 9 Q80 2 160 7 Q240 12 316 4" stroke="#22d3ee" strokeWidth="3.5" strokeLinecap="round" fill="none" opacity="0.9"/>
@@ -164,21 +165,21 @@ export default function Hero() {
               </span>
             </h1>
 
-            <p className="text-slate-400 text-sm leading-relaxed max-w-2xl">
-              Launch your own premium VPN brand with private infrastructure, full customer control, and white-label capabilities. Deploy enterprise-grade security across Windows, macOS, Linux, iOS, Android, and router platforms. Our platform provides everything you need: branded setup portal, automated profile delivery, customer dashboard with server selection, comprehensive admin controls, and Vultr integration for global server management. Protect millions of devices with military-grade AES-256 encryption, zero-knowledge architecture, and blazing-fast performance. Scale from startup to enterprise with built-in payment processing, user analytics, and dedicated support.
+            <p className="text-slate-400 text-base leading-relaxed max-w-md">
+              VoxVPN encrypts your connection, hides your identity, and unlocks the internet — on every device, everywhere in the world.
             </p>
 
             <div className="flex flex-wrap gap-3 pt-1">
               <button className="px-7 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full text-sm transition-all shadow-lg shadow-cyan-500/25">
-                Connect through VoxVPN.
+                Get Protected Now
               </button>
               <button className="px-7 py-3 border border-white/15 hover:border-cyan-500/50 text-white font-semibold rounded-full text-sm transition-all">
-                View Platform
+                See How It Works
               </button>
             </div>
 
             <div className="flex flex-wrap gap-5 pt-1">
-              {['No-logs architecture', 'One-click setup flow', 'Global server routing'].map((f) => (
+              {['No-Logs Policy', 'Blazing Fast', '10+ Locations', 'AES-256 Bit'].map((f) => (
                 <div key={f} className="flex items-center gap-2">
                   <CheckCircle size={14} className="text-cyan-400 flex-shrink-0" />
                   <span className="text-slate-400 text-sm">{f}</span>
@@ -192,18 +193,8 @@ export default function Hero() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="flex flex-col items-center justify-center gap-6"
+            className="flex items-center justify-center"
           >
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-center"
-            >
-              <p className="text-cyan-400/80 text-sm sm:text-base font-semibold tracking-wide px-4">
-                Military-grade AES-256 encryption · Zero-knowledge architecture · Blazing-fast performance
-              </p>
-            </motion.div>
             <ShieldViz />
           </motion.div>
         </div>
