@@ -12,7 +12,7 @@ const tabs = [
 export default function MobileBottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { activeTab, setActiveTab, saveScrollPosition } = useTabContext();
+  const { activeTab, setActiveTab, saveScrollPosition, saveTabState } = useTabContext();
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
   if (!isMobile) return null;
@@ -27,8 +27,8 @@ export default function MobileBottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 border-t border-white/5 bg-[#060910] z-40">
-      <div className="flex items-center justify-around h-16 safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 border-t border-white/5 bg-[#060910] z-40 safe-area-bottom">
+      <div className="flex items-center justify-around h-16">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -36,7 +36,7 @@ export default function MobileBottomNav() {
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab)}
-              className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+              className={`flex flex-col items-center justify-center flex-1 h-full transition-colors select-none touch-target ${
                 isActive ? 'text-cyan-400' : 'text-slate-500 hover:text-slate-300'
               }`}
             >

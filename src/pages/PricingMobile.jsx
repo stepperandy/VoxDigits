@@ -53,7 +53,7 @@ function PlanCard({ plan, yearly, onCheckout, isLoading }) {
       <button
         onClick={() => onCheckout(plan, yearly)}
         disabled={isLoading}
-        className="w-full mt-4 py-3 rounded-lg font-bold text-sm transition-all touch-target disabled:opacity-60"
+        className="w-full mt-4 py-3 rounded-lg font-bold text-sm transition-all select-none touch-target active:scale-95 disabled:opacity-60"
         style={{
           background: plan.popular
             ? 'linear-gradient(135deg, #0ea5ff, #4fd1ff)'
@@ -112,27 +112,27 @@ export default function PricingMobile() {
 
           {/* Toggle */}
           <div className="flex items-center gap-3 my-6 p-3 bg-[#0d1120] rounded-lg">
-            <button
-              onClick={() => setYearly(false)}
-              className={`flex-1 py-2 rounded transition-colors font-bold text-sm ${
-                !yearly
-                  ? 'bg-cyan-400 text-black'
-                  : 'text-slate-400'
-              }`}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setYearly(true)}
-              className={`flex-1 py-2 rounded transition-colors font-bold text-sm ${
-                yearly
-                  ? 'bg-cyan-400 text-black'
-                  : 'text-slate-400'
-              }`}
-            >
-              Yearly
-            </button>
-          </div>
+                 <button
+                   onClick={() => setYearly(false)}
+                   className={`flex-1 py-2 rounded transition-colors font-bold text-sm select-none touch-target active:scale-95 ${
+                     !yearly
+                       ? 'bg-cyan-400 text-black'
+                       : 'text-slate-400'
+                   }`}
+                 >
+                   Monthly
+                 </button>
+                 <button
+                   onClick={() => setYearly(true)}
+                   className={`flex-1 py-2 rounded transition-colors font-bold text-sm select-none touch-target active:scale-95 ${
+                     yearly
+                       ? 'bg-cyan-400 text-black'
+                       : 'text-slate-400'
+                   }`}
+                 >
+                   Yearly
+                 </button>
+               </div>
 
           {/* Plans */}
           <div className="space-y-4">

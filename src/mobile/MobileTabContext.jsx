@@ -10,6 +10,12 @@ export function TabProvider({ children }) {
     'home': 0,
     'account': 0,
   });
+  const tabState = useRef({
+    'features': {},
+    'pricing': { yearly: false },
+    'home': {},
+    'account': {},
+  });
 
   const saveScrollPosition = (tab, position) => {
     scrollPositions.current[tab] = position;
@@ -19,8 +25,16 @@ export function TabProvider({ children }) {
     return scrollPositions.current[tab] || 0;
   };
 
+  const saveTabState = (tab, state) => {
+    tabState.current[tab] = { ...tabState.current[tab], ...state };
+  };
+
+  const getTabState = (tab) => {
+    return tabState.current[tab] || {};
+  };
+
   return (
-    <TabContext.Provider value={{ activeTab, setActiveTab, saveScrollPosition, getScrollPosition }}>
+    <TabContext.Provider value={{ activeTab, setActiveTab, saveScrollPosition, getScrollPosition, saveTabState, getTabState }}>
       {children}
     </TabContext.Provider>
   );

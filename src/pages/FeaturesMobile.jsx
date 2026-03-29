@@ -55,9 +55,9 @@ export default function FeaturesMobile() {
               const Icon = f.icon;
               return (
                 <div
-                  key={i}
-                  className="p-4 rounded-xl border border-white/5 bg-[#0d1120] active:bg-[#0f1428] transition-colors touch-target"
-                >
+                   key={i}
+                   className="p-4 rounded-xl border border-white/5 bg-[#0d1120] active:bg-[#0f1428] transition-colors select-none touch-target"
+                 >
                   <div className="flex items-start gap-3">
                     <Icon size={20} className="text-cyan-400 flex-shrink-0 mt-1" />
                     <div>
@@ -76,7 +76,7 @@ export default function FeaturesMobile() {
               const pricingBtn = Array.from(nav?.querySelectorAll('button') || []).find(btn => btn.textContent.includes('Pricing'));
               pricingBtn?.click();
             }}
-            className="w-full mt-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-lg transition-colors"
+            className="w-full mt-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-lg transition-colors select-none touch-target active:scale-95"
           >
             Get Protected
           </button>

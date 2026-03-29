@@ -68,27 +68,27 @@ export default function AccountMobile() {
               {/* Actions */}
               <div className="space-y-3">
                 <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center justify-between p-4 rounded-lg border border-white/5 bg-[#0d1120] hover:bg-[#0f1428] transition-colors touch-target"
-                >
-                  <div className="flex items-center gap-3">
-                    <LogOut size={18} className="text-slate-400" />
-                    <span className="text-white font-medium">Log Out</span>
-                  </div>
-                  <ChevronRight size={18} className="text-slate-500" />
-                </button>
+                   onClick={handleLogout}
+                   className="w-full flex items-center justify-between p-4 rounded-lg border border-white/5 bg-[#0d1120] hover:bg-[#0f1428] transition-colors select-none touch-target active:scale-95"
+                 >
+                   <div className="flex items-center gap-3">
+                     <LogOut size={18} className="text-slate-400" />
+                     <span className="text-white font-medium">Log Out</span>
+                   </div>
+                   <ChevronRight size={18} className="text-slate-500" />
+                 </button>
 
                 {/* Delete Account */}
                 <div className="space-y-2">
                   <button
-                    onClick={handleDeleteAccount}
-                    disabled={deleting}
-                    className={`w-full flex items-center justify-between p-4 rounded-lg border transition-colors touch-target ${
-                      showDeleteConfirm
-                        ? 'border-red-500 bg-red-500/10'
-                        : 'border-white/5 bg-[#0d1120] hover:bg-[#0f1428]'
-                    }`}
-                  >
+                     onClick={handleDeleteAccount}
+                     disabled={deleting}
+                     className={`w-full flex items-center justify-between p-4 rounded-lg border transition-colors select-none touch-target active:scale-95 disabled:scale-100 ${
+                       showDeleteConfirm
+                         ? 'border-red-500 bg-red-500/10'
+                         : 'border-white/5 bg-[#0d1120] hover:bg-[#0f1428]'
+                     }`}
+                   >
                     <div className="flex items-center gap-3">
                       <Trash2
                         size={18}
@@ -111,14 +111,14 @@ export default function AccountMobile() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => setShowDeleteConfirm(false)}
-                          className="flex-1 py-2 rounded bg-slate-700 text-white text-sm font-bold transition-colors"
+                          className="flex-1 py-2 rounded bg-slate-700 text-white text-sm font-bold transition-colors select-none touch-target active:scale-95"
                         >
                           Cancel
                         </button>
                         <button
                           onClick={handleDeleteAccount}
                           disabled={deleting}
-                          className="flex-1 py-2 rounded bg-red-600 text-white text-sm font-bold transition-colors disabled:opacity-50"
+                          className="flex-1 py-2 rounded bg-red-600 text-white text-sm font-bold transition-colors select-none touch-target active:scale-95 disabled:opacity-50 disabled:scale-100"
                         >
                           {deleting ? 'Deleting...' : 'Confirm Delete'}
                         </button>
@@ -132,11 +132,11 @@ export default function AccountMobile() {
             <div className="text-center py-12">
               <p className="text-slate-400 mb-4">Please log in to view your account.</p>
               <button
-                onClick={() => base44.auth.redirectToLogin()}
-                className="px-6 py-3 bg-cyan-400 text-black font-bold rounded-lg transition-colors"
-              >
-                Log In
-              </button>
+                 onClick={() => base44.auth.redirectToLogin()}
+                 className="px-6 py-3 bg-cyan-400 text-black font-bold rounded-lg transition-colors select-none touch-target active:scale-95"
+               >
+                 Log In
+               </button>
             </div>
           )}
         </div>
