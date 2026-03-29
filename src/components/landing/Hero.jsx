@@ -192,8 +192,18 @@ export default function Hero() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="flex items-center justify-center"
+            className="flex flex-col items-center justify-center gap-6"
           >
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-center"
+            >
+              <p className="text-cyan-400/80 text-sm sm:text-base font-semibold tracking-wide px-4">
+                Military-grade AES-256 encryption · Zero-knowledge architecture · Blazing-fast performance
+              </p>
+            </motion.div>
             <ShieldViz />
           </motion.div>
         </div>
