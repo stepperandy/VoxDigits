@@ -1,0 +1,42 @@
+{
+  "name": "Analytics",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Analytics date"
+    },
+    "total_active_connections": {
+      "type": "integer",
+      "description": "Total active VPN connections across all servers"
+    },
+    "total_bandwidth_gb": {
+      "type": "number",
+      "description": "Total bandwidth consumed (GB)"
+    },
+    "new_subscriptions": {
+      "type": "integer",
+      "description": "New subscriptions created today"
+    },
+    "cancelled_subscriptions": {
+      "type": "integer",
+      "description": "Subscriptions cancelled today"
+    },
+    "server_connections": {
+      "type": "object",
+      "description": "Active connections per server (JSON map)"
+    },
+    "peak_hour": {
+      "type": "integer",
+      "description": "Hour of day with highest traffic"
+    },
+    "peak_connections": {
+      "type": "integer",
+      "description": "Peak concurrent connections during the day"
+    }
+  },
+  "required": [
+    "date"
+  ]
+}

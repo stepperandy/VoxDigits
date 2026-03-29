@@ -7,6 +7,8 @@ import UsersView from '@/components/admin/UsersView';
 import ServersView from '@/components/admin/ServersView';
 import SetupsView from '@/components/admin/SetupsView';
 import DownloadsView from '@/components/admin/DownloadsView';
+import VPNServerManagement from '@/components/admin/VPNServerManagement';
+import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
 
 export default function Admin() {
   const [activePage, setActivePage] = useState('dashboard');
@@ -19,8 +21,10 @@ export default function Admin() {
     switch (activePage) {
       case 'users': return <UsersView />;
       case 'servers': return <ServersView />;
+      case 'vpn-servers': return <VPNServerManagement />;
       case 'setups': return <SetupsView />;
       case 'downloads': return <DownloadsView />;
+      case 'analytics': return <AnalyticsDashboard />;
       default: return <DashboardView />;
     }
   };

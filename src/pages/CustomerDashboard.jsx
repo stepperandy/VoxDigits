@@ -1,0 +1,404 @@
+import { useEffect, useState } from 'react';
+import { base44 } from '@/api/base44Client';
+import { Download, Trash2, Plus, Loader2, Check, AlertCircle, Smartphone, Monitor, Wifi } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const deviceIcons = {
+  windows: Monitor,
+  macos: Monitor,
+  linux: Monitor,
+  ios: Smartphone,
+  android: Smartphone,
+  router: Wifi,
+};
+
+const deviceLabels = {
+  windows: 'Windows',
+  macos: 'macOS',
+  linux: 'Linux',
+  ios: 'iPhone/iPad',
+  android: 'Android',
+  router: 'Router',
+};
+
+export default function CustomerDashboard() {
+  const [subscription, setSubscription] = useState(null);
+  const [devices, setDevices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(null);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const currentUser = await base44.auth.me();
+        setUser(currentUser);
+
+        // Load subscription
+        const subs = await base44.entities.VPNSubscription.filter({
+          user_email: currentUser.email,
+        });
+        if (subs.length > 0) {
+          setSubscription(subs[0]);
+
+          // Load linked devices
+          const devs = await base44.entities.LinkedDevice.filter({
+            subscription_id: subs[0].id,
+          });
+          setDevices(devs);
+        }
+      } catch (error) {
+        console.error('Failed to load dashboard:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const downloadConfig = async (deviceId, deviceType) => {
+    setDownloading(deviceId);
+    try {
+      const response = await base44.functions.invoke('downloadVpnConfig', {
+        device_id: deviceId,
+        device_type: deviceType,
+      });
+
+      if (response.data?.file_url) {
+        window.open(response.data.file_url, '_blank');
+      }
+    } catch (error) {
+      alert('Failed to download config: ' + error.message);
+    } finally {
+      setDownloading(null);
+    }
+  };
+
+  const downloadWindowsInstaller = async () => {
+    setDownloading('windows-exe');
+    try {
+      const response = await base44.functions.invoke('generateSetupFiles', {
+        platform: 'windows',
+      });
+
+      const blob = new Blob([response.data.content], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'VoxVPN-Windows-Setup.nsi';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      alert('Failed to download: ' + error.message);
+    } finally {
+      setDownloading(null);
+    }
+  };
+
+  const removeDevice = async (deviceId) => {
+    if (!window.confirm('Remove this device from your VPN account?')) return;
+
+    try {
+      await base44.entities.LinkedDevice.delete(deviceId);
+      setDevices(devices.filter(d => d.id !== deviceId));
+    } catch (error) {
+      alert('Failed to remove device: ' + error.message);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#060910] flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 size={32} className="text-cyan-400 animate-spin mx-auto mb-3" />
+          <p className="text-slate-400">Loading your VPN dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!subscription) {
+    return (
+      <div className="min-h-screen bg-[#060910] flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <AlertCircle size={48} className="text-amber-500 mx-auto mb-4" />
+          <h2 className="text-white text-2xl font-bold mb-2">No Active Subscription</h2>
+          <p className="text-slate-400 mb-6">
+            You don't have an active VPN subscription. Visit our pricing page to get started.
+          </p>
+          <a
+            href="/#pricing"
+            className="inline-block px-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-lg transition-all"
+          >
+            View Plans
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#060910] pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">
+            VPN Dashboard
+          </h1>
+          <p className="text-slate-400">
+            Welcome back, {user?.full_name}. Manage your VPN subscription and devices.
+          </p>
+        </div>
+
+        {/* Subscription Status */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border border-cyan-500/20 bg-[#0d1120] p-6 md:p-8"
+        >
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-6">
+            <div>
+              <p className="text-slate-500 text-xs uppercase tracking-widest mb-2">
+                Active Subscription
+              </p>
+              <h2 className="text-2xl sm:text-3xl font-black text-white mb-1">
+                {subscription.plan} Plan
+              </h2>
+              <p className="text-slate-400 text-sm">
+                {subscription.billing_cycle === 'yearly' ? 'Billed yearly' : 'Billed monthly'}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="absolute inset-0 bg-cyan-500/20 rounded-full animate-pulse" />
+                <div className="relative w-20 h-20 bg-cyan-500/10 border border-cyan-500/30 rounded-full flex items-center justify-center">
+                  <Check size={32} className="text-cyan-400" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              { label: 'Price', value: `$${subscription.price}/${subscription.billing_cycle === 'yearly' ? 'year' : 'month'}` },
+              { label: 'Devices', value: `${devices.length}/${subscription.max_devices}` },
+              { label: 'Status', value: subscription.status.toUpperCase() },
+              {
+                label: 'Renews',
+                value: new Date(subscription.renewal_date).toLocaleDateString(),
+              },
+            ].map((item) => (
+              <div key={item.label} className="bg-[#0a1020] rounded-xl p-3">
+                <p className="text-slate-600 text-xs uppercase tracking-wider mb-1">
+                  {item.label}
+                </p>
+                <p className="text-white font-bold text-sm">{item.value}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Downloads Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="rounded-2xl border border-white/5 bg-[#0d1120] p-6 md:p-8"
+        >
+          <h3 className="text-xl font-bold text-white mb-4">
+            Download VPN Configuration
+          </h3>
+          <p className="text-slate-400 text-sm mb-6">
+            Get your personalized VPN configuration for any device.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Windows Installer */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={downloadWindowsInstaller}
+              disabled={downloading === 'windows-exe'}
+              className="p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 transition-all flex items-center gap-3 disabled:opacity-50"
+            >
+              <Monitor size={24} className="text-blue-400" />
+              <div className="text-left">
+                <p className="text-white font-bold text-sm">Windows (.exe)</p>
+                <p className="text-slate-500 text-xs">NSIS Installer</p>
+              </div>
+              {downloading === 'windows-exe' ? (
+                <Loader2 size={18} className="ml-auto text-cyan-400 animate-spin" />
+              ) : (
+                <Download size={18} className="ml-auto text-slate-500" />
+              )}
+            </motion.button>
+
+            {/* macOS Config */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => downloadConfig('macos-config', 'macos')}
+              disabled={downloading === 'macos-config'}
+              className="p-4 rounded-xl border border-slate-500/20 bg-slate-500/5 hover:bg-slate-500/10 transition-all flex items-center gap-3 disabled:opacity-50"
+            >
+              <Monitor size={24} className="text-slate-400" />
+              <div className="text-left">
+                <p className="text-white font-bold text-sm">macOS Config</p>
+                <p className="text-slate-500 text-xs">.conf file</p>
+              </div>
+              {downloading === 'macos-config' ? (
+                <Loader2 size={18} className="ml-auto text-cyan-400 animate-spin" />
+              ) : (
+                <Download size={18} className="ml-auto text-slate-500" />
+              )}
+            </motion.button>
+
+            {/* Linux Config */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => downloadConfig('linux-config', 'linux')}
+              disabled={downloading === 'linux-config'}
+              className="p-4 rounded-xl border border-orange-500/20 bg-orange-500/5 hover:bg-orange-500/10 transition-all flex items-center gap-3 disabled:opacity-50"
+            >
+              <Monitor size={24} className="text-orange-400" />
+              <div className="text-left">
+                <p className="text-white font-bold text-sm">Linux Config</p>
+                <p className="text-slate-500 text-xs">.conf file</p>
+              </div>
+              {downloading === 'linux-config' ? (
+                <Loader2 size={18} className="ml-auto text-cyan-400 animate-spin" />
+              ) : (
+                <Download size={18} className="ml-auto text-slate-500" />
+              )}
+            </motion.button>
+
+            {/* iOS Config */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => downloadConfig('ios-config', 'ios')}
+              disabled={downloading === 'ios-config'}
+              className="p-4 rounded-xl border border-cyan-500/20 bg-cyan-500/5 hover:bg-cyan-500/10 transition-all flex items-center gap-3 disabled:opacity-50"
+            >
+              <Smartphone size={24} className="text-cyan-400" />
+              <div className="text-left">
+                <p className="text-white font-bold text-sm">iOS Config</p>
+                <p className="text-slate-500 text-xs">.conf file</p>
+              </div>
+              {downloading === 'ios-config' ? (
+                <Loader2 size={18} className="ml-auto text-cyan-400 animate-spin" />
+              ) : (
+                <Download size={18} className="ml-auto text-slate-500" />
+              )}
+            </motion.button>
+
+            {/* Android Config */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => downloadConfig('android-config', 'android')}
+              disabled={downloading === 'android-config'}
+              className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 transition-all flex items-center gap-3 disabled:opacity-50"
+            >
+              <Smartphone size={24} className="text-emerald-400" />
+              <div className="text-left">
+                <p className="text-white font-bold text-sm">Android Config</p>
+                <p className="text-slate-500 text-xs">.conf file</p>
+              </div>
+              {downloading === 'android-config' ? (
+                <Loader2 size={18} className="ml-auto text-cyan-400 animate-spin" />
+              ) : (
+                <Download size={18} className="ml-auto text-slate-500" />
+              )}
+            </motion.button>
+
+            {/* Router Config */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => downloadConfig('router-config', 'router')}
+              disabled={downloading === 'router-config'}
+              className="p-4 rounded-xl border border-violet-500/20 bg-violet-500/5 hover:bg-violet-500/10 transition-all flex items-center gap-3 disabled:opacity-50"
+            >
+              <Wifi size={24} className="text-violet-400" />
+              <div className="text-left">
+                <p className="text-white font-bold text-sm">Router Config</p>
+                <p className="text-slate-500 text-xs">.conf file</p>
+              </div>
+              {downloading === 'router-config' ? (
+                <Loader2 size={18} className="ml-auto text-cyan-400 animate-spin" />
+              ) : (
+                <Download size={18} className="ml-auto text-slate-500" />
+              )}
+            </motion.button>
+          </div>
+        </motion.div>
+
+        {/* Linked Devices */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="rounded-2xl border border-white/5 bg-[#0d1120] p-6 md:p-8"
+        >
+          <h3 className="text-xl font-bold text-white mb-4">
+            Linked Devices ({devices.length}/{subscription.max_devices})
+          </h3>
+
+          {devices.length === 0 ? (
+            <div className="text-center py-12">
+              <Smartphone size={32} className="text-slate-700 mx-auto mb-3" />
+              <p className="text-slate-500">
+                No devices linked yet. Download a configuration above to get started.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <AnimatePresence>
+                {devices.map((device) => {
+                  const Icon = deviceIcons[device.device_type] || Smartphone;
+                  return (
+                    <motion.div
+                      key={device.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-[#0a1020] hover:border-white/10 transition-all"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center">
+                          <Icon size={20} className="text-cyan-400" />
+                        </div>
+                        <div>
+                          <p className="text-white font-semibold text-sm">
+                            {device.device_name}
+                          </p>
+                          <p className="text-slate-500 text-xs">
+                            {deviceLabels[device.device_type]} •{' '}
+                            {device.last_connected
+                              ? new Date(device.last_connected).toLocaleDateString()
+                              : 'Never connected'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => removeDevice(device.id)}
+                        className="p-2 rounded-lg hover:bg-rose-500/10 text-slate-600 hover:text-rose-400 transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
+          )}
+        </motion.div>
+      </div>
+    </div>
+  );
+}

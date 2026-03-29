@@ -1,0 +1,72 @@
+{
+  "name": "VPNServer",
+  "type": "object",
+  "properties": {
+    "region": {
+      "type": "string",
+      "description": "Server region (New York, London, Tokyo, etc.)"
+    },
+    "country": {
+      "type": "string",
+      "description": "Country code (US, UK, JP)"
+    },
+    "city": {
+      "type": "string",
+      "description": "City name"
+    },
+    "ip_address": {
+      "type": "string",
+      "description": "Server public IP address"
+    },
+    "port": {
+      "type": "integer",
+      "default": 51820,
+      "description": "WireGuard port"
+    },
+    "public_key": {
+      "type": "string",
+      "description": "WireGuard public key"
+    },
+    "vultr_instance_id": {
+      "type": "string",
+      "description": "Vultr instance ID (if provisioned via Vultr)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "online",
+        "offline",
+        "maintenance"
+      ],
+      "default": "online",
+      "description": "Server status"
+    },
+    "current_load": {
+      "type": "number",
+      "description": "Current load percentage (0-100)"
+    },
+    "max_connections": {
+      "type": "integer",
+      "description": "Maximum allowed concurrent connections"
+    },
+    "active_connections": {
+      "type": "integer",
+      "default": 0,
+      "description": "Current active connections"
+    },
+    "bandwidth_used_gb": {
+      "type": "number",
+      "description": "Bandwidth used this month (GB)"
+    },
+    "uptime_percentage": {
+      "type": "number",
+      "description": "Monthly uptime percentage"
+    }
+  },
+  "required": [
+    "region",
+    "country",
+    "ip_address",
+    "public_key"
+  ]
+}

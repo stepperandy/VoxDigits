@@ -1,0 +1,67 @@
+{
+  "name": "VPNSubscription",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the VPN subscriber"
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "Basic",
+        "Standard",
+        "Premium",
+        "Advanced",
+        "Enterprise"
+      ],
+      "description": "Subscription plan type"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "paused",
+        "expired",
+        "cancelled"
+      ],
+      "default": "active",
+      "description": "Current subscription status"
+    },
+    "billing_cycle": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "yearly"
+      ],
+      "description": "Billing cycle"
+    },
+    "price": {
+      "type": "number",
+      "description": "Current subscription price"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Subscription start date"
+    },
+    "renewal_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Next renewal date"
+    },
+    "max_devices": {
+      "type": "integer",
+      "description": "Maximum number of linked devices"
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "description": "Stripe subscription ID for billing"
+    }
+  },
+  "required": [
+    "user_email",
+    "plan",
+    "status"
+  ]
+}

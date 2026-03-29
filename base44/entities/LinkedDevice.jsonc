@@ -1,0 +1,57 @@
+{
+  "name": "LinkedDevice",
+  "type": "object",
+  "properties": {
+    "subscription_id": {
+      "type": "string",
+      "description": "Reference to VPNSubscription"
+    },
+    "device_name": {
+      "type": "string",
+      "description": "User-friendly name (e.g., My iPhone, Work Laptop)"
+    },
+    "device_type": {
+      "type": "string",
+      "enum": [
+        "windows",
+        "macos",
+        "linux",
+        "ios",
+        "android",
+        "router"
+      ],
+      "description": "Operating system / device type"
+    },
+    "device_id": {
+      "type": "string",
+      "description": "Unique device identifier (hash)"
+    },
+    "vpn_profile_key": {
+      "type": "string",
+      "description": "WireGuard private key for this device"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive"
+      ],
+      "default": "active",
+      "description": "Device connection status"
+    },
+    "last_connected": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last connection timestamp"
+    },
+    "ip_address": {
+      "type": "string",
+      "description": "Current VPN IP assigned to device"
+    }
+  },
+  "required": [
+    "subscription_id",
+    "device_name",
+    "device_type"
+  ]
+}

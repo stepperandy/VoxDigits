@@ -13,6 +13,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 // Lazy-loaded pages
 const Home = lazy(() => import('./pages/Home'));
 const Admin = lazy(() => import('./pages/Admin.jsx'));
+const CustomerDashboard = lazy(() => import('./pages/CustomerDashboard.jsx'));
 const VpnUSA = lazy(() => import('./pages/vpn-countries/VpnUSA.jsx'));
 const VpnUK = lazy(() => import('./pages/vpn-countries/VpnUK.jsx'));
 const VpnCanada = lazy(() => import('./pages/vpn-countries/VpnCanada.jsx'));
@@ -96,6 +97,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
         <Routes>
           <Route path="/" element={<PageTransition>{isMobileDevice ? <FeaturesMobile /> : <Home />}</PageTransition>} />
           <Route path="/admin" element={<PageTransition><Admin /></PageTransition>} />
+          <Route path="/dashboard" element={<PageTransition><CustomerDashboard /></PageTransition>} />
           <Route path="/vpn-for-usa" element={<PageTransition><VpnUSA /></PageTransition>} />
           <Route path="/vpn-for-uk" element={<PageTransition><VpnUK /></PageTransition>} />
           <Route path="/vpn-for-canada" element={<PageTransition><VpnCanada /></PageTransition>} />
