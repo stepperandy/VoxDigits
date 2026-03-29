@@ -170,10 +170,16 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-wrap gap-3 pt-1">
-              <button className="px-7 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full text-sm transition-all shadow-lg shadow-cyan-500/25">
+              <button 
+                onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+                className="px-7 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full text-sm transition-all shadow-lg shadow-cyan-500/25"
+              >
                 Get Protected Now
               </button>
-              <button className="px-7 py-3 border border-white/15 hover:border-cyan-500/50 text-white font-semibold rounded-full text-sm transition-all">
+              <button 
+                onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                className="px-7 py-3 border border-white/15 hover:border-cyan-500/50 text-white font-semibold rounded-full text-sm transition-all"
+              >
                 See How It Works
               </button>
             </div>
