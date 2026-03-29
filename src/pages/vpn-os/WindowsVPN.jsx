@@ -27,7 +27,7 @@ export default function WindowsVPN() {
         <div className="rounded-2xl border border-cyan-500/20 bg-[#0d1a20] p-8 text-center">
           <h2 className="text-2xl font-bold text-white mb-3">Download VoxVPN for Windows</h2>
           <p className="text-slate-400 mb-6">Compatible with Windows 10 and Windows 11. 30-day money-back guarantee.</p>
-          <a href="/#pricing" className="inline-block px-8 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full transition-all">Download Now</a>
+          <a href="/setup?os=windows" className="inline-block px-8 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full transition-all">Download Now</a>
         </div>
       </div>
       <Footer />
