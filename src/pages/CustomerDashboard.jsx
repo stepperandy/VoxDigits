@@ -24,6 +24,7 @@ const deviceLabels = {
 export default function CustomerDashboard() {
   const [subscription, setSubscription] = useState(null);
   const [devices, setDevices] = useState([]);
+  const [downloads, setDownloads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(null);
   const [user, setUser] = useState(null);
@@ -47,6 +48,10 @@ export default function CustomerDashboard() {
           });
           setDevices(devs);
         }
+
+        // Load available downloads
+        const dlList = await base44.entities.Download.filter({ is_active: true });
+        setDownloads(dlList);
       } catch (error) {
         console.error('Failed to load dashboard:', error);
       } finally {
@@ -57,38 +62,12 @@ export default function CustomerDashboard() {
     loadData();
   }, []);
 
-  const downloadConfig = async (deviceId, deviceType) => {
-    setDownloading(deviceId);
+
+
+  const downloadFile = async (platform, fileUrl) => {
+    setDownloading(platform);
     try {
-      const response = await base44.functions.invoke('downloadVpnConfig', {
-        device_id: deviceId,
-        device_type: deviceType,
-      });
-
-      if (response.data?.file_url) {
-        window.open(response.data.file_url, '_blank');
-      }
-    } catch (error) {
-      alert('Failed to download config: ' + error.message);
-    } finally {
-      setDownloading(null);
-    }
-  };
-
-  const downloadWindowsInstaller = async () => {
-    setDownloading('windows-exe');
-    try {
-      const response = await base44.functions.invoke('generateSetupFiles', {
-        platform: 'windows',
-      });
-
-      const blob = new Blob([response.data.content], { type: 'text/plain' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'VoxVPN-Windows-Setup.nsi';
-      a.click();
-      window.URL.revokeObjectURL(url);
+      window.open(fileUrl, '_blank');
     } catch (error) {
       alert('Failed to download: ' + error.message);
     } finally {
@@ -208,132 +187,59 @@ export default function CustomerDashboard() {
           className="rounded-2xl border border-white/5 bg-[#0d1120] p-6 md:p-8"
         >
           <h3 className="text-xl font-bold text-white mb-4">
-            Download VPN Configuration
+            Download VPN for Your Device
           </h3>
           <p className="text-slate-400 text-sm mb-6">
-            Get your personalized VPN configuration for any device.
+            Download the official VoxVPN client for your device or configuration file.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Windows Installer */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={downloadWindowsInstaller}
-              disabled={downloading === 'windows-exe'}
-              className="p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 transition-all flex items-center gap-3 disabled:opacity-50"
-            >
-              <Monitor size={24} className="text-blue-400" />
-              <div className="text-left">
-                <p className="text-white font-bold text-sm">Windows (.exe)</p>
-                <p className="text-slate-500 text-xs">NSIS Installer</p>
-              </div>
-              {downloading === 'windows-exe' ? (
-                <Loader2 size={18} className="ml-auto text-cyan-400 animate-spin" />
-              ) : (
-                <Download size={18} className="ml-auto text-slate-500" />
-              )}
-            </motion.button>
+            {downloads.length === 0 ? (
+              <p className="text-slate-500 text-sm col-span-2">No downloads available at this time.</p>
+            ) : (
+              downloads.map((dl) => {
+                const platformIcons = {
+                  Windows: Monitor,
+                  macOS: Monitor,
+                  Linux: Monitor,
+                  iOS: Smartphone,
+                  Android: Smartphone,
+                  Router: Wifi,
+                };
+                const platformColors = {
+                  Windows: 'border-blue-500/20 bg-blue-500/5 text-blue-400',
+                  macOS: 'border-slate-500/20 bg-slate-500/5 text-slate-400',
+                  Linux: 'border-orange-500/20 bg-orange-500/5 text-orange-400',
+                  iOS: 'border-cyan-500/20 bg-cyan-500/5 text-cyan-400',
+                  Android: 'border-emerald-500/20 bg-emerald-500/5 text-emerald-400',
+                  Router: 'border-violet-500/20 bg-violet-500/5 text-violet-400',
+                };
+                const Icon = platformIcons[dl.platform] || Download;
+                const colorClass = platformColors[dl.platform] || '';
 
-            {/* macOS Config */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => downloadConfig('macos-config', 'macos')}
-              disabled={downloading === 'macos-config'}
-              className="p-4 rounded-xl border border-slate-500/20 bg-slate-500/5 hover:bg-slate-500/10 transition-all flex items-center gap-3 disabled:opacity-50"
-            >
-              <Monitor size={24} className="text-slate-400" />
-              <div className="text-left">
-                <p className="text-white font-bold text-sm">macOS Config</p>
-                <p className="text-slate-500 text-xs">.conf file</p>
-              </div>
-              {downloading === 'macos-config' ? (
-                <Loader2 size={18} className="ml-auto text-cyan-400 animate-spin" />
-              ) : (
-                <Download size={18} className="ml-auto text-slate-500" />
-              )}
-            </motion.button>
-
-            {/* Linux Config */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => downloadConfig('linux-config', 'linux')}
-              disabled={downloading === 'linux-config'}
-              className="p-4 rounded-xl border border-orange-500/20 bg-orange-500/5 hover:bg-orange-500/10 transition-all flex items-center gap-3 disabled:opacity-50"
-            >
-              <Monitor size={24} className="text-orange-400" />
-              <div className="text-left">
-                <p className="text-white font-bold text-sm">Linux Config</p>
-                <p className="text-slate-500 text-xs">.conf file</p>
-              </div>
-              {downloading === 'linux-config' ? (
-                <Loader2 size={18} className="ml-auto text-cyan-400 animate-spin" />
-              ) : (
-                <Download size={18} className="ml-auto text-slate-500" />
-              )}
-            </motion.button>
-
-            {/* iOS Config */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => downloadConfig('ios-config', 'ios')}
-              disabled={downloading === 'ios-config'}
-              className="p-4 rounded-xl border border-cyan-500/20 bg-cyan-500/5 hover:bg-cyan-500/10 transition-all flex items-center gap-3 disabled:opacity-50"
-            >
-              <Smartphone size={24} className="text-cyan-400" />
-              <div className="text-left">
-                <p className="text-white font-bold text-sm">iOS Config</p>
-                <p className="text-slate-500 text-xs">.conf file</p>
-              </div>
-              {downloading === 'ios-config' ? (
-                <Loader2 size={18} className="ml-auto text-cyan-400 animate-spin" />
-              ) : (
-                <Download size={18} className="ml-auto text-slate-500" />
-              )}
-            </motion.button>
-
-            {/* Android Config */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => downloadConfig('android-config', 'android')}
-              disabled={downloading === 'android-config'}
-              className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 transition-all flex items-center gap-3 disabled:opacity-50"
-            >
-              <Smartphone size={24} className="text-emerald-400" />
-              <div className="text-left">
-                <p className="text-white font-bold text-sm">Android Config</p>
-                <p className="text-slate-500 text-xs">.conf file</p>
-              </div>
-              {downloading === 'android-config' ? (
-                <Loader2 size={18} className="ml-auto text-cyan-400 animate-spin" />
-              ) : (
-                <Download size={18} className="ml-auto text-slate-500" />
-              )}
-            </motion.button>
-
-            {/* Router Config */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => downloadConfig('router-config', 'router')}
-              disabled={downloading === 'router-config'}
-              className="p-4 rounded-xl border border-violet-500/20 bg-violet-500/5 hover:bg-violet-500/10 transition-all flex items-center gap-3 disabled:opacity-50"
-            >
-              <Wifi size={24} className="text-violet-400" />
-              <div className="text-left">
-                <p className="text-white font-bold text-sm">Router Config</p>
-                <p className="text-slate-500 text-xs">.conf file</p>
-              </div>
-              {downloading === 'router-config' ? (
-                <Loader2 size={18} className="ml-auto text-cyan-400 animate-spin" />
-              ) : (
-                <Download size={18} className="ml-auto text-slate-500" />
-              )}
-            </motion.button>
+                return (
+                  <motion.button
+                    key={dl.id}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => downloadFile(dl.id, dl.file_url)}
+                    disabled={downloading === dl.id || !dl.file_url}
+                    className={`p-4 rounded-xl border hover:opacity-80 transition-all flex items-center gap-3 disabled:opacity-50 ${colorClass}`}
+                  >
+                    <Icon size={24} />
+                    <div className="text-left">
+                      <p className="text-white font-bold text-sm">{dl.name}</p>
+                      <p className="text-slate-500 text-xs">{dl.version && `v${dl.version}`} {dl.is_free ? '• Free' : `• $${dl.price}`}</p>
+                    </div>
+                    {downloading === dl.id ? (
+                      <Loader2 size={18} className="ml-auto text-cyan-400 animate-spin" />
+                    ) : (
+                      <Download size={18} className="ml-auto text-slate-500" />
+                    )}
+                  </motion.button>
+                );
+              })
+            )}
           </div>
         </motion.div>
 
