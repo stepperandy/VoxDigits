@@ -280,12 +280,12 @@ export default function SetupPortal() {
                 <h3 className="text-white font-bold text-sm mb-3">Branded Customer Flow</h3>
                 <ol className="space-y-2 text-[#a9b7c9] text-sm list-decimal list-inside m-0 p-0">
                   {[
-                    'Buyer completes payment for a VoxVPN plan.',
-                    'Backend provisions a secure VoxVPN profile on your own servers.',
-                    'Buyer receives a VoxVPN email with secure access link.',
-                    'Buyer opens this VoxVPN setup center.',
-                    'Buyer downloads the correct setup profile for their OS.',
-                    'Buyer follows VoxVPN-branded installation instructions.',
+                    'Choose your VoxVPN plan and complete payment.',
+                    'Your secure VPN access is provisioned on our own VoxVPN servers.',
+                    'You receive an email with your secure setup link.',
+                    'Open your setup page and download the right file for your device.',
+                    'Import your setup and connect in minutes.',
+                    'Choose from multiple server locations for speed, privacy, and flexibility.',
                   ].map((s, i) => <li key={i}>{s}</li>)}
                 </ol>
               </div>
