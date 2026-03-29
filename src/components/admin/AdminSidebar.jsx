@@ -26,15 +26,11 @@ export default function AdminSidebar({ activePage, onNavigate, onLogout }) {
       <aside className={`fixed left-0 top-0 h-screen w-64 bg-[#060910] border-r border-white/5 transition-transform duration-300 z-40 flex flex-col ${open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         {/* Logo */}
         <div className="p-5 border-b border-white/5">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center">
-              <Shield size={18} className="text-cyan-400" />
-            </div>
-            <div>
-              <div className="text-white font-bold text-sm">VoxVPN</div>
-              <div className="text-cyan-400/70 text-xs tracking-wide">Control Panel</div>
-            </div>
-          </div>
+          <img
+            src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/2372c7923_image.png"
+            alt="VoxVPN"
+            className="h-9 w-9"
+          />
         </div>
 
         {/* Section label */}
