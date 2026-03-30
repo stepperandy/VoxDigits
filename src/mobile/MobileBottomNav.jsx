@@ -17,10 +17,13 @@ export default function MobileBottomNav() {
 
   if (!isMobile) return null;
 
+  const pathToTab = { '/': 'home', '/features-mobile': 'features', '/pricing-mobile': 'pricing', '/account-mobile': 'account' };
+  const currentTab = pathToTab[location.pathname] || activeTab;
+
   const handleTabChange = (tab) => {
     const mainContent = document.querySelector('main');
     if (mainContent) {
-      saveScrollPosition(activeTab, mainContent.scrollTop);
+      saveScrollPosition(currentTab, mainContent.scrollTop);
     }
     setActiveTab(tab.id);
     navigate(tab.path);
@@ -31,7 +34,7 @@ export default function MobileBottomNav() {
       <div className="flex items-center justify-around h-16">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
+          const isActive = currentTab === tab.id;
           return (
             <button
               key={tab.id}

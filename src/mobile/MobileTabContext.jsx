@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useRef } from 'react';
 const TabContext = createContext();
 
 export function TabProvider({ children }) {
-  const [activeTab, setActiveTab] = useState('features');
+  const [activeTab, setActiveTab] = useState('home');
   const scrollPositions = useRef({
     'features': 0,
     'pricing': 0,
