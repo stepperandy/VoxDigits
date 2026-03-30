@@ -1,65 +1,55 @@
 import { useState } from 'react';
+// Pricing plans match Stripe products exactly
 import { Check } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
 const plans = [
   {
+    name: 'Monthly',
+    price: 8.99,
+    billingLabel: 'billed monthly',
+    popular: false,
+    features: ['5 Devices', '50+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Log Policy'],
+    priceId: 'price_1TDvPiAj5jZA8C2y4aS6FXt1',
+  },
+  {
     name: 'Basic',
     price: 9.99,
-    yearly: 5.00,
+    billingLabel: 'billed monthly',
     popular: false,
-    features: ['2 Devices', '50+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption'],
-    priceIdMonthly: 'price_1QsgL0EiNNFb5ydcXxxxx',
-    priceIdYearly: 'price_1QsgL0EiNNFb5ydcYyyyy',
+    features: ['5 Devices', '50+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Log Policy', '3-Day Free Trial'],
+    priceId: 'price_1TFwCxAj5jZA8C2ywLEfaNXR',
+    trial: true,
   },
   {
-    name: 'Standard',
-    price: 14.99,
-    yearly: 10.00,
-    popular: false,
-    features: ['3 Devices', 'All Locations', 'Unlimited Bandwidth', 'AES-256 Encryption', 'Priority Support'],
-    priceIdMonthly: 'price_1QsgL0EiNNFb5ydcZzzzz',
-    priceIdYearly: 'price_1QsgL0EiNNFb5ydcAaaaa',
-  },
-  {
-    name: 'Premium',
-    price: 19.99,
-    yearly: 14.99,
+    name: 'Annual',
+    price: 4.99,
+    billingLabel: 'billed $59.88/year',
     popular: true,
-    features: ['5 Devices', 'All 12 Locations', 'Unlimited Bandwidth', 'AES-256 Encryption', 'Priority Support', 'Split Tunneling'],
-    priceIdMonthly: 'price_1QsgL0EiNNFb5ydcBbbbb',
-    priceIdYearly: 'price_1QsgL0EiNNFb5ydcCcccc',
+    features: ['5 Devices', 'All Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Log Policy', 'Priority Support', 'Kill Switch'],
+    priceId: 'price_1TDvPjAj5jZA8C2yKmoBiYce',
+    savings: 'Save 44%',
   },
   {
-    name: 'Advanced',
-    price: 29.99,
-    yearly: 24.99,
+    name: '2-Year',
+    price: 2.99,
+    billingLabel: 'billed $71.76 every 2 years',
     popular: false,
-    features: ['7 Devices', 'All Premium Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', '24/7 Support', 'Dedicated IP'],
-    priceIdMonthly: 'price_1QsgL0EiNNFb5ydcDdddd',
-    priceIdYearly: 'price_1QsgL0EiNNFb5ydcEeeee',
-  },
-  {
-    name: 'Enterprise',
-    price: 39.99,
-    yearly: 18.00,
-    popular: false,
-    features: ['10 Devices', 'All Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', '24/7 Priority Support', 'Dedicated IP', 'Kill Switch'],
-    priceIdMonthly: 'price_1QsgL0EiNNFb5ydcFffff',
-    priceIdYearly: 'price_1QsgL0EiNNFb5ydcGgggg',
+    features: ['5 Devices', 'All Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Log Policy', '24/7 Support', 'Kill Switch', 'Dedicated IP'],
+    priceId: 'price_1TDvPjAj5jZA8C2yrapCxQbT',
+    savings: 'Best Value',
   },
 ];
 
-function PlanCard({ plan, yearly }) {
+function PlanCard({ plan }) {
   const [loading, setLoading] = useState(false);
 
   const handleCheckout = async () => {
     setLoading(true);
     try {
-      const priceId = yearly ? plan.priceIdYearly : plan.priceIdMonthly;
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: plan.name,
-        priceId: priceId,
+        priceId: plan.priceId,
       });
       if (res.data?.url) {
         window.location.href = res.data.url;
@@ -83,11 +73,18 @@ function PlanCard({ plan, yearly }) {
           <span className="px-3 py-1 bg-cyan-500 text-black text-xs font-bold rounded-full">Most Popular</span>
         </div>
       )}
+      {plan.savings && !plan.popular && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+          <span className="px-3 py-1 bg-emerald-500 text-black text-xs font-bold rounded-full">{plan.savings}</span>
+        </div>
+      )}
       <h3 className="text-white font-bold text-base mb-1">{plan.name}</h3>
-      <div className="flex items-baseline gap-1 mb-4">
-        <span className="text-3xl font-extrabold text-white">${yearly ? plan.yearly : plan.price}</span>
+      <div className="flex items-baseline gap-1 mb-1">
+        <span className="text-3xl font-extrabold text-white">${plan.price}</span>
         <span className="text-slate-500 text-xs">/month</span>
       </div>
+      <p className="text-slate-600 text-xs mb-4">{plan.billingLabel}</p>
+      {plan.trial && <p className="text-cyan-400 text-xs font-semibold mb-3">✓ 3-day free trial</p>}
       <button onClick={handleCheckout} disabled={loading} className={`w-full py-2.5 rounded text-sm font-bold mb-5 transition-all disabled:opacity-50 ${
         plan.popular
           ? 'bg-cyan-500 hover:bg-cyan-400 text-black'
@@ -108,38 +105,17 @@ function PlanCard({ plan, yearly }) {
 }
 
 export default function Pricing() {
-  const [yearly, setYearly] = useState(false);
-
   return (
     <section id="pricing" className="bg-[#080c18] py-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-3">Pricing</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Simple, Transparent Pricing</h2>
-          <p className="text-slate-400 text-sm mb-8">All plans include AES-256 encryption and no-log policy</p>
-
-          <div className="flex items-center justify-center gap-4">
-            <span className={`text-sm font-medium ${!yearly ? 'text-white' : 'text-slate-500'}`}>Monthly</span>
-            <button
-              onClick={() => setYearly(!yearly)}
-              className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${yearly ? 'bg-cyan-500' : 'bg-slate-700'}`}
-            >
-              <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${yearly ? 'translate-x-6' : 'translate-x-1'}`} />
-            </button>
-            <span className={`text-sm font-medium ${yearly ? 'text-white' : 'text-slate-500'}`}>
-              Yearly <span className="text-cyan-400">Save 30%</span>
-            </span>
-          </div>
+          <p className="text-slate-400 text-sm">All plans include AES-256 encryption and no-log policy</p>
         </div>
 
-        {/* Row 1: Basic + Premium */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 max-w-2xl mx-auto">
-          {[plans[0], plans[2]].map((plan) => <PlanCard key={plan.name} plan={plan} yearly={yearly} />)}
-        </div>
-
-        {/* Row 2: Standard + Advanced + Enterprise */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[plans[1], plans[3], plans[4]].map((plan) => <PlanCard key={plan.name} plan={plan} yearly={yearly} />)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {plans.map((plan) => <PlanCard key={plan.name} plan={plan} />)}
         </div>
       </div>
     </section>
