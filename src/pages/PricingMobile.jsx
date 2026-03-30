@@ -86,8 +86,13 @@ function PlanCard({ plan, onCheckout, isLoading }) {
 }
 
 export default function PricingMobile() {
+  const [yearly, setYearly] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingPlan, setLoadingPlan] = useState(null);
+
+  const visiblePlans = yearly
+    ? plans.filter(p => p.name === 'Annual' || p.name === '2-Year')
+    : plans.filter(p => p.name === 'Monthly' || p.name === 'Basic');
 
   const handleCheckout = async (plan) => {
     setLoadingPlan(plan.name);
@@ -116,9 +121,27 @@ export default function PricingMobile() {
       <PullToRefresh onRefresh={handleRefresh}>
         <div className="pb-24 px-4 pt-6">
           <h1 className="text-white text-2xl font-black mb-1">Choose Your Plan</h1>
-          <p className="text-slate-500 text-sm mb-6">All plans include AES-256 encryption & no-log policy</p>
+          <p className="text-slate-500 text-sm mb-4">All plans include AES-256 encryption & no-log policy</p>
+
+          {/* Toggle */}
+          <div className="flex items-center gap-1 bg-[#0d1120] border border-white/10 rounded-full p-1 mb-6 w-fit">
+            <button
+              onClick={() => setYearly(false)}
+              className={`px-5 py-2 rounded-full text-sm font-bold transition-all select-none ${!yearly ? 'bg-cyan-500 text-black' : 'text-slate-400'}`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setYearly(true)}
+              className={`px-5 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 select-none ${yearly ? 'bg-cyan-500 text-black' : 'text-slate-400'}`}
+            >
+              Yearly
+              <span className={`text-xs font-black px-2 py-0.5 rounded-full ${yearly ? 'bg-black/20 text-black' : 'bg-emerald-500/20 text-emerald-400'}`}>-30%</span>
+            </button>
+          </div>
+
           <div className="space-y-4">
-            {plans.map((plan) => (
+            {visiblePlans.map((plan) => (
               <PlanCard
                 key={plan.name}
                 plan={plan}

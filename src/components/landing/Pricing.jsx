@@ -105,17 +105,41 @@ function PlanCard({ plan }) {
 }
 
 export default function Pricing() {
+  const [yearly, setYearly] = useState(false);
+  const visiblePlans = yearly
+    ? plans.filter(p => p.name === 'Annual' || p.name === '2-Year')
+    : plans.filter(p => p.name === 'Monthly' || p.name === 'Basic');
+
   return (
     <section id="pricing" className="bg-[#080c18] py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-3">Pricing</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Simple, Transparent Pricing</h2>
           <p className="text-slate-400 text-sm">All plans include AES-256 encryption and no-log policy</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {plans.map((plan) => <PlanCard key={plan.name} plan={plan} />)}
+        {/* Toggle */}
+        <div className="flex justify-center mb-10">
+          <div className="flex items-center gap-1 bg-[#0d1120] border border-white/10 rounded-full p-1">
+            <button
+              onClick={() => setYearly(false)}
+              className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${!yearly ? 'bg-cyan-500 text-black' : 'text-slate-400 hover:text-white'}`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setYearly(true)}
+              className={`px-5 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${yearly ? 'bg-cyan-500 text-black' : 'text-slate-400 hover:text-white'}`}
+            >
+              Yearly
+              <span className={`text-xs font-black px-2 py-0.5 rounded-full ${yearly ? 'bg-black/20 text-black' : 'bg-emerald-500/20 text-emerald-400'}`}>-30%</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+          {visiblePlans.map((plan) => <PlanCard key={plan.name} plan={plan} />)}
         </div>
       </div>
     </section>
