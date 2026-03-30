@@ -27,6 +27,10 @@
       "type": "string",
       "description": "WireGuard public key"
     },
+    "api_token": {
+      "type": "string",
+      "description": "VoxVPN peer API secret token (for /create-peer calls)"
+    },
     "vultr_instance_id": {
       "type": "string",
       "description": "Vultr instance ID (if provisioned via Vultr)"

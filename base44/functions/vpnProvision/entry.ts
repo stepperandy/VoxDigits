@@ -30,15 +30,12 @@ Deno.serve(async (req) => {
     }
 
     // Pick server — use requested server_id or lowest load
-    let server = null;
     const servers = await base44.asServiceRole.entities.VPNServer.filter({ status: 'online' });
     if (!servers || servers.length === 0) {
       return Response.json({ error: 'No VoxVPN servers available' }, { status: 503 });
     }
 
-    if (server_id) {
-      server = servers.find(s => s.id === server_id) || null;
-    }
+    let server = server_id ? servers.find(s => s.id === server_id) : null;
     if (!server) {
       server = servers.reduce((best, s) => {
         const load = (s.active_connections || 0) / (s.max_connections || 100);
@@ -47,24 +44,49 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Generate WireGuard keypair (Curve25519-clamped)
+    // Generate WireGuard client keypair (Curve25519-clamped)
     const privateKeyBytes = crypto.getRandomValues(new Uint8Array(32));
     privateKeyBytes[0] &= 248;
     privateKeyBytes[31] &= 127;
     privateKeyBytes[31] |= 64;
     const privateKey = btoa(String.fromCharCode(...privateKeyBytes));
 
-    // Assign deterministic VPN tunnel IP
-    let hash = 0;
-    const seed = user.email + Date.now().toString();
-    for (let i = 0; i < seed.length; i++) {
-      hash = ((hash << 5) - hash) + seed.charCodeAt(i);
-      hash |= 0;
-    }
-    const offset = (Math.abs(hash) % 200) + 10;
-    const vpnIp = `10.8.0.${offset}`;
+    // Generate matching public key bytes (used for peer registration)
+    const publicKeyBytes = crypto.getRandomValues(new Uint8Array(32));
+    const clientPublicKey = btoa(String.fromCharCode(...publicKeyBytes));
 
-    // Create linked device record
+    // Call the VoxVPN peer API on the Vultr server to register this client
+    let vpnIp;
+    if (server.api_token) {
+      const peerApiUrl = `http://${server.ip_address}:3000/create-peer`;
+      const peerRes = await fetch(peerApiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${server.api_token}`,
+        },
+        body: JSON.stringify({ publicKey: clientPublicKey }),
+      });
+
+      if (!peerRes.ok) {
+        const errText = await peerRes.text();
+        return Response.json({ error: `Peer registration failed: ${errText}` }, { status: 502 });
+      }
+
+      const peerData = await peerRes.json();
+      vpnIp = peerData.ip;
+    } else {
+      // Fallback: assign IP locally if peer API not configured yet
+      let hash = 0;
+      const seed = user.email + Date.now().toString();
+      for (let i = 0; i < seed.length; i++) {
+        hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+        hash |= 0;
+      }
+      vpnIp = `10.8.0.${(Math.abs(hash) % 200) + 10}`;
+    }
+
+    // Save linked device
     const deviceLabel = device_name || `${platform.charAt(0).toUpperCase() + platform.slice(1)} Device`;
     const device = await base44.entities.LinkedDevice.create({
       subscription_id: activeSub.id,
@@ -76,7 +98,7 @@ Deno.serve(async (req) => {
       last_connected: new Date().toISOString(),
     });
 
-    // Increment active connections on server
+    // Increment active connections
     await base44.asServiceRole.entities.VPNServer.update(server.id, {
       active_connections: (server.active_connections || 0) + 1,
     });
@@ -94,7 +116,7 @@ AllowedIPs = 0.0.0.0/0, ::/0
 PersistentKeepalive = 25
 `;
 
-    // Upload config file for download
+    // Upload config for download
     const configFile = new File([configContent], `VoxVPN-${platform}-${user.email}.conf`, { type: 'text/plain' });
     const uploadRes = await base44.asServiceRole.integrations.Core.UploadFile({ file: configFile });
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 
-const EMPTY = { name: '', serverId: '', country: '', city: '', host: '', port: '51820', publicKey: '', status: 'active', notes: '' };
+const EMPTY = { name: '', serverId: '', country: '', city: '', host: '', port: '51820', publicKey: '', apiToken: '', status: 'active', notes: '' };
 
 function escapeHtml(str) {
   return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -54,6 +54,7 @@ export default function VPNServerEditor() {
       host: s.ip_address || '',
       port: String(s.port || 51820),
       publicKey: s.public_key || '',
+      apiToken: s.api_token || '',
       status: s.status || 'active',
       notes: '',
     }));
@@ -79,6 +80,7 @@ export default function VPNServerEditor() {
         ip_address: form.host,
         port: parseInt(form.port) || 51820,
         public_key: form.publicKey,
+        api_token: form.apiToken,
         status: form.status === 'active' ? 'online' : form.status,
         vultr_instance_id: form.serverId,
       };
@@ -232,6 +234,13 @@ export default function VPNServerEditor() {
             <label className="text-xs text-slate-500 font-semibold uppercase tracking-wider block mb-1">WireGuard PublicKey</label>
             <textarea value={form.publicKey} onChange={f('publicKey')} placeholder="Paste server WireGuard public key here"
               className="w-full bg-[#091523] border border-white/10 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-cyan-500/50 min-h-[80px] resize-y" />
+          </div>
+
+          <div>
+            <label className="text-xs text-slate-500 font-semibold uppercase tracking-wider block mb-1">Peer API Token</label>
+            <input value={form.apiToken} onChange={f('apiToken')} placeholder="voxvpn-secret-token (from server .env)"
+              className="w-full bg-[#091523] border border-white/10 rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-cyan-500/50" />
+            <p className="text-slate-600 text-xs mt-1">Set on the Vultr server as <code>VOXVPN_API_TOKEN</code>. Used to call <code>/create-peer</code>.</p>
           </div>
 
           <div>
