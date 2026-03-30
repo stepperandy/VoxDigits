@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Home, Zap, DollarSign, User } from 'lucide-react';
 import { useTabContext } from '@/mobile/MobileTabContext';
 
@@ -12,8 +13,15 @@ const tabs = [
 export default function MobileBottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { activeTab, setActiveTab, saveScrollPosition, saveTabState } = useTabContext();
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const { activeTab, setActiveTab, saveScrollPosition } = useTabContext();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   if (!isMobile) return null;
 
