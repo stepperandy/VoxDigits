@@ -11,7 +11,6 @@ import { TabProvider } from '@/mobile/MobileTabContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 
 // Lazy-loaded pages
-const Landing = lazy(() => import('./pages/Landing'));
 const Home = lazy(() => import('./pages/Home'));
 const Admin = lazy(() => import('./pages/Admin.jsx'));
 const CustomerDashboard = lazy(() => import('./pages/CustomerDashboard.jsx'));
@@ -96,8 +95,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
     <AnimatePresence mode="wait">
       <Suspense fallback={<div className="fixed inset-0 flex items-center justify-center"><div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div></div>}>
         <Routes>
-          <Route path="/" element={<PageTransition>{isMobileDevice ? <FeaturesMobile /> : <Landing />}</PageTransition>} />
-          <Route path="/home" element={<PageTransition><Home /></PageTransition>} />
+          <Route path="/" element={<PageTransition>{isMobileDevice ? <FeaturesMobile /> : <Home />}</PageTransition>} />
           <Route path="/admin" element={<PageTransition><Admin /></PageTransition>} />
           <Route path="/dashboard" element={<PageTransition><CustomerDashboard /></PageTransition>} />
           <Route path="/vpn-for-usa" element={<PageTransition><VpnUSA /></PageTransition>} />
