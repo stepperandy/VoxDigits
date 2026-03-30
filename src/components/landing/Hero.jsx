@@ -127,7 +127,7 @@ function ShieldViz() {
 
 export default function Hero() {
   return (
-    <div className="bg-[#080c18] pt-28 pb-4 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="bg-[#080c18] pt-20 sm:pt-28 pb-4 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Grid bg */}
       <div className="absolute inset-0 opacity-[0.04]" style={{
         backgroundImage: 'linear-gradient(rgba(34,211,238,1) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,1) 1px, transparent 1px)',
