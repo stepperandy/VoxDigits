@@ -15,9 +15,12 @@
     <script type="module" src="/src/main.jsx"></script>
     <script>
       window.addEventListener('load', function() {
+        document.getElementById('appLoader').style.display = 'none';
+      });
+      setTimeout(() => {
         const loader = document.getElementById('appLoader');
         if (loader) loader.style.display = 'none';
-      });
+      }, 5000);
     </script>
   </body>
 </html>
