@@ -172,8 +172,8 @@ function App() {
           <QueryClientProvider client={queryClientInstance}>
             <Router>
               <AuthenticatedAppWrapper isMobileDevice={isMobileDevice} />
+              <FloatingAssistant />
             </Router>
-            <FloatingAssistant />
             <Toaster />
           </QueryClientProvider>
         </AuthProvider>

@@ -10,14 +10,22 @@ export default function FloatingAssistant() {
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [sending, setSending] = useState(false);
   const [initializing, setInitializing] = useState(false);
+  const [error, setError] = useState(null);
   const bottomRef = useRef(null);
+  const unsubscribeRef = useRef(null);
 
   useEffect(() => {
-    if (open && !conversation) {
+    if (open && !conversation && !initializing) {
       initConversation();
     }
+    return () => {
+      if (!open && unsubscribeRef.current) {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
+      }
+    };
   }, [open]);
 
   useEffect(() => {
@@ -26,6 +34,7 @@ export default function FloatingAssistant() {
 
   const initConversation = async () => {
     setInitializing(true);
+    setError(null);
     try {
       const convo = await base44.agents.createConversation({
         agent_name: AGENT_NAME,
@@ -33,25 +42,28 @@ export default function FloatingAssistant() {
       });
       setConversation(convo);
       setMessages(convo.messages || []);
-      base44.agents.subscribeToConversation(convo.id, (data) => {
-        setMessages(data.messages || []);
+      unsubscribeRef.current = base44.agents.subscribeToConversation(convo.id, (data) => {
+        setMessages([...(data.messages || [])]);
       });
     } catch (e) {
-      console.error(e);
+      console.error('FloatingAssistant init error:', e);
+      setError('Could not start the assistant. Please try again.');
     } finally {
       setInitializing(false);
     }
   };
 
   const sendMessage = async () => {
-    if (!input.trim() || loading || !conversation) return;
+    if (!input.trim() || sending || !conversation) return;
     const text = input.trim();
     setInput('');
-    setLoading(true);
+    setSending(true);
     try {
       await base44.agents.addMessage(conversation, { role: 'user', content: text });
+    } catch (e) {
+      console.error('Send error:', e);
     } finally {
-      setLoading(false);
+      setSending(false);
     }
   };
 
@@ -62,14 +74,23 @@ export default function FloatingAssistant() {
     }
   };
 
-  const visibleMessages = messages.filter(m => m.content && m.role !== 'tool');
+  const handleToggle = () => {
+    setOpen((prev) => !prev);
+  };
+
+  const visibleMessages = messages.filter((m) => m.content && m.role !== 'tool');
+  const isThinking = visibleMessages.length > 0 &&
+    visibleMessages[visibleMessages.length - 1]?.role === 'user' &&
+    !sending === false;
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
       {/* Chat window */}
       {open && (
-        <div className="w-[340px] sm:w-[380px] rounded-2xl border border-white/10 bg-[#0d1120] shadow-2xl flex flex-col overflow-hidden"
-          style={{ height: '480px' }}>
+        <div
+          className="w-[340px] sm:w-[380px] rounded-2xl border border-white/10 bg-[#0d1120] shadow-2xl flex flex-col overflow-hidden"
+          style={{ height: '480px' }}
+        >
           {/* Header */}
           <div className="flex items-center gap-3 px-4 py-3 bg-[#0a1428] border-b border-white/5">
             <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
@@ -82,7 +103,7 @@ export default function FloatingAssistant() {
                 <span className="text-emerald-400 text-xs">Online</span>
               </div>
             </div>
-            <button onClick={() => setOpen(false)} className="text-slate-500 hover:text-white transition-colors">
+            <button onClick={handleToggle} className="text-slate-500 hover:text-white transition-colors">
               <X size={18} />
             </button>
           </div>
@@ -90,8 +111,19 @@ export default function FloatingAssistant() {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {initializing ? (
-              <div className="flex items-center justify-center h-full">
+              <div className="flex flex-col items-center justify-center h-full gap-2">
                 <Loader2 size={20} className="text-cyan-400 animate-spin" />
+                <p className="text-slate-500 text-xs">Starting assistant...</p>
+              </div>
+            ) : error ? (
+              <div className="flex flex-col items-center justify-center h-full text-center px-4 gap-3">
+                <p className="text-rose-400 text-sm">{error}</p>
+                <button
+                  onClick={initConversation}
+                  className="px-4 py-2 bg-cyan-400 text-black text-xs font-bold rounded-full"
+                >
+                  Retry
+                </button>
               </div>
             ) : visibleMessages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center px-4">
@@ -100,31 +132,49 @@ export default function FloatingAssistant() {
                 <p className="text-slate-600 text-xs mt-1">Ask me anything about setup, plans, or troubleshooting.</p>
               </div>
             ) : (
-              visibleMessages.map((msg, i) => (
-                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] rounded-xl px-3 py-2 text-sm ${
-                    msg.role === 'user'
-                      ? 'bg-cyan-500/15 border border-cyan-500/20 text-white'
-                      : 'bg-[#0a1428] border border-white/5 text-slate-200'
-                  }`}>
-                    {msg.role === 'user' ? (
-                      <p className="leading-relaxed">{msg.content}</p>
-                    ) : (
-                      <ReactMarkdown
-                        className="prose prose-sm prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
-                        components={{
-                          p: ({ children }) => <p className="my-1 leading-relaxed text-sm">{children}</p>,
-                          a: ({ children, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">{children}</a>,
-                          ul: ({ children }) => <ul className="my-1 ml-4 list-disc">{children}</ul>,
-                          li: ({ children }) => <li className="my-0.5 text-sm">{children}</li>,
-                        }}
-                      >
-                        {msg.content}
-                      </ReactMarkdown>
-                    )}
+              <>
+                {visibleMessages.map((msg, i) => (
+                  <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div
+                      className={`max-w-[85%] rounded-xl px-3 py-2 text-sm ${
+                        msg.role === 'user'
+                          ? 'bg-cyan-500/15 border border-cyan-500/20 text-white'
+                          : 'bg-[#0a1428] border border-white/5 text-slate-200'
+                      }`}
+                    >
+                      {msg.role === 'user' ? (
+                        <p className="leading-relaxed">{msg.content}</p>
+                      ) : (
+                        <ReactMarkdown
+                          className="prose prose-sm prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
+                          components={{
+                            p: ({ children }) => <p className="my-1 leading-relaxed text-sm">{children}</p>,
+                            a: ({ children, ...props }) => (
+                              <a {...props} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                                {children}
+                              </a>
+                            ),
+                            ul: ({ children }) => <ul className="my-1 ml-4 list-disc">{children}</ul>,
+                            li: ({ children }) => <li className="my-0.5 text-sm">{children}</li>,
+                          }}
+                        >
+                          {msg.content}
+                        </ReactMarkdown>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))
+                ))}
+                {/* Typing indicator */}
+                {sending && (
+                  <div className="flex justify-start">
+                    <div className="bg-[#0a1428] border border-white/5 rounded-xl px-3 py-2 flex gap-1 items-center">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
+                )}
+              </>
             )}
             <div ref={bottomRef} />
           </div>
@@ -137,14 +187,15 @@ export default function FloatingAssistant() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask anything..."
-              className="flex-1 bg-[#091523] border border-white/10 focus:border-cyan-500/40 rounded-xl px-3 py-2 text-white text-sm outline-none placeholder:text-slate-600"
+              disabled={initializing || !!error}
+              className="flex-1 bg-[#091523] border border-white/10 focus:border-cyan-500/40 rounded-xl px-3 py-2 text-white text-sm outline-none placeholder:text-slate-600 disabled:opacity-40"
             />
             <button
               onClick={sendMessage}
-              disabled={loading || !input.trim()}
+              disabled={sending || !input.trim() || initializing || !!error}
               className="w-9 h-9 rounded-xl bg-cyan-400 hover:bg-cyan-300 disabled:opacity-40 disabled:cursor-not-allowed text-black flex items-center justify-center transition-all flex-shrink-0"
             >
-              {loading ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+              {sending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
             </button>
           </div>
         </div>
@@ -152,7 +203,7 @@ export default function FloatingAssistant() {
 
       {/* Toggle button */}
       <button
-        onClick={() => setOpen(!open)}
+        onClick={handleToggle}
         className="w-14 h-14 rounded-full bg-cyan-400 hover:bg-cyan-300 text-black shadow-lg shadow-cyan-500/30 flex items-center justify-center transition-all active:scale-95"
       >
         {open ? <X size={22} /> : <MessageCircle size={22} />}
