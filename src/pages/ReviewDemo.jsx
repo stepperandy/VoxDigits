@@ -31,6 +31,11 @@ export default function ReviewDemo() {
   const [server, setServer] = useState(servers[0]);
   const [vpnStatus, setVpnStatus] = useState('');
 
+  const connectVpn = () => {
+    setVpnStatus('Connecting...');
+    setTimeout(() => setVpnStatus('Connected to ' + server), 1500);
+  };
+
   const login = () => {
     if (
       (email.trim() === REVIEW_ACCOUNT.email && password.trim() === REVIEW_ACCOUNT.password) ||
@@ -97,8 +102,8 @@ export default function ReviewDemo() {
           >
             {servers.map(s => <option key={s}>{s}</option>)}
           </select>
-          <button onClick={() => setVpnStatus('Connected to ' + server)} style={{ padding: '12px 18px', cursor: 'pointer' }}>Connect</button>
-          {vpnStatus && <p style={{ marginTop: 14, color: '#0a7a2f' }}>{vpnStatus}</p>}
+          <button onClick={connectVpn} style={{ padding: '12px 18px', cursor: 'pointer' }}>Connect</button>
+          {vpnStatus && <p style={{ marginTop: 14, color: vpnStatus.startsWith('Connecting') ? '#888' : '#0a7a2f' }}>{vpnStatus}</p>}
         </>
       )}
     </div>
