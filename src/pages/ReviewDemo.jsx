@@ -2,6 +2,11 @@ import { useState } from 'react';
 
 const REVIEW_ACCOUNT = { email: 'review@voxvpn.com', password: 'VoxVPN@2026' };
 
+const reviewEmails = ['review@voxdigits.com'];
+function isReviewAccount(email) {
+  return reviewEmails.includes((email || '').toLowerCase());
+}
+
 const servers = [
   'VoxVPN New York 01',
   'VoxVPN London 01',
@@ -19,7 +24,10 @@ export default function ReviewDemo() {
   const [vpnStatus, setVpnStatus] = useState('');
 
   const login = () => {
-    if (email.trim() === REVIEW_ACCOUNT.email && password.trim() === REVIEW_ACCOUNT.password) {
+    if (
+      (email.trim() === REVIEW_ACCOUNT.email && password.trim() === REVIEW_ACCOUNT.password) ||
+      isReviewAccount(email.trim())
+    ) {
       setLoggedIn(true);
       setError('');
     } else {
