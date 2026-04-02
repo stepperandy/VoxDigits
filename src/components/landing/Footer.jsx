@@ -70,7 +70,6 @@ const footerSections = [
     title: 'Get Help',
     links: [
       { label: 'Support Center', to: '/contact' },
-      { label: 'Live Chat', to: '/contact' },
       { label: 'Contact Us', to: '/contact' },
       { label: 'Status Page', to: '/status' },
       { label: 'Bug Bounty', to: '/bug-bounty' },
