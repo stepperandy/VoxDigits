@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { MessageCircle, X, Send, Loader2, Shield, LogIn } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, Shield } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 const AGENT_NAME = 'voxvpn_support';
@@ -13,7 +13,6 @@ export default function FloatingAssistant() {
   const [sending, setSending] = useState(false);
   const [initializing, setInitializing] = useState(false);
   const [error, setError] = useState(null);
-  const [needsLogin, setNeedsLogin] = useState(false);
   const bottomRef = useRef(null);
   const unsubscribeRef = useRef(null);
 
@@ -37,13 +36,6 @@ export default function FloatingAssistant() {
     setInitializing(true);
     setError(null);
     try {
-      // Ensure user is authenticated before creating a conversation
-      const authed = await base44.auth.isAuthenticated();
-      if (!authed) {
-        setNeedsLogin(true);
-        setInitializing(false);
-        return;
-      }
       const convo = await base44.agents.createConversation({
         agent_name: AGENT_NAME,
         metadata: { name: 'VoxVPN Chat' },
@@ -87,9 +79,6 @@ export default function FloatingAssistant() {
   };
 
   const visibleMessages = messages.filter((m) => m.content && m.role !== 'tool');
-  const isThinking = visibleMessages.length > 0 &&
-    visibleMessages[visibleMessages.length - 1]?.role === 'user' &&
-    !sending === false;
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
@@ -122,22 +111,6 @@ export default function FloatingAssistant() {
               <div className="flex flex-col items-center justify-center h-full gap-2">
                 <Loader2 size={20} className="text-cyan-400 animate-spin" />
                 <p className="text-slate-500 text-xs">Starting assistant...</p>
-              </div>
-            ) : needsLogin ? (
-              <div className="flex flex-col items-center justify-center h-full text-center px-4 gap-4">
-                <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-                  <LogIn size={20} className="text-cyan-400" />
-                </div>
-                <div>
-                  <p className="text-white text-sm font-bold mb-1">Sign in to chat</p>
-                  <p className="text-slate-500 text-xs">You need an account to use the VoxVPN assistant.</p>
-                </div>
-                <button
-                  onClick={() => base44.auth.redirectToLogin(window.location.href)}
-                  className="px-5 py-2.5 bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-bold rounded-full transition-all"
-                >
-                  Sign In
-                </button>
               </div>
             ) : error ? (
               <div className="flex flex-col items-center justify-center h-full text-center px-4 gap-3">
@@ -211,12 +184,12 @@ export default function FloatingAssistant() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask anything..."
-              disabled={initializing || !!error || needsLogin}
+              disabled={initializing || !!error}
               className="flex-1 bg-[#091523] border border-white/10 focus:border-cyan-500/40 rounded-xl px-3 py-2 text-white text-sm outline-none placeholder:text-slate-600 disabled:opacity-40"
             />
             <button
               onClick={sendMessage}
-              disabled={sending || !input.trim() || initializing || !!error || needsLogin}
+              disabled={sending || !input.trim() || initializing || !!error}
               className="w-9 h-9 rounded-xl bg-cyan-400 hover:bg-cyan-300 disabled:opacity-40 disabled:cursor-not-allowed text-black flex items-center justify-center transition-all flex-shrink-0"
             >
               {sending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
