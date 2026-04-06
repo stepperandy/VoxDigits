@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Shield, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 
 const API_BASE = 'https://package-manager-setup.replit.app';
 
@@ -41,10 +41,11 @@ export default function VpnLogin() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center mb-10">
-          <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-4">
-            <Shield size={32} className="text-cyan-400" />
-          </div>
-          <h1 className="text-2xl font-black text-white">VoxVPN</h1>
+          <img
+            src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/e4e826602_f43645b8-7e9b-46cb-9b95-1fc45590f65b.png"
+            alt="VoxVPN"
+            className="h-14 w-auto mb-4"
+          />
           <p className="text-slate-500 text-sm mt-1">Sign in to your account</p>
         </div>
 
