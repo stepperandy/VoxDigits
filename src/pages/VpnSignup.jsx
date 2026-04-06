@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Eye, EyeOff, Mail } from 'lucide-react';
 
 const API_BASE = 'https://package-manager-setup.replit.app';
 
@@ -10,6 +10,7 @@ export default function VpnSignup() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
@@ -23,12 +24,18 @@ export default function VpnSignup() {
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      if (!res.ok || !data.token) {
-        setError(data.message || 'Signup failed. Please try again.');
+      // If backend returned a token, log in directly
+      if (data.token) {
+        localStorage.setItem('auth_token', data.token);
+        navigate('/vpn-dashboard');
         return;
       }
-      localStorage.setItem('auth_token', data.token);
-      navigate('/vpn-dashboard');
+      // Backend may require email confirmation — show success message
+      if (res.ok || (data.message && data.message.toLowerCase().includes('email'))) {
+        setSuccess(data.message || 'Account created! Please check your email to confirm your account, then sign in.');
+        return;
+      }
+      setError(data.message || 'Signup failed. Please try again.');
     } catch {
       setError('Could not connect to VoxVPN server. Please try again.');
     } finally {
@@ -90,13 +97,31 @@ export default function VpnSignup() {
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2"
-          >
-            {loading ? <><Loader2 size={16} className="animate-spin" /> Creating account...</> : 'Create Account'}
-          </button>
+          {success && (
+            <div className="px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm flex items-start gap-2">
+              <Mail size={16} className="flex-shrink-0 mt-0.5" />
+              <span>{success}</span>
+            </div>
+          )}
+
+          {!success && (
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2"
+            >
+              {loading ? <><Loader2 size={16} className="animate-spin" /> Creating account...</> : 'Create Account'}
+            </button>
+          )}
+
+          {success && (
+            <Link
+              to="/vpn-login"
+              className="block w-full py-3 text-center bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl text-sm transition-all"
+            >
+              Go to Sign In
+            </Link>
+          )}
         </form>
 
         <p className="text-center text-slate-500 text-sm mt-6">
