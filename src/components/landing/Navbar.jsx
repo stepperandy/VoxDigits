@@ -1,4 +1,4 @@
-import { Menu, X, LogOut, Home } from 'lucide-react';
+import { Menu, X, LogOut, Shield } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -16,12 +16,14 @@ const navLinks = [
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [vpnLoggedIn, setVpnLoggedIn] = useState(false);
   const [activeHash, setActiveHash] = useState('');
   const [announcementVisible, setAnnouncementVisible] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
+    setVpnLoggedIn(!!localStorage.getItem('auth_token'));
   }, []);
 
   useEffect(() => {
@@ -96,6 +98,14 @@ export default function Navbar() {
 
             {/* CTA buttons */}
             <div className="hidden md:flex items-center gap-2 ml-auto">
+              {vpnLoggedIn && (
+                <Link
+                  to="/vpn-dashboard"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-400 text-sm font-bold rounded-full transition-all"
+                >
+                  <Shield size={14} /> My VPN
+                </Link>
+              )}
               {user ? (
                 <>
                   <span className="text-slate-400 text-sm">{user.full_name}</span>
@@ -108,18 +118,18 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  <button
-                    onClick={() => base44.auth.redirectToLogin(window.location.href)}
+                  <Link
+                    to="/vpn-login"
                     className="px-4 py-2 text-slate-300 hover:text-white text-sm font-medium transition-colors border border-white/10 hover:border-white/20 rounded-full"
                   >
                     Log In
-                  </button>
-                  <button
-                    onClick={() => base44.auth.redirectToLogin(window.location.href)}
+                  </Link>
+                  <Link
+                    to="/vpn-signup"
                     className="px-4 py-2 bg-white/10 hover:bg-white/15 text-white text-sm font-semibold rounded-full transition-all border border-white/10"
                   >
                     Sign Up
-                  </button>
+                  </Link>
                 </>
               )}
               <a
@@ -156,13 +166,22 @@ export default function Navbar() {
                   Admin Panel
                 </Link>
               )}
+              {vpnLoggedIn && (
+                <Link
+                  to="/vpn-dashboard"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 rounded text-sm font-bold text-cyan-400"
+                >
+                  <Shield size={15} /> My VPN Dashboard
+                </Link>
+              )}
               <div className="flex gap-2 pt-2">
                 {user ? (
                   <button onClick={() => base44.auth.logout('/')} className="flex-1 py-2 border border-white/10 text-slate-300 text-sm font-medium rounded-full">Log Out</button>
                 ) : (
                   <>
-                    <button onClick={() => base44.auth.redirectToLogin(window.location.href)} className="flex-1 py-2 border border-white/10 text-slate-300 text-sm font-medium rounded-full">Log In</button>
-                    <button onClick={() => base44.auth.redirectToLogin(window.location.href)} className="flex-1 py-2 bg-white/10 text-white text-sm font-semibold rounded-full">Sign Up</button>
+                    <Link to="/vpn-login" onClick={() => setMobileOpen(false)} className="flex-1 py-2 text-center border border-white/10 text-slate-300 text-sm font-medium rounded-full">Log In</Link>
+                    <Link to="/vpn-signup" onClick={() => setMobileOpen(false)} className="flex-1 py-2 text-center bg-white/10 text-white text-sm font-semibold rounded-full">Sign Up</Link>
                   </>
                 )}
               </div>

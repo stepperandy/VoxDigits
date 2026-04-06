@@ -57,7 +57,7 @@ export default function VpnDashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem('auth_token');
-    navigate('/vpn-login');
+    window.location.href = '/vpn-login';
   };
 
   return (
