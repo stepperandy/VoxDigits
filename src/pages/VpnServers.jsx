@@ -1,12 +1,19 @@
 import { useState } from 'react';
 import { VPN_SERVERS } from '@/lib/vpnServers';
+import { VPN_CONFIGS } from '@/lib/vpnConfigs';
 import { Shield, Server, FileText, CheckCircle2 } from 'lucide-react';
 
 export default function VpnServers() {
   const [selectedServer, setSelectedServer] = useState(null);
 
   const handleConnect = (server) => {
+    const config = VPN_CONFIGS[server.id];
     console.log('Selected server:', server);
+    if (config && config.trim().length > 0) {
+      console.log('Config text:', config);
+    } else {
+      console.log('Config not added yet');
+    }
   };
 
   return (
