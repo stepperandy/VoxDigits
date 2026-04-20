@@ -61,6 +61,12 @@ const OsSetupGuide = lazy(() => import('./pages/OsSetupGuide.jsx'));
 const VpnLogin = lazy(() => import('./pages/VpnLogin.jsx'));
 const VpnSignup = lazy(() => import('./pages/VpnSignup.jsx'));
 const VpnDashboard = lazy(() => import('./pages/VpnDashboard.jsx'));
+const AppSplash = lazy(() => import('./pages/mobile-app/Splash.jsx'));
+const AppLogin = lazy(() => import('./pages/mobile-app/Login.jsx'));
+const AppServerList = lazy(() => import('./pages/mobile-app/ServerList.jsx'));
+const AppConnect = lazy(() => import('./pages/mobile-app/ConnectInstructions.jsx'));
+const AppSubscription = lazy(() => import('./pages/mobile-app/Subscription.jsx'));
+const AppSettings = lazy(() => import('./pages/mobile-app/Settings.jsx'));
 
 const PageTransition = ({ children }) => (
   <motion.div
@@ -140,6 +146,12 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/vpn-login" element={<PageTransition><VpnLogin /></PageTransition>} />
           <Route path="/vpn-signup" element={<PageTransition><VpnSignup /></PageTransition>} />
           <Route path="/vpn-dashboard" element={<PageTransition><VpnDashboard /></PageTransition>} />
+          <Route path="/app" element={<AppSplash />} />
+          <Route path="/app/login" element={<AppLogin />} />
+          <Route path="/app/servers" element={<AppServerList />} />
+          <Route path="/app/connect/:id" element={<AppConnect />} />
+          <Route path="/app/subscription" element={<AppSubscription />} />
+          <Route path="/app/settings" element={<AppSettings />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Suspense>
