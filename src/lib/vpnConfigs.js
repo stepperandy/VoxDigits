@@ -112,7 +112,7 @@ S1DU2rXPE0faX/Vgzyik+VN9cFl1UwFY
 # Note: this configuration is user-locked to the username below
 # OVPN_ACCESS_SERVER_USERNAME=testuser
 # Define the profile name of this particular configuration file
-# OVPN_ACCESS_SERVER_PROFILE=testuser@45.32.232.63
+# OVPN_ACCESS_SERVER_PROFILE=testuser@45.76.133.13
 
 # Default Cipher
 cipher AES-256-CBC
@@ -120,7 +120,7 @@ cipher AES-256-CBC
 # OVPN_ACCESS_SERVER_CLI_PREF_BASIC_CLIENT=False
 # OVPN_ACCESS_SERVER_CLI_PREF_ENABLE_CONNECT=False
 # OVPN_ACCESS_SERVER_CLI_PREF_ENABLE_XD_PROXY=True
-# OVPN_ACCESS_SERVER_WSHOST=45.32.232.63:443
+# OVPN_ACCESS_SERVER_WSHOST=45.76.133.13:443
 # OVPN_ACCESS_SERVER_WEB_CA_BUNDLE_START
 # -----BEGIN CERTIFICATE-----
 # MIIB0DCCAVWgAwIBAgIEaeaURjAKBggqhkjOPQQDAjBAMT4wPAYDVQQDDDVPcGVu
@@ -139,14 +139,14 @@ cipher AES-256-CBC
 client
 server-poll-timeout 4
 nobind
-remote 45.32.232.63 1194 udp
-remote 45.32.232.63 1194 udp
-remote 45.32.232.63 443 tcp
-remote 45.32.232.63 1194 udp
-remote 45.32.232.63 1194 udp
-remote 45.32.232.63 1194 udp
-remote 45.32.232.63 1194 udp
-remote 45.32.232.63 1194 udp
+remote 45.76.133.13 1194 udp
+remote 45.76.133.13 1194 udp
+remote 45.76.133.13 443 tcp
+remote 45.76.133.13 1194 udp
+remote 45.76.133.13 1194 udp
+remote 45.76.133.13 1194 udp
+remote 45.76.133.13 1194 udp
+remote 45.76.133.13 1194 udp
 dev tun
 dev-type tun
 remote-cert-tls server
