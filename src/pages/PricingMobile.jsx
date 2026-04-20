@@ -40,6 +40,8 @@ const plans = [
   },
 ];
 
+const HUBTEL_LINK = 'https://paylink.hubtel.com/voxvpn';
+
 function PlanCard({ plan, onCheckout, isLoading }) {
   return (
     <div
@@ -61,6 +63,8 @@ function PlanCard({ plan, onCheckout, isLoading }) {
       </div>
       <p className="text-slate-500 text-xs mb-1">{plan.billingLabel}</p>
       {plan.trial && <p className="text-cyan-400 text-xs font-semibold mb-2">✓ 3-day free trial</p>}
+
+      {/* Stripe button */}
       <button
         onClick={() => onCheckout(plan)}
         disabled={isLoading}
@@ -71,8 +75,19 @@ function PlanCard({ plan, onCheckout, isLoading }) {
           border: plan.popular ? 'none' : '1px solid #223654',
         }}
       >
-        {isLoading ? 'Processing...' : 'Choose Plan'}
+        {isLoading ? 'Processing...' : '💳 Pay with Card'}
       </button>
+
+      {/* Hubtel button */}
+      <a
+        href={HUBTEL_LINK}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block w-full mt-2 py-3 rounded-lg font-bold text-sm text-center transition-all select-none active:scale-95 border border-orange-500/40 text-orange-400 hover:bg-orange-500/10"
+      >
+        🛒 Pay with Hubtel (MoMo / Card)
+      </a>
+
       <ul className="mt-4 space-y-2">
         {plan.features.map((f, i) => (
           <li key={i} className="flex items-center gap-2 text-xs text-slate-400">
