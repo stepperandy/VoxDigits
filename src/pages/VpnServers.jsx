@@ -194,21 +194,24 @@ export default function VpnServers() {
                   <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${
                     isConnected
                       ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                      : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                      : 'bg-white/5 text-slate-500 border-white/10'
                   }`}>
                     {isConnected ? 'Connected' : 'Ready'}
                   </span>
                   <button
-                    onClick={(e) => { e.stopPropagation(); handleConnectClick(server); }}
-                    className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all active:scale-95 ${
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (isConnected) { disconnect(); } else { handleConnectClick(server); }
+                    }}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all active:scale-95 whitespace-nowrap ${
                       isConnected
-                        ? 'bg-emerald-400 hover:bg-emerald-300 text-black'
+                        ? 'bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/20'
                         : isSelected
                         ? 'bg-cyan-400 hover:bg-cyan-300 text-black shadow-lg shadow-cyan-500/20'
                         : 'bg-white/10 hover:bg-white/15 text-white border border-white/10'
                     }`}
                   >
-                    {isConnected ? 'Manage' : 'Connect'}
+                    {isConnected ? 'Disconnect' : 'Download Config & Connect'}
                   </button>
                 </div>
               </div>
@@ -282,7 +285,7 @@ export default function VpnServers() {
                 {/* Action button */}
                 {connState === STATES.READY && (
                   <button onClick={startConnection} className="w-full py-3.5 bg-cyan-400 hover:bg-cyan-300 text-black font-black rounded-2xl text-sm transition-all active:scale-[0.98] shadow-lg shadow-cyan-500/20">
-                    Connect Now
+                    Download Config & Connect
                   </button>
                 )}
                 {connState === STATES.CONNECTING && (
