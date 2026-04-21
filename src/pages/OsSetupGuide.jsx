@@ -237,6 +237,11 @@ export default function OsSetupGuide() {
 
         {/* Header */}
         <div className="mb-10 text-center">
+          <img
+            src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
+            alt="VoxVPN"
+            className="h-14 w-auto mx-auto mb-4"
+          />
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 text-xs font-medium mb-4">
             <Shield size={12} />
             Step-by-step VPN setup
@@ -284,9 +289,9 @@ export default function OsSetupGuide() {
           <div className="space-y-4">
             {/* Download Card */}
             <div className="rounded-2xl border border-cyan-500/20 bg-[#0d1a20] p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <OsIcon size={18} className={osInfo.color} />
-                <h3 className="text-white font-bold text-sm">Config File for {osInfo.label}</h3>
+              <div className="flex items-center gap-3 mb-4">
+                <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png" alt="VoxVPN" className="h-7 w-auto" />
+                <h3 className="text-white font-bold text-sm">VoxVPN for {osInfo.label}</h3>
               </div>
 
               {loadingUser ? (

@@ -225,14 +225,10 @@ export default function SetupPortal() {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-4 mb-5">
             <img
-              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/2372c7923_image.png"
+              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
               alt="VoxVPN"
-              className="h-14 w-14"
+              className="h-16 w-auto"
             />
-            <div>
-              <p className="text-[#4fd1ff] text-sm font-bold uppercase tracking-[1.8px] m-0">VoxVPN Secure Network</p>
-              <p className="text-[#a9b7c9] text-sm m-0">Powered by VoxVPN private infrastructure</p>
-            </div>
           </div>
           <h1 className="text-4xl sm:text-5xl font-black text-white mb-3 leading-tight">Set Up VoxVPN On Any Device</h1>
           <p className="text-[#a9b7c9] text-base max-w-3xl leading-relaxed">
