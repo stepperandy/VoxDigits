@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Check, Zap } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import PaymentMethodModal from '../PaymentMethodModal';
 
 const PLANS = [
   {
@@ -127,27 +128,13 @@ const PLANS = [
   },
 ];
 
-function PlanCard({ plan, yearly }) {
+function PlanCard({ plan, yearly, isAdmin, onPaymentMethodSelect }) {
   const [loading, setLoading] = useState(false);
   const price = yearly ? plan.yearlyPrice : plan.monthlyPrice;
   const priceId = yearly ? plan.priceId.yearly : plan.priceId.monthly;
 
-  const handleCheckout = async () => {
-    setLoading(true);
-    try {
-      const res = await base44.functions.invoke('createStripeCheckout', {
-        plan: plan.name,
-        priceId,
-      });
-      if (res.data?.url) {
-        window.location.href = res.data.url;
-      }
-    } catch (error) {
-      console.error('Checkout error:', error);
-      alert('Error starting checkout. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+  const handleCheckout = () => {
+    onPaymentMethodSelect(plan, priceId, yearly);
   };
 
   return (
@@ -194,6 +181,58 @@ function PlanCard({ plan, yearly }) {
 
 export default function Pricing() {
   const [yearly, setYearly] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [selectedPriceId, setSelectedPriceId] = useState(null);
+  const [selectedYearly, setSelectedYearly] = useState(false);
+
+  useEffect(() => {
+    base44.auth.me()
+      .then(u => {
+        setUser(u);
+        setIsAdmin(u?.role === 'admin');
+      })
+      .catch(() => {});
+  }, []);
+
+  const handlePaymentMethodSelect = (plan, priceId, isYearly) => {
+    setSelectedPlan(plan);
+    setSelectedPriceId(priceId);
+    setSelectedYearly(isYearly);
+    setModalOpen(true);
+  };
+
+  const handlePaymentProceed = async (method) => {
+    try {
+      if (isAdmin && method === 'admin-bypass') {
+        // Admin bypass: create subscription without payment
+        await base44.functions.invoke('grantSubscription', {
+          plan: selectedPlan.name,
+          email: user.email,
+        });
+        alert(`${selectedPlan.name} plan granted to ${user.email}`);
+        setModalOpen(false);
+        return;
+      }
+
+      // Regular checkout via Stripe
+      const res = await base44.functions.invoke('createStripeCheckout', {
+        plan: selectedPlan.name,
+        priceId: selectedPriceId,
+      });
+      if (res.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        alert('Failed to create checkout session. Please try again.');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert('Error processing payment: ' + error.message);
+    }
+    setModalOpen(false);
+  };
 
   return (
     <section id="pricing" className="bg-[#080c18] py-20 px-4 sm:px-6 lg:px-8">
@@ -228,9 +267,24 @@ export default function Pricing() {
         {/* Plans grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {PLANS.map((plan) => (
-            <PlanCard key={plan.name} plan={plan} yearly={yearly} />
+            <PlanCard 
+              key={plan.name} 
+              plan={plan} 
+              yearly={yearly}
+              isAdmin={isAdmin}
+              onPaymentMethodSelect={handlePaymentMethodSelect}
+            />
           ))}
         </div>
+
+        {/* Payment Method Modal */}
+        <PaymentMethodModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          plan={selectedPlan}
+          isAdmin={isAdmin}
+          onProceed={handlePaymentProceed}
+        />
 
         <p className="text-center text-slate-600 text-xs mt-8">
           All prices in USD. 30-day money-back guarantee. Secure payment via Stripe.

@@ -4,6 +4,7 @@ import PullToRefresh from '@/mobile/PullToRefresh';
 import MobileSelectSheet from '@/mobile/MobileSelectSheet';
 import { Check } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import PaymentMethodModal from '@/components/PaymentMethodModal';
 
 const MONTHLY_PLANS = [
   {
@@ -117,19 +118,38 @@ export default function PricingMobile() {
   const [yearly, setYearly] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingPlan, setLoadingPlan] = useState(null);
+  const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [selectedPriceId, setSelectedPriceId] = useState(null);
 
-  // Capture referral code from URL and store it
   useEffect(() => {
+    // Capture referral code
     const params = new URLSearchParams(window.location.search);
     const ref = params.get('ref');
     if (ref) sessionStorage.setItem('referral_code', ref);
+
+    // Check user auth
+    base44.auth.me()
+      .then(u => {
+        setUser(u);
+        setIsAdmin(u?.role === 'admin');
+      })
+      .catch(() => {});
   }, []);
 
   const visiblePlans = yearly ? YEARLY_PLANS : MONTHLY_PLANS;
 
-  const handleCheckout = async (plan) => {
+  const handleCheckout = (plan) => {
+    const priceId = yearly ? plan.priceId : plan.priceId;
+    setSelectedPlan(plan);
+    setSelectedPriceId(priceId);
     setLoadingPlan(plan.name);
-    setLoading(true);
+    setModalOpen(true);
+  };
+
+  const handlePaymentProceed = async (method) => {
     try {
       // Register referral if one was captured
       const refCode = sessionStorage.getItem('referral_code');
@@ -138,21 +158,38 @@ export default function PricingMobile() {
           await base44.functions.invoke('referral', { action: 'register_referee', code: refCode });
           sessionStorage.removeItem('referral_code');
         } catch (e) {
-          // Non-fatal — proceed with checkout regardless
+          // Non-fatal
         }
       }
 
+      if (isAdmin && method === 'admin-bypass') {
+        // Admin bypass
+        await base44.functions.invoke('grantSubscription', {
+          plan: selectedPlan.name,
+          email: user.email,
+        });
+        alert(`${selectedPlan.name} plan granted to ${user.email}`);
+        setModalOpen(false);
+        setLoadingPlan(null);
+        return;
+      }
+
+      // Regular checkout via Stripe
       const res = await base44.functions.invoke('createStripeCheckout', {
-        plan: plan.name,
-        priceId: plan.priceId,
+        plan: selectedPlan.name,
+        priceId: selectedPriceId,
       });
       if (res.data?.url) {
         window.location.href = res.data.url;
+      } else {
+        alert('Failed to create checkout session. Please try again.');
       }
     } catch (error) {
       console.error('Checkout error:', error);
+      alert('Error processing payment: ' + error.message);
+    } finally {
+      setModalOpen(false);
       setLoadingPlan(null);
-      setLoading(false);
     }
   };
 
@@ -190,11 +227,20 @@ export default function PricingMobile() {
                 key={plan.name}
                 plan={plan}
                 onCheckout={handleCheckout}
-                isLoading={loading && loadingPlan === plan.name}
+                isLoading={loadingPlan === plan.name}
                 yearly={yearly}
               />
             ))}
           </div>
+
+          {/* Payment Method Modal */}
+          <PaymentMethodModal
+            isOpen={modalOpen}
+            onClose={() => { setModalOpen(false); setLoadingPlan(null); }}
+            plan={selectedPlan}
+            isAdmin={isAdmin}
+            onProceed={handlePaymentProceed}
+          />
         </div>
       </PullToRefresh>
     </MobileLayout>
