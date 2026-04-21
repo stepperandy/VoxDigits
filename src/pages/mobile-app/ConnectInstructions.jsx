@@ -4,10 +4,10 @@ import { ArrowLeft, Download, ExternalLink, CheckCircle2, Shield, AlertCircle } 
 import { VPN_SERVERS } from '@/lib/vpnServers';
 
 const STEPS = [
-  { num: 1, title: 'Download VoxVPN Profile', desc: 'Tap the button below to download your VoxVPN config file.' },
-  { num: 2, title: 'Open VoxVPN App', desc: 'Launch the VoxVPN app on your device.' },
-  { num: 3, title: 'Import Your Profile', desc: 'Tap "+" → "Import from Files" and select your VoxVPN profile.' },
-  { num: 4, title: 'Connect with VoxVPN', desc: 'Enable the profile to start your secure VoxVPN session.' },
+  { num: 1, title: 'Download your VoxVPN profile', desc: 'Your unique encrypted configuration file.' },
+  { num: 2, title: 'Open it in OpenVPN Connect', desc: 'Launch the OpenVPN Connect app.' },
+  { num: 3, title: 'Import profile', desc: 'Tap "+" and select your downloaded VoxVPN file.' },
+  { num: 4, title: 'Tap connect', desc: 'Start your secure VoxVPN session instantly.' },
 ];
 
 const STATUS = { IDLE: 'idle', READY: 'ready', DOWNLOADED: 'downloaded' };
@@ -80,56 +80,84 @@ export default function ConnectInstructions() {
       </div>
 
       <div className="flex-1 px-5 pb-8 flex flex-col gap-5">
-        {/* Server card */}
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-blue-600/5 border border-cyan-500/20 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
-            <Shield size={24} className="text-cyan-400" />
-          </div>
-          <div>
-            <p className="text-white font-black text-xl">{server.name}</p>
-            <p className="text-slate-400 text-sm font-mono">VoxVPN-{server.name}.ovpn</p>
-          </div>
-          <div className="ml-auto">
-            <span className={`px-2 py-1 rounded-full text-xs font-bold ${hasConfig ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
-              {hasConfig ? 'Config Ready' : 'No Config'}
-            </span>
-          </div>
-        </div>
+        {/* Branded Setup Card */}
+        {status === STATUS.DOWNLOADED ? (
+          <div className="rounded-3xl bg-gradient-to-br from-cyan-500/15 to-blue-600/10 border-2 border-cyan-400 p-6 space-y-5">
+            {/* Header */}
+            <div className="text-center">
+              <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png" alt="VoxVPN" className="h-8 w-auto mx-auto mb-3" />
+              <h2 className="text-white font-black text-xl mb-1">Setup Guide</h2>
+              <p className="text-cyan-300 text-sm font-semibold">{server.name}</p>
+            </div>
 
-        {/* Status feedback */}
-        {status === STATUS.DOWNLOADED && (
-          <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-start gap-3">
-            <CheckCircle2 size={18} className="text-emerald-400 flex-shrink-0 mt-0.5" />
-            <p className="text-emerald-300 text-sm leading-relaxed">
-              <strong>VoxVPN-{server.name}.ovpn</strong> downloaded. Open this profile in the VoxVPN app to start your secure session.
-            </p>
-          </div>
-        )}
+            {/* File Info */}
+            <div className="bg-black/20 rounded-2xl p-4 border border-cyan-500/20">
+              <p className="text-slate-500 text-xs uppercase tracking-wide mb-1">Your Profile</p>
+              <p className="text-white font-mono font-bold text-sm break-all">VoxVPN-{server.name}.ovpn</p>
+            </div>
 
-        {!hasConfig && (
-          <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-3">
-            <AlertCircle size={18} className="text-rose-400 flex-shrink-0 mt-0.5" />
-            <p className="text-rose-300 text-sm">Config not available for this server yet. Try another location.</p>
-          </div>
-        )}
+            {/* Steps */}
+            <div className="space-y-3">
+              {STEPS.map((step) => (
+                <div key={step.num} className="flex gap-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-black font-black text-sm flex-shrink-0">
+                    {step.num}
+                  </div>
+                  <div className="flex-1 pt-0.5">
+                    <p className="text-white font-bold text-sm">{step.title}</p>
+                    <p className="text-slate-400 text-xs mt-0.5">{step.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-        {/* Steps */}
-        <div className="space-y-2">
-          <p className="text-slate-500 text-xs uppercase tracking-widest font-semibold mb-3">How to Connect with VoxVPN</p>
-          {STEPS.map((step) => (
-            <div key={step.num} className="flex gap-3 p-4 rounded-2xl bg-[#0d1120] border border-white/5">
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-black ${
-                status === STATUS.DOWNLOADED && step.num === 1 ? 'bg-emerald-400 text-black' : 'bg-cyan-500/20 text-cyan-400'
-              }`}>
-                {status === STATUS.DOWNLOADED && step.num === 1 ? <CheckCircle2 size={14} /> : step.num}
+            {/* CTA */}
+            <button
+              onClick={openOpenVPN}
+              className="w-full py-3 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-black font-black rounded-2xl text-sm transition-all active:scale-[0.98] shadow-lg shadow-cyan-500/30"
+            >
+              Open OpenVPN Connect
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Server card */}
+            <div className="p-5 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-blue-600/5 border border-cyan-500/20 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                <Shield size={24} className="text-cyan-400" />
               </div>
               <div>
-                <p className="text-white font-bold text-sm">{step.title}</p>
-                <p className="text-slate-500 text-xs mt-0.5 leading-relaxed">{step.desc}</p>
+                <p className="text-white font-black text-xl">{server.name}</p>
+                <p className="text-slate-400 text-sm font-mono">VoxVPN-{server.name}.ovpn</p>
+              </div>
+              <div className="ml-auto">
+                <span className={`px-2 py-1 rounded-full text-xs font-bold ${hasConfig ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
+                  {hasConfig ? 'Ready' : 'No Config'}
+                </span>
               </div>
             </div>
-          ))}
-        </div>
+
+            {!hasConfig && (
+              <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-3">
+                <AlertCircle size={18} className="text-rose-400 flex-shrink-0 mt-0.5" />
+                <p className="text-rose-300 text-sm">Config not available. Try another location.</p>
+              </div>
+            )}
+
+            {/* Quick Steps Preview */}
+            <div className="space-y-2">
+              <p className="text-slate-500 text-xs uppercase tracking-widest font-semibold">Quick Setup</p>
+              {STEPS.map((step) => (
+                <div key={step.num} className="flex gap-2 items-start">
+                  <div className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5">
+                    {step.num}
+                  </div>
+                  <p className="text-slate-400 text-xs pt-0.5">{step.title}</p>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
 
         {/* Action buttons */}
         <div className="flex flex-col gap-3 mt-auto">
