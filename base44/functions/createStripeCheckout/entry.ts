@@ -10,6 +10,11 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Missing plan or priceId' }, { status: 400 });
     }
 
+    // Validate priceId format (must start with 'price_')
+    if (!priceId.startsWith('price_')) {
+      return Response.json({ error: `Invalid priceId format: ${priceId}. Ensure all priceIds are configured in Stripe.` }, { status: 400 });
+    }
+
     // Try to get authenticated user — not required for checkout
     let user = null;
     try {
