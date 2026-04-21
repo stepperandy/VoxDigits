@@ -1,30 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { Shield, Settings, CreditCard, LogOut, ChevronRight, Wifi } from 'lucide-react';
-
-const API_BASE = 'https://voxvpn-backend.onrender.com';
-
-const SERVERS = [
-  { id: 1, city: 'Amsterdam',  country: 'Netherlands', flag: '🇳🇱', ping: '12ms',  load: 32 },
-  { id: 2, city: 'London',     country: 'UK',          flag: '🇬🇧', ping: '18ms',  load: 45 },
-  { id: 3, city: 'USA',        country: 'United States', flag: '🇺🇸', ping: '89ms',  load: 67 },
-  { id: 4, city: 'Singapore',  country: 'Singapore',   flag: '🇸🇬', ping: '134ms', load: 28 },
-];
-
-function LoadBar({ load }) {
-  const color = load < 50 ? 'bg-emerald-400' : load < 75 ? 'bg-amber-400' : 'bg-rose-400';
-  return (
-    <div className="w-16 h-1.5 rounded-full bg-white/10 overflow-hidden">
-      <div className={`h-full rounded-full ${color}`} style={{ width: `${load}%` }} />
-    </div>
-  );
-}
+import { VPN_SERVERS } from '@/lib/vpnServers';
 
 export default function ServerList() {
   const navigate = useNavigate();
   const email = localStorage.getItem('vpn_email') || '';
 
   const handleSelect = (server) => {
-    navigate(`/app/connect/${server.id}`, { state: { server } });
+    navigate(`/app/connect/${server.id}`);
   };
 
   const handleLogout = () => {
@@ -67,21 +50,19 @@ export default function ServerList() {
       <div className="px-5 flex-1">
         <p className="text-slate-500 text-xs uppercase tracking-widest font-semibold mb-3">Select Location</p>
         <div className="space-y-2">
-          {SERVERS.map((server) => (
+          {VPN_SERVERS.map((server) => (
             <button
               key={server.id}
               onClick={() => handleSelect(server)}
               className="w-full flex items-center gap-4 p-4 rounded-2xl border border-white/5 bg-[#0d1120] hover:border-cyan-500/30 hover:bg-[#0d1a20] transition-all active:scale-[0.98] text-left"
             >
-              <span className="text-3xl">{server.flag}</span>
               <div className="flex-1 min-w-0">
-                <p className="text-white font-bold text-sm">{server.city}</p>
-                <p className="text-slate-500 text-xs">{server.country}</p>
-                <LoadBar load={server.load} />
-              </div>
-              <div className="text-right flex-shrink-0">
-                <p className="text-slate-400 text-xs font-mono">{server.ping}</p>
-                <p className="text-slate-600 text-xs">{server.load}% load</p>
+                <p className="text-white font-bold text-sm">{server.name}</p>
+                <p className="text-slate-500 text-xs font-mono">{server.id}.ovpn</p>
+                <div className="flex items-center gap-1 mt-1">
+                  <span className={`w-1.5 h-1.5 rounded-full ${server.config?.trim() ? 'bg-emerald-400' : 'bg-slate-600'}`} />
+                  <span className="text-xs text-slate-600">{server.config?.trim() ? 'Config ready' : 'No config'}</span>
+                </div>
               </div>
               <ChevronRight size={16} className="text-slate-600 flex-shrink-0" />
             </button>
