@@ -18,120 +18,110 @@ const OS_LIST = [
 
 const GUIDES = {
   windows: {
-    wireguardUrl: 'https://www.wireguard.com/install/',
     steps: [
       {
-        title: 'Download & Install WireGuard',
-        desc: 'Download the official WireGuard client for Windows and run the installer.',
-        action: { label: 'Download WireGuard', href: 'https://www.wireguard.com/install/' },
+        title: 'Download VoxVPN for Windows',
+        desc: 'Click the "Download Config" button below to get your personal VoxVPN configuration file for Windows.',
       },
       {
-        title: 'Download Your VoxVPN Config',
-        desc: 'Click the "Download Config" button below to get your personal WireGuard configuration file (.conf) tied to your account.',
+        title: 'Install & Launch',
+        desc: 'Run the downloaded installer and open the VoxVPN app on your Windows device.',
       },
       {
         title: 'Import the Config',
-        desc: 'Open WireGuard → click "Import tunnel(s) from file" → select the downloaded VoxVPN-Windows.conf file.',
+        desc: 'Inside the VoxVPN app, click "Import" and select the downloaded VoxVPN-Windows.conf file.',
       },
       {
-        title: 'Activate & Connect',
-        desc: 'Click the "Activate" toggle next to VoxVPN in the WireGuard app. You\'re now protected!',
+        title: 'Connect',
+        desc: 'Click the "Connect" button next to VoxVPN. You\'re now protected!',
       },
     ],
   },
   macos: {
-    wireguardUrl: 'https://apps.apple.com/us/app/wireguard/id1451685025',
     steps: [
       {
-        title: 'Install WireGuard from the Mac App Store',
-        desc: 'Search for "WireGuard" on the Mac App Store and install the free official app.',
-        action: { label: 'Open App Store', href: 'https://apps.apple.com/us/app/wireguard/id1451685025' },
+        title: 'Download VoxVPN for macOS',
+        desc: 'Click the "Download Config" button below to get your personal VoxVPN configuration file for macOS.',
       },
       {
-        title: 'Download Your VoxVPN Config',
-        desc: 'Click the "Download Config" button below to get your personal .conf file.',
+        title: 'Install & Launch',
+        desc: 'Open the downloaded file and follow the installation steps. Launch the VoxVPN app.',
       },
       {
         title: 'Import the Config',
-        desc: 'Open WireGuard → click "+" → "Import tunnel(s) from file" → select the downloaded VoxVPN-macOS.conf file.',
+        desc: 'In VoxVPN, click "+" → "Import from file" → select the downloaded VoxVPN-macOS.conf file.',
       },
       {
         title: 'Connect',
-        desc: 'Toggle the tunnel on. Allow the VPN configuration when macOS prompts you.',
+        desc: 'Toggle the VoxVPN connection on. Allow the VPN configuration when macOS prompts you.',
       },
     ],
   },
   linux: {
-    wireguardUrl: 'https://www.wireguard.com/install/',
     steps: [
       {
-        title: 'Install WireGuard',
-        desc: 'Run the appropriate command for your distro:\n• Ubuntu/Debian: sudo apt install wireguard\n• Fedora: sudo dnf install wireguard-tools\n• Arch: sudo pacman -S wireguard-tools',
+        title: 'Download VoxVPN for Linux',
+        desc: 'Click the "Download Config" button below to get your VoxVPN configuration file.',
       },
       {
-        title: 'Download Your VoxVPN Config',
-        desc: 'Click the "Download Config" button below to get your .conf file.',
+        title: 'Move Config to VPN Directory',
+        desc: 'Run: sudo mv ~/Downloads/VoxVPN-Linux.conf /etc/voxvpn/voxvpn.conf',
       },
       {
-        title: 'Move Config to WireGuard Directory',
-        desc: 'Run: sudo mv ~/Downloads/VoxVPN-Linux.conf /etc/wireguard/voxvpn.conf',
+        title: 'Start VoxVPN',
+        desc: 'Run: sudo voxvpn up\nTo disconnect: sudo voxvpn down\nTo auto-start: sudo systemctl enable voxvpn',
       },
       {
-        title: 'Connect',
-        desc: 'Run: sudo wg-quick up voxvpn\nTo disconnect: sudo wg-quick down voxvpn\nTo auto-start: sudo systemctl enable wg-quick@voxvpn',
+        title: 'Verify Connection',
+        desc: 'Check your IP has changed to confirm you are connected through VoxVPN.',
       },
     ],
   },
   ios: {
-    wireguardUrl: 'https://apps.apple.com/us/app/wireguard/id1441195209',
     steps: [
       {
-        title: 'Install WireGuard from the App Store',
-        desc: 'Search for "WireGuard" on the App Store and install the free official app.',
-        action: { label: 'Open App Store', href: 'https://apps.apple.com/us/app/wireguard/id1441195209' },
+        title: 'Download VoxVPN for iPhone / iPad',
+        desc: 'Tap the "Download Config" button below. Your VoxVPN config file will be saved to your Files app.',
       },
       {
-        title: 'Download Your VoxVPN Config',
-        desc: 'Tap the "Download Config" button below. Your .conf file will be saved to your Files app.',
+        title: 'Install VoxVPN App',
+        desc: 'Search for "VoxVPN" on the App Store and install the official app.',
       },
       {
         title: 'Import the Config',
-        desc: 'Open WireGuard → tap "+" → "Create from file or archive" → locate the downloaded VoxVPN-iOS.conf.',
+        desc: 'Open VoxVPN → tap "+" → "Import from Files" → locate the downloaded VoxVPN-iOS.conf.',
       },
       {
         title: 'Connect',
-        desc: 'Toggle the VoxVPN tunnel on and allow VPN configuration when prompted.',
+        desc: 'Toggle the VoxVPN connection on and allow VPN configuration when prompted.',
       },
     ],
   },
   android: {
-    wireguardUrl: 'https://play.google.com/store/apps/details?id=com.wireguard.android',
     steps: [
       {
-        title: 'Install WireGuard from Google Play',
-        desc: 'Search for "WireGuard" on Google Play and install the free official app.',
-        action: { label: 'Open Google Play', href: 'https://play.google.com/store/apps/details?id=com.wireguard.android' },
+        title: 'Download VoxVPN for Android',
+        desc: 'Tap the "Download Config" button below to get your VoxVPN config file.',
       },
       {
-        title: 'Download Your VoxVPN Config',
-        desc: 'Tap the "Download Config" button below to get your .conf file.',
+        title: 'Install VoxVPN App',
+        desc: 'Search for "VoxVPN" on Google Play and install the official app.',
       },
       {
         title: 'Import the Config',
-        desc: 'Open WireGuard → tap the "+" button → "Import from file or archive" → locate VoxVPN-Android.conf in your Downloads.',
+        desc: 'Open VoxVPN → tap "+" → "Import from file" → locate VoxVPN-Android.conf in your Downloads.',
       },
       {
         title: 'Connect',
-        desc: 'Toggle the VoxVPN tunnel on. Grant VPN permission when Android prompts.',
+        desc: 'Toggle the VoxVPN connection on. Grant VPN permission when Android prompts.',
       },
     ],
   },
   router: {
-    wireguardUrl: 'https://www.wireguard.com/',
     steps: [
       {
         title: 'Check Router Compatibility',
-        desc: 'Ensure your router supports WireGuard. Recommended: GL.iNet routers, or routers running OpenWrt/DD-WRT firmware.',
+        desc: 'Ensure your router supports VPN client mode. Recommended: GL.iNet routers, or routers running OpenWrt/DD-WRT firmware.',
       },
       {
         title: 'Download Your VoxVPN Config',
@@ -139,11 +129,11 @@ const GUIDES = {
       },
       {
         title: 'Access Router Admin Panel',
-        desc: 'Log in to your router admin panel (typically 192.168.1.1 or 192.168.0.1) and navigate to VPN → WireGuard.',
+        desc: 'Log in to your router admin panel (typically 192.168.1.1 or 192.168.0.1) and navigate to VPN settings.',
       },
       {
         title: 'Import & Activate',
-        desc: 'Upload the downloaded .conf file in your router\'s WireGuard section, save, and enable the tunnel.',
+        desc: 'Upload the downloaded VoxVPN .conf file in your router\'s VPN section, save, and enable the tunnel.',
       },
     ],
   },
@@ -228,7 +218,6 @@ export default function OsSetupGuide() {
 
   const guide = GUIDES[selectedOS] || GUIDES.windows;
   const osInfo = OS_LIST.find(o => o.id === selectedOS) || OS_LIST[0];
-  const OsIcon = osInfo.icon;
 
   return (
     <div className="min-h-screen bg-[#080c18]">
@@ -345,18 +334,17 @@ export default function OsSetupGuide() {
               )}
             </div>
 
-            {/* WireGuard link */}
+            {/* VoxVPN app link */}
             <div className="rounded-xl border border-white/5 bg-[#0d1120] p-4">
-              <p className="text-slate-400 text-xs mb-2 font-semibold uppercase tracking-wide">Need WireGuard?</p>
+              <p className="text-slate-400 text-xs mb-2 font-semibold uppercase tracking-wide">Get VoxVPN</p>
               <a
-                href={guide.wireguardUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/#pricing"
+                onClick={(e) => { e.preventDefault(); window.location.assign('/#pricing'); }}
                 className="flex items-center justify-between text-cyan-400 hover:text-cyan-300 text-sm font-semibold transition-colors"
               >
-                Download WireGuard <ExternalLink size={14} />
+                View Plans <ExternalLink size={14} />
               </a>
-              <p className="text-slate-600 text-xs mt-1">Free, open-source VPN client</p>
+              <p className="text-slate-600 text-xs mt-1">Secure, private VPN by VoxDigits</p>
             </div>
 
             {/* Support */}

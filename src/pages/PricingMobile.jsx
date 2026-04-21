@@ -11,7 +11,7 @@ const MONTHLY_PLANS = [
     price: 3.99,
     billingLabel: 'billed monthly',
     priceId: 'price_basic_monthly',
-    features: ['1 Device', '10+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'WireGuard Protocol'],
+    features: ['1 Device', '10+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'VoxVPN Protocol'],
   },
   {
     name: 'Standard',
@@ -46,7 +46,7 @@ const MONTHLY_PLANS = [
 ];
 
 const YEARLY_PLANS = [
-  { name: 'Basic',      price: 2.49, yearlyTotal: 29.88,  priceId: 'price_basic_yearly',      popular: false, savings: 'Save 38%', features: ['1 Device', '10+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'WireGuard Protocol'] },
+  { name: 'Basic',      price: 2.49, yearlyTotal: 29.88,  priceId: 'price_basic_yearly',      popular: false, savings: 'Save 38%', features: ['1 Device', '10+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'VoxVPN Protocol'] },
   { name: 'Standard',   price: 4.49, yearlyTotal: 53.88,  priceId: 'price_standard_yearly',   popular: false, savings: 'Save 36%', features: ['3 Devices', '30+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'Kill Switch'] },
   { name: 'Premium',    price: 6.49, yearlyTotal: 77.88,  priceId: 'price_premium_yearly',    popular: true,  savings: 'Save 35%', features: ['5 Devices', '50+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'Kill Switch', 'Split Tunneling', 'Priority Support'] },
   { name: 'Advanced',   price: 9.99, yearlyTotal: 119.88, priceId: 'price_advanced_yearly',   popular: false, savings: 'Save 33%', features: ['10 Devices', '60+ Servers', 'Unlimited Bandwidth', 'AES-256 Encryption', 'No-Logs Policy', 'Kill Switch', 'Dedicated IP', '24/7 Support'] },

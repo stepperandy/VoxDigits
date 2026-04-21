@@ -235,7 +235,7 @@ export default function VpnServers() {
           <div className="flex items-start gap-3 p-3 rounded-xl bg-cyan-500/5 border border-cyan-500/15">
             <Info size={14} className="text-cyan-400 flex-shrink-0 mt-0.5" />
             <p className="text-cyan-200/70 text-xs leading-relaxed">
-              Download your VoxVPN profile and open it with <span className="font-bold text-cyan-300">OpenVPN Connect</span>
+              Download your VoxVPN profile to connect to this server securely.
             </p>
           </div>
 

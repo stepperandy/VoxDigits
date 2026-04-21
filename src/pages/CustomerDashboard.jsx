@@ -160,7 +160,7 @@ export default function CustomerDashboard() {
               {[
                 { icon: '🔒', title: 'AES-256 Encryption', desc: 'Military-grade encryption on all your traffic.' },
                 { icon: '🌍', title: '10+ Global Servers', desc: 'Connect from USA, UK, Germany, Singapore & more.' },
-                { icon: '🚀', title: 'Blazing Fast Speeds', desc: 'WireGuard protocol for ultra-low latency.' },
+                { icon: '🚀', title: 'Blazing Fast Speeds', desc: 'Optimized servers for ultra-low latency.' },
                 { icon: '📵', title: 'No-Logs Policy', desc: 'We never store or sell your browsing data.' },
                 { icon: '📱', title: 'Up to 5 Devices', desc: 'Protect your phone, laptop, and tablet simultaneously.' },
                 { icon: '🛡️', title: 'Kill Switch', desc: 'Automatically cuts internet if VPN drops.' },
@@ -335,21 +335,21 @@ export default function CustomerDashboard() {
             {[
               {
                 step: '1',
-                title: 'Install WireGuard',
-                desc: 'Download and install the free WireGuard client for Windows.',
-                action: 'Download WireGuard',
-                href: 'https://www.wireguard.com/install/',
+                title: 'Download VoxVPN',
+                desc: 'Download the VoxVPN client for Windows using the button above.',
+                action: null,
+                href: null,
               },
               {
                 step: '2',
-                title: 'Download Your VoxVPN Config',
-                desc: 'Click "Download VPN for Your Device" above and select Windows to get your personal .conf file.',
+                title: 'Install & Launch',
+                desc: 'Run the installer and open the VoxVPN app on your Windows device.',
                 action: null,
               },
               {
                 step: '3',
-                title: 'Import & Connect',
-                desc: 'Open WireGuard → "Import tunnel(s) from file" → select VoxVPN-Windows.conf → click Activate.',
+                title: 'Connect',
+                desc: 'Log in with your VoxVPN account, choose a server location, and click Connect.',
                 action: null,
               },
             ].map((s) => (

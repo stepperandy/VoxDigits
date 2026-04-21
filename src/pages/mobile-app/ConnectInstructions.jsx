@@ -5,9 +5,9 @@ import { VPN_SERVERS } from '@/lib/vpnServers';
 
 const STEPS = [
   { num: 1, title: 'Download VoxVPN Profile', desc: 'Tap the button below to download your VoxVPN config file.' },
-  { num: 2, title: 'Open OpenVPN Connect', desc: 'Launch the OpenVPN Connect app on your device.' },
-  { num: 3, title: 'Import into OpenVPN Connect', desc: 'Tap "+" → "Import from Files" and select your VoxVPN profile.' },
-  { num: 4, title: 'Connect with VoxVPN', desc: 'Enable the profile to start your VoxVPN encrypted session.' },
+  { num: 2, title: 'Open VoxVPN App', desc: 'Launch the VoxVPN app on your device.' },
+  { num: 3, title: 'Import Your Profile', desc: 'Tap "+" → "Import from Files" and select your VoxVPN profile.' },
+  { num: 4, title: 'Connect with VoxVPN', desc: 'Enable the profile to start your secure VoxVPN session.' },
 ];
 
 const STATUS = { IDLE: 'idle', READY: 'ready', DOWNLOADED: 'downloaded' };
@@ -101,7 +101,7 @@ export default function ConnectInstructions() {
           <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-start gap-3">
             <CheckCircle2 size={18} className="text-emerald-400 flex-shrink-0 mt-0.5" />
             <p className="text-emerald-300 text-sm leading-relaxed">
-              <strong>VoxVPN-{server.name}.ovpn</strong> downloaded. Open this profile in OpenVPN Connect to start your VoxVPN session.
+              <strong>VoxVPN-{server.name}.ovpn</strong> downloaded. Open this profile in the VoxVPN app to start your secure session.
             </p>
           </div>
         )}
@@ -149,7 +149,7 @@ export default function ConnectInstructions() {
             className="w-full py-4 bg-[#0d1120] hover:bg-[#0d1a20] border border-white/10 hover:border-cyan-500/30 text-white font-black rounded-2xl text-base transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
           >
             <ExternalLink size={18} className="text-cyan-400" />
-            Open OpenVPN Connect
+            Open VoxVPN App
           </button>
         </div>
       </div>
