@@ -79,7 +79,7 @@ export default function CustomerDashboard() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `VoxVPN-${platform.charAt(0).toUpperCase() + platform.slice(1)}.conf`;
+      a.download = `VoxVPN-${platform.charAt(0).toUpperCase() + platform.slice(1)}.ovpn`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
