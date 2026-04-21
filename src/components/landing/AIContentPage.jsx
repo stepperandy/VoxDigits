@@ -81,6 +81,7 @@ Return JSON with exactly these fields:
               <h2 className="text-2xl font-bold text-white mb-4">{content?.cta_headline}</h2>
               <a
                 href={ctaHref || '/#pricing'}
+                onClick={(e) => { e.preventDefault(); window.location.assign(ctaHref || '/#pricing'); }}
                 className="inline-block px-8 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full transition-all"
               >
                 {ctaLabel || 'Get Protected Now'}

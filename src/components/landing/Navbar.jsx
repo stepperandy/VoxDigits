@@ -44,8 +44,12 @@ export default function Navbar() {
   const handleNavClick = (href) => {
     setMobileOpen(false);
     if (href.startsWith('#')) {
-      const el = document.querySelector(href);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      if (location.pathname === '/') {
+        const el = document.querySelector(href);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        window.location.assign('/' + href);
+      }
     }
   };
 
