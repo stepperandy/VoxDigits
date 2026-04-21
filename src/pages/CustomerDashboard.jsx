@@ -124,6 +124,7 @@ export default function CustomerDashboard() {
           </p>
           <a
             href="/#pricing"
+            onClick={() => { window.location.href = '/#pricing'; }}
             className="inline-block px-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-lg transition-all"
           >
             View Plans
