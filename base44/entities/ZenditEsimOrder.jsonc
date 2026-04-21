@@ -1,0 +1,52 @@
+{
+  "name": "ZenditEsimOrder",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user who purchased the eSIM"
+    },
+    "order_id": {
+      "type": "string",
+      "description": "VoxVPN/Stripe order ID"
+    },
+    "plan": {
+      "type": "string",
+      "description": "VPN plan associated with this eSIM order"
+    },
+    "zendit_order_id": {
+      "type": "string",
+      "description": "Zendit's unique order identifier"
+    },
+    "zendit_iccid": {
+      "type": "string",
+      "description": "ICCID of the provisioned eSIM"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "provisioned",
+        "activated",
+        "failed"
+      ],
+      "default": "pending",
+      "description": "Current status of the eSIM"
+    },
+    "provisioned_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the eSIM was provisioned by Zendit"
+    },
+    "activated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the user activated the eSIM"
+    }
+  },
+  "required": [
+    "user_email",
+    "order_id",
+    "plan"
+  ]
+}

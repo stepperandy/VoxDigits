@@ -50,7 +50,19 @@ Deno.serve(async (req) => {
         configUrl: provisionData.configUrl || null,
       });
 
-      // 3. Handle referral reward if this user was referred
+      // 3. Provision Zendit eSIM
+      try {
+        await base44.asServiceRole.functions.invoke('provisionZenditEsim', {
+          email: customerEmail,
+          plan: plan || 'Basic',
+          orderId: session.id,
+        });
+      } catch (zenditErr) {
+        console.error('Zendit provisioning error:', zenditErr.message);
+        // Non-fatal — VPN access still granted
+      }
+
+      // 4. Handle referral reward if this user was referred
       try {
         const referrals = await base44.asServiceRole.entities.Referral.filter({ referee_email: customerEmail });
         const pendingReferral = referrals.find(r => r.status === 'pending' && r.referee_email);
