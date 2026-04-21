@@ -60,9 +60,9 @@ const footerSections = [
   {
     title: 'eSIM Providers',
     links: [
-      { label: 'esimgo', external: 'https://voxdigits.com' },
-      { label: 'Airalo', external: 'https://voxdigits.com' },
-      { label: 'Zendit', external: 'https://voxdigits.com' },
+      { label: 'VoxGO', external: 'https://voxdigits.com' },
+      { label: 'VoxAIR', external: 'https://voxdigits.com' },
+      { label: 'VoxZen', external: 'https://voxdigits.com' },
     ],
   },
   {
