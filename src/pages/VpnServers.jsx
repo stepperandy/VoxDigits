@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { VPN_SERVERS } from '@/lib/vpnServers';
-import { VPN_CONFIGS } from '@/lib/vpnConfigs';
 import { connectToVpn, disconnectVpn, STATES } from '@/lib/vpnConnectionService';
 import { Shield, Server, FileText, Wifi, WifiOff, Loader2, AlertCircle, X, Search, Zap } from 'lucide-react';
 
@@ -43,7 +42,7 @@ export default function VpnServers() {
   );
 
   const handleConnectClick = (server) => {
-    const config = VPN_CONFIGS[server.id];
+    const config = server.config;
     setSelectedServer(server);
     setMissingConfig(!config || config.trim().length === 0);
     setConnState(!config || config.trim().length === 0 ? STATES.IDLE : STATES.READY);
@@ -57,8 +56,7 @@ export default function VpnServers() {
 
   const startConnection = async () => {
     setConnState(STATES.CONNECTING);
-    const config = VPN_CONFIGS[selectedServer.id];
-    const result = await connectToVpn(selectedServer, config);
+    const result = await connectToVpn(selectedServer, selectedServer.config);
     if (result.success) {
       setConnState(STATES.CONNECTED);
       setConnectedServer(selectedServer);
@@ -74,8 +72,9 @@ export default function VpnServers() {
     setShowPanel(false);
   };
 
-  const config = selectedServer ? VPN_CONFIGS[selectedServer.id] : '';
-  const configPreview = config ? config.split('\n').slice(0, 10).join('\n') : '';
+  const configPreview = selectedServer?.config
+    ? selectedServer.config.split('\n').slice(0, 10).join('\n')
+    : '';
 
   return (
     <div className="min-h-screen bg-[#060d1a] px-5 pt-14 pb-10">
@@ -186,7 +185,7 @@ export default function VpnServers() {
                     </p>
                     <div className="flex items-center gap-1.5 text-slate-600 text-xs mt-0.5">
                       <FileText size={10} />
-                      <span className="font-mono truncate">{server.file}</span>
+                      <span className="font-mono truncate">{server.id}.ovpn</span>
                     </div>
                   </div>
                 </div>
@@ -197,7 +196,7 @@ export default function VpnServers() {
                       ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                       : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                   }`}>
-                    {isConnected ? 'Connected' : server.status}
+                    {isConnected ? 'Connected' : 'Ready'}
                   </span>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleConnectClick(server); }}
@@ -230,7 +229,7 @@ export default function VpnServers() {
                 </div>
                 <div>
                   <p className="text-white font-black text-base">{selectedServer.name}</p>
-                  <p className="text-slate-500 text-xs font-mono">{selectedServer.file}</p>
+                  <p className="text-slate-500 text-xs font-mono">{selectedServer.id}.ovpn</p>
                 </div>
               </div>
               <button onClick={() => setShowPanel(false)} className="text-slate-500 hover:text-white transition-colors p-1">

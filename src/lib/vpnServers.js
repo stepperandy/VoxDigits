@@ -1,12 +1,14 @@
+import { VPN_CONFIGS } from './vpnConfigs';
+
 export const VPN_SERVERS = [
-  { id: "chicago", name: "Chicago", file: "Chicago.ovpn", status: "Ready" },
-  { id: "london", name: "London", file: "london.ovpn", status: "Ready" },
-  { id: "amsterdam", name: "Amsterdam", file: "amsterdam.ovpn", status: "Ready" },
-  { id: "singapore", name: "Singapore", file: "singapore.ovpn", status: "Ready" },
-  { id: "losangeles", name: "Los Angeles", file: "losangeles.ovpn", status: "Ready" },
-  { id: "newjersey", name: "New Jersey", file: "Newjersey.ovpn", status: "Ready" },
-  { id: "frankfurt", name: "Frankfurt", file: "frankfurt.ovpn", status: "Ready" },
-  { id: "sydney", name: "Sydney", file: "sydney.ovpn", status: "Ready" },
-  { id: "siliconvalley", name: "Silicon Valley", file: "siliconvalley.ovpn", status: "Ready" },
-  { id: "johannesburg", name: "Johannesburg", file: "johannesburg.ovpn", status: "Ready" }
+  { id: "chicago",      name: "Chicago",       config: VPN_CONFIGS.chicago },
+  { id: "london",       name: "London",        config: VPN_CONFIGS.london },
+  { id: "amsterdam",    name: "Amsterdam",     config: VPN_CONFIGS.amsterdam },
+  { id: "singapore",    name: "Singapore",     config: VPN_CONFIGS.singapore },
+  { id: "losangeles",   name: "Los Angeles",   config: VPN_CONFIGS.losangeles },
+  { id: "newjersey",    name: "New Jersey",    config: VPN_CONFIGS.newjersey },
+  { id: "frankfurt",    name: "Frankfurt",     config: VPN_CONFIGS.frankfurt },
+  { id: "sydney",       name: "Sydney",        config: VPN_CONFIGS.sydney },
+  { id: "siliconvalley",name: "Silicon Valley",config: VPN_CONFIGS.siliconvalley },
+  { id: "johannesburg", name: "Johannesburg",  config: VPN_CONFIGS.johannesburg },
 ];
