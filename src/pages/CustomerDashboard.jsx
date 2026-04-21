@@ -115,20 +115,82 @@ export default function CustomerDashboard() {
 
   if (!subscription) {
     return (
-      <div className="min-h-screen bg-[#060910] flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <AlertCircle size={48} className="text-amber-500 mx-auto mb-4" />
-          <h2 className="text-white text-2xl font-bold mb-2">No Active Subscription</h2>
-          <p className="text-slate-400 mb-6">
-            You don't have an active VPN subscription. Visit our pricing page to get started.
-          </p>
-          <a
-            href="/#pricing"
-            onClick={() => { window.location.href = '/#pricing'; }}
-            className="inline-block px-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-lg transition-all"
+      <div className="min-h-screen bg-[#060910] pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto space-y-8">
+          {/* Header */}
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">VPN Dashboard</h1>
+            <p className="text-slate-400">Welcome, {user?.full_name}. Get started by choosing a plan below.</p>
+          </div>
+
+          {/* No subscription banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
           >
-            View Plans
-          </a>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
+                <AlertCircle size={22} className="text-amber-400" />
+              </div>
+              <div>
+                <p className="text-white font-bold">No Active Subscription</p>
+                <p className="text-slate-400 text-sm">Activate a plan to unlock full VPN access across all your devices.</p>
+              </div>
+            </div>
+            <a
+              href="/#pricing"
+              onClick={() => { window.location.href = '/#pricing'; }}
+              className="flex-shrink-0 px-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl transition-all text-sm"
+            >
+              View Plans →
+            </a>
+          </motion.div>
+
+          {/* Plan highlights */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="rounded-2xl border border-white/5 bg-[#0d1120] p-6 md:p-8"
+          >
+            <h3 className="text-xl font-bold text-white mb-2">Why get VoxVPN?</h3>
+            <p className="text-slate-400 text-sm mb-6">Everything you need to browse securely and privately.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                { icon: '🔒', title: 'AES-256 Encryption', desc: 'Military-grade encryption on all your traffic.' },
+                { icon: '🌍', title: '10+ Global Servers', desc: 'Connect from USA, UK, Germany, Singapore & more.' },
+                { icon: '🚀', title: 'Blazing Fast Speeds', desc: 'WireGuard protocol for ultra-low latency.' },
+                { icon: '📵', title: 'No-Logs Policy', desc: 'We never store or sell your browsing data.' },
+                { icon: '📱', title: 'Up to 5 Devices', desc: 'Protect your phone, laptop, and tablet simultaneously.' },
+                { icon: '🛡️', title: 'Kill Switch', desc: 'Automatically cuts internet if VPN drops.' },
+              ].map((f) => (
+                <div key={f.title} className="bg-[#0a1020] rounded-xl p-4 border border-white/5">
+                  <div className="text-2xl mb-2">{f.icon}</div>
+                  <p className="text-white font-bold text-sm mb-1">{f.title}</p>
+                  <p className="text-slate-500 text-xs leading-relaxed">{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-[#0d1120] p-8 text-center"
+          >
+            <h3 className="text-2xl font-black text-white mb-2">Start protecting yourself today</h3>
+            <p className="text-slate-400 text-sm mb-6">Plans start from just $2.99/month. Cancel anytime.</p>
+            <a
+              href="/#pricing"
+              onClick={() => { window.location.href = '/#pricing'; }}
+              className="inline-block px-8 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl transition-all shadow-lg shadow-cyan-500/20"
+            >
+              Get Protected Now
+            </a>
+          </motion.div>
         </div>
       </div>
     );
