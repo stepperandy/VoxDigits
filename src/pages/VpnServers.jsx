@@ -43,7 +43,6 @@ const STATUS_META = {
 export default function VpnServers() {
   const [selectedServer, setSelectedServer] = useState(null);
   const [flow, setFlow] = useState(FLOW.IDLE);
-  const [showPanel, setShowPanel] = useState(false);
   const [search, setSearch] = useState('');
 
   const filteredServers = VPN_SERVERS.filter(s =>
@@ -52,11 +51,9 @@ export default function VpnServers() {
 
   const openPanel = (server) => {
     setSelectedServer(server);
-    // Only reset state if switching servers
     if (!selectedServer || selectedServer.id !== server.id) {
       setFlow(server.config?.trim() ? FLOW.CONFIG_READY : FLOW.IDLE);
     }
-    setShowPanel(true);
   };
 
   const handleDownload = () => {
@@ -65,7 +62,7 @@ export default function VpnServers() {
   };
 
   const handleMarkConnected = () => setFlow(FLOW.CONNECTED);
-  const handleDisconnect = () => { setFlow(FLOW.DISCONNECTED); setShowPanel(false); };
+  const handleDisconnect = () => { setFlow(FLOW.DISCONNECTED); setSelectedServer(null); };
   const handleReconnect = () => { openPanel(selectedServer); };
 
   const isConnected = flow === FLOW.CONNECTED && selectedServer;
@@ -182,122 +179,103 @@ export default function VpnServers() {
         })}
       </div>
 
-      {/* Bottom sheet panel */}
-      {showPanel && selectedServer && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end justify-center z-50 px-4 pb-6">
-          <div className="w-full max-w-md bg-[#0d1120] border border-white/10 rounded-3xl p-6 space-y-4">
-            {/* Panel header */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-                  <Server size={16} className="text-cyan-400" />
-                </div>
-                <div>
-                  <p className="text-white font-black text-base">{selectedServer.name}</p>
-                  <p className="text-slate-500 text-xs font-mono">{selectedServer.id}.ovpn</p>
-                </div>
+      {/* Server Details Panel */}
+      {selectedServer && (
+        <div className="mt-6 rounded-2xl border border-white/10 bg-[#0d1120] p-5 space-y-4">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                <Server size={16} className="text-cyan-400" />
               </div>
-              <button onClick={() => setShowPanel(false)} className="text-slate-500 hover:text-white transition-colors p-1">
-                <X size={20} />
-              </button>
+              <div>
+                <p className="text-white font-black text-base leading-none">{selectedServer.name}</p>
+                <p className="text-slate-500 text-xs mt-0.5">Server Details</p>
+              </div>
+            </div>
+            <button onClick={() => setSelectedServer(null)} className="text-slate-500 hover:text-white transition-colors p-1">
+              <X size={18} />
+            </button>
+          </div>
+
+          {/* Info rows */}
+          <div className="space-y-2.5">
+            {/* Status */}
+            <div className="flex items-center justify-between py-2.5 border-b border-white/5">
+              <span className="text-slate-500 text-xs uppercase tracking-wider">Status</span>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${flow === FLOW.CONNECTED ? 'bg-emerald-400' : 'bg-cyan-400'}`} />
+                <span className={`text-xs font-bold ${STATUS_META[flow].color}`}>{STATUS_META[flow].label}</span>
+              </div>
             </div>
 
-            {/* No config */}
-            {!selectedServer.config?.trim() ? (
-              <div className="flex items-start gap-3 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20">
-                <AlertCircle size={18} className="text-rose-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-rose-300 font-bold text-sm">Config not available</p>
-                  <p className="text-rose-500 text-xs mt-0.5">This server's .ovpn config hasn't been loaded yet.</p>
-                </div>
+            {/* Config file */}
+            <div className="flex items-center justify-between py-2.5 border-b border-white/5">
+              <span className="text-slate-500 text-xs uppercase tracking-wider">Config File</span>
+              <div className="flex items-center gap-1.5">
+                <FileText size={12} className="text-slate-400" />
+                <span className="text-slate-200 text-xs font-mono">{selectedServer.id}.ovpn</span>
               </div>
-            ) : (
-              <>
-                {/* Status row */}
-                <div className={`flex items-center gap-3 p-3 rounded-2xl border ${STATUS_META[flow].bg}`}>
-                  <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
-                    {flow === FLOW.CONNECTED && <Wifi size={14} className="text-emerald-400" />}
-                    {flow === FLOW.DOWNLOADED && <CheckCircle2 size={14} className="text-yellow-400" />}
-                    {flow === FLOW.CONFIG_READY && <FileText size={14} className="text-cyan-400" />}
-                    {(flow === FLOW.IDLE || flow === FLOW.DISCONNECTED) && <WifiOff size={14} className="text-slate-500" />}
-                  </div>
-                  <p className={`text-sm font-bold ${STATUS_META[flow].color}`}>{STATUS_META[flow].label}</p>
-                </div>
+            </div>
 
-                {/* Config preview */}
-                <div>
-                  <p className="text-slate-500 text-xs uppercase tracking-widest mb-2">Config Preview</p>
-                  <pre className="text-xs text-slate-400 bg-black/30 rounded-xl p-3 overflow-hidden leading-relaxed border border-white/5 whitespace-pre-wrap break-all max-h-28">
-                    {configPreview}
-                  </pre>
-                </div>
-
-                {/* Instruction after download */}
-                {(flow === FLOW.DOWNLOADED || flow === FLOW.CONFIG_READY) && flow === FLOW.DOWNLOADED && (
-                  <div className="flex items-start gap-3 p-3 rounded-2xl bg-yellow-500/10 border border-yellow-500/20">
-                    <Info size={16} className="text-yellow-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-yellow-200 text-xs leading-relaxed">
-                      <span className="font-bold">Open the downloaded file in OpenVPN Connect.</span> Once connected in the OpenVPN app, tap "I'm Connected" below.
-                    </p>
-                  </div>
-                )}
-
-                {/* Action buttons */}
-                <div className="space-y-2.5">
-                  {/* Download Config */}
-                  {(flow === FLOW.CONFIG_READY || flow === FLOW.DISCONNECTED || flow === FLOW.DOWNLOADED) && (
-                    <button
-                      onClick={handleDownload}
-                      className="w-full py-3.5 bg-cyan-400 hover:bg-cyan-300 text-black font-black rounded-2xl text-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20"
-                    >
-                      <Download size={16} />
-                      {flow === FLOW.DOWNLOADED ? 'Re-download Config' : 'Download Config'}
-                    </button>
-                  )}
-
-                  {/* Mark as connected */}
-                  {flow === FLOW.DOWNLOADED && (
-                    <button
-                      onClick={handleMarkConnected}
-                      className="w-full py-3.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 font-black rounded-2xl text-sm transition-all active:scale-[0.98]"
-                    >
-                      ✓ I'm Connected
-                    </button>
-                  )}
-
-                  {/* Connected state */}
-                  {flow === FLOW.CONNECTED && (
-                    <div className="flex gap-2">
-                      <button
-                        onClick={handleDownload}
-                        className="flex-1 py-3.5 bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 font-bold rounded-2xl text-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-                      >
-                        <Download size={14} />
-                        Re-download
-                      </button>
-                      <button
-                        onClick={handleDisconnect}
-                        className="flex-1 py-3.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/20 font-black rounded-2xl text-sm transition-all active:scale-[0.98]"
-                      >
-                        Disconnect
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Idle fallback */}
-                  {flow === FLOW.IDLE && (
-                    <button
-                      onClick={handleDownload}
-                      className="w-full py-3.5 bg-cyan-400 hover:bg-cyan-300 text-black font-black rounded-2xl text-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-                    >
-                      <Download size={16} />
-                      Download Config
-                    </button>
-                  )}
-                </div>
-              </>
-            )}
+            {/* Config available */}
+            <div className="flex items-center justify-between py-2.5 border-b border-white/5">
+              <span className="text-slate-500 text-xs uppercase tracking-wider">Config Available</span>
+              {selectedServer.config?.trim() ? (
+                <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-400">
+                  <CheckCircle2 size={13} /> Yes
+                </span>
+              ) : (
+                <span className="flex items-center gap-1.5 text-xs font-bold text-rose-400">
+                  <AlertCircle size={13} /> Not loaded
+                </span>
+              )}
+            </div>
           </div>
+
+          {/* Usage hint */}
+          <div className="flex items-start gap-3 p-3 rounded-xl bg-cyan-500/5 border border-cyan-500/15">
+            <Info size={14} className="text-cyan-400 flex-shrink-0 mt-0.5" />
+            <p className="text-cyan-200/70 text-xs leading-relaxed">
+              Download the config and open it with <span className="font-bold text-cyan-300">OpenVPN Connect</span>
+            </p>
+          </div>
+
+          {/* Actions */}
+          {selectedServer.config?.trim() ? (
+            <div className="space-y-2">
+              <button
+                onClick={handleDownload}
+                className="w-full py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-black rounded-xl text-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+              >
+                <Download size={15} />
+                {flow === FLOW.DOWNLOADED ? 'Re-download Config' : 'Download Config'}
+              </button>
+
+              {flow === FLOW.DOWNLOADED && (
+                <button
+                  onClick={handleMarkConnected}
+                  className="w-full py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 font-black rounded-xl text-sm transition-all active:scale-[0.98]"
+                >
+                  ✓ I'm Connected
+                </button>
+              )}
+
+              {flow === FLOW.CONNECTED && (
+                <button
+                  onClick={handleDisconnect}
+                  className="w-full py-3 bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/20 font-black rounded-xl text-sm transition-all active:scale-[0.98]"
+                >
+                  Disconnect
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
+              <AlertCircle size={14} className="text-rose-400 flex-shrink-0 mt-0.5" />
+              <p className="text-rose-300 text-xs">Config not available for this server yet.</p>
+            </div>
+          )}
         </div>
       )}
     </div>
