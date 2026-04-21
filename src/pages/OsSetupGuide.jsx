@@ -316,6 +316,7 @@ export default function OsSetupGuide() {
                   </div>
                   <a
                     href="/#pricing"
+                    onClick={(e) => { e.preventDefault(); window.location.assign('/#pricing'); }}
                     className="block w-full py-3 text-center bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl text-sm transition-all"
                   >
                     View Plans
