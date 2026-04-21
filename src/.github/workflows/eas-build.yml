@@ -29,6 +29,9 @@ jobs:
       - name: Build on EAS (${{ matrix.platform }})
         run: eas build --platform ${{ matrix.platform }} --non-interactive
       
+      - name: Submit to App Store/Play Store
+        run: eas submit --platform ${{ matrix.platform }} --non-interactive --latest
+      
       - name: Notify build status
         if: always()
         uses: actions/github-script@v7
