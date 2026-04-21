@@ -5,46 +5,46 @@ const footerSections = [
   {
     title: 'VPN for Countries',
     links: [
-      { label: 'VPN for USA', to: '/vpn-for-usa' },
-      { label: 'VPN for UK', to: '/vpn-for-uk' },
-      { label: 'VPN for Canada', to: '/vpn-for-canada' },
-      { label: 'VPN for Australia', to: '/vpn-for-australia' },
-      { label: 'VPN for Germany', to: '/vpn-for-germany' },
-      { label: 'VPN for France', to: '/vpn-for-france' },
-      { label: 'VPN for Japan', to: '/vpn-for-japan' },
+      { label: 'VPN for USA', external: 'https://voxvpn.net/#pricing' },
+      { label: 'VPN for UK', external: 'https://voxvpn.net/#pricing' },
+      { label: 'VPN for Canada', external: 'https://voxvpn.net/#pricing' },
+      { label: 'VPN for Australia', external: 'https://voxvpn.net/#pricing' },
+      { label: 'VPN for Germany', external: 'https://voxvpn.net/#pricing' },
+      { label: 'VPN for France', external: 'https://voxvpn.net/#pricing' },
+      { label: 'VPN for Japan', external: 'https://voxvpn.net/#pricing' },
     ],
   },
   {
     title: 'VPN Download by OS',
     links: [
-      { label: 'Windows VPN', to: '/windows-vpn' },
-      { label: 'Mac VPN', to: '/mac-vpn' },
-      { label: 'Linux VPN', to: '/linux-vpn' },
-      { label: 'iOS VPN', to: '/ios-vpn' },
-      { label: 'Android VPN', to: '/android-vpn' },
-      { label: 'Router VPN', to: '/router-vpn' },
-      { label: 'Chrome Extension', to: '/chrome-extension' },
+      { label: 'Windows VPN', external: 'https://voxvpn.net/#pricing' },
+      { label: 'Mac VPN', external: 'https://voxvpn.net/#pricing' },
+      { label: 'Linux VPN', external: 'https://voxvpn.net/#pricing' },
+      { label: 'iOS VPN', external: 'https://voxvpn.net/#pricing' },
+      { label: 'Android VPN', external: 'https://voxvpn.net/#pricing' },
+      { label: 'Router VPN', external: 'https://voxvpn.net/#pricing' },
+      { label: 'Chrome Extension', external: 'https://voxvpn.net/#pricing' },
     ],
   },
   {
     title: 'Features',
     links: [
-      { label: 'No-Logs Policy', to: '/no-logs-policy' },
-      { label: 'Kill Switch', to: '/kill-switch' },
-      { label: 'Split Tunneling', to: '/split-tunneling' },
-      { label: 'AES-256 Encryption', to: '/aes-256-encryption' },
-      { label: 'DNS Leak Protection', to: '/dns-leak-protection' },
-      { label: 'IPv6 Leak Protection', to: '/ipv6-leak-protection' },
+      { label: 'No-Logs Policy', external: 'https://voxvpn.net/#pricing' },
+      { label: 'Kill Switch', external: 'https://voxvpn.net/#pricing' },
+      { label: 'Split Tunneling', external: 'https://voxvpn.net/#pricing' },
+      { label: 'AES-256 Encryption', external: 'https://voxvpn.net/#pricing' },
+      { label: 'DNS Leak Protection', external: 'https://voxvpn.net/#pricing' },
+      { label: 'IPv6 Leak Protection', external: 'https://voxvpn.net/#pricing' },
     ],
   },
   {
     title: 'Solutions',
     links: [
-      { label: 'VPN for Streaming', to: '/vpn-for-streaming' },
-      { label: 'VPN for Gaming', to: '/vpn-for-gaming' },
-      { label: 'VPN for Torrenting', to: '/vpn-for-torrenting' },
-      { label: 'VPN for Business', to: '/vpn-for-business' },
-      { label: 'VPN for Travel', to: '/vpn-for-travel' },
+      { label: 'VPN for Streaming', external: 'https://voxvpn.net/#pricing' },
+      { label: 'VPN for Gaming', external: 'https://voxvpn.net/#pricing' },
+      { label: 'VPN for Torrenting', external: 'https://voxvpn.net/#pricing' },
+      { label: 'VPN for Business', external: 'https://voxvpn.net/#pricing' },
+      { label: 'VPN for Travel', external: 'https://voxvpn.net/#pricing' },
     ],
   },
   {
@@ -133,7 +133,9 @@ export default function Footer() {
               <ul className="space-y-2">
                 {section.links.map((link) => (
                   <li key={link.label}>
-                    {link.hash ? (
+                    {link.external ? (
+                      <a href={link.external} target="_blank" rel="noopener noreferrer" className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link.label}</a>
+                    ) : link.hash ? (
                       <button onClick={() => handleLink(link)} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors text-left">{link.label}</button>
                     ) : (
                       <Link to={link.to} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link.label}</Link>
@@ -153,7 +155,9 @@ export default function Footer() {
               <ul className="space-y-2">
                 {section.links.map((link) => (
                   <li key={link.label}>
-                    {link.hash ? (
+                    {link.external ? (
+                      <a href={link.external} target="_blank" rel="noopener noreferrer" className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link.label}</a>
+                    ) : link.hash ? (
                       <button onClick={() => handleLink(link)} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors text-left">{link.label}</button>
                     ) : (
                       <Link to={link.to} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link.label}</Link>
