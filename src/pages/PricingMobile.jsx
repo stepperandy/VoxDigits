@@ -40,9 +40,10 @@ const plans = [
   },
 ];
 
-const HUBTEL_LINK = 'https://paylink.hubtel.com/voxvpn';
+const HUBTEL_BASE_LINK = 'https://paylink.hubtel.com/voxvpn';
 
 function PlanCard({ plan, onCheckout, isLoading }) {
+  const cedisPrice = (plan.price * 12.5).toFixed(2);
   return (
     <div
       className={`relative p-4 rounded-xl border transition-all ${
@@ -80,12 +81,12 @@ function PlanCard({ plan, onCheckout, isLoading }) {
 
       {/* Hubtel button */}
       <a
-        href={HUBTEL_LINK}
+        href={HUBTEL_BASE_LINK}
         target="_blank"
         rel="noopener noreferrer"
         className="block w-full mt-2 py-3 rounded-lg font-bold text-sm text-center transition-all select-none active:scale-95 border border-orange-500/40 text-orange-400 hover:bg-orange-500/10"
       >
-        🛒 Pay with Hubtel (MoMo / Card)
+        🛒 Pay with Hubtel — GH₵{cedisPrice}
       </a>
 
       <ul className="mt-4 space-y-2">
