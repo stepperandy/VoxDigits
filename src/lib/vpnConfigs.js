@@ -519,6 +519,85 @@ SkQxaKFjHqnP+1Vtgqfl4oNL143xr8Dw/wC62Qo5YdouKm5dyoyfTkMmjkiHMU+l
 KJ6WoefmW37MV80BpDvjreOdiNa+qPsBWQ==
 -----END OpenVPN tls-crypt-v2 client key-----
 </tls-crypt-v2>`,
+  frankfurt: `# Automatically generated OpenVPN client config file
+# Generated on Tue Apr 21 00:03:57 2026 by vultr
+# OVPN_ACCESS_SERVER_PROFILE=testuser@45.76.81.204
+# Default Cipher
+cipher AES-256-CBC
+client
+server-poll-timeout 4
+nobind
+remote 45.76.81.204 1194 udp
+remote 45.76.81.204 1194 udp
+remote 45.76.81.204 443 tcp
+remote 45.76.81.204 1194 udp
+remote 45.76.81.204 1194 udp
+remote 45.76.81.204 1194 udp
+remote 45.76.81.204 1194 udp
+remote 45.76.81.204 1194 udp
+dev tun
+dev-type tun
+remote-cert-tls server
+tls-version-min 1.2
+reneg-sec 604800
+tun-mtu 1420
+auth-user-pass
+verb 3
+push-peer-info
+
+<ca>
+-----BEGIN CERTIFICATE-----
+MIIBeTCB/6ADAgECAgRp5r3IMAoGCCqGSM49BAMCMBUxEzARBgNVBAMMCk9wZW5W
+UE4gQ0EwHhcNMjYwNDE5MjM1OTA0WhcNMzYwNDE3MjM1OTA0WjAVMRMwEQYDVQQD
+DApPcGVuVlBOIENBMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEK7Ghmbn4itvZF4Jy
+X67r53fjuvmzKyhsqspdisgkqAbH9+px6XooifOEGB6Ii9gb1T3UXVCOq32TMrHI
+MITuhZzuJjVWJnUATKbcn22qInFrU7uCTljHHGemZ863Z/S6oyAwHjAPBgNVHRMB
+Af8EBTADAQH/MAsGA1UdDwQEAwIBBjAKBggqhkjOPQQDAgNpADBmAjEAzy8Exkoy
+B7idwrOHaAjNnc0LifhM3d1ulu1rS9e6E3mV1iRRoqonOKXUbwiZL9tbAjEA8mBX
+L1QHotTBE+S1JNvj2RW9bIoRRdWS7AfEFQhSZdoTwYB0GWxV2WdmeMNgOGRR
+-----END CERTIFICATE-----
+</ca>
+<cert>
+-----BEGIN CERTIFICATE-----
+MIIBoDCCASagAwIBAgIII+u+PApBe30wCgYIKoZIzj0EAwIwFTETMBEGA1UEAwwK
+T3BlblZQTiBDQTAeFw0yNjA0MjAwMDAzNTdaFw0zNjA0MTgwMDAzNTdaMBMxETAP
+BgNVBAMMCHRlc3R1c2VyMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAELB7NIJNIZMMA
+jHFzlvyV4xEp8ZzzIbRIpcuRjIA8Z8KH9WamQioUPloj/ds4IidVBkVVRx3St5Tq
+ljoXW49JHvGLs2w+LoyozfmxO9/ohoUhiqTYfDEOtQApAECuzG2do0UwQzAMBgNV
+HRMBAf8EAjAAMAsGA1UdDwQEAwIHgDATBgNVHSUEDDAKBggrBgEFBQcDAjARBglg
+hkgBhvhCAQEEBAMCB4AwCgYIKoZIzj0EAwIDaAAwZQIwBRCW9uayhuilGVoR9pKN
+oqLILNM/lOZA/Gs5kGtfVJYErUNrODcQf3kJGI7lnkEhAjEAmN/LiflllhUrVksS
+pUcHzHCixW6DpmdOur+Yyn8Aaw7GYHxZjSWEMcmbqTgbCnQY
+-----END CERTIFICATE-----
+</cert>
+<key>
+-----BEGIN PRIVATE KEY-----
+MIG2AgEAMBAGByqGSM49AgEGBSuBBAAiBIGeMIGbAgEBBDBeoQo7pzFoXE3md+Q4
+P6WPlZjmidGxANCBAzRnR7v+Sb70eywXdSyA5+V6puH8n4OhZANiAAQsHs0gk0hk
+wwCMcXOW/JXjESnxnPMhtEily5GMgDxnwof1ZqZCKhQ+WiP92zgiJ1UGRVVHHdK3
+lOqWOhdbj0ke8YuzbD4ujKjN+bE73+iGhSGKpNh8MQ61ACkAQK7MbZ0=
+-----END PRIVATE KEY-----
+</key>
+<tls-crypt-v2>
+-----BEGIN OpenVPN tls-crypt-v2 client key-----
+nrChQXDQrxIn+mdyGr24RDfPblVH0Sman/IwVvAraiTV4sbc+BiSaCAOjklLGrRb
+EthvLh3QuV+YpFWotiUb7GtY2MxzTIIxatznvfM0M5uPcubG5Lu8F3d+5bBLEApj
+QAi7pS97BczmU8JfF22TvMT1VZOt4GkMH+k9WzcFH7xkPsC86sbHxKF/3weYlimd
+EHamL/gxCBK9JOtLThwVir98uO4FabBEmgsNo5kpCA0ug3EOC6D/3bMI5UQcEbxH
+zhbJazI2r5KlIpv94d1jI4S/YbZsCm85Zg2v3YuxZfj3C4BZRWF1dgk21VDWq5ti
+n+CaIUxXsxzmyBEXKdKy7JRv3WbtQu+JnFjOaYiSiedJK77WVIni4eEbyaBR3lb0
+79hOaZ8KC3Qu2yYj3AHu5pKmumzUUvz0e/FHNwRZw+W9uLD02MqQBBjHct9+rK3t
+4GpSwDeIJYE6StQWwqQH47GLlHI+U2/uB+abt1bk3SHzRGpBpzw27QrZ16t/j3Fa
+ASIRwcVQhbow86/2d5a+1T0yjlUaOF3rYNO6A5mQjgLkrcr95acvyiz11lb4uM10
+c7+rPo9uQ83K4s3nX1iIlnDzO5f2rhojOTYt/tZdBXpdEEG6PySWK6LWTDuFTi7q
+nPGjgOrSU56hfAqIqNul0V0kpuC95Jl3wLmtfFwLzG/Iz7twm1NlMn6mY3p0N0ug
+/CK19XpXyjEWnry0WS03qJmRT+llnwbtDf1bvpAYa0WZ3rExZJLbwcXFaFohvRGG
+W058oBjF3FsVhzJCHyvSx1uwAz7gkbEBWQ==
+-----END OpenVPN tls-crypt-v2 client key-----
+</tls-crypt-v2>`,
+  sydney: ``,
+  siliconvalley: ``,
+  johannesburg: ``,
   newjersey: `# Automatically generated OpenVPN client config file
 # Generated on Mon Apr 20 20:49:06 2026 by voxvpn-us-east
 # Note: this config file contains inline private keys
