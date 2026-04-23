@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Download, Trash2, Plus, Loader2, Check, AlertCircle, Smartphone, Monitor, Wifi } from 'lucide-react';
+import { Download, Trash2, Loader2, Check, AlertCircle, Smartphone, Monitor, Wifi, CreditCard, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import UsageCharts from '@/components/dashboard/UsageCharts';
 
 const deviceIcons = {
   windows: Monitor,
@@ -28,6 +29,7 @@ export default function CustomerDashboard() {
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(null);
   const [user, setUser] = useState(null);
+  const [portalLoading, setPortalLoading] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -88,6 +90,22 @@ export default function CustomerDashboard() {
       alert('Failed to download config: ' + error.message);
     } finally {
       setDownloading(null);
+    }
+  };
+
+  const openBillingPortal = async () => {
+    setPortalLoading(true);
+    try {
+      const res = await base44.functions.invoke('createStripePortal', {});
+      if (res.data?.url) {
+        window.open(res.data.url, '_blank');
+      } else {
+        alert(res.data?.error || 'Could not open billing portal. Please contact support.');
+      }
+    } catch (err) {
+      alert('Error: ' + err.message);
+    } finally {
+      setPortalLoading(false);
     }
   };
 
@@ -245,7 +263,7 @@ export default function CustomerDashboard() {
               { label: 'Status', value: subscription.status.toUpperCase() },
               {
                 label: 'Renews',
-                value: new Date(subscription.renewal_date).toLocaleDateString(),
+                value: subscription.renewal_date ? new Date(subscription.renewal_date).toLocaleDateString() : 'N/A',
               },
             ].map((item) => (
               <div key={item.label} className="bg-[#0a1020] rounded-xl p-3">
@@ -256,6 +274,31 @@ export default function CustomerDashboard() {
               </div>
             ))}
           </div>
+
+          {/* Manage Billing */}
+          <div className="mt-4 pt-4 border-t border-white/5 flex justify-end">
+            <button
+              onClick={openBillingPortal}
+              disabled={portalLoading}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-cyan-500/30 bg-cyan-500/5 hover:bg-cyan-500/10 text-cyan-400 text-sm font-semibold transition-all disabled:opacity-50"
+            >
+              {portalLoading ? <Loader2 size={15} className="animate-spin" /> : <CreditCard size={15} />}
+              Manage Billing & Invoices
+              <ExternalLink size={13} />
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Usage Charts */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08 }}
+          className="rounded-2xl border border-white/5 bg-[#0d1120] p-6 md:p-8"
+        >
+          <h3 className="text-xl font-bold text-white mb-1">Usage Overview</h3>
+          <p className="text-slate-400 text-sm mb-6">Your bandwidth and connection time for the past 7 days.</p>
+          <UsageCharts subscription={subscription} />
         </motion.div>
 
         {/* Downloads Section */}
