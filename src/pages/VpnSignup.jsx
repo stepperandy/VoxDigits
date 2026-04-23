@@ -11,11 +11,16 @@ export default function VpnSignup() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setError('');
+    if (!agreedToTerms) {
+      setError('You must agree to the Terms of Service and Privacy Policy to continue.');
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch(`${API_BASE}/api/auth/signup`, {
@@ -90,6 +95,22 @@ export default function VpnSignup() {
               </button>
             </div>
           </div>
+
+          {/* Terms Agreement */}
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={agreedToTerms}
+              onChange={e => setAgreedToTerms(e.target.checked)}
+              className="mt-1 accent-cyan-400 w-4 h-4 flex-shrink-0"
+            />
+            <span className="text-slate-400 text-xs leading-relaxed">
+              I agree to the{' '}
+              <Link to="/terms-of-service" className="text-cyan-400 hover:text-cyan-300 font-semibold" target="_blank">Terms of Service</Link>
+              {' '}and{' '}
+              <Link to="/privacy-policy" className="text-cyan-400 hover:text-cyan-300 font-semibold" target="_blank">Privacy Policy</Link>
+            </span>
+          </label>
 
           {error && (
             <div className="px-4 py-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm">
