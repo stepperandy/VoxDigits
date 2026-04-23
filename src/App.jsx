@@ -69,6 +69,8 @@ const AppSubscription = lazy(() => import('./pages/mobile-app/Subscription.jsx')
 const AppSettings = lazy(() => import('./pages/mobile-app/Settings.jsx'));
 const VpnServers = lazy(() => import('./pages/VpnServers.jsx'));
 const UserProfile = lazy(() => import('./pages/UserProfile.jsx'));
+const MobileSetupGuide = lazy(() => import('./pages/MobileSetupGuide.jsx'));
+const ReferralPage = lazy(() => import('./pages/ReferralPage.jsx'));
 
 const PageTransition = ({ children }) => (
   <motion.div
@@ -156,6 +158,8 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/app/settings" element={<AppSettings />} />
           <Route path="/vpn-servers" element={<VpnServers />} />
           <Route path="/profile" element={<PageTransition><UserProfile /></PageTransition>} />
+          <Route path="/mobile-setup" element={<PageTransition><MobileSetupGuide /></PageTransition>} />
+          <Route path="/referral" element={<PageTransition><ReferralPage /></PageTransition>} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Suspense>
