@@ -45,6 +45,47 @@ export default function VoxVPNApp() {
 
   const PLATFORMS = ['windows', 'macos', 'linux', 'ios', 'android'];
 
+  const platformFileLabel = {
+    windows: 'VoxVPN-Setup.ps1',
+    macos: 'VoxVPN-Setup.sh',
+    linux: 'VoxVPN-Setup.sh',
+    ios: 'VoxVPN.conf',
+    android: 'VoxVPN.conf',
+  };
+
+  const platformInstructions = {
+    windows: [
+      'Click "Download Setup" — saves VoxVPN-Setup.ps1',
+      'Right-click the file → "Run with PowerShell"',
+      'Allow Administrator access when prompted',
+      'Script auto-installs WireGuard + your VoxVPN config',
+      'VoxVPN connects automatically — you\'re protected!',
+    ],
+    macos: [
+      'Click "Download Setup" — saves VoxVPN-Setup.sh',
+      'Open Terminal and run: sudo bash ~/Downloads/VoxVPN-Setup.sh',
+      'Script installs WireGuard + your VoxVPN config',
+      'VoxVPN connects automatically',
+    ],
+    linux: [
+      'Click "Download Setup" — saves VoxVPN-Setup.sh',
+      'Open Terminal: sudo bash ~/Downloads/VoxVPN-Setup.sh',
+      'Script installs WireGuard + activates tunnel',
+    ],
+    ios: [
+      'Install "WireGuard" from the App Store',
+      'Click "Download Config" — saves VoxVPN.conf',
+      'Open WireGuard → "+" → Import from file',
+      'Select VoxVPN.conf and tap Activate',
+    ],
+    android: [
+      'Install "WireGuard" from Google Play',
+      'Click "Download Config" — saves VoxVPN.conf',
+      'Open WireGuard → "+" → Import from file',
+      'Select VoxVPN.conf and tap Activate',
+    ],
+  };
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -110,11 +151,9 @@ export default function VoxVPNApp() {
     return (
       <div className="min-h-screen bg-[#080c18] flex items-center justify-center">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
-          <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mx-auto mb-4">
-            <Shield size={28} className="text-cyan-400" />
-          </div>
+          <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png" alt="VoxVPN" className="h-14 w-auto mx-auto mb-6" />
           <Loader2 size={20} className="text-cyan-400 animate-spin mx-auto mb-2" />
-          <p className="text-slate-400 text-sm">Connecting to VoxVPN…</p>
+          <p className="text-slate-400 text-sm">Loading your VoxVPN servers…</p>
         </motion.div>
       </div>
     );
@@ -247,7 +286,7 @@ export default function VoxVPNApp() {
                 whileTap={{ scale: 0.96 }}
                 onClick={handleDownload}
                 disabled={!selectedServer || downloading}
-                className={`w-36 h-36 rounded-full border-4 flex flex-col items-center justify-center gap-2 transition-all shadow-2xl disabled:opacity-60 ${
+                className={`w-40 h-40 rounded-full border-4 flex flex-col items-center justify-center gap-2 transition-all shadow-2xl disabled:opacity-60 ${
                   connected
                     ? 'border-emerald-500 bg-emerald-500/10 shadow-emerald-500/20'
                     : 'border-cyan-500 bg-cyan-500/10 shadow-cyan-500/20 hover:shadow-cyan-500/30'
@@ -258,18 +297,21 @@ export default function VoxVPNApp() {
                 ) : connected ? (
                   <CheckCircle2 size={36} className="text-emerald-400" />
                 ) : (
-                  <Shield size={36} className="text-cyan-400" />
+                  <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png" alt="VoxVPN" className="h-10 w-auto" />
                 )}
-                <span className={`text-xs font-bold ${connected ? 'text-emerald-400' : 'text-cyan-400'}`}>
-                  {downloading ? 'Preparing…' : connected ? 'Download Again' : 'Download Config'}
+                <span className={`text-xs font-bold text-center px-2 ${connected ? 'text-emerald-400' : 'text-cyan-400'}`}>
+                  {downloading ? 'Preparing…' : connected ? 'Download Again' : platform === 'windows' ? 'Download Setup' : platform === 'ios' || platform === 'android' ? 'Download Config' : 'Download Setup'}
                 </span>
               </motion.button>
 
-              <p className="text-slate-500 text-xs mt-4 text-center">
-                {connected
-                  ? 'Config downloaded! Import it into WireGuard to connect.'
-                  : 'Select a server then click to download your WireGuard config.'}
-              </p>
+              <div className="text-center mt-3">
+                <p className="text-slate-400 text-xs">
+                  {connected ? '✅ File ready! Follow the steps below.' : selectedServer ? `↑ Click to download ${platformFileLabel[platform]}` : 'Select a server from the list'}
+                </p>
+                {!connected && selectedServer && platform === 'windows' && (
+                  <p className="text-slate-600 text-[11px] mt-1">Auto-installs WireGuard + VoxVPN</p>
+                )}
+              </div>
             </div>
 
             {/* Selected server info */}
@@ -323,25 +365,30 @@ export default function VoxVPNApp() {
               </div>
             </div>
 
-            {/* How to use */}
+            {/* How to use — dynamic per platform */}
             <div className="rounded-xl border border-white/5 bg-[#0d1120] p-4 space-y-2">
-              <p className="text-white text-xs font-bold mb-2">How to use this config</p>
-              {[
-                'Install WireGuard from wireguard.com',
-                'Click "Download Config" above',
-                'In WireGuard, click "Import tunnel from file"',
-                'Select the downloaded .conf file',
-                'Click Activate — you\'re protected!',
-              ].map((step, i) => (
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-white text-xs font-bold">
+                  {platform === 'windows' ? 'Windows Setup Instructions' :
+                   platform === 'macos' ? 'macOS Setup Instructions' :
+                   platform === 'linux' ? 'Linux Setup Instructions' :
+                   platform === 'ios' ? 'iPhone / iPad Instructions' : 'Android Instructions'}
+                </p>
+                <span className="text-[10px] text-slate-600 font-mono bg-white/5 px-2 py-0.5 rounded">{platformFileLabel[platform]}</span>
+              </div>
+              {(platformInstructions[platform] || []).map((step, i) => (
                 <div key={i} className="flex items-start gap-2">
                   <span className="w-4 h-4 rounded-full bg-cyan-500/20 text-cyan-400 text-[10px] font-black flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
                   <p className="text-slate-400 text-xs">{step}</p>
                 </div>
               ))}
-              <a href="https://www.wireguard.com/install/" target="_blank" rel="noopener noreferrer"
-                className="inline-block mt-2 text-xs text-cyan-400 hover:text-cyan-300 font-semibold transition-colors">
-                Download WireGuard →
-              </a>
+              {(platform === 'ios' || platform === 'android') && (
+                <a href={platform === 'ios' ? 'https://apps.apple.com/app/wireguard/id1441195209' : 'https://play.google.com/store/apps/details?id=com.wireguard.android'}
+                  target="_blank" rel="noopener noreferrer"
+                  className="inline-block mt-2 text-xs text-cyan-400 hover:text-cyan-300 font-semibold transition-colors">
+                  Get WireGuard →
+                </a>
+              )}
             </div>
           </div>
         </main>
@@ -363,8 +410,11 @@ export default function VoxVPNApp() {
               <button onClick={handleDownload} disabled={downloading}
                 className="w-full py-3 rounded-xl bg-cyan-400 hover:bg-cyan-300 disabled:opacity-60 text-black font-bold text-sm flex items-center justify-center gap-2 transition-all">
                 {downloading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
-                {downloading ? 'Preparing…' : 'Download Config'}
+                {downloading ? 'Preparing…' : platform === 'windows' ? 'Download VoxVPN-Setup.ps1' : 'Download Config'}
               </button>
+              <p className="text-slate-500 text-[11px] text-center">
+                {platform === 'windows' ? 'Right-click → Run with PowerShell (as Admin)' : 'Import into WireGuard app to connect'}
+              </p>
             </motion.div>
           )}
         </AnimatePresence>
