@@ -49,8 +49,8 @@ export default function VoxVPNApp() {
     windows: 'VoxVPN-Setup.ps1',
     macos: 'VoxVPN-Setup.sh',
     linux: 'VoxVPN-Setup.sh',
-    ios: 'VoxVPN.conf',
-    android: 'VoxVPN.conf',
+    ios: 'VoxVPN.ovpn',
+    android: 'VoxVPN.ovpn',
   };
 
   const platformInstructions = {
@@ -58,31 +58,31 @@ export default function VoxVPNApp() {
       'Click "Download Setup" — saves VoxVPN-Setup.ps1',
       'Right-click the file → "Run with PowerShell"',
       'Allow Administrator access when prompted',
-      'Script auto-installs WireGuard + your VoxVPN config',
-      'VoxVPN connects automatically — you\'re protected!',
+      'Script auto-installs OpenVPN + your VoxVPN config',
+      'Open OpenVPN GUI from system tray and click Connect',
     ],
     macos: [
       'Click "Download Setup" — saves VoxVPN-Setup.sh',
       'Open Terminal and run: sudo bash ~/Downloads/VoxVPN-Setup.sh',
-      'Script installs WireGuard + your VoxVPN config',
+      'Script installs OpenVPN + your VoxVPN config',
       'VoxVPN connects automatically',
     ],
     linux: [
       'Click "Download Setup" — saves VoxVPN-Setup.sh',
       'Open Terminal: sudo bash ~/Downloads/VoxVPN-Setup.sh',
-      'Script installs WireGuard + activates tunnel',
+      'Script installs OpenVPN + activates tunnel',
     ],
     ios: [
-      'Install "WireGuard" from the App Store',
-      'Click "Download Config" — saves VoxVPN.conf',
-      'Open WireGuard → "+" → Import from file',
-      'Select VoxVPN.conf and tap Activate',
+      'Install "OpenVPN Connect" from the App Store',
+      'Click "Download Config" — saves VoxVPN.ovpn',
+      'Tap the .ovpn file → "Copy to OpenVPN"',
+      'In OpenVPN Connect, tap Add and then Connect',
     ],
     android: [
-      'Install "WireGuard" from Google Play',
-      'Click "Download Config" — saves VoxVPN.conf',
-      'Open WireGuard → "+" → Import from file',
-      'Select VoxVPN.conf and tap Activate',
+      'Install "OpenVPN Connect" from Google Play',
+      'Click "Download Config" — saves VoxVPN.ovpn',
+      'Open OpenVPN Connect → "+" → Import from file',
+      'Select VoxVPN.ovpn and tap Connect',
     ],
   };
 
@@ -383,10 +383,10 @@ export default function VoxVPNApp() {
                 </div>
               ))}
               {(platform === 'ios' || platform === 'android') && (
-                <a href={platform === 'ios' ? 'https://apps.apple.com/app/wireguard/id1441195209' : 'https://play.google.com/store/apps/details?id=com.wireguard.android'}
+                <a href={platform === 'ios' ? 'https://apps.apple.com/app/openvpn-connect/id590379981' : 'https://play.google.com/store/apps/details?id=net.openvpn.openvpn'}
                   target="_blank" rel="noopener noreferrer"
                   className="inline-block mt-2 text-xs text-cyan-400 hover:text-cyan-300 font-semibold transition-colors">
-                  Get WireGuard →
+                  Get OpenVPN Connect →
                 </a>
               )}
             </div>
@@ -410,10 +410,10 @@ export default function VoxVPNApp() {
               <button onClick={handleDownload} disabled={downloading}
                 className="w-full py-3 rounded-xl bg-cyan-400 hover:bg-cyan-300 disabled:opacity-60 text-black font-bold text-sm flex items-center justify-center gap-2 transition-all">
                 {downloading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
-                {downloading ? 'Preparing…' : platform === 'windows' ? 'Download VoxVPN-Setup.ps1' : 'Download Config'}
+                {downloading ? 'Preparing…' : platform === 'windows' ? 'Download VoxVPN-Setup.ps1' : 'Download .ovpn Config'}
               </button>
               <p className="text-slate-500 text-[11px] text-center">
-                {platform === 'windows' ? 'Right-click → Run with PowerShell (as Admin)' : 'Import into WireGuard app to connect'}
+                {platform === 'windows' ? 'Right-click → Run with PowerShell (as Admin)' : 'Import into OpenVPN Connect app to connect'}
               </p>
             </motion.div>
           )}

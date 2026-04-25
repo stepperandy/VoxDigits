@@ -61,25 +61,34 @@ Deno.serve(async (req) => {
 
     const serverLabel = (server.city || server.region || 'Server').replace(/\s+/g, '-');
 
-    const wireGuardConfig = `[Interface]
-PrivateKey = ${device.vpn_profile_key}
-Address = ${device.ip_address}/32
-DNS = 1.1.1.1, 8.8.8.8
+    // OpenVPN .ovpn config
+    const ovpnConfig = `client
+dev tun
+proto udp
+remote ${server.ip_address} ${server.port || 1194}
+resolv-retry infinite
+nobind
+persist-key
+persist-tun
+remote-cert-tls server
+cipher AES-256-CBC
+auth SHA256
+verb 3
+keepalive 10 120
 
-[Peer]
 # VoxVPN Server - ${server.region} (${server.city || server.country})
-PublicKey = ${server.public_key}
-Endpoint = ${server.ip_address}:${server.port || 51820}
-AllowedIPs = 0.0.0.0/0, ::/0
-PersistentKeepalive = 25`;
+# Generated for: ${user.email}
+
+<ca>
+${server.public_key || '# CA certificate will be provided by your VoxVPN server'}
+</ca>`;
 
     await base44.entities.LinkedDevice.update(device.id, {
       last_connected: new Date().toISOString(),
     });
 
-    // Windows: deliver a PowerShell installer that auto-installs WireGuard + imports config
+    // Windows: PowerShell installer that auto-installs OpenVPN + imports config
     if ((platform || '').toLowerCase() === 'windows') {
-      const escapedConfig = wireGuardConfig.replace(/`/g, '``').replace(/"/g, '`"').replace(/\$/g, '`$');
       const psScript = `# VoxVPN Windows Setup - ${server.city || server.region}
 # Right-click this file and select "Run with PowerShell" (as Administrator)
 # =====================================================================
@@ -88,13 +97,7 @@ $ErrorActionPreference = "Stop"
 
 Write-Host ""
 Write-Host "  ██╗   ██╗ ██████╗ ██╗  ██╗██╗   ██╗██████╗ ███╗   ██╗" -ForegroundColor Cyan
-Write-Host "  ██║   ██║██╔═══██╗╚██╗██╔╝██║   ██║██╔══██╗████╗  ██║" -ForegroundColor Cyan
-Write-Host "  ██║   ██║██║   ██║ ╚███╔╝ ██║   ██║██████╔╝██╔██╗ ██║" -ForegroundColor Cyan
-Write-Host "  ╚██╗ ██╔╝██║   ██║ ██╔██╗ ╚██╗ ██╔╝██╔═══╝ ██║╚██╗██║" -ForegroundColor Cyan
-Write-Host "   ╚████╔╝ ╚██████╔╝██╔╝ ██╗ ╚████╔╝ ██║     ██║ ╚████║" -ForegroundColor Cyan
-Write-Host "    ╚═══╝   ╚═════╝ ╚═╝  ╚═╝  ╚═══╝  ╚═╝     ╚═╝  ╚═══╝" -ForegroundColor Cyan
-Write-Host ""
-Write-Host "  VoxVPN Setup — Server: ${server.city || server.region}" -ForegroundColor White
+Write-Host "  VoxVPN Setup - Server: ${server.city || server.region}" -ForegroundColor White
 Write-Host "  www.voxvpn.net | support@voxdigits.com" -ForegroundColor DarkGray
 Write-Host ""
 
@@ -107,44 +110,37 @@ if (-not $isAdmin) {
     exit 1
 }
 
-# Step 1: Install WireGuard if not present
-$wgPath = "$env:ProgramFiles\\WireGuard\\wireguard.exe"
-if (-not (Test-Path $wgPath)) {
-    Write-Host "[1/3] Downloading WireGuard..." -ForegroundColor Cyan
-    $wgInstaller = "$env:TEMP\\wireguard-installer.exe"
-    Invoke-WebRequest -Uri "https://download.wireguard.com/windows-client/wireguard-installer.exe" -OutFile $wgInstaller -UseBasicParsing
-    Write-Host "[1/3] Installing WireGuard silently..." -ForegroundColor Cyan
-    Start-Process -FilePath $wgInstaller -ArgumentList "/S" -Wait
-    Remove-Item $wgInstaller -Force -ErrorAction SilentlyContinue
-    Write-Host "[1/3] WireGuard installed." -ForegroundColor Green
+# Step 1: Install OpenVPN if not present
+$ovpnPath = "$env:ProgramFiles\\OpenVPN\\bin\\openvpn.exe"
+if (-not (Test-Path $ovpnPath)) {
+    Write-Host "[1/3] Downloading OpenVPN..." -ForegroundColor Cyan
+    $ovpnInstaller = "$env:TEMP\\openvpn-installer.exe"
+    Invoke-WebRequest -Uri "https://swupdate.openvpn.org/community/releases/OpenVPN-2.6.12-I001-amd64.msi" -OutFile $ovpnInstaller -UseBasicParsing
+    Write-Host "[1/3] Installing OpenVPN silently..." -ForegroundColor Cyan
+    Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $ovpnInstaller /quiet /norestart" -Wait
+    Remove-Item $ovpnInstaller -Force -ErrorAction SilentlyContinue
+    Write-Host "[1/3] OpenVPN installed." -ForegroundColor Green
 } else {
-    Write-Host "[1/3] WireGuard already installed." -ForegroundColor Green
+    Write-Host "[1/3] OpenVPN already installed." -ForegroundColor Green
 }
 
 # Step 2: Write VoxVPN config
 Write-Host "[2/3] Writing VoxVPN configuration..." -ForegroundColor Cyan
-$configDir = "$env:ProgramFiles\\WireGuard\\Data\\Configurations"
+$configDir = "$env:ProgramFiles\\OpenVPN\\config"
 New-Item -ItemType Directory -Force -Path $configDir | Out-Null
-$configPath = "$configDir\\VoxVPN-${serverLabel}.conf"
-$configContent = @"
-${wireGuardConfig}
-"@
+$configPath = "$configDir\\VoxVPN-${serverLabel}.ovpn"
+$configContent = @'
+${ovpnConfig}
+'@
 Set-Content -Path $configPath -Value $configContent -Encoding UTF8
 Write-Host "[2/3] Config saved to: $configPath" -ForegroundColor Green
 
-# Step 3: Import and activate tunnel
-Write-Host "[3/3] Activating VoxVPN tunnel..." -ForegroundColor Cyan
-& "$wgPath" /installtunnelservice $configPath
-Start-Sleep -Seconds 2
-
 Write-Host ""
 Write-Host "  =============================================" -ForegroundColor Green
-Write-Host "  VoxVPN is now ACTIVE on ${server.city || server.region}!" -ForegroundColor Green
-Write-Host "  Your traffic is encrypted and protected." -ForegroundColor Green
+Write-Host "  VoxVPN config installed for ${server.city || server.region}!" -ForegroundColor Green
+Write-Host "  Open OpenVPN GUI from your system tray," -ForegroundColor White
+Write-Host "  right-click the icon, and select Connect." -ForegroundColor White
 Write-Host "  =============================================" -ForegroundColor Green
-Write-Host ""
-Write-Host "  To manage: Open WireGuard from your system tray" -ForegroundColor White
-Write-Host "  To disconnect: wireguard /uninstalltunnelservice VoxVPN-${serverLabel}" -ForegroundColor DarkGray
 Write-Host ""
 Read-Host "Press Enter to close"
 `;
@@ -158,52 +154,42 @@ Read-Host "Press Enter to close"
       });
     }
 
-    // macOS: shell script installer
+    // macOS: shell script installer for OpenVPN
     if ((platform || '').toLowerCase() === 'macos') {
       const shScript = `#!/bin/bash
 # VoxVPN macOS Setup - ${server.city || server.region}
 # Run in Terminal: sudo bash VoxVPN-${serverLabel}-Setup.sh
-# =====================================================================
 
-echo ""
-echo "  ██╗   ██╗ ██████╗ ██╗  ██╗██╗   ██╗██████╗ ███╗   ██╗"
-echo "  VoxVPN Setup — ${server.city || server.region}"
-echo "  www.voxvpn.net"
-echo ""
+echo "VoxVPN Setup — ${server.city || server.region}"
+echo "www.voxvpn.net"
 
-# Check root
 if [ "$EUID" -ne 0 ]; then
   echo "[!] Please run as root: sudo bash $0"
   exit 1
 fi
 
-# Install WireGuard via Homebrew if not present
-if ! command -v wg &> /dev/null; then
-  echo "[1/3] Installing WireGuard..."
+# Install OpenVPN via Homebrew
+if ! command -v openvpn &> /dev/null; then
+  echo "[1/3] Installing OpenVPN..."
   if ! command -v brew &> /dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   fi
-  brew install wireguard-tools
+  brew install openvpn
 fi
-echo "[1/3] WireGuard ready."
+echo "[1/3] OpenVPN ready."
 
-# Write config
 echo "[2/3] Writing VoxVPN configuration..."
-mkdir -p /etc/wireguard
-cat > /etc/wireguard/VoxVPN-${serverLabel}.conf << 'CONF'
-${wireGuardConfig}
+mkdir -p /etc/openvpn
+cat > /etc/openvpn/VoxVPN-${serverLabel}.ovpn << 'CONF'
+${ovpnConfig}
 CONF
-chmod 600 /etc/wireguard/VoxVPN-${serverLabel}.conf
+chmod 600 /etc/openvpn/VoxVPN-${serverLabel}.ovpn
 echo "[2/3] Config saved."
 
-# Activate
-echo "[3/3] Activating VoxVPN..."
-wg-quick up /etc/wireguard/VoxVPN-${serverLabel}.conf
-
-echo ""
-echo "  ✅ VoxVPN is ACTIVE — ${server.city || server.region}"
-echo "  To disconnect: sudo wg-quick down VoxVPN-${serverLabel}"
-echo ""
+echo "[3/3] Connecting to VoxVPN..."
+openvpn --config /etc/openvpn/VoxVPN-${serverLabel}.ovpn --daemon
+echo "✅ VoxVPN is ACTIVE — ${server.city || server.region}"
+echo "To disconnect: sudo pkill openvpn"
 `;
       return new Response(shScript, {
         status: 200,
@@ -214,22 +200,23 @@ echo ""
       });
     }
 
-    // Linux: same shell approach
+    // Linux: OpenVPN shell installer
     if ((platform || '').toLowerCase() === 'linux') {
       const shScript = `#!/bin/bash
 # VoxVPN Linux Setup - ${server.city || server.region}
 # Run: sudo bash VoxVPN-${serverLabel}-Setup.sh
-echo "[1/3] Installing WireGuard..."
-apt-get update -qq && apt-get install -y wireguard 2>/dev/null || yum install -y wireguard-tools 2>/dev/null
+echo "[1/3] Installing OpenVPN..."
+apt-get update -qq && apt-get install -y openvpn 2>/dev/null || yum install -y openvpn 2>/dev/null
 echo "[2/3] Writing config..."
-mkdir -p /etc/wireguard
-cat > /etc/wireguard/VoxVPN-${serverLabel}.conf << 'CONF'
-${wireGuardConfig}
+mkdir -p /etc/openvpn
+cat > /etc/openvpn/VoxVPN-${serverLabel}.ovpn << 'CONF'
+${ovpnConfig}
 CONF
-chmod 600 /etc/wireguard/VoxVPN-${serverLabel}.conf
-echo "[3/3] Activating..."
-wg-quick up VoxVPN-${serverLabel}
+chmod 600 /etc/openvpn/VoxVPN-${serverLabel}.ovpn
+echo "[3/3] Connecting..."
+openvpn --config /etc/openvpn/VoxVPN-${serverLabel}.ovpn --daemon
 echo "✅ VoxVPN connected to ${server.city || server.region}"
+echo "To disconnect: sudo pkill openvpn"
 `;
       return new Response(shScript, {
         status: 200,
@@ -240,12 +227,12 @@ echo "✅ VoxVPN connected to ${server.city || server.region}"
       });
     }
 
-    // iOS / Android / default: plain WireGuard .conf
-    return new Response(wireGuardConfig, {
+    // iOS / Android / default: plain .ovpn file for OpenVPN Connect app
+    return new Response(ovpnConfig, {
       status: 200,
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
-        'Content-Disposition': `attachment; filename="VoxVPN-${serverLabel}.conf"`,
+        'Content-Disposition': `attachment; filename="VoxVPN-${serverLabel}.ovpn"`,
       },
     });
 
