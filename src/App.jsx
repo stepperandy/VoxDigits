@@ -70,6 +70,7 @@ const AppSettings = lazy(() => import('./pages/mobile-app/Settings.jsx'));
 const VpnServers = lazy(() => import('./pages/VpnServers.jsx'));
 const UserProfile = lazy(() => import('./pages/UserProfile.jsx'));
 const MobileSetupGuide = lazy(() => import('./pages/MobileSetupGuide.jsx'));
+const VoxVPNApp = lazy(() => import('./pages/VoxVPNApp.jsx'));
 const ReferralPage = lazy(() => import('./pages/ReferralPage.jsx'));
 
 const PageTransition = ({ children }) => (
@@ -159,6 +160,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/vpn-servers" element={<VpnServers />} />
           <Route path="/profile" element={<PageTransition><UserProfile /></PageTransition>} />
           <Route path="/mobile-setup" element={<PageTransition><MobileSetupGuide /></PageTransition>} />
+          <Route path="/vpn-app" element={<VoxVPNApp />} />
           <Route path="/referral" element={<PageTransition><ReferralPage /></PageTransition>} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
