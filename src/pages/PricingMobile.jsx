@@ -163,10 +163,9 @@ export default function PricingMobile() {
       }
 
       if (isAdmin && method === 'admin-bypass') {
-        // Admin bypass
         await base44.functions.invoke('grantSubscription', {
           plan: selectedPlan.name,
-          email: user.email,
+          target_email: user.email,
         });
         alert(`${selectedPlan.name} plan granted to ${user.email}`);
         setModalOpen(false);
@@ -174,20 +173,21 @@ export default function PricingMobile() {
         return;
       }
 
-      // Regular checkout via Stripe
+      // Regular Stripe checkout
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: selectedPlan.name,
         isBilledYearly: yearly,
       });
+      setModalOpen(false);
+      setLoadingPlan(null);
       if (res.data?.url) {
         window.location.href = res.data.url;
       } else {
-        alert('Failed to create checkout session. Please try again.');
+        alert('Failed to create checkout session: ' + (res.data?.error || 'Unknown error'));
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      alert('Error processing payment: ' + error.message);
-    } finally {
+      alert('Error: ' + error.message);
       setModalOpen(false);
       setLoadingPlan(null);
     }

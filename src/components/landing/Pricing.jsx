@@ -207,31 +207,32 @@ export default function Pricing() {
   const handlePaymentProceed = async (method) => {
     try {
       if (isAdmin && method === 'admin-bypass') {
-        // Admin bypass: create subscription without payment
         await base44.functions.invoke('grantSubscription', {
           plan: selectedPlan.name,
-          email: user.email,
+          target_email: user.email,
         });
         alert(`${selectedPlan.name} plan granted to ${user.email}`);
         setModalOpen(false);
         return;
       }
 
-      // Regular checkout via Stripe
+      // Regular Stripe checkout
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: selectedPlan.name,
         isBilledYearly: selectedYearly,
       });
       if (res.data?.url) {
+        setModalOpen(false);
         window.location.href = res.data.url;
       } else {
-        alert('Failed to create checkout session. Please try again.');
+        alert('Failed to create checkout session: ' + (res.data?.error || 'Unknown error'));
+        setModalOpen(false);
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      alert('Error processing payment: ' + error.message);
+      alert('Error: ' + error.message);
+      setModalOpen(false);
     }
-    setModalOpen(false);
   };
 
   return (
