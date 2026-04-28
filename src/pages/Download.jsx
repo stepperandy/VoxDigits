@@ -17,9 +17,10 @@ const PLATFORMS = [
     border: 'border-blue-500/30',
     bg: 'bg-blue-500/5',
     badge: 'Windows 10 / 11',
-    file: 'VoxVPN-Windows-Setup.ps1',
-    desc: 'Auto-installs OpenVPN and your VoxVPN config via PowerShell.',
-    steps: ['Download VoxVPN-Windows-Setup.ps1', 'Right-click → Run with PowerShell (as Admin)', 'Script installs OpenVPN + VoxVPN config automatically', 'Open OpenVPN GUI from system tray → Connect'],
+    file: 'VoxVPN-Setup.exe',
+    directUrl: 'https://www.voxvpn.net/downloads/VoxVPN-Setup.exe',
+    desc: 'One-click installer for Windows 10 and 11. Installs and configures VoxVPN automatically.',
+    steps: ['Download VoxVPN-Setup.exe', 'Double-click the installer and follow the prompts', 'VoxVPN installs and connects automatically', 'Look for VoxVPN in your system tray'],
   },
   {
     id: 'macos',
@@ -118,6 +119,16 @@ export default function DownloadPage() {
 
   const handleDownload = async () => {
     if (!user) { base44.auth.redirectToLogin(window.location.href); return; }
+    // Direct URL download (e.g. Windows .exe)
+    if (platform.directUrl) {
+      const a = document.createElement('a');
+      a.href = platform.directUrl;
+      a.download = platform.file;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      return;
+    }
     setDownloading(true);
     try {
       const res = await base44.functions.invoke('downloadVpnConfig', { platform: selected });
