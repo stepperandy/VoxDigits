@@ -18,7 +18,7 @@ const PLATFORMS = [
     bg: 'bg-blue-500/5',
     badge: 'Windows 10 / 11',
     file: 'VoxVPN-Setup.exe',
-    directUrl: 'https://www.voxvpn.net/downloads/VoxVPN-Setup.exe',
+    directUrl: 'https://voxvpn.net/downloads/VoxVPN-Setup.exe',
     desc: 'One-click installer for Windows 10 and 11. Installs and configures VoxVPN automatically.',
     steps: ['Download VoxVPN-Setup.exe', 'Double-click the installer and follow the prompts', 'VoxVPN installs and connects automatically', 'Look for VoxVPN in your system tray'],
   },
