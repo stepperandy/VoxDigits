@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Server, LogOut, Menu, X, Shield, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone } from 'lucide-react';
+import { LayoutDashboard, Users, Server, LogOut, Menu, X, Shield, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2 } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
@@ -9,6 +9,8 @@ const navItems = [
   { icon: Link, label: 'Setups', id: 'setups', desc: 'Setup portals' },
   { icon: Download, label: 'Downloads', id: 'downloads', desc: 'Setup files & payments' },
   { icon: TrendingUp, label: 'Analytics', id: 'analytics', desc: 'Real-time traffic & trends' },
+  { icon: Activity, label: 'Server Status', id: 'server-status', desc: 'All VPN nodes & regions' },
+  { icon: BarChart2, label: 'Connections', id: 'connections', desc: 'Connections, bandwidth & export' },
   { icon: Megaphone, label: 'Marketing', id: 'marketing', desc: 'SEO, PPC & AI campaigns' },
 ];
 

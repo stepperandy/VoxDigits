@@ -11,6 +11,8 @@ import VPNServerManagement from '@/components/admin/VPNServerManagement';
 import VPNServerEditor from '@/components/admin/VPNServerEditor';
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
 import MarketingView from '@/components/admin/MarketingView';
+import ServerStatusView from '@/components/admin/ServerStatusView';
+import ConnectionsDashboard from '@/components/admin/ConnectionsDashboard';
 
 export default function Admin() {
   const [activePage, setActivePage] = useState('dashboard');
@@ -28,6 +30,8 @@ export default function Admin() {
       case 'downloads': return <DownloadsView />;
       case 'analytics': return <AnalyticsDashboard />;
       case 'marketing': return <MarketingView />;
+      case 'server-status': return <ServerStatusView />;
+      case 'connections': return <ConnectionsDashboard />;
       default: return <DashboardView />;
     }
   };
