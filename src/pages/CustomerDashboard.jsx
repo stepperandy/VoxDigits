@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Download, Trash2, Loader2, Check, AlertCircle, Smartphone, Monitor, Wifi, CreditCard, ExternalLink, UserCircle, Gift, Globe } from 'lucide-react';
+import { Download, Trash2, Loader2, Check, AlertCircle, Smartphone, Monitor, Wifi, CreditCard, ExternalLink, UserCircle, Gift, Globe, Zap, Circle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import UsageCharts from '@/components/dashboard/UsageCharts';
@@ -220,7 +220,12 @@ export default function CustomerDashboard() {
             ))}
           </div>
 
-          <div className="pt-4 border-t border-white/5 flex justify-end">
+          <div className="pt-4 border-t border-white/5 flex flex-wrap items-center justify-between gap-3">
+            {/* Upgrade button */}
+            <a href="/#pricing" onClick={(e) => { e.preventDefault(); window.location.assign('/#pricing'); }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black text-sm font-bold transition-all shadow-lg shadow-cyan-500/20">
+              <Zap size={14} /> Upgrade Plan
+            </a>
             <button onClick={openBillingPortal} disabled={portalLoading}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-cyan-500/30 bg-cyan-500/5 hover:bg-cyan-500/10 text-cyan-400 text-sm font-semibold transition-all disabled:opacity-50">
               {portalLoading ? <Loader2 size={14} className="animate-spin" /> : <CreditCard size={14} />}
@@ -335,6 +340,16 @@ export default function CustomerDashboard() {
                           <p className="text-white font-semibold text-sm">{device.device_name}</p>
                           <p className="text-slate-500 text-xs">{deviceLabels[device.device_type]} · {device.last_connected ? new Date(device.last_connected).toLocaleDateString() : 'Never connected'}</p>
                         </div>
+                        {/* Status badge */}
+                        {device.status === 'active' ? (
+                          <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-semibold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Active
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-500/10 border border-slate-500/20 text-slate-500 text-[11px] font-semibold">
+                            <Circle size={8} /> Offline
+                          </span>
+                        )}
                       </div>
                       <button onClick={() => removeDevice(device.id)}
                         className="p-2 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-rose-500/10 text-slate-600 hover:text-rose-400 transition-all">

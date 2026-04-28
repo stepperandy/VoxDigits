@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield, Search, Download, Loader2, Wifi, WifiOff, ChevronRight,
-  Globe, Signal, CheckCircle2, AlertCircle, LogOut, User, RefreshCw
+  Globe, Signal, CheckCircle2, AlertCircle, LogOut, User, RefreshCw, Star
 } from 'lucide-react';
 
 // Country flag emoji helper
@@ -42,6 +42,18 @@ export default function VoxVPNApp() {
   const [connected, setConnected] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [platform, setPlatform] = useState('windows');
+  const [favorites, setFavorites] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('voxvpn_favs') || '[]'); } catch { return []; }
+  });
+  const [showFavs, setShowFavs] = useState(false);
+
+  const toggleFav = (id) => {
+    setFavorites(prev => {
+      const next = prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id];
+      localStorage.setItem('voxvpn_favs', JSON.stringify(next));
+      return next;
+    });
+  };
 
   const PLATFORMS = ['windows', 'macos', 'linux', 'ios', 'android'];
 
@@ -111,14 +123,15 @@ export default function VoxVPNApp() {
   }, []);
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return servers;
+    let list = showFavs ? servers.filter(s => favorites.includes(s.id)) : servers;
+    if (!search.trim()) return list;
     const q = search.toLowerCase();
-    return servers.filter(s =>
+    return list.filter(s =>
       (s.region || '').toLowerCase().includes(q) ||
       (s.city || '').toLowerCase().includes(q) ||
       (s.country || '').toLowerCase().includes(q)
     );
-  }, [servers, search]);
+  }, [servers, search, showFavs, favorites]);
 
   const handleDownload = async () => {
     if (!selectedServer) return;
@@ -207,17 +220,27 @@ export default function VoxVPNApp() {
         {/* Left panel — server list */}
         <aside className="w-full sm:w-80 lg:w-96 border-r border-white/5 flex flex-col bg-[#0a0e1a]">
 
-          {/* Search */}
-          <div className="p-4 border-b border-white/5">
+          {/* Search + Favorites filter */}
+          <div className="p-4 border-b border-white/5 space-y-2">
             <div className="relative">
               <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
                 type="text"
-                placeholder="Search servers…"
+                placeholder="Search by region or city…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/40 transition-colors"
               />
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setShowFavs(false)}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-semibold border transition-all ${!showFavs ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400' : 'border-white/10 text-slate-500 hover:text-white'}`}>
+                All Servers
+              </button>
+              <button onClick={() => setShowFavs(true)}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-semibold border transition-all flex items-center justify-center gap-1.5 ${showFavs ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'border-white/10 text-slate-500 hover:text-white'}`}>
+                <Star size={11} className={showFavs ? 'fill-amber-400' : ''} /> Favorites {favorites.length > 0 && `(${favorites.length})`}
+              </button>
             </div>
           </div>
 
@@ -258,6 +281,12 @@ export default function VoxVPNApp() {
                         <p className="text-slate-500 text-xs truncate">{server.region}</p>
                       </div>
                       {loadBar(load)}
+                      <button
+                        onClick={e => { e.stopPropagation(); toggleFav(server.id); }}
+                        className="flex-shrink-0 p-1 rounded hover:bg-white/10 transition-colors"
+                      >
+                        <Star size={13} className={favorites.includes(server.id) ? 'fill-amber-400 text-amber-400' : 'text-slate-600 hover:text-amber-400'} />
+                      </button>
                       {isSelected && <ChevronRight size={14} className="text-cyan-400 flex-shrink-0" />}
                     </motion.button>
                   );
