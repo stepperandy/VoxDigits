@@ -1,14 +1,27 @@
 import { useState } from 'react';
-import { CreditCard, X, AlertCircle } from 'lucide-react';
+import { CreditCard, X, Smartphone } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { base44 } from '@/api/base44Client';
 
-export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, isAdmin }) {
+export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, isAdmin, isBilledYearly }) {
   const [selectedMethod, setSelectedMethod] = useState('stripe');
   const [loading, setLoading] = useState(false);
 
   const handleProceed = async () => {
     setLoading(true);
     try {
+      if (selectedMethod === 'hubtel') {
+        const res = await base44.functions.invoke('createHubtelCheckout', {
+          plan: plan?.name,
+          isBilledYearly: !!isBilledYearly,
+        });
+        if (res.data?.url) {
+          window.location.href = res.data.url;
+        } else {
+          alert('Hubtel error: ' + (res.data?.error || 'Unknown error'));
+        }
+        return;
+      }
       await onProceed(selectedMethod);
     } finally {
       setLoading(false);
@@ -65,6 +78,29 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
             </div>
           </label>
 
+          <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
+            selectedMethod === 'hubtel'
+              ? 'border-orange-500 bg-orange-500/5'
+              : 'border-white/10 hover:border-white/20'
+          }`}>
+            <input
+              type="radio"
+              name="payment"
+              value="hubtel"
+              checked={selectedMethod === 'hubtel'}
+              onChange={(e) => setSelectedMethod(e.target.value)}
+              className="mt-1.5"
+            />
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <Smartphone size={14} className="text-orange-400" />
+                <p className="text-white font-bold text-sm">Hubtel</p>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-400 font-bold">GHS</span>
+              </div>
+              <p className="text-slate-400 text-xs mt-0.5">Mobile Money, Visa, Mastercard (Ghana)</p>
+            </div>
+          </label>
+
           <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-white/10 hover:border-white/20 cursor-pointer transition-colors opacity-50">
             <input
               type="radio"
@@ -110,7 +146,7 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
           </button>
           <button
             onClick={handleProceed}
-            disabled={loading || (selectedMethod !== 'stripe' && selectedMethod !== 'admin-bypass')}
+            disabled={loading || (selectedMethod !== 'stripe' && selectedMethod !== 'hubtel' && selectedMethod !== 'admin-bypass')}
             className="flex-1 px-4 py-3 rounded-lg bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold transition-all flex items-center justify-center gap-2"
           >
             <CreditCard size={16} />

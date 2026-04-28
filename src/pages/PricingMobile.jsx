@@ -239,6 +239,7 @@ export default function PricingMobile() {
             onClose={() => { setModalOpen(false); setLoadingPlan(null); }}
             plan={selectedPlan}
             isAdmin={isAdmin}
+            isBilledYearly={yearly}
             onProceed={handlePaymentProceed}
           />
         </div>

@@ -284,6 +284,7 @@ export default function Pricing() {
           onClose={() => setModalOpen(false)}
           plan={selectedPlan}
           isAdmin={isAdmin}
+          isBilledYearly={selectedYearly}
           onProceed={handlePaymentProceed}
         />
 
