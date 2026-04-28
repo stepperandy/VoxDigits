@@ -96,12 +96,19 @@ function detectOS() {
   return 'windows';
 }
 
+const PLANS = [
+  { name: 'Free', price: '$0', desc: 'Limited servers', color: 'border-white/10', btn: 'bg-white/10 text-white hover:bg-white/20' },
+  { name: 'Pro', price: '$5/mo', desc: 'All servers + speed', color: 'border-cyan-500/40', btn: 'bg-cyan-400 text-black hover:bg-cyan-300', popular: true },
+  { name: 'Business', price: '$15/mo', desc: 'Premium routing', color: 'border-emerald-500/30', btn: 'bg-emerald-400 text-black hover:bg-emerald-300' },
+];
+
 export default function DownloadPage() {
   const [selected, setSelected] = useState(null);
   const [user, setUser] = useState(null);
   const [hasSub, setHasSub] = useState(false);
   const [loadingUser, setLoadingUser] = useState(true);
   const [downloading, setDownloading] = useState(false);
+  const [unlocked, setUnlocked] = useState(false);
 
   useEffect(() => {
     setSelected(detectOS());
@@ -160,12 +167,53 @@ export default function DownloadPage() {
             <Download size={12} /> Download VoxVPN
           </div>
           <h1 className="text-4xl sm:text-6xl font-black text-white mb-4 leading-tight">
-            Get VoxVPN on <span className="text-cyan-400">Any Device</span>
+            Get <span className="text-cyan-400">VoxVPN</span>
           </h1>
           <p className="text-slate-400 text-lg max-w-xl mx-auto">
-            One account. Protect up to 10 devices. Works on every major platform.
+            Secure. Fast. Global.
           </p>
         </motion.div>
+
+        {/* Pricing unlock section */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-14">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 max-w-3xl mx-auto mb-8">
+            {PLANS.map((plan) => (
+              <div key={plan.name} className={`relative rounded-2xl border ${plan.color} bg-white/5 p-7 text-center flex flex-col gap-4`}>
+                {plan.popular && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 rounded-full bg-cyan-400 text-black">Most Popular</span>
+                )}
+                <h2 className="text-white font-black text-xl">{plan.name}</h2>
+                <p className="text-3xl font-black text-white">{plan.price}</p>
+                <p className="text-slate-400 text-sm">{plan.desc}</p>
+                <button
+                  onClick={() => setUnlocked(true)}
+                  className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${plan.btn}`}
+                >
+                  {plan.name === 'Free' ? 'Get Free' : plan.name === 'Pro' ? 'Subscribe' : 'Get Business'}
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Download section — revealed after clicking a plan */}
+          {unlocked && (
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+              className="text-center p-8 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 max-w-md mx-auto">
+              <CheckCircle2 size={28} className="text-emerald-400 mx-auto mb-3" />
+              <h2 className="text-white font-black text-xl mb-2">Download VoxVPN</h2>
+              <p className="text-slate-400 text-sm mb-5">Click below to download the Windows installer.</p>
+              <a
+                href="https://voxvpn.net/downloads/VoxVPN-Setup.exe"
+                download
+                className="inline-flex items-center gap-2 px-7 py-3 bg-emerald-400 hover:bg-emerald-300 text-black font-black rounded-xl text-sm transition-all"
+              >
+                <Download size={16} /> Download for Windows
+              </a>
+            </motion.div>
+          )}
+        </motion.div>
+
+        <hr className="border-white/5 mb-14" />
 
         {/* Platform selector */}
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-10">
