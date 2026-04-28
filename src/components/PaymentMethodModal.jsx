@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { CreditCard, X, Smartphone } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { base44 } from '@/api/base44Client';
 
 export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, isAdmin, isBilledYearly }) {
@@ -28,30 +27,31 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#0d1120] border border-white/10 rounded-2xl max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-white">Choose Payment Method</DialogTitle>
-          <button
-            onClick={onClose}
-            className="absolute right-4 top-4 text-slate-500 hover:text-white transition-colors"
-          >
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+
+      {/* Modal */}
+      <div className="relative bg-[#0d1120] border border-white/10 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-white font-bold text-lg">Choose Payment Method</h2>
+          <button onClick={onClose} className="text-slate-500 hover:text-white transition-colors">
             <X size={18} />
           </button>
-        </DialogHeader>
+        </div>
 
+        {/* Options */}
         <div className="space-y-3 mb-6">
           {isAdmin && (
             <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-violet-500 bg-violet-500/5 cursor-pointer">
-              <input
-                type="radio"
-                name="payment"
-                value="admin-bypass"
+              <input type="radio" name="payment" value="admin-bypass"
                 checked={selectedMethod === 'admin-bypass'}
                 onChange={(e) => setSelectedMethod(e.target.value)}
-                className="mt-1.5"
-              />
+                className="mt-1.5" />
               <div className="flex-1">
                 <p className="text-white font-bold text-sm">Admin Credit</p>
                 <p className="text-slate-400 text-xs mt-0.5">Grant subscription using admin credit balance</p>
@@ -60,18 +60,12 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
           )}
 
           <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
-            selectedMethod === 'stripe' 
-              ? 'border-cyan-500 bg-cyan-500/5' 
-              : 'border-white/10 hover:border-white/20'
+            selectedMethod === 'stripe' ? 'border-cyan-500 bg-cyan-500/5' : 'border-white/10 hover:border-white/20'
           }`}>
-            <input
-              type="radio"
-              name="payment"
-              value="stripe"
+            <input type="radio" name="payment" value="stripe"
               checked={selectedMethod === 'stripe'}
               onChange={(e) => setSelectedMethod(e.target.value)}
-              className="mt-1.5"
-            />
+              className="mt-1.5" />
             <div className="flex-1">
               <p className="text-white font-bold text-sm">Credit Card</p>
               <p className="text-slate-400 text-xs mt-0.5">Visa, Mastercard, Amex</p>
@@ -79,18 +73,12 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
           </label>
 
           <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
-            selectedMethod === 'hubtel'
-              ? 'border-orange-500 bg-orange-500/5'
-              : 'border-white/10 hover:border-white/20'
+            selectedMethod === 'hubtel' ? 'border-orange-500 bg-orange-500/5' : 'border-white/10 hover:border-white/20'
           }`}>
-            <input
-              type="radio"
-              name="payment"
-              value="hubtel"
+            <input type="radio" name="payment" value="hubtel"
               checked={selectedMethod === 'hubtel'}
               onChange={(e) => setSelectedMethod(e.target.value)}
-              className="mt-1.5"
-            />
+              className="mt-1.5" />
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <Smartphone size={14} className="text-orange-400" />
@@ -101,28 +89,16 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
             </div>
           </label>
 
-          <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-white/10 hover:border-white/20 cursor-pointer transition-colors opacity-50">
-            <input
-              type="radio"
-              name="payment"
-              value="bank"
-              disabled
-              className="mt-1.5"
-            />
+          <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-white/10 cursor-pointer opacity-50">
+            <input type="radio" name="payment" value="bank" disabled className="mt-1.5" />
             <div className="flex-1">
               <p className="text-slate-400 font-bold text-sm">Bank Transfer</p>
               <p className="text-slate-600 text-xs mt-0.5">Coming soon</p>
             </div>
           </label>
 
-          <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-white/10 hover:border-white/20 cursor-pointer transition-colors opacity-50">
-            <input
-              type="radio"
-              name="payment"
-              value="crypto"
-              disabled
-              className="mt-1.5"
-            />
+          <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-white/10 cursor-pointer opacity-50">
+            <input type="radio" name="payment" value="crypto" disabled className="mt-1.5" />
             <div className="flex-1">
               <p className="text-slate-400 font-bold text-sm">Cryptocurrency</p>
               <p className="text-slate-600 text-xs mt-0.5">Coming soon</p>
@@ -130,30 +106,26 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
           </label>
         </div>
 
-        <div className="space-y-3">
-          <div className="p-3 rounded-lg bg-[#0a1020] border border-white/5">
-            <p className="text-slate-500 text-xs uppercase tracking-wide mb-1">Plan</p>
-            <p className="text-white font-bold">{plan?.name}</p>
-          </div>
+        {/* Plan summary */}
+        <div className="p-3 rounded-lg bg-[#0a1020] border border-white/5 mb-6">
+          <p className="text-slate-500 text-xs uppercase tracking-wide mb-1">Plan</p>
+          <p className="text-white font-bold">{plan?.name}</p>
         </div>
 
-        <div className="flex gap-3 mt-6 pt-6 border-t border-white/5">
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-3 rounded-lg border border-white/10 text-white hover:bg-white/5 font-bold transition-colors"
-          >
+        {/* Actions */}
+        <div className="flex gap-3 pt-4 border-t border-white/5">
+          <button onClick={onClose}
+            className="flex-1 px-4 py-3 rounded-lg border border-white/10 text-white hover:bg-white/5 font-bold transition-colors">
             Cancel
           </button>
-          <button
-            onClick={handleProceed}
-            disabled={loading || (selectedMethod !== 'stripe' && selectedMethod !== 'hubtel' && selectedMethod !== 'admin-bypass')}
-            className="flex-1 px-4 py-3 rounded-lg bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold transition-all flex items-center justify-center gap-2"
-          >
+          <button onClick={handleProceed}
+            disabled={loading || !['stripe', 'hubtel', 'admin-bypass'].includes(selectedMethod)}
+            className="flex-1 px-4 py-3 rounded-lg bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold transition-all flex items-center justify-center gap-2">
             <CreditCard size={16} />
             {loading ? 'Processing...' : 'Proceed'}
           </button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }
