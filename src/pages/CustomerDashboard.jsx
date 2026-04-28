@@ -4,6 +4,7 @@ import { Download, Trash2, Loader2, Check, AlertCircle, Smartphone, Monitor, Wif
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import UsageCharts from '@/components/dashboard/UsageCharts';
+import RewardsSummary from '@/components/dashboard/RewardsSummary';
 
 const deviceIcons = { windows: Monitor, macos: Monitor, linux: Monitor, ios: Smartphone, android: Smartphone, router: Wifi };
 const deviceLabels = { windows: 'Windows', macos: 'macOS', linux: 'Linux', ios: 'iPhone/iPad', android: 'Android', router: 'Router' };
@@ -251,6 +252,9 @@ export default function CustomerDashboard() {
           <p className="text-slate-400 text-sm mb-6">Bandwidth and connection time for the past 7 days.</p>
           <UsageCharts subscription={subscription} />
         </motion.div>
+
+        {/* Rewards Summary */}
+        <RewardsSummary user={user} />
 
         {/* Downloads + Setup in 2 columns on larger screens */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

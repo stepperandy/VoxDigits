@@ -1,12 +1,15 @@
-import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 
 // Generate simulated usage data for the past 7 days
+// Seeded so it doesn't change on every render
 function generateUsageData() {
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  return days.map((day) => ({
+  const seed = [4.2, 7.8, 3.1, 9.4, 5.6, 6.3, 8.1];
+  const hourSeed = [2.5, 4.1, 1.8, 5.5, 3.2, 4.8, 5.0];
+  return days.map((day, i) => ({
     day,
-    bandwidth: parseFloat((Math.random() * 8 + 1).toFixed(2)),
-    hours: parseFloat((Math.random() * 6 + 0.5).toFixed(1)),
+    bandwidth: seed[i],
+    hours: hourSeed[i],
   }));
 }
 
@@ -22,10 +25,19 @@ const CustomTooltip = ({ active, payload, label, unit }) => {
   return null;
 };
 
+const PLAN_DAILY_LIMITS = {
+  Basic: 5,
+  Standard: 12,
+  Premium: 25,
+  Advanced: 50,
+  Enterprise: 200,
+};
+
 export default function UsageCharts({ subscription }) {
   const data = generateUsageData();
   const totalBandwidth = data.reduce((sum, d) => sum + d.bandwidth, 0).toFixed(1);
   const totalHours = data.reduce((sum, d) => sum + d.hours, 0).toFixed(1);
+  const dailyLimit = PLAN_DAILY_LIMITS[subscription?.plan] || 10;
 
   return (
     <div className="space-y-6">
@@ -45,8 +57,13 @@ export default function UsageCharts({ subscription }) {
 
       {/* Bandwidth Chart */}
       <div>
-        <p className="text-slate-400 text-sm font-semibold mb-3">Daily Bandwidth Usage (GB)</p>
-        <div className="h-36">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-slate-400 text-sm font-semibold">Daily Bandwidth Usage (GB)</p>
+          <span className="text-xs text-slate-600 border border-white/10 rounded-full px-2 py-0.5">
+            Limit: {dailyLimit} GB/day
+          </span>
+        </div>
+        <div className="h-40">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
               <defs>
@@ -59,6 +76,7 @@ export default function UsageCharts({ subscription }) {
               <XAxis dataKey="day" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip unit="GB" />} />
+              <ReferenceLine y={dailyLimit} stroke="#f59e0b" strokeDasharray="4 4" label={{ value: 'Limit', position: 'right', fill: '#f59e0b', fontSize: 10 }} />
               <Area type="monotone" dataKey="bandwidth" stroke="#22d3ee" strokeWidth={2} fill="url(#bwGrad)" />
             </AreaChart>
           </ResponsiveContainer>
