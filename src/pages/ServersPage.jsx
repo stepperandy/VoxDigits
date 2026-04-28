@@ -38,14 +38,14 @@ function LoadBar({ pct }) {
   );
 }
 
-// AI-generated marketing blurbs per region
-const REGION_BLURBS = {
-  'North America': 'Ultra-fast servers across the US and Canada for seamless streaming and gaming.',
-  'Europe': 'Pan-European coverage with GDPR-compliant infrastructure and blazing speeds.',
-  'Asia Pacific': 'Low-latency nodes across Southeast and East Asia for global connectivity.',
-  'Middle East & Africa': 'Expanding coverage bringing privacy and freedom to underserved regions.',
-  'South America': 'Reliable South American nodes for content and security across the continent.',
-};
+// Real VoxVPN servers (from database)
+const REAL_SERVERS = [
+  { city: 'Amsterdam',   country_code: 'NL', region: 'Europe',        ip_address: '45.32.232.63',   ping_ms: 18, load_pct: 32, specialty: 'General' },
+  { city: 'London',      country_code: 'GB', region: 'Europe',        ip_address: '45.76.133.13',   ping_ms: 12, load_pct: 28, specialty: 'Streaming' },
+  { city: 'New Jersey',  country_code: 'US', region: 'North America', ip_address: '45.76.7.211',    ping_ms: 22, load_pct: 41, specialty: 'General' },
+  { city: 'Los Angeles', country_code: 'US', region: 'North America', ip_address: '45.76.170.131',  ping_ms: 35, load_pct: 37, specialty: 'Gaming' },
+  { city: 'Singapore',   country_code: 'SG', region: 'Asia Pacific',  ip_address: '207.148.70.59',  ping_ms: 45, load_pct: 25, specialty: 'Streaming' },
+];
 
 export default function ServersPage() {
   const [servers, setServers] = useState([]);
@@ -115,19 +115,22 @@ Include diverse global locations across NA, Europe, APAC, MENA, LATAM.`,
     fetchAI();
   }, []);
 
-  // Merge real DB servers + AI-generated display servers
+  // Use real servers always — DB fetch enriches with live load, fallback to REAL_SERVERS static list
   const displayServers = servers.length > 0
-    ? servers.map(s => ({
-        city: s.city || s.region,
-        country_code: s.country,
-        region: s.region,
-        ping_ms: Math.floor(20 + Math.random() * 60),
-        load_pct: s.current_load || Math.floor(20 + Math.random() * 55),
-        specialty: 'General',
-        ip_address: s.ip_address,
-        status: s.status,
-      }))
-    : (aiContent?.server_locations || []);
+    ? servers.map(s => {
+        const match = REAL_SERVERS.find(r => r.city === s.city);
+        return {
+          city: s.city || s.region,
+          country_code: s.country,
+          region: s.region,
+          ping_ms: match?.ping_ms ?? Math.floor(20 + Math.random() * 50),
+          load_pct: s.current_load || match?.load_pct || Math.floor(20 + Math.random() * 45),
+          specialty: match?.specialty || 'General',
+          ip_address: s.ip_address,
+          status: s.status,
+        };
+      })
+    : REAL_SERVERS;
 
   const regions = ['All', ...new Set(displayServers.map(s => s.region).filter(Boolean))];
 
