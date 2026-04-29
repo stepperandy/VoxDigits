@@ -288,6 +288,35 @@ export default function Pricing() {
           onProceed={handlePaymentProceed}
         />
 
+        {/* Trust bar */}
+        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          {/* Live Support */}
+          <div className="flex items-start gap-4 p-6 rounded-2xl border border-white/5 bg-[#0d1120]">
+            <div className="text-3xl flex-shrink-0">💬</div>
+            <div className="flex-1">
+              <h3 className="text-white font-bold text-base mb-1">Live, 24-hour customer support</h3>
+              <p className="text-slate-400 text-sm leading-relaxed mb-4">Real support from real people. We're available through instant live chat and email to help you set up and troubleshoot.</p>
+              <a href="/contact" className="inline-flex items-center gap-1.5 px-4 py-2 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-sm font-semibold rounded-lg transition-all">
+                Contact Support →
+              </a>
+            </div>
+          </div>
+
+          {/* Money-back */}
+          <div className="flex items-start gap-4 p-6 rounded-2xl border border-white/5 bg-[#0d1120]">
+            <div className="flex-shrink-0 w-12 h-12 rounded-full border-4 border-cyan-400 flex items-center justify-center">
+              <span className="text-cyan-400 font-black text-sm">30</span>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-white font-bold text-base mb-1">30-day money-back guarantee</h3>
+              <p className="text-slate-400 text-sm leading-relaxed mb-4">Our VPN is easy to use. So is our guarantee. If you're not satisfied, just ask Support for a full refund. No hassle, no risk.</p>
+              <a href="#pricing" className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-sm font-semibold rounded-lg transition-all">
+                Get VoxVPN →
+              </a>
+            </div>
+          </div>
+        </div>
+
         <p className="text-center text-slate-600 text-xs mt-8">
           All prices in USD. 30-day money-back guarantee. Secure payment via Stripe.
         </p>
