@@ -49,7 +49,15 @@ export default function CustomerDashboard() {
   const downloadConfig = async (platform, fileUrl) => {
     setDownloading(platform);
     try {
-      if (fileUrl) { window.open(fileUrl, '_blank'); return; }
+      if (fileUrl) {
+        const a = document.createElement('a');
+        a.href = fileUrl;
+        a.download = fileUrl.split('/').pop();
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        return;
+      }
       const res = await base44.functions.invoke('downloadVpnConfig', { platform });
       const blob = new Blob([res.data], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
@@ -61,7 +69,7 @@ export default function CustomerDashboard() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (error) {
-      alert('Failed to download config: ' + error.message);
+      alert('Failed to download: ' + error.message);
     } finally {
       setDownloading(null);
     }
