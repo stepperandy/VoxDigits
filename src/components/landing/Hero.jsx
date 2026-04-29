@@ -1,17 +1,25 @@
 import { motion } from 'framer-motion';
-import { Lock, Shield, Globe, Zap, Play, ArrowRight, Eye, EyeOff, Wifi, Key, Fingerprint, ShieldCheck, RadioTower, Server } from 'lucide-react';
+import { Lock, Shield, Globe, Zap, Play, ArrowRight, Eye, EyeOff, Wifi, Key, Fingerprint, ShieldCheck, RadioTower, Server, Database, Network, ScanLine, ShieldAlert, BrainCircuit, Cpu } from 'lucide-react';
 
 const FLYING_ICONS = [
-  { Icon: Lock,        x: '8%',  y: '15%', size: 18, duration: 14, delay: 0,   rotate: 25  },
-  { Icon: ShieldCheck, x: '88%', y: '10%', size: 22, duration: 18, delay: 1,   rotate: -15 },
-  { Icon: Key,         x: '5%',  y: '55%', size: 16, duration: 12, delay: 2.5, rotate: 40  },
-  { Icon: Wifi,        x: '92%', y: '45%', size: 20, duration: 16, delay: 0.8, rotate: -30 },
-  { Icon: Globe,       x: '15%', y: '78%', size: 24, duration: 20, delay: 1.5, rotate: 10  },
-  { Icon: Eye,         x: '82%', y: '75%', size: 17, duration: 13, delay: 3,   rotate: -20 },
-  { Icon: Fingerprint, x: '75%', y: '20%', size: 21, duration: 17, delay: 0.5, rotate: 35  },
-  { Icon: Server,      x: '20%', y: '35%', size: 15, duration: 11, delay: 2,   rotate: -10 },
-  { Icon: RadioTower,  x: '60%', y: '82%', size: 19, duration: 15, delay: 1.2, rotate: 20  },
-  { Icon: EyeOff,      x: '40%', y: '8%',  size: 16, duration: 19, delay: 3.5, rotate: -25 },
+  { Icon: Lock,        x: '8%',  y: '15%', size: 18, duration: 14, delay: 0,   rotate: 25,  color: '#22d3ee' },
+  { Icon: ShieldCheck, x: '88%', y: '10%', size: 22, duration: 18, delay: 1,   rotate: -15, color: '#a78bfa' },
+  { Icon: Key,         x: '5%',  y: '55%', size: 16, duration: 12, delay: 2.5, rotate: 40,  color: '#34d399' },
+  { Icon: Wifi,        x: '92%', y: '45%', size: 20, duration: 16, delay: 0.8, rotate: -30, color: '#22d3ee' },
+  { Icon: Globe,       x: '15%', y: '78%', size: 24, duration: 20, delay: 1.5, rotate: 10,  color: '#a78bfa' },
+  { Icon: Eye,         x: '82%', y: '75%', size: 17, duration: 13, delay: 3,   rotate: -20, color: '#34d399' },
+  { Icon: Fingerprint, x: '75%', y: '20%', size: 21, duration: 17, delay: 0.5, rotate: 35,  color: '#22d3ee' },
+  { Icon: Server,      x: '20%', y: '35%', size: 15, duration: 11, delay: 2,   rotate: -10, color: '#f59e0b' },
+  { Icon: RadioTower,  x: '60%', y: '82%', size: 19, duration: 15, delay: 1.2, rotate: 20,  color: '#22d3ee' },
+  { Icon: EyeOff,      x: '40%', y: '8%',  size: 16, duration: 19, delay: 3.5, rotate: -25, color: '#a78bfa' },
+  { Icon: Database,    x: '55%', y: '60%', size: 20, duration: 16, delay: 0.3, rotate: 15,  color: '#34d399' },
+  { Icon: Network,     x: '30%', y: '90%', size: 18, duration: 13, delay: 1.8, rotate: -35, color: '#22d3ee' },
+  { Icon: ScanLine,    x: '70%', y: '55%', size: 22, duration: 21, delay: 2.2, rotate: 50,  color: '#f59e0b' },
+  { Icon: ShieldAlert, x: '3%',  y: '80%', size: 17, duration: 10, delay: 0.6, rotate: -5,  color: '#f43f5e' },
+  { Icon: BrainCircuit,x: '95%', y: '30%', size: 20, duration: 17, delay: 4,   rotate: 30,  color: '#a78bfa' },
+  { Icon: Cpu,         x: '45%', y: '88%', size: 16, duration: 14, delay: 1.0, rotate: -40, color: '#22d3ee' },
+  { Icon: Lock,        x: '62%', y: '5%',  size: 14, duration: 12, delay: 2.8, rotate: 20,  color: '#34d399' },
+  { Icon: Zap,         x: '28%', y: '12%', size: 19, duration: 15, delay: 3.2, rotate: -18, color: '#f59e0b' },
 ];
 
 const TRUST_BADGES = [
@@ -23,7 +31,7 @@ const TRUST_BADGES = [
 
 export default function Hero() {
   return (
-    <div className="relative min-h-screen bg-[#06080f] flex flex-col items-center justify-center overflow-hidden pt-20 pb-16 px-4">
+    <div className="relative min-h-screen bg-[#06080f] flex flex-col items-center justify-center overflow-hidden pt-32 pb-20 px-4">
 
       {/* Dot grid background */}
       <div className="absolute inset-0 pointer-events-none"
@@ -45,18 +53,18 @@ export default function Hero() {
       />
 
       {/* Flying security objects */}
-      {FLYING_ICONS.map(({ Icon, x, y, size, duration, delay, rotate }, i) => (
+      {FLYING_ICONS.map(({ Icon, x, y, size, duration, delay, rotate, color }, i) => (
         <motion.div
           key={i}
           className="absolute pointer-events-none"
           style={{ left: x, top: y }}
           initial={{ opacity: 0 }}
           animate={{
-            opacity: [0, 0.18, 0.12, 0.2, 0],
-            y: [0, -30, -55, -80, -110],
-            x: [0, 12 * (i % 2 === 0 ? 1 : -1), 6, 18 * (i % 2 === 0 ? 1 : -1), 0],
-            rotate: [rotate, rotate + 20, rotate - 10, rotate + 30, rotate],
-            scale: [0.8, 1, 1.1, 0.95, 0.7],
+            opacity: [0, 0.35, 0.08, 0.45, 0.1, 0.38, 0],
+            y: [0, -25, -50, -75, -100, -130, -160],
+            x: [0, 10 * (i % 2 === 0 ? 1 : -1), 4, 16 * (i % 2 === 0 ? 1 : -1), 8, 20 * (i % 2 === 0 ? 1 : -1), 0],
+            rotate: [rotate, rotate + 15, rotate - 8, rotate + 28, rotate - 5, rotate + 20, rotate],
+            scale: [0.7, 1, 0.85, 1.1, 0.9, 1.05, 0.6],
           }}
           transition={{
             duration,
@@ -65,7 +73,13 @@ export default function Hero() {
             ease: 'easeInOut',
           }}
         >
-          <Icon size={size} className="text-cyan-400" style={{ filter: 'drop-shadow(0 0 6px rgba(34,211,238,0.5))' }} />
+          <Icon
+            size={size}
+            style={{
+              color,
+              filter: `drop-shadow(0 0 8px ${color}) drop-shadow(0 0 20px ${color}80)`,
+            }}
+          />
         </motion.div>
       ))}
 
