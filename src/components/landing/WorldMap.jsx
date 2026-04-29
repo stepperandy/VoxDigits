@@ -65,7 +65,7 @@ export default function WorldMap({ servers = [] }) {
           backgroundSize: '94% auto',
           backgroundPosition: 'center 40%',
           backgroundRepeat: 'no-repeat',
-          filter: 'brightness(0.18) saturate(0.5) hue-rotate(180deg)',
+          filter: 'brightness(0.55) saturate(0.8) hue-rotate(180deg)',
         }}
       />
 
