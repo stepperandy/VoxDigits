@@ -16,7 +16,7 @@ const PLANS = [
     popular: false,
     features: [
       '1 Device',
-      '10+ Server Locations',
+      '20 Server Locations',
       'Unlimited Bandwidth',
       'AES-256 Encryption',
       'No-Logs Policy',
@@ -36,7 +36,7 @@ const PLANS = [
     popular: false,
     features: [
       '3 Devices',
-      '30+ Server Locations',
+      '20+ Server Locations',
       'Unlimited Bandwidth',
       'AES-256 Encryption',
       'No-Logs Policy',
@@ -58,7 +58,7 @@ const PLANS = [
     popular: true,
     features: [
       '5 Devices',
-      '50+ Server Locations',
+      '20+ Server Locations',
       'Unlimited Bandwidth',
       'AES-256 Encryption',
       'No-Logs Policy',
@@ -83,7 +83,7 @@ const PLANS = [
     popular: false,
     features: [
       '10 Devices',
-      '60+ Server Locations',
+      '20 Server Locations',
       'Unlimited Bandwidth',
       'AES-256 Encryption',
       'No-Logs Policy',
@@ -109,7 +109,7 @@ const PLANS = [
     popular: false,
     features: [
       'Unlimited Devices',
-      'All 60+ Server Locations',
+      'All 20 Server Locations',
       'Unlimited Bandwidth',
       'AES-256 Encryption',
       'No-Logs Policy',

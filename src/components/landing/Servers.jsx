@@ -5,26 +5,26 @@ import { base44 } from '@/api/base44Client';
 import WorldMap from './WorldMap';
 
 const regionNames = {
-  lhr: { name: 'London',        country: 'United Kingdom', flag: '🇬🇧', region: 'Europe' },
-  lax: { name: 'Los Angeles',   country: 'United States',  flag: '🇺🇸', region: 'Americas' },
-  ewr: { name: 'New York',      country: 'United States',  flag: '🇺🇸', region: 'Americas' },
-  ord: { name: 'Chicago',       country: 'United States',  flag: '🇺🇸', region: 'Americas' },
-  dfw: { name: 'Dallas',        country: 'United States',  flag: '🇺🇸', region: 'Americas' },
-  sea: { name: 'Seattle',       country: 'United States',  flag: '🇺🇸', region: 'Americas' },
-  atl: { name: 'Atlanta',       country: 'United States',  flag: '🇺🇸', region: 'Americas' },
-  mia: { name: 'Miami',         country: 'United States',  flag: '🇺🇸', region: 'Americas' },
-  sgp: { name: 'Singapore',     country: 'Singapore',      flag: '🇸🇬', region: 'Asia Pacific' },
-  ams: { name: 'Amsterdam',     country: 'Netherlands',    flag: '🇳🇱', region: 'Europe' },
-  fra: { name: 'Frankfurt',     country: 'Germany',        flag: '🇩🇪', region: 'Europe' },
-  par: { name: 'Paris',         country: 'France',         flag: '🇫🇷', region: 'Europe' },
-  nrt: { name: 'Tokyo',         country: 'Japan',          flag: '🇯🇵', region: 'Asia Pacific' },
-  syd: { name: 'Sydney',        country: 'Australia',      flag: '🇦🇺', region: 'Asia Pacific' },
-  yto: { name: 'Toronto',       country: 'Canada',         flag: '🇨🇦', region: 'Americas' },
-  bom: { name: 'Mumbai',        country: 'India',          flag: '🇮🇳', region: 'Asia Pacific' },
-  jnb: { name: 'Johannesburg',  country: 'South Africa',   flag: '🇿🇦', region: 'Africa' },
-  mad: { name: 'Madrid',        country: 'Spain',          flag: '🇪🇸', region: 'Europe' },
-  waw: { name: 'Warsaw',        country: 'Poland',         flag: '🇵🇱', region: 'Europe' },
-  sto: { name: 'Stockholm',     country: 'Sweden',         flag: '🇸🇪', region: 'Europe' },
+  amsterdam:    { name: 'Amsterdam',    country: 'Netherlands',    flag: '🇳🇱', region: 'Europe' },
+  atlanta:      { name: 'Atlanta',      country: 'United States',  flag: '🇺🇸', region: 'Americas' },
+  chicago:      { name: 'Chicago',      country: 'United States',  flag: '🇺🇸', region: 'Americas' },
+  frankfurt:    { name: 'Frankfurt',    country: 'Germany',        flag: '🇩🇪', region: 'Europe' },
+  johannesburg: { name: 'Johannesburg', country: 'South Africa',   flag: '🇿🇦', region: 'Africa' },
+  london:       { name: 'London',       country: 'United Kingdom', flag: '🇬🇧', region: 'Europe' },
+  losangeles:   { name: 'Los Angeles',  country: 'United States',  flag: '🇺🇸', region: 'Americas' },
+  madrid:       { name: 'Madrid',       country: 'Spain',          flag: '🇪🇸', region: 'Europe' },
+  manchester:   { name: 'Manchester',   country: 'United Kingdom', flag: '🇬🇧', region: 'Europe' },
+  melbourne:    { name: 'Melbourne',    country: 'Australia',      flag: '🇦🇺', region: 'Asia Pacific' },
+  miami:        { name: 'Miami',        country: 'United States',  flag: '🇺🇸', region: 'Americas' },
+  milan:        { name: 'Milan',        country: 'Italy',          flag: '🇮🇹', region: 'Europe' },
+  newjersey:    { name: 'New Jersey',   country: 'United States',  flag: '🇺🇸', region: 'Americas' },
+  paris:        { name: 'Paris',        country: 'France',         flag: '🇫🇷', region: 'Europe' },
+  seattle:      { name: 'Seattle',      country: 'United States',  flag: '🇺🇸', region: 'Americas' },
+  siliconvalley:{ name: 'Silicon Valley',country: 'United States', flag: '🇺🇸', region: 'Americas' },
+  singapore:    { name: 'Singapore',    country: 'Singapore',      flag: '🇸🇬', region: 'Asia Pacific' },
+  sydney:       { name: 'Sydney',       country: 'Australia',      flag: '🇦🇺', region: 'Asia Pacific' },
+  tokyo:        { name: 'Tokyo',        country: 'Japan',          flag: '🇯🇵', region: 'Asia Pacific' },
+  toronto:      { name: 'Toronto',      country: 'Canada',         flag: '🇨🇦', region: 'Americas' },
 };
 
 const REGION_GROUPS = [
@@ -84,7 +84,7 @@ export default function Servers() {
             <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent"> Continent</span>
           </h2>
           <p className="text-slate-400 text-base max-w-lg mx-auto">
-            Connect through our high-speed infrastructure in 10+ countries. Every server runs VoxVPN with AES-256 encryption.
+            Connect through our high-speed infrastructure in 20 locations across 4 continents. Every server runs VoxVPN with AES-256 encryption.
           </p>
         </motion.div>
 

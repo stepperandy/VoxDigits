@@ -3,7 +3,7 @@ import { Users, Server, Activity, ShieldCheck } from 'lucide-react';
 
 const stats = [
   { icon: Users, number: '2,500+', label: 'Active Users', sub: 'and growing daily', color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/20' },
-  { icon: Server, number: '10+', label: 'Server Locations', sub: 'across 4 continents', color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/20' },
+  { icon: Server, number: '20', label: 'Server Locations', sub: 'across 4 continents', color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/20' },
 
   { icon: Activity, number: '99.8%', label: 'Uptime SLA', sub: 'guaranteed reliability', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
   { icon: ShieldCheck, number: '0 Logs', label: 'Data Stored', sub: 'strict no-logs policy', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20' },

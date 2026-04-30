@@ -2,35 +2,40 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const SERVER_LOCATIONS = [
-  { key: 'lhr', name: 'London',        country: 'United Kingdom', flag: '🇬🇧', x: 48.5, y: 28,   region: 'Europe' },
-  { key: 'ewr', name: 'New York',      country: 'United States',  flag: '🇺🇸', x: 23,   y: 32,   region: 'Americas' },
-  { key: 'lax', name: 'Los Angeles',   country: 'United States',  flag: '🇺🇸', x: 14,   y: 35,   region: 'Americas' },
-  { key: 'ord', name: 'Chicago',       country: 'United States',  flag: '🇺🇸', x: 20,   y: 30,   region: 'Americas' },
-  { key: 'mia', name: 'Miami',         country: 'United States',  flag: '🇺🇸', x: 22,   y: 40,   region: 'Americas' },
-  { key: 'yto', name: 'Toronto',       country: 'Canada',         flag: '🇨🇦', x: 22,   y: 27,   region: 'Americas' },
-  { key: 'ams', name: 'Amsterdam',     country: 'Netherlands',    flag: '🇳🇱', x: 50,   y: 26,   region: 'Europe' },
-  { key: 'fra', name: 'Frankfurt',     country: 'Germany',        flag: '🇩🇪', x: 51.5, y: 27,   region: 'Europe' },
-  { key: 'par', name: 'Paris',         country: 'France',         flag: '🇫🇷', x: 49,   y: 29,   region: 'Europe' },
-  { key: 'sto', name: 'Stockholm',     country: 'Sweden',         flag: '🇸🇪', x: 53,   y: 20,   region: 'Europe' },
-  { key: 'mad', name: 'Madrid',        country: 'Spain',          flag: '🇪🇸', x: 46,   y: 33,   region: 'Europe' },
-  { key: 'sgp', name: 'Singapore',     country: 'Singapore',      flag: '🇸🇬', x: 78,   y: 54,   region: 'Asia Pacific' },
-  { key: 'nrt', name: 'Tokyo',         country: 'Japan',          flag: '🇯🇵', x: 84,   y: 31,   region: 'Asia Pacific' },
-  { key: 'syd', name: 'Sydney',        country: 'Australia',      flag: '🇦🇺', x: 84,   y: 73,   region: 'Asia Pacific' },
-  { key: 'jnb', name: 'Johannesburg',  country: 'South Africa',   flag: '🇿🇦', x: 56,   y: 70,   region: 'Africa' },
-  { key: 'bom', name: 'Mumbai',        country: 'India',          flag: '🇮🇳', x: 70,   y: 43,   region: 'Asia Pacific' },
+  { key: 'amsterdam',    name: 'Amsterdam',     country: 'Netherlands',    flag: '🇳🇱', x: 50,   y: 26,   region: 'Europe' },
+  { key: 'atlanta',      name: 'Atlanta',       country: 'United States',  flag: '🇺🇸', x: 21,   y: 37,   region: 'Americas' },
+  { key: 'chicago',      name: 'Chicago',       country: 'United States',  flag: '🇺🇸', x: 20,   y: 30,   region: 'Americas' },
+  { key: 'frankfurt',    name: 'Frankfurt',     country: 'Germany',        flag: '🇩🇪', x: 51.5, y: 27,   region: 'Europe' },
+  { key: 'johannesburg', name: 'Johannesburg',  country: 'South Africa',   flag: '🇿🇦', x: 56,   y: 70,   region: 'Africa' },
+  { key: 'london',       name: 'London',        country: 'United Kingdom', flag: '🇬🇧', x: 48.5, y: 28,   region: 'Europe' },
+  { key: 'losangeles',   name: 'Los Angeles',   country: 'United States',  flag: '🇺🇸', x: 14,   y: 35,   region: 'Americas' },
+  { key: 'madrid',       name: 'Madrid',        country: 'Spain',          flag: '🇪🇸', x: 46,   y: 33,   region: 'Europe' },
+  { key: 'manchester',   name: 'Manchester',    country: 'United Kingdom', flag: '🇬🇧', x: 47.5, y: 26,   region: 'Europe' },
+  { key: 'melbourne',    name: 'Melbourne',     country: 'Australia',      flag: '🇦🇺', x: 83,   y: 76,   region: 'Asia Pacific' },
+  { key: 'miami',        name: 'Miami',         country: 'United States',  flag: '🇺🇸', x: 22,   y: 40,   region: 'Americas' },
+  { key: 'milan',        name: 'Milan',         country: 'Italy',          flag: '🇮🇹', x: 52,   y: 30,   region: 'Europe' },
+  { key: 'newjersey',    name: 'New Jersey',    country: 'United States',  flag: '🇺🇸', x: 24,   y: 31,   region: 'Americas' },
+  { key: 'paris',        name: 'Paris',         country: 'France',         flag: '🇫🇷', x: 49,   y: 29,   region: 'Europe' },
+  { key: 'seattle',      name: 'Seattle',       country: 'United States',  flag: '🇺🇸', x: 13,   y: 28,   region: 'Americas' },
+  { key: 'siliconvalley',name: 'Silicon Valley',country: 'United States',  flag: '🇺🇸', x: 12,   y: 34,   region: 'Americas' },
+  { key: 'singapore',    name: 'Singapore',     country: 'Singapore',      flag: '🇸🇬', x: 78,   y: 54,   region: 'Asia Pacific' },
+  { key: 'sydney',       name: 'Sydney',        country: 'Australia',      flag: '🇦🇺', x: 85,   y: 73,   region: 'Asia Pacific' },
+  { key: 'tokyo',        name: 'Tokyo',         country: 'Japan',          flag: '🇯🇵', x: 84,   y: 31,   region: 'Asia Pacific' },
+  { key: 'toronto',      name: 'Toronto',       country: 'Canada',         flag: '🇨🇦', x: 22,   y: 27,   region: 'Americas' },
 ];
 
-// Connection lines between key hubs
 const CONNECTIONS = [
-  { from: 'ewr', to: 'lhr' },
-  { from: 'lhr', to: 'fra' },
-  { from: 'fra', to: 'sgp' },
-  { from: 'sgp', to: 'nrt' },
-  { from: 'ewr', to: 'mia' },
-  { from: 'lax', to: 'nrt' },
-  { from: 'bom', to: 'sgp' },
-  { from: 'lhr', to: 'jnb' },
-  { from: 'yto', to: 'lax' },
+  { from: 'newjersey',   to: 'london' },
+  { from: 'london',      to: 'frankfurt' },
+  { from: 'frankfurt',   to: 'singapore' },
+  { from: 'singapore',   to: 'tokyo' },
+  { from: 'miami',       to: 'atlanta' },
+  { from: 'losangeles',  to: 'tokyo' },
+  { from: 'singapore',   to: 'sydney' },
+  { from: 'london',      to: 'johannesburg' },
+  { from: 'toronto',     to: 'losangeles' },
+  { from: 'london',      to: 'amsterdam' },
+  { from: 'chicago',     to: 'newjersey' },
 ];
 
 function getLocation(key) {
@@ -39,12 +44,6 @@ function getLocation(key) {
 
 export default function WorldMap({ servers = [] }) {
   const [tooltip, setTooltip] = useState(null);
-  const [pulse, setPulse] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => setPulse(p => p + 1), 2000);
-    return () => clearInterval(t);
-  }, []);
 
   const getServerData = (key) => servers.find(s => s.location === key);
   const isOnline = (s) => s && s.status === 'active' && s.power === 'running';
@@ -58,7 +57,7 @@ export default function WorldMap({ servers = [] }) {
           style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(34,211,238,0.04) 0%, transparent 70%)' }} />
       </div>
 
-      {/* World map image — high contrast */}
+      {/* World map image */}
       <div className="absolute inset-0"
         style={{
           backgroundImage: `url("https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/World_map_-_low_resolution.svg/2560px-World_map_-_low_resolution.svg.png")`,
@@ -72,10 +71,6 @@ export default function WorldMap({ servers = [] }) {
       {/* SVG layer — connections + pins */}
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
         <defs>
-          <radialGradient id="pinGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#22d3ee" stopOpacity="0" />
-          </radialGradient>
           <filter id="glow">
             <feGaussianBlur stdDeviation="0.4" result="blur" />
             <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
@@ -113,13 +108,9 @@ export default function WorldMap({ servers = [] }) {
               onMouseLeave={() => setTooltip(null)}
               style={{ cursor: 'pointer' }}
             >
-              {/* Outer pulse ring */}
               <circle cx={loc.x} cy={loc.y} r="3" fill={color} opacity="0.06" />
-              {/* Mid ring */}
               <circle cx={loc.x} cy={loc.y} r="1.8" fill={color} opacity="0.12" />
-              {/* Core dot */}
               <circle cx={loc.x} cy={loc.y} r="0.9" fill={color} opacity="0.95" filter="url(#glow)" />
-              {/* Hover ring */}
               {isHovered && (
                 <circle cx={loc.x} cy={loc.y} r="2.5" fill="none" stroke={color} strokeWidth="0.3" opacity="0.7" />
               )}
@@ -128,7 +119,7 @@ export default function WorldMap({ servers = [] }) {
         })}
       </svg>
 
-      {/* Animated CSS pulses on top of SVG */}
+      {/* Animated CSS pulses */}
       {SERVER_LOCATIONS.map((loc, i) => (
         <motion.div
           key={`pulse-${loc.key}`}
@@ -208,7 +199,7 @@ export default function WorldMap({ servers = [] }) {
             Offline
           </span>
         </div>
-        <span className="text-slate-500 text-xs">{SERVER_LOCATIONS.length} server locations · Hover a pin for details</span>
+        <span className="text-slate-500 text-xs">20 server locations · Hover a pin for details</span>
       </div>
     </div>
   );
