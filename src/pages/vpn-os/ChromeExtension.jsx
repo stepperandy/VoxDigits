@@ -1,4 +1,4 @@
 import AIContentPage from '@/components/landing/AIContentPage';
 export default function ChromeExtension() {
-  return <AIContentPage topic="VPN Chrome Extension - browser VPN extension for Chrome, instant privacy, proxy protection" badge="Chrome Extension" emoji="🌐" ctaLabel="Add to Chrome" ctaHref="/#pricing" />;
+  return <AIContentPage topic="VPN Chrome Extension - lightweight browser VPN for Chrome, encrypt browser traffic, bypass geo-blocks instantly" badge="Chrome Extension" emoji="🌐" ctaLabel="Get Chrome Extension" ctaHref="/#pricing" />;
 }
