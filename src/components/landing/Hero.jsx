@@ -60,9 +60,9 @@ export default function Hero() {
         >
           <defs>
             <linearGradient id="shieldBody" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#0a1628" />
-              <stop offset="40%" stopColor="#0d2244" />
-              <stop offset="100%" stopColor="#061020" />
+              <stop offset="0%" stopColor="#0a1628" stopOpacity="0" />
+              <stop offset="40%" stopColor="#0d2244" stopOpacity="0" />
+              <stop offset="100%" stopColor="#061020" stopOpacity="0" />
             </linearGradient>
             <linearGradient id="shieldEdge" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#00d4ff" />
@@ -70,8 +70,8 @@ export default function Hero() {
               <stop offset="100%" stopColor="#00d4ff" />
             </linearGradient>
             <linearGradient id="shieldInner" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#003a6e" />
-              <stop offset="100%" stopColor="#001a3a" />
+              <stop offset="0%" stopColor="#003a6e" stopOpacity="0" />
+              <stop offset="100%" stopColor="#001a3a" stopOpacity="0" />
             </linearGradient>
             <linearGradient id="shieldHighlight" x1="0%" y1="0%" x2="60%" y2="100%">
               <stop offset="0%" stopColor="rgba(0,212,255,0.4)" />
