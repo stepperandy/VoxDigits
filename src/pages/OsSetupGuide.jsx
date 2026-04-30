@@ -20,61 +20,61 @@ const GUIDES = {
   windows: {
     steps: [
       {
-        title: 'Download the VoxVPN Setup Script',
-        desc: 'Click "Download Setup" below — you\'ll get VoxVPN-Windows-Setup.ps1, a branded PowerShell installer.',
+        title: 'Download VoxVPN-Setup.exe',
+        desc: 'Click "Download Setup" below to get the official VoxVPN Windows installer (.exe).',
       },
       {
-        title: 'Run as Administrator',
-        desc: 'Right-click the downloaded .ps1 file → select "Run with PowerShell". Click Yes on the UAC prompt to allow admin access.',
+        title: 'Run the Installer',
+        desc: 'Double-click VoxVPN-Setup.exe and follow the on-screen prompts. Click Yes on any UAC prompt to allow installation.',
       },
       {
-        title: 'Auto-install OpenVPN',
-        desc: 'The script automatically downloads and silently installs OpenVPN, then writes your personal VoxVPN config into the OpenVPN config folder.',
+        title: 'VoxVPN Installs Automatically',
+        desc: 'The installer sets up OpenVPN and configures your personal VoxVPN connection automatically.',
       },
       {
-        title: 'Connect via OpenVPN GUI',
-        desc: 'After the script finishes, find the OpenVPN GUI icon in your system tray. Right-click it → select your VoxVPN server → Connect.',
+        title: 'Connect',
+        desc: 'Look for the VoxVPN icon in your system tray. Right-click it and select Connect to start your secure session.',
       },
     ],
-    note: '⚠️ Note: We generate a .ps1 PowerShell installer (not a .exe). A branded .exe requires compiling with NSIS/Inno Setup in a build pipeline. The .ps1 does the same job automatically.',
   },
   macos: {
     steps: [
       {
-        title: 'Download the VoxVPN Setup Script',
-        desc: 'Click "Download Setup" — you\'ll get VoxVPN-macOS-Setup.sh, a shell script that installs OpenVPN and your config.',
+        title: 'Install Tunnelblick or OpenVPN Connect',
+        desc: 'Download Tunnelblick (free, recommended) from tunnelblick.net, or OpenVPN Connect from the Mac App Store.',
+        action: { label: 'Get Tunnelblick', href: 'https://tunnelblick.net/downloads.html' },
       },
       {
-        title: 'Open Terminal and Run',
-        desc: 'Open Terminal (Spotlight → Terminal) and run: sudo bash ~/Downloads/VoxVPN-macOS-Setup.sh',
+        title: 'Download Your VoxVPN Config',
+        desc: 'Click "Download Config" below — you\'ll get your personal VoxVPN.ovpn file.',
       },
       {
-        title: 'Auto-install OpenVPN',
-        desc: 'The script installs Homebrew (if needed) and OpenVPN, then writes your VoxVPN config automatically.',
+        title: 'Import the Config',
+        desc: 'Double-click the VoxVPN.ovpn file. Tunnelblick will automatically detect and import it.',
       },
       {
-        title: 'Connected!',
-        desc: 'VoxVPN activates automatically. To disconnect, run: sudo pkill openvpn',
+        title: 'Connect',
+        desc: 'Click the Tunnelblick icon in your menu bar → select VoxVPN → Connect.',
       },
     ],
   },
   linux: {
     steps: [
       {
-        title: 'Download the VoxVPN Setup Script',
-        desc: 'Click "Download Setup" — you\'ll get VoxVPN-Linux-Setup.sh.',
+        title: 'Install OpenVPN',
+        desc: 'Run: sudo apt install openvpn (Ubuntu/Debian) or sudo yum install openvpn (CentOS/RHEL).',
       },
       {
-        title: 'Run in Terminal',
-        desc: 'Open a terminal and run: sudo bash ~/Downloads/VoxVPN-Linux-Setup.sh',
+        title: 'Download Your VoxVPN Config',
+        desc: 'Click "Download Config" below — you\'ll get your personal VoxVPN.ovpn file.',
       },
       {
-        title: 'Auto-install OpenVPN',
-        desc: 'The script installs OpenVPN via apt or yum and writes your VoxVPN config to /etc/openvpn/.',
+        title: 'Connect via Terminal',
+        desc: 'Run: sudo openvpn --config ~/Downloads/VoxVPN.ovpn',
       },
       {
         title: 'Connected!',
-        desc: 'VoxVPN connects automatically. To disconnect: sudo pkill openvpn',
+        desc: 'VoxVPN is now active. To disconnect, press Ctrl+C in the terminal or run: sudo pkill openvpn',
       },
     ],
   },
@@ -203,6 +203,11 @@ export default function OsSetupGuide() {
     setDownloading(true);
     try {
       const res = await base44.functions.invoke('downloadVpnConfig', { platform: selectedOS });
+      // Windows returns a direct URL
+      if (res.data?.directUrl) {
+        window.location.href = res.data.directUrl;
+        return;
+      }
       const blob = new Blob([res.data], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -329,17 +334,12 @@ export default function OsSetupGuide() {
                     {downloading ? (
                       <><Loader2 size={16} className="animate-spin" /> Generating...</>
                     ) : (
-                      <><Download size={16} /> {['windows','macos','linux'].includes(selectedOS) ? 'Download Setup Script' : 'Download .ovpn Config'}</>
+                      <><Download size={16} /> {selectedOS === 'windows' ? 'Download VoxVPN-Setup.exe' : 'Download .ovpn Config'}</>
                     )}
                   </button>
                   <p className="text-slate-600 text-xs text-center">
-                    {['windows','macos','linux'].includes(selectedOS)
-                      ? `VoxVPN-${osInfo.label}-Setup.${selectedOS === 'windows' ? 'ps1' : 'sh'}`
-                      : `VoxVPN-${osInfo.label.replace(' / ', '-').replace(' ', '')}.ovpn`}
+                    {selectedOS === 'windows' ? 'VoxVPN-Setup.exe' : `VoxVPN-${osInfo.label.replace(' / ', '-').replace(' ', '')}.ovpn`}
                   </p>
-                  {guide.note && (
-                    <p className="text-amber-400/80 text-[11px] leading-relaxed mt-1">{guide.note}</p>
-                  )}
                 </div>
               )}
             </div>

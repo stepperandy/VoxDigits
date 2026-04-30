@@ -18,9 +18,9 @@ const PLATFORMS = [
     bg: 'bg-blue-500/5',
     badge: 'Windows 10 / 11',
     file: 'VoxVPN-Setup.exe',
-    directUrl: 'https://github.com/stepperandy/VoxVPN-Backend-Soft/releases/download/voxvpn.exe/VoxVPN-Setup.exe',
-    desc: 'One-click installer for Windows 10 and 11. Installs and configures VoxVPN automatically.',
-    steps: ['Download VoxVPN-Setup.exe', 'Double-click the installer and follow the prompts', 'VoxVPN installs and connects automatically', 'Look for VoxVPN in your system tray'],
+    directUrl: 'https://voxvpn.net/downloads/VoxVPN-Setup.exe',
+    desc: 'One-click installer for Windows 10 and 11. Installs OpenVPN and configures your VoxVPN connection automatically.',
+    steps: ['Download VoxVPN-Setup.exe', 'Double-click the installer and follow the prompts', 'VoxVPN installs OpenVPN and connects automatically', 'Look for VoxVPN in your system tray'],
   },
   {
     id: 'macos',
@@ -30,9 +30,10 @@ const PLATFORMS = [
     border: 'border-slate-500/30',
     bg: 'bg-slate-500/5',
     badge: 'macOS 12+',
-    file: 'VoxVPN-macOS-Setup.sh',
-    desc: 'Shell script installs OpenVPN via Homebrew and activates your tunnel.',
-    steps: ['Download VoxVPN-macOS-Setup.sh', 'Open Terminal → run: sudo bash ~/Downloads/VoxVPN-macOS-Setup.sh', 'VoxVPN connects automatically'],
+    file: 'VoxVPN.ovpn',
+    desc: 'Download your personal OpenVPN .ovpn config file and import it into Tunnelblick or OpenVPN Connect.',
+    store: { label: 'Get Tunnelblick', url: 'https://tunnelblick.net/downloads.html' },
+    steps: ['Install Tunnelblick or OpenVPN Connect on your Mac', 'Download your VoxVPN.ovpn config below', 'Double-click the .ovpn file — it imports automatically into Tunnelblick', 'Click Connect in Tunnelblick'],
   },
   {
     id: 'linux',
@@ -42,9 +43,9 @@ const PLATFORMS = [
     border: 'border-orange-500/30',
     bg: 'bg-orange-500/5',
     badge: 'Ubuntu / Debian / CentOS',
-    file: 'VoxVPN-Linux-Setup.sh',
-    desc: 'Installs OpenVPN via apt/yum and writes your config to /etc/openvpn.',
-    steps: ['Download VoxVPN-Linux-Setup.sh', 'Run: sudo bash ~/Downloads/VoxVPN-Linux-Setup.sh', 'VoxVPN connects automatically'],
+    file: 'VoxVPN.ovpn',
+    desc: 'Download your .ovpn config and connect via the OpenVPN CLI.',
+    steps: ['Install OpenVPN: sudo apt install openvpn (Ubuntu/Debian) or sudo yum install openvpn (CentOS)', 'Download your VoxVPN.ovpn config below', 'Run: sudo openvpn --config ~/Downloads/VoxVPN.ovpn', 'VoxVPN connects automatically'],
   },
   {
     id: 'ios',
@@ -57,7 +58,7 @@ const PLATFORMS = [
     file: 'VoxVPN.ovpn',
     desc: 'Import your .ovpn config into OpenVPN Connect from the App Store.',
     store: { label: 'App Store', url: 'https://apps.apple.com/app/openvpn-connect/id590379981' },
-    steps: ['Install OpenVPN Connect from the App Store', 'Download your VoxVPN.ovpn config below', 'Tap the file → Copy to OpenVPN', 'Tap connect in OpenVPN Connect'],
+    steps: ['Install OpenVPN Connect from the App Store', 'Download your VoxVPN.ovpn config below', 'Tap the .ovpn file → Share → Copy to OpenVPN Connect', 'Tap connect in OpenVPN Connect'],
   },
   {
     id: 'android',
@@ -70,7 +71,7 @@ const PLATFORMS = [
     file: 'VoxVPN.ovpn',
     desc: 'Import your .ovpn config into OpenVPN Connect from Google Play.',
     store: { label: 'Google Play', url: 'https://play.google.com/store/apps/details?id=net.openvpn.openvpn' },
-    steps: ['Install OpenVPN Connect from Google Play', 'Download your VoxVPN.ovpn config below', 'Open OpenVPN Connect → + → Import from file', 'Tap connect'],
+    steps: ['Install OpenVPN Connect from Google Play', 'Download your VoxVPN.ovpn config below', 'Open OpenVPN Connect → + → Import from file → select VoxVPN.ovpn', 'Tap connect'],
   },
   {
     id: 'router',
@@ -82,7 +83,7 @@ const PLATFORMS = [
     badge: 'OpenWrt / GL.iNet / DD-WRT',
     file: 'VoxVPN.ovpn',
     desc: 'Upload your .ovpn config into your router\'s OpenVPN client section.',
-    steps: ['Ensure router supports OpenVPN client mode', 'Download your VoxVPN.ovpn config below', 'Login to router admin → VPN → OpenVPN Client', 'Upload the .ovpn file and enable the tunnel'],
+    steps: ['Ensure your router supports OpenVPN client mode (GL.iNet, OpenWrt, DD-WRT)', 'Download your VoxVPN.ovpn config below', 'Login to router admin → VPN → OpenVPN Client', 'Upload the .ovpn file and enable the tunnel'],
   },
 ];
 
@@ -133,6 +134,11 @@ export default function DownloadPage() {
     setDownloading(true);
     try {
       const res = await base44.functions.invoke('downloadVpnConfig', { platform: selected });
+      // Windows returns a direct URL
+      if (res.data?.directUrl) {
+        window.location.href = res.data.directUrl;
+        return;
+      }
       const blob = new Blob([res.data], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');

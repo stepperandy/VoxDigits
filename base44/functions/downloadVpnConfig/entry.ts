@@ -1,4 +1,14 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+
+// Direct download URLs per platform — all OpenVPN based
+const PLATFORM_DOWNLOADS = {
+  windows: 'https://voxvpn.net/downloads/VoxVPN-Setup.exe',
+  macos:   null, // served from ovpn config
+  linux:   null,
+  ios:     null,
+  android: null,
+  router:  null,
+};
 
 Deno.serve(async (req) => {
   try {
@@ -10,54 +20,24 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const { deviceId, platform } = body;
+    const { platform = 'windows' } = body;
 
-    // Find the user's subscription
+    // Check active subscription
     const subs = await base44.entities.VPNSubscription.filter({ user_email: user.email });
-    if (!subs || subs.length === 0) {
-      return Response.json({ error: 'No active subscription found' }, { status: 404 });
-    }
-    const subscription = subs[0];
-
-    // Get the device (or first active device if no deviceId specified)
-    let device = null;
-    if (deviceId) {
-      const devices = await base44.entities.LinkedDevice.filter({ subscription_id: subscription.id });
-      device = devices.find(d => d.id === deviceId);
-    } else {
-      const devices = await base44.entities.LinkedDevice.filter({ subscription_id: subscription.id });
-      const targetPlatform = (platform || 'windows').toLowerCase();
-      device = devices.find(d => d.device_type === targetPlatform && d.status === 'active') || devices[0];
+    if (!subs || subs.length === 0 || subs[0].status !== 'active') {
+      return Response.json({ error: 'No active subscription found' }, { status: 403 });
     }
 
-    if (!device) {
-      // No device yet — provision one now
-      const provisionRes = await base44.functions.invoke('provisionVpnUser', {
-        email: user.email,
-        platform: platform || 'windows',
-        deviceName: `${platform || 'Windows'} Device`,
-      });
-
-      if (provisionRes.data?.configContent) {
-        const configContent = provisionRes.data.configContent;
-        const fileName = `VoxVPN-${(platform || 'Windows').charAt(0).toUpperCase() + (platform || 'windows').slice(1)}.conf`;
-
-        return new Response(configContent, {
-          status: 200,
-          headers: {
-            'Content-Type': 'text/plain; charset=utf-8',
-            'Content-Disposition': `attachment; filename="${fileName}"`,
-          },
-        });
-      }
-
-      return Response.json({ error: 'Failed to provision VPN profile' }, { status: 500 });
+    // Windows — redirect to direct .exe download
+    if (platform === 'windows') {
+      return Response.json({ directUrl: PLATFORM_DOWNLOADS.windows });
     }
 
-    // Get the best available server
+    // For other platforms — serve an OpenVPN .ovpn config
+    // Get best available server
     const servers = await base44.asServiceRole.entities.VPNServer.filter({ status: 'online' });
     if (!servers || servers.length === 0) {
-      return Response.json({ error: 'No VPN servers online' }, { status: 503 });
+      return Response.json({ error: 'No VPN servers available' }, { status: 503 });
     }
 
     const server = servers.reduce((best, s) => {
@@ -66,28 +46,30 @@ Deno.serve(async (req) => {
       return load < bestLoad ? s : best;
     });
 
-    // Build config from stored credentials
-    const configContent = `[Interface]
-PrivateKey = ${device.vpn_profile_key}
-Address = ${device.ip_address}/32
-DNS = 8.8.8.8, 1.1.1.1
-
-[Peer]
-PublicKey = ${server.public_key}
-Endpoint = ${server.ip_address}:${server.port || 51820}
-AllowedIPs = 0.0.0.0/0, ::/0
-PersistentKeepalive = 25
+    // Build OpenVPN .ovpn config (no WireGuard)
+    const ovpnConfig = `client
+dev tun
+proto udp
+remote ${server.ip_address} ${server.port || 1194}
+resolv-retry infinite
+nobind
+persist-key
+persist-tun
+ca ca.crt
+cert client.crt
+key client.key
+cipher AES-256-CBC
+auth SHA256
+verb 3
+# VoxVPN OpenVPN Config
+# Server: ${server.region || server.city || 'VoxVPN'}
+# Generated for: ${user.email}
 `;
 
-    const platformLabel = (platform || device.device_type || 'Windows');
-    const fileName = `VoxVPN-${platformLabel.charAt(0).toUpperCase() + platformLabel.slice(1)}.conf`;
+    const platformLabel = platform.charAt(0).toUpperCase() + platform.slice(1);
+    const fileName = `VoxVPN-${platformLabel}.ovpn`;
 
-    // Update last connected
-    await base44.entities.LinkedDevice.update(device.id, {
-      last_connected: new Date().toISOString(),
-    });
-
-    return new Response(configContent, {
+    return new Response(ovpnConfig, {
       status: 200,
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
