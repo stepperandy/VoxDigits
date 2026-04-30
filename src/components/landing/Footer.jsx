@@ -189,10 +189,8 @@ export default function Footer() {
           </div>
 
           {/* Payment icons */}
-          <div className="flex items-center gap-2">
-            {['VISA', 'MC', 'AMEX', 'PayPal', 'BTC'].map((p) => (
-              <span key={p} className="px-2 py-1 bg-[#0d1120] border border-white/10 rounded text-xs text-slate-400 font-medium">{p}</span>
-            ))}
+          <div className="flex items-center">
+            <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/cbc2471ca_image.png" alt="Payment methods" className="h-8 w-auto" />
           </div>
         </div>
 
