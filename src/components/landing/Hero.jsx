@@ -31,64 +31,109 @@ export default function Hero() {
         }}
       />
 
-      {/* 3D Shield — centered, overlapping mesh */}
+      {/* Premium Shield — centered */}
       <motion.div
         initial={{ opacity: 0, y: -30, scale: 0.85 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
         className="relative z-10 flex items-center justify-center"
-        style={{ marginTop: '20px', marginBottom: '-20px' }}
+        style={{ marginTop: '20px', marginBottom: '-10px' }}
       >
+        {/* Outer glow aura */}
+        <div className="absolute" style={{
+          width: 260, height: 260,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(0,212,255,0.15) 0%, rgba(0,100,255,0.08) 50%, transparent 75%)',
+          filter: 'blur(16px)',
+        }} />
         <svg
-          width="180"
-          height="210"
-          viewBox="0 0 88 100"
+          width="200"
+          height="230"
+          viewBox="0 0 100 115"
           fill="none"
           style={{
             filter:
-              'drop-shadow(0 0 30px rgba(130,80,255,0.8)) drop-shadow(0 0 60px rgba(100,50,220,0.4))',
+              'drop-shadow(0 0 12px rgba(0,212,255,1)) drop-shadow(0 0 30px rgba(0,150,255,0.8)) drop-shadow(0 0 60px rgba(0,100,255,0.5))',
+            position: 'relative',
+            zIndex: 10,
           }}
         >
           <defs>
-            <linearGradient id="shieldLeft" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#a855f7" />
-              <stop offset="100%" stopColor="#6d28d9" />
+            <linearGradient id="shieldBody" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#0a1628" />
+              <stop offset="40%" stopColor="#0d2244" />
+              <stop offset="100%" stopColor="#061020" />
             </linearGradient>
-            <linearGradient id="shieldRight" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#818cf8" />
-              <stop offset="100%" stopColor="#4f46e5" />
+            <linearGradient id="shieldEdge" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#00d4ff" />
+              <stop offset="40%" stopColor="#0080ff" />
+              <stop offset="100%" stopColor="#00d4ff" />
             </linearGradient>
-            <linearGradient id="shieldBorder" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#c084fc" />
-              <stop offset="50%" stopColor="#818cf8" />
-              <stop offset="100%" stopColor="#67e8f9" />
+            <linearGradient id="shieldInner" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#003a6e" />
+              <stop offset="100%" stopColor="#001a3a" />
             </linearGradient>
+            <linearGradient id="shieldHighlight" x1="0%" y1="0%" x2="60%" y2="100%">
+              <stop offset="0%" stopColor="rgba(0,212,255,0.4)" />
+              <stop offset="100%" stopColor="rgba(0,128,255,0)" />
+            </linearGradient>
+            <linearGradient id="glowCenter" x1="50%" y1="0%" x2="50%" y2="100%">
+              <stop offset="0%" stopColor="rgba(0,212,255,0.6)" />
+              <stop offset="60%" stopColor="rgba(0,100,255,0.2)" />
+              <stop offset="100%" stopColor="transparent" />
+            </linearGradient>
+            <filter id="innerGlow">
+              <feGaussianBlur stdDeviation="2" result="blur" />
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
           </defs>
-          {/* Left half */}
+
+          {/* Shield outer body */}
           <path
-            d="M44 4L8 18V48C8 70 24 88 44 98V4Z"
-            fill="url(#shieldLeft)"
+            d="M50 3L10 18V52C10 76 28 96 50 108C72 96 90 76 90 52V18L50 3Z"
+            fill="url(#shieldBody)"
           />
-          {/* Right half */}
+
+          {/* Shield outer border — cyan glow */}
           <path
-            d="M44 4L80 18V48C80 70 64 88 44 98V4Z"
-            fill="url(#shieldRight)"
-          />
-          {/* Border */}
-          <path
-            d="M44 4L8 18V48C8 70 24 88 44 98C64 88 80 70 80 48V18L44 4Z"
+            d="M50 3L10 18V52C10 76 28 96 50 108C72 96 90 76 90 52V18L50 3Z"
             fill="none"
-            stroke="url(#shieldBorder)"
-            strokeWidth="1.5"
-            strokeOpacity="0.6"
+            stroke="url(#shieldEdge)"
+            strokeWidth="2"
           />
-          {/* Center line */}
-          <line x1="44" y1="4" x2="44" y2="98" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-          {/* Highlight */}
+
+          {/* Inner panel bevel */}
           <path
-            d="M44 4L8 18V32C20 28 32 22 44 20V4Z"
-            fill="rgba(255,255,255,0.12)"
+            d="M50 12L18 24V52C18 70 32 86 50 97C68 86 82 70 82 52V24L50 12Z"
+            fill="url(#shieldInner)"
           />
+          <path
+            d="M50 12L18 24V52C18 70 32 86 50 97C68 86 82 70 82 52V24L50 12Z"
+            fill="none"
+            stroke="rgba(0,180,255,0.3)"
+            strokeWidth="1"
+          />
+
+          {/* Inner glow highlight (top-left) */}
+          <path
+            d="M50 12L18 24V44C28 40 38 34 50 30V12Z"
+            fill="url(#shieldHighlight)"
+          />
+
+          {/* Center vertical crease */}
+          <line x1="50" y1="12" x2="50" y2="97" stroke="rgba(0,212,255,0.25)" strokeWidth="0.8" />
+
+          {/* Center glow orb */}
+          <ellipse cx="50" cy="52" rx="12" ry="14" fill="url(#glowCenter)" opacity="0.6" filter="url(#innerGlow)" />
+
+          {/* Top cap rivet dots */}
+          <circle cx="35" cy="16" r="1.2" fill="rgba(0,212,255,0.5)" />
+          <circle cx="50" cy="11" r="1.4" fill="rgba(0,212,255,0.7)" />
+          <circle cx="65" cy="16" r="1.2" fill="rgba(0,212,255,0.5)" />
+
+          {/* Edge accent lines */}
+          <path d="M18 36 Q14 44 14 52" stroke="rgba(0,212,255,0.4)" strokeWidth="0.8" fill="none" />
+          <path d="M82 36 Q86 44 86 52" stroke="rgba(0,212,255,0.4)" strokeWidth="0.8" fill="none" />
         </svg>
       </motion.div>
 
