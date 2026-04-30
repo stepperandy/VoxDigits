@@ -13,24 +13,21 @@ export default function Hero() {
       className="relative min-h-screen flex flex-col items-center justify-start overflow-hidden pt-24"
       style={{ background: 'linear-gradient(180deg, #1a0533 0%, #0d0118 40%, #080010 100%)' }}
     >
-      {/* Mesh wave background image — upper portion */}
+      {/* Tech circuit background image — full hero */}
       <div
-        className="absolute top-0 left-0 right-0 pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          height: '62%',
-          backgroundImage: `url("https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/1dab58cfb_generated_image.png")`,
+          backgroundImage: `url("https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/373e867b8_image.png")`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center top',
-          opacity: 1,
+          backgroundPosition: 'center center',
+          opacity: 0.85,
         }}
       />
-      {/* Fade mesh into dark bg */}
+      {/* Overlay to keep text readable */}
       <div
-        className="absolute left-0 right-0 pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          top: '30%',
-          height: '32%',
-          background: 'linear-gradient(to bottom, transparent, #0d0118)',
+          background: 'linear-gradient(180deg, rgba(10,5,30,0.45) 0%, rgba(8,0,16,0.6) 60%, rgba(8,0,16,0.92) 100%)',
         }}
       />
 
