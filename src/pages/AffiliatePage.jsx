@@ -26,7 +26,7 @@ export default function AffiliatePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const baseUrl = window.location.origin;
+  const baseUrl = 'https://www.voxvpn.net';
   const affiliateLink = user ? `${baseUrl}/?aff=${affiliateCode}` : `${baseUrl}/?aff=YOURCODE`;
 
   const shareLinks = [
