@@ -15,7 +15,7 @@ const footerSections = [
     ],
   },
   {
-    title: 'VPN Download by OS',
+    title: 'VPN by Device',
     links: [
       { label: 'Windows VPN', to: '/windows-vpn' },
       { label: 'Mac VPN', to: '/mac-vpn' },
@@ -58,6 +58,15 @@ const footerSections = [
     ],
   },
   {
+    title: 'Resources',
+    links: [
+      { label: 'Blog & Guides', to: '/blog' },
+      { label: 'Press & Backlinks', to: '/press' },
+      { label: 'Affiliate Program', to: '/affiliate-register' },
+      { label: 'VPN Setup Guide', to: '/setup-guide' },
+    ],
+  },
+  {
     title: 'eSIM Providers',
     links: [
       { label: 'VoxGO', external: 'https://voxdigits.com' },
@@ -84,7 +93,7 @@ const footerSections = [
     ],
   },
   {
-    title: 'Legal Offers',
+    title: 'Legal',
     links: [
       { label: 'Privacy Policy', to: '/privacy-policy' },
       { label: 'Terms of Service', to: '/terms-of-service' },
@@ -94,26 +103,34 @@ const footerSections = [
   },
 ];
 
+function FooterLinkItem({ link, onHash }) {
+  if (link.external) {
+    return <a href={link.external} target="_blank" rel="noopener noreferrer" className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link.label}</a>;
+  }
+  if (link.hash) {
+    return <button onClick={() => onHash(link)} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors text-left">{link.label}</button>;
+  }
+  return <Link to={link.to} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link.label}</Link>;
+}
+
 export default function Footer() {
   const navigate = useNavigate();
 
-  const handleLink = (link) => {
-    if (link.hash) {
-      navigate(link.to);
-      setTimeout(() => {
-        const el = document.getElementById(link.hash);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
+  const handleHash = (link) => {
+    navigate(link.to);
+    setTimeout(() => {
+      const el = document.getElementById(link.hash);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   };
 
   return (
     <footer className="bg-[#060910] border-t border-white/5 pt-16 pb-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Top: logo + columns */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 mb-12">
-          {/* Brand */}
-          <div className="col-span-2 sm:col-span-3 lg:col-span-1">
+      <div className="max-w-7xl mx-auto">
+
+        {/* Brand row */}
+        <div className="flex flex-col sm:flex-row gap-6 mb-10 items-start">
+          <div className="flex-shrink-0 max-w-[200px]">
             <img
               src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
               alt="VoxVPN"
@@ -134,47 +151,21 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Footer link columns */}
-          {footerSections.slice(0, 4).map((section) => (
-            <div key={section.title}>
-              <h4 className="text-white text-xs font-bold mb-4 uppercase tracking-wider">{section.title}</h4>
-              <ul className="space-y-2">
-                {section.links.map((link) => (
-                  <li key={link.label}>
-                    {link.external ? (
-                      <a href={link.external} target="_blank" rel="noopener noreferrer" className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link.label}</a>
-                    ) : link.hash ? (
-                      <button onClick={() => handleLink(link)} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors text-left">{link.label}</button>
-                    ) : (
-                      <Link to={link.to} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link.label}</Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        {/* Second row of columns */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12 lg:ml-[20%]">
-          {footerSections.slice(4).map((section) => (
-            <div key={section.title}>
-              <h4 className="text-white text-xs font-bold mb-4 uppercase tracking-wider">{section.title}</h4>
-              <ul className="space-y-2">
-                {section.links.map((link) => (
-                  <li key={link.label}>
-                    {link.external ? (
-                      <a href={link.external} target="_blank" rel="noopener noreferrer" className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link.label}</a>
-                    ) : link.hash ? (
-                      <button onClick={() => handleLink(link)} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors text-left">{link.label}</button>
-                    ) : (
-                      <Link to={link.to} className="text-slate-500 text-xs hover:text-cyan-400 transition-colors">{link.label}</Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {/* All link columns — responsive grid */}
+          <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-8">
+            {footerSections.map((section) => (
+              <div key={section.title}>
+                <h4 className="text-white text-xs font-bold mb-3 uppercase tracking-wider">{section.title}</h4>
+                <ul className="space-y-2">
+                  {section.links.map((link) => (
+                    <li key={link.label}>
+                      <FooterLinkItem link={link} onHash={handleHash} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* App store badges */}
@@ -187,8 +178,6 @@ export default function Footer() {
               <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/1349633d5_image.png" alt="Get it on Google Play" className="h-10 w-auto" />
             </a>
           </div>
-
-          {/* Payment icons */}
           <div className="flex items-center">
             <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/cbc2471ca_image.png" alt="Payment methods" className="h-8 w-auto" />
           </div>
