@@ -57,7 +57,7 @@ export default function Navbar() {
     <header className="fixed top-0 w-full z-50">
       {/* Main nav */}
       <nav className="bg-[#080c18]/95 backdrop-blur-md border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10">
           <div className="flex items-center h-[72px] gap-4">
             {/* Logo — 100% bigger */}
             <Link to="/" className="flex-shrink-0">
@@ -72,7 +72,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center justify-center gap-1 flex-1">
               {navLinks.map((link) => {
                 const active = isActive(link.href);
-                const cls = `px-3 py-1.5 text-sm font-medium transition-all ${
+                const cls = `px-2.5 py-1.5 text-xs font-medium transition-all whitespace-nowrap ${
                   active ? 'text-white' : 'text-slate-400 hover:text-white'
                 }`;
                 if (link.external) {
@@ -100,21 +100,21 @@ export default function Navbar() {
             </div>
 
             {/* CTA buttons */}
-            <div className="hidden md:flex items-center gap-2 ml-auto">
+            <div className="hidden md:flex items-center gap-1.5 ml-auto flex-shrink-0">
               {user && (
                 <Link
                   to="/vpn-dashboard"
-                  className="flex items-center gap-1.5 px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-400 text-sm font-bold rounded-full transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-400 text-xs font-bold rounded-full transition-all"
                 >
                   <Shield size={14} /> My VPN
                 </Link>
               )}
               {user ? (
                 <>
-                  <span className="text-slate-400 text-sm">{user.full_name}</span>
+                  <span className="text-slate-400 text-xs hidden lg:block">{user.full_name}</span>
                   <button
                     onClick={() => base44.auth.logout('/')}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-slate-400 hover:text-white text-sm transition-colors"
+                    className="flex items-center gap-1.5 px-2 py-1.5 text-slate-400 hover:text-white text-xs transition-colors"
                   >
                     <LogOut size={14} /> Log Out
                   </button>
@@ -123,13 +123,13 @@ export default function Navbar() {
                 <>
                   <Link
                     to="/vpn-login"
-                    className="px-4 py-2 text-slate-300 hover:text-white text-sm font-medium transition-colors border border-white/10 hover:border-white/20 rounded-full"
+                    className="px-3 py-1.5 text-slate-300 hover:text-white text-xs font-medium transition-colors border border-white/10 hover:border-white/20 rounded-full"
                   >
                     Log In
                   </Link>
                   <Link
                     to="/vpn-signup"
-                    className="px-4 py-2 bg-white/10 hover:bg-white/15 text-white text-sm font-semibold rounded-full transition-all border border-white/10"
+                    className="px-3 py-1.5 bg-white/10 hover:bg-white/15 text-white text-xs font-semibold rounded-full transition-all border border-white/10"
                   >
                     Sign Up
                   </Link>
@@ -137,7 +137,7 @@ export default function Navbar() {
               )}
               <a
                 href="https://voxvpn.net/#pricing"
-                className="px-5 py-2 bg-cyan-400 hover:bg-cyan-300 text-black text-sm font-bold rounded-full transition-all shadow-lg shadow-cyan-500/20"
+                className="px-4 py-1.5 bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-bold rounded-full transition-all shadow-lg shadow-cyan-500/20 whitespace-nowrap"
               >
                 Get Protected
               </a>
