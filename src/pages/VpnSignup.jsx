@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Loader2, Eye, EyeOff, Mail } from 'lucide-react';
-
-const API_BASE = 'https://package-manager-setup.replit.app';
+import { base44 } from '@/api/base44Client';
 
 export default function VpnSignup() {
   const [email, setEmail] = useState('');
@@ -23,12 +22,8 @@ export default function VpnSignup() {
     }
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/auth/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
+      const res = await base44.functions.invoke('voxvpnProxy', { action: 'register', email, password });
+      const data = res.data;
       // If backend returned a token, log in directly
       if (data.token) {
         localStorage.setItem('auth_token', data.token);
@@ -36,13 +31,13 @@ export default function VpnSignup() {
         return;
       }
       // Backend may require email confirmation — show success message
-      if (res.ok || (data.message && data.message.toLowerCase().includes('email'))) {
-        setSuccess(data.message || 'Account created! Please check your email to confirm your account, then sign in.');
+      if (data.message) {
+        setSuccess(data.message);
         return;
       }
-      setError(data.message || 'Signup failed. Please try again.');
-    } catch {
-      setError('Could not connect to VoxVPN server. Please try again.');
+      setError(data.error || 'Signup failed. Please try again.');
+    } catch (err) {
+      setError(err?.response?.data?.error || 'Could not connect to VoxVPN server. Please try again.');
     } finally {
       setLoading(false);
     }
