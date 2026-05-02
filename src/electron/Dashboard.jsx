@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   Shield, LogOut, WifiOff, Loader2, AlertTriangle,
-  ChevronDown, RefreshCw, CheckCircle2, Lock, Globe
+  ChevronDown, RefreshCw, CheckCircle2, Lock, Globe, ExternalLink
 } from 'lucide-react';
 import { api } from './api';
 import { useAuth } from './AuthContext';
@@ -41,15 +41,18 @@ function normalizeServers(raw) {
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
+
   const [servers, setServers]           = useState(FALLBACK_SERVERS);
   const [selected, setSelected]         = useState(FALLBACK_SERVERS[0]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [status, setStatus]             = useState('idle'); // idle | connecting | connected | disconnecting
+  const [hasAccess, setHasAccess]       = useState(user?.hasAccess === true);
+  const [plan, setPlan]                 = useState(user?.plan || null);
   const [error, setError]               = useState('');
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    loadServers();
+    loadAll();
     const close = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setDropdownOpen(false);
     };
@@ -57,22 +60,35 @@ export default function Dashboard() {
     return () => document.removeEventListener('mousedown', close);
   }, []);
 
-  const loadServers = async () => {
+  const loadAll = async () => {
     try {
-      const data = await api.servers();
-      const list = normalizeServers(data?.servers || data);
-      setServers(list);
-      setSelected(list[0]);
+      // Check live access status from backend (source of truth)
+      const [accessRes, serversRes] = await Promise.allSettled([
+        api.checkAccess(user.token, user.email),
+        api.servers(user.token),
+      ]);
+
+      if (accessRes.status === 'fulfilled') {
+        setHasAccess(accessRes.value.access === true);
+        setPlan(accessRes.value.plan || null);
+      }
+
+      if (serversRes.status === 'fulfilled') {
+        const list = normalizeServers(serversRes.value?.servers || serversRes.value);
+        setServers(list);
+        setSelected(list[0]);
+      }
     } catch {
-      // Keep fallback list
+      // Keep cached values if network fails
     }
   };
 
   const handleConnect = async () => {
+    if (!hasAccess) return;
     setStatus('connecting');
     setError('');
     try {
-      await api.connect(user.email, selected.id);
+      await api.connect(user.token, user.email, selected.id);
       setStatus('connected');
     } catch (err) {
       setError(err.message);
@@ -84,7 +100,7 @@ export default function Dashboard() {
     setStatus('disconnecting');
     setError('');
     try {
-      await api.disconnect(user.email);
+      await api.disconnect(user.token, user.email);
       setStatus('idle');
     } catch (err) {
       setError(err.message);
@@ -145,11 +161,39 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Subscription warning — backend controls this */}
+          {!hasAccess && (
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 flex items-start gap-3">
+              <AlertTriangle size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-amber-300 font-bold text-sm">Subscription Required</p>
+                <p className="text-amber-200/50 text-xs mt-0.5 mb-2">You need an active plan to connect.</p>
+                <a
+                  href="https://voxvpn.net/#pricing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-cyan-400 text-xs font-bold hover:text-cyan-300 transition-colors"
+                >
+                  View Plans <ExternalLink size={10} />
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* Active plan badge */}
+          {hasAccess && plan && (
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+              <span className="text-emerald-400 text-xs font-semibold">{plan} Plan — Active</span>
+            </div>
+          )}
+
           {/* Server dropdown */}
           <div ref={dropdownRef} className="relative">
             <button
               onClick={() => setDropdownOpen(v => !v)}
-              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-white/8 bg-[#0d1120] hover:border-cyan-500/30 transition-all"
+              disabled={!hasAccess}
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-white/8 bg-[#0d1120] hover:border-cyan-500/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <span className="text-xl leading-none">{selected.flag}</span>
               <div className="flex-1 text-left">
@@ -182,14 +226,14 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Connect / Disconnect */}
+          {/* Connect / Disconnect — blocked if no access */}
           {!isConnected ? (
             <button
               onClick={handleConnect}
-              disabled={isConnecting}
+              disabled={!hasAccess || isConnecting}
               className="w-full py-4 rounded-xl font-black text-base transition-all flex items-center justify-center gap-2
                 bg-cyan-400 hover:bg-cyan-300 text-black shadow-lg shadow-cyan-500/20
-                disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
             >
               {isConnecting
                 ? <><Loader2 size={18} className="animate-spin" /> Connecting…</>
@@ -233,17 +277,16 @@ export default function Dashboard() {
           {/* Refresh */}
           <div className="flex justify-center">
             <button
-              onClick={loadServers}
+              onClick={loadAll}
               className="flex items-center gap-1.5 text-slate-600 hover:text-slate-400 text-xs transition-colors"
             >
-              <RefreshCw size={11} /> Refresh servers
+              <RefreshCw size={11} /> Refresh
             </button>
           </div>
 
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-white/5 py-3 text-center">
         <p className="text-slate-700 text-xs">VoxVPN · Military-grade privacy</p>
       </footer>

@@ -17,8 +17,20 @@ export default function Login({ onSwitchToSignup }) {
     setLoading(true);
     setError('');
     try {
+      // 1. Authenticate against real backend
       const data = await api.login(email, password);
-      login({ email, token: data.token, name: data.name || email });
+      const token = data.token;
+
+      // 2. Immediately check subscription/access status
+      const access = await api.checkAccess(token, email);
+
+      login({
+        email,
+        token,
+        name: data.name || data.full_name || email.split('@')[0],
+        plan: access.plan || data.plan || null,
+        hasAccess: access.access === true,
+      });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -30,7 +42,6 @@ export default function Login({ onSwitchToSignup }) {
     <div className="min-h-screen bg-[#080c18] flex items-center justify-center px-4" style={gridBg}>
       <div className="w-full max-w-sm">
 
-        {/* Logo */}
         <div className="flex flex-col items-center mb-8">
           <img
             src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
@@ -40,7 +51,6 @@ export default function Login({ onSwitchToSignup }) {
           <p className="text-slate-500 text-sm">Sign in to your VoxVPN account</p>
         </div>
 
-        {/* Card */}
         <div className="rounded-2xl border border-white/8 bg-[#0d1120] p-6 shadow-2xl shadow-black/50">
           <h2 className="text-white font-black text-xl mb-6">Welcome back</h2>
 
@@ -89,9 +99,14 @@ export default function Login({ onSwitchToSignup }) {
 
           <p className="text-center text-slate-500 text-sm mt-5">
             No account?{' '}
-            <button onClick={onSwitchToSignup} className="text-cyan-400 hover:text-cyan-300 font-bold transition-colors">
-              Create one
-            </button>
+            <a
+              href="https://voxvpn.net/#pricing"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cyan-400 hover:text-cyan-300 font-bold transition-colors"
+            >
+              Get a plan
+            </a>
           </p>
         </div>
 
