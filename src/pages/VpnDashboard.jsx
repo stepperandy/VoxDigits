@@ -228,9 +228,9 @@ export default function VpnDashboard() {
               <div>
                 <p className="text-amber-300 font-bold text-sm">Subscription Required</p>
                 <p className="text-amber-200/50 text-xs mt-0.5 mb-2">You need an active plan to connect.</p>
-                <Link to="/#pricing" className="text-cyan-400 text-xs font-bold hover:text-cyan-300 transition-colors">
+                <a href="/#pricing" onClick={() => { window.location.href = '/#pricing'; }} className="text-cyan-400 text-xs font-bold hover:text-cyan-300 transition-colors">
                   View Plans →
-                </Link>
+                </a>
               </div>
             </div>
           )}
