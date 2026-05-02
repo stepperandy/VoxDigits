@@ -1,26 +1,71 @@
-import { useState, useEffect } from 'react';
-import { Shield, LogOut, MapPin, Wifi, WifiOff, Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import {
+  Shield, LogOut, Wifi, WifiOff, Loader2, AlertTriangle,
+  ChevronDown, RefreshCw, CheckCircle2, Lock, Globe
+} from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
+
+// Fallback static servers if backend is unreachable
+const FALLBACK_SERVERS = [
+  { id: 'us-ny',   city: 'New York',      country: 'United States',  flag: '🇺🇸' },
+  { id: 'us-la',   city: 'Los Angeles',   country: 'United States',  flag: '🇺🇸' },
+  { id: 'us-chi',  city: 'Chicago',       country: 'United States',  flag: '🇺🇸' },
+  { id: 'gb-lon',  city: 'London',        country: 'United Kingdom', flag: '🇬🇧' },
+  { id: 'de-fra',  city: 'Frankfurt',     country: 'Germany',        flag: '🇩🇪' },
+  { id: 'fr-par',  city: 'Paris',         country: 'France',         flag: '🇫🇷' },
+  { id: 'nl-ams',  city: 'Amsterdam',     country: 'Netherlands',    flag: '🇳🇱' },
+  { id: 'se-sto',  city: 'Stockholm',     country: 'Sweden',         flag: '🇸🇪' },
+  { id: 'ch-zur',  city: 'Zurich',        country: 'Switzerland',    flag: '🇨🇭' },
+  { id: 'no-osl',  city: 'Oslo',          country: 'Norway',         flag: '🇳🇴' },
+  { id: 'ca-tor',  city: 'Toronto',       country: 'Canada',         flag: '🇨🇦' },
+  { id: 'au-syd',  city: 'Sydney',        country: 'Australia',      flag: '🇦🇺' },
+  { id: 'sg-sgp',  city: 'Singapore',     country: 'Singapore',      flag: '🇸🇬' },
+  { id: 'jp-tyo',  city: 'Tokyo',         country: 'Japan',          flag: '🇯🇵' },
+  { id: 'hk-hkg',  city: 'Hong Kong',     country: 'Hong Kong',      flag: '🇭🇰' },
+  { id: 'in-mum',  city: 'Mumbai',        country: 'India',          flag: '🇮🇳' },
+  { id: 'br-sao',  city: 'São Paulo',     country: 'Brazil',         flag: '🇧🇷' },
+  { id: 'mx-mex',  city: 'Mexico City',   country: 'Mexico',         flag: '🇲🇽' },
+  { id: 'za-jnb',  city: 'Johannesburg',  country: 'South Africa',   flag: '🇿🇦' },
+  { id: 'ae-dxb',  city: 'Dubai',         country: 'UAE',            flag: '🇦🇪' },
+];
+
+function normalizeServers(raw) {
+  if (!raw || !Array.isArray(raw)) return FALLBACK_SERVERS;
+  return raw.map((s, i) => ({
+    id: s.id || s.server_id || `srv-${i}`,
+    city: s.city || s.name || s.location || `Server ${i + 1}`,
+    country: s.country || s.region || '',
+    flag: s.flag || '🌐',
+  }));
+}
 
 export default function VpnDashboard() {
   const [user, setUser] = useState(null);
   const [subscription, setSubscription] = useState(null);
-  const [servers, setServers] = useState([]);
-  const [connected, setConnected] = useState(null); // server id currently connected
-  const [loadingAction, setLoadingAction] = useState(null); // server id being acted on
+  const [servers, setServers] = useState(FALLBACK_SERVERS);
+  const [selectedServer, setSelectedServer] = useState(FALLBACK_SERVERS[0]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [status, setStatus] = useState('idle'); // idle | connecting | connected | disconnecting
   const [loadingInit, setLoadingInit] = useState(true);
   const [error, setError] = useState('');
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     init();
+    const handleClick = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
   const init = async () => {
     setLoadingInit(true);
     setError('');
     try {
-      // 1. Get Base44 user
       const me = await base44.auth.me();
       if (!me) {
         base44.auth.redirectToLogin('/vpn-dashboard');
@@ -28,215 +73,293 @@ export default function VpnDashboard() {
       }
       setUser(me);
 
-      // 2. Check subscription in Base44 DB
-      const subs = await base44.entities.VPNSubscription.filter({ user_email: me.email });
-      const active = subs.find(s => s.status === 'active') || null;
-      setSubscription(active);
+      // Parallel: subscription + servers
+      const [subs, serversRes] = await Promise.allSettled([
+        base44.entities.VPNSubscription.filter({ user_email: me.email }),
+        base44.functions.invoke('voxvpnProxy', { action: 'servers' }),
+      ]);
 
-      // 3. Load servers from VoxVPN backend
-      const res = await base44.functions.invoke('voxvpnProxy', { action: 'servers' });
-      const data = res.data;
-      if (Array.isArray(data)) {
-        setServers(data);
-      } else if (data?.servers) {
-        setServers(data.servers);
+      if (subs.status === 'fulfilled') {
+        const active = subs.value.find(s => s.status === 'active') || null;
+        setSubscription(active);
       }
-    } catch (err) {
-      setError('Failed to load dashboard. Please refresh.');
+
+      if (serversRes.status === 'fulfilled') {
+        const normalized = normalizeServers(
+          serversRes.value?.data?.servers || serversRes.value?.data
+        );
+        if (normalized.length > 0) {
+          setServers(normalized);
+          setSelectedServer(normalized[0]);
+        }
+      }
+    } catch {
+      setError('Could not load dashboard.');
     } finally {
       setLoadingInit(false);
     }
   };
 
-  const handleConnect = async (server) => {
-    if (!subscription) return;
-    setLoadingAction(server.id);
+  const handleConnect = async () => {
+    if (!subscription || status === 'connected') return;
+    setStatus('connecting');
     setError('');
     try {
       const res = await base44.functions.invoke('voxvpnProxy', {
         action: 'connect',
         user_email: user.email,
-        server_id: server.id,
+        server_id: selectedServer.id,
       });
       if (res.data?.error) {
         setError(res.data.error);
+        setStatus('idle');
       } else {
-        setConnected(server.id);
+        setStatus('connected');
       }
-    } catch (err) {
-      setError('Connection failed. Please try again.');
-    } finally {
-      setLoadingAction(null);
+    } catch {
+      setError('Connection failed. Try again.');
+      setStatus('idle');
     }
   };
 
   const handleDisconnect = async () => {
-    setLoadingAction('disconnect');
+    setStatus('disconnecting');
     setError('');
     try {
       await base44.functions.invoke('voxvpnProxy', {
         action: 'disconnect',
         user_email: user.email,
       });
-      setConnected(null);
-    } catch (err) {
-      setError('Disconnect failed. Please try again.');
-    } finally {
-      setLoadingAction(null);
+      setStatus('idle');
+    } catch {
+      setError('Disconnect failed.');
+      setStatus('idle');
     }
   };
 
-  // Loading state
   if (loadingInit) {
     return (
       <div className="min-h-screen bg-[#080c18] flex items-center justify-center">
-        <Loader2 size={32} className="text-cyan-400 animate-spin" />
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+            <Shield size={22} className="text-cyan-400" />
+          </div>
+          <Loader2 size={20} className="text-cyan-400 animate-spin" />
+        </div>
       </div>
     );
   }
 
+  const isConnected = status === 'connected';
+  const isConnecting = status === 'connecting';
+  const isDisconnecting = status === 'disconnecting';
   const hasSubscription = !!subscription;
 
   return (
     <div className="min-h-screen bg-[#080c18] flex flex-col">
+
+      {/* Subtle grid background */}
+      <div className="fixed inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(6,182,212,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,0.03) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+        }}
+      />
+
       {/* Header */}
-      <header className="border-b border-white/5 px-6 py-4 flex items-center justify-between">
+      <header className="relative z-10 border-b border-white/5 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-            <Shield size={18} className="text-cyan-400" />
-          </div>
-          <span className="text-white font-black text-lg">VoxVPN</span>
+          <img
+            src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
+            alt="VoxVPN"
+            className="h-12 w-auto"
+          />
         </div>
         <div className="flex items-center gap-4">
-          {user && <span className="text-slate-500 text-sm hidden sm:block">{user.email}</span>}
+          {user && (
+            <span className="text-slate-500 text-xs hidden sm:block truncate max-w-[160px]">{user.email}</span>
+          )}
           <button
             onClick={() => base44.auth.logout('/')}
-            className="flex items-center gap-2 text-slate-500 hover:text-white text-sm transition-colors"
+            className="flex items-center gap-1.5 text-slate-500 hover:text-white text-sm transition-colors"
           >
-            <LogOut size={15} />
-            Log Out
+            <LogOut size={14} />
+            <span className="hidden sm:inline">Log Out</span>
           </button>
         </div>
       </header>
 
       {/* Main */}
-      <main className="flex-1 flex flex-col items-center px-4 py-12">
-        <div className="w-full max-w-md space-y-6">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8">
+        <div className="w-full max-w-sm space-y-4">
 
-          {/* Subscription status */}
+          {/* Logo / status ring */}
+          <div className="flex flex-col items-center mb-2">
+            <div className={`relative w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500
+              ${isConnected
+                ? 'bg-cyan-500/10 shadow-[0_0_40px_rgba(6,182,212,0.25)] border-2 border-cyan-500/50'
+                : 'bg-white/3 border-2 border-white/10'
+              }`}
+            >
+              {/* Animated ring when connecting */}
+              {(isConnecting || isDisconnecting) && (
+                <div className="absolute inset-0 rounded-full border-2 border-cyan-400/40 animate-ping" />
+              )}
+              <Shield size={48} className={`transition-colors duration-300 ${isConnected ? 'text-cyan-400' : 'text-slate-600'}`} />
+            </div>
+
+            <div className="mt-3 text-center">
+              {isConnecting && <p className="text-cyan-400 text-sm font-semibold animate-pulse">Connecting…</p>}
+              {isDisconnecting && <p className="text-amber-400 text-sm font-semibold animate-pulse">Disconnecting…</p>}
+              {isConnected && (
+                <div className="flex items-center gap-1.5 justify-center">
+                  <CheckCircle2 size={14} className="text-emerald-400" />
+                  <p className="text-emerald-400 text-sm font-bold">Protected</p>
+                </div>
+              )}
+              {status === 'idle' && <p className="text-slate-500 text-sm">Not Connected</p>}
+            </div>
+          </div>
+
+          {/* Subscription warning */}
           {!hasSubscription && (
-            <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5 flex items-start gap-3">
-              <AlertTriangle size={20} className="text-amber-400 flex-shrink-0 mt-0.5" />
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 flex items-start gap-3">
+              <AlertTriangle size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-amber-300 font-bold text-sm mb-1">Subscription Required</p>
-                <p className="text-amber-200/60 text-xs mb-3">You need an active subscription to connect to VPN servers.</p>
-                <Link
-                  to="/#pricing"
-                  className="inline-block px-4 py-2 bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-bold rounded-lg transition-all"
-                >
+                <p className="text-amber-300 font-bold text-sm">Subscription Required</p>
+                <p className="text-amber-200/50 text-xs mt-0.5 mb-2">You need an active plan to connect.</p>
+                <Link to="/#pricing" className="text-cyan-400 text-xs font-bold hover:text-cyan-300 transition-colors">
                   View Plans →
                 </Link>
               </div>
             </div>
           )}
 
+          {/* Active plan badge */}
           {hasSubscription && (
-            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 px-5 py-3 flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <div>
-                <span className="text-emerald-400 font-bold text-sm">{subscription.plan} Plan — Active</span>
-                {subscription.renewal_date && (
-                  <p className="text-emerald-300/50 text-xs">Renews {new Date(subscription.renewal_date).toLocaleDateString()}</p>
-                )}
-              </div>
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+              <span className="text-emerald-400 text-xs font-semibold">{subscription.plan} Plan — Active</span>
+              {subscription.renewal_date && (
+                <span className="text-emerald-300/40 text-xs ml-auto">
+                  Renews {new Date(subscription.renewal_date).toLocaleDateString()}
+                </span>
+              )}
             </div>
           )}
 
-          {/* Error */}
-          {error && (
-            <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 px-4 py-3 text-rose-400 text-sm flex items-center gap-2">
-              <AlertTriangle size={15} />
-              {error}
-            </div>
-          )}
-
-          {/* Connected status */}
-          {connected && (
-            <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-5 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Wifi size={20} className="text-cyan-400" />
-                <div>
-                  <p className="text-white font-bold text-sm">Connected</p>
-                  <p className="text-slate-400 text-xs">
-                    {servers.find(s => s.id === connected)?.city || 'VPN Server'}
-                  </p>
-                </div>
+          {/* Server dropdown */}
+          <div ref={dropdownRef} className="relative">
+            <button
+              onClick={() => setDropdownOpen(v => !v)}
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-white/10 bg-[#0d1120] hover:border-cyan-500/30 transition-all"
+            >
+              <span className="text-xl">{selectedServer.flag}</span>
+              <div className="flex-1 text-left">
+                <p className="text-white font-bold text-sm">{selectedServer.city}</p>
+                <p className="text-slate-500 text-xs flex items-center gap-1">
+                  <Globe size={9} /> {selectedServer.country}
+                </p>
               </div>
-              <button
-                onClick={handleDisconnect}
-                disabled={loadingAction === 'disconnect'}
-                className="px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 text-xs font-bold rounded-lg transition-all disabled:opacity-50 flex items-center gap-1.5"
-              >
-                {loadingAction === 'disconnect' ? <Loader2 size={13} className="animate-spin" /> : <WifiOff size={13} />}
-                Disconnect
-              </button>
-            </div>
-          )}
+              <ChevronDown
+                size={16}
+                className={`text-slate-500 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
 
-          {/* Server list */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h1 className="text-white font-black text-xl">Select a Server</h1>
-              <button onClick={init} className="text-slate-500 hover:text-white transition-colors">
-                <RefreshCw size={15} />
-              </button>
-            </div>
-
-            {servers.length === 0 ? (
-              <div className="text-center py-10 text-slate-500 text-sm">
-                No servers available. Check your connection.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-3">
-                {servers.map((server) => {
-                  const isConnected = connected === server.id;
-                  const isLoading = loadingAction === server.id;
-                  return (
-                    <button
-                      key={server.id}
-                      onClick={() => isConnected ? handleDisconnect() : handleConnect(server)}
-                      disabled={!hasSubscription || isLoading || (connected && !isConnected)}
-                      className={`flex items-center gap-4 w-full px-5 py-4 rounded-2xl border transition-all group
-                        ${isConnected
-                          ? 'border-cyan-500/40 bg-cyan-500/5'
-                          : 'border-white/5 bg-[#0d1120] hover:border-cyan-500/30 hover:bg-[#0d1a20]'}
-                        disabled:opacity-40 disabled:cursor-not-allowed`}
-                    >
-                      <span className="text-2xl">{server.flag || '🌐'}</span>
-                      <div className="text-left flex-1">
-                        <p className="text-white font-bold">{server.city || server.name}</p>
-                        <p className="text-slate-500 text-xs flex items-center gap-1">
-                          <MapPin size={10} /> {server.country || server.region}
-                        </p>
-                      </div>
-                      <div className={`flex items-center gap-1.5 text-xs font-semibold transition-colors
-                        ${isConnected ? 'text-cyan-400' : 'text-slate-500 group-hover:text-cyan-400'}`}>
-                        {isLoading
-                          ? <Loader2 size={14} className="animate-spin text-cyan-400" />
-                          : isConnected
-                            ? <><Wifi size={14} /> Connected</>
-                            : <><Wifi size={14} /> Connect</>
-                        }
-                      </div>
-                    </button>
-                  );
-                })}
+            {dropdownOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-[#0d1120] border border-white/10 rounded-xl overflow-hidden z-50 shadow-2xl max-h-64 overflow-y-auto">
+                {servers.map((server) => (
+                  <button
+                    key={server.id}
+                    onClick={() => { setSelectedServer(server); setDropdownOpen(false); if (isConnected) setStatus('idle'); }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/5 transition-colors text-left
+                      ${selectedServer.id === server.id ? 'bg-cyan-500/10' : ''}`}
+                  >
+                    <span className="text-lg">{server.flag}</span>
+                    <div className="flex-1">
+                      <p className={`text-sm font-semibold ${selectedServer.id === server.id ? 'text-cyan-400' : 'text-white'}`}>
+                        {server.city}
+                      </p>
+                      <p className="text-slate-500 text-xs">{server.country}</p>
+                    </div>
+                    {selectedServer.id === server.id && (
+                      <CheckCircle2 size={14} className="text-cyan-400 flex-shrink-0" />
+                    )}
+                  </button>
+                ))}
               </div>
             )}
           </div>
 
+          {/* Connect / Disconnect button */}
+          {!isConnected ? (
+            <button
+              onClick={handleConnect}
+              disabled={!hasSubscription || isConnecting}
+              className="w-full py-4 rounded-xl font-black text-base transition-all flex items-center justify-center gap-2
+                bg-cyan-400 hover:bg-cyan-300 text-black shadow-lg shadow-cyan-500/20
+                disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+            >
+              {isConnecting
+                ? <><Loader2 size={18} className="animate-spin" /> Connecting…</>
+                : <><Lock size={18} /> Connect</>
+              }
+            </button>
+          ) : (
+            <button
+              onClick={handleDisconnect}
+              disabled={isDisconnecting}
+              className="w-full py-4 rounded-xl font-black text-base transition-all flex items-center justify-center gap-2
+                bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400
+                disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {isDisconnecting
+                ? <><Loader2 size={18} className="animate-spin" /> Disconnecting…</>
+                : <><WifiOff size={18} /> Disconnect</>
+              }
+            </button>
+          )}
+
+          {/* Error */}
+          {error && (
+            <div className="flex items-center gap-2 px-4 py-3 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-400 text-sm">
+              <AlertTriangle size={14} className="flex-shrink-0" />
+              {error}
+            </div>
+          )}
+
+          {/* Connected info */}
+          {isConnected && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="px-4 py-3 rounded-xl border border-white/5 bg-[#0d1120] text-center">
+                <p className="text-slate-500 text-xs mb-1">Server</p>
+                <p className="text-white font-bold text-sm">{selectedServer.city}</p>
+              </div>
+              <div className="px-4 py-3 rounded-xl border border-white/5 bg-[#0d1120] text-center">
+                <p className="text-slate-500 text-xs mb-1">Protocol</p>
+                <p className="text-white font-bold text-sm">WireGuard</p>
+              </div>
+            </div>
+          )}
+
+          {/* Refresh servers */}
+          <div className="flex justify-center pt-1">
+            <button
+              onClick={init}
+              className="flex items-center gap-1.5 text-slate-600 hover:text-slate-400 text-xs transition-colors"
+            >
+              <RefreshCw size={11} /> Refresh
+            </button>
+          </div>
+
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="relative z-10 border-t border-white/5 py-3 text-center">
+        <p className="text-slate-700 text-xs">VoxVPN — Military-grade privacy</p>
+      </footer>
     </div>
   );
 }
