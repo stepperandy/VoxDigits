@@ -53,11 +53,15 @@ Name: "{commondesktop}\{#MyAppName}";             Filename: "{app}\{#MyAppExeNam
 Name: "{userstartup}\{#MyAppName}";               Filename: "{app}\{#MyAppExeName}"; Tasks: startupicon
 
 [Run]
-; Install OpenVPN + TAP driver silently
+; Install OpenVPN CLI + TAP driver silently — GUI is explicitly disabled
+; so it cannot intercept or take over the connection flow
 Filename: "{tmp}\openvpn-installer.exe"; \
-  Parameters: "/S /SELECT_OPENVPN=1 /SELECT_OPENVPNGUI=0 /SELECT_TAP=1 /SELECT_OPENSSL_UTILITIES=0 /SELECT_EASY_RSA=0 /SELECT_PATH=1"; \
-  StatusMsg: "Installing OpenVPN TAP driver..."; \
+  Parameters: "/S /SELECT_OPENVPN=1 /SELECT_OPENVPNGUI=0 /SELECT_TAP=1 /SELECT_SERVICE=1 /SELECT_OPENSSL_UTILITIES=0 /SELECT_EASY_RSA=0 /SELECT_PATH=1"; \
+  StatusMsg: "Installing OpenVPN (no GUI)..."; \
   Flags: waitprocfinished
+
+; Kill OpenVPN GUI if it was previously installed and is running
+Filename: "taskkill"; Parameters: "/F /IM openvpn-gui.exe"; Flags: runhidden waitprocfinished
 
 ; Copy .ovpn configs to OpenVPN config directory
 Filename: "xcopy"; \
@@ -70,8 +74,9 @@ Filename: "{app}\{#MyAppExeName}"; \
   Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
-Filename: "taskkill"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runhidden waitprocfinished
-Filename: "taskkill"; Parameters: "/F /IM openvpn.exe";     Flags: runhidden waitprocfinished
+Filename: "taskkill"; Parameters: "/F /IM {#MyAppExeName}";  Flags: runhidden waitprocfinished
+Filename: "taskkill"; Parameters: "/F /IM openvpn.exe";      Flags: runhidden waitprocfinished
+Filename: "taskkill"; Parameters: "/F /IM openvpn-gui.exe";  Flags: runhidden waitprocfinished
 
 [Code]
 function OpenVPNInstalled(): Boolean;

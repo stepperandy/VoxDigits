@@ -55,27 +55,34 @@ ipcMain.on('window-minimize', () => mainWindow?.minimize());
 ipcMain.on('window-close',    () => { disconnectVpn(); mainWindow?.close(); });
 
 // ─── VPN: Connect ─────────────────────────────────────────────────────────────
-ipcMain.handle('vpn-connect', async (_event, { ovpnContent, serverName }) => {
+ipcMain.handle('vpn-connect', async (_event, { ovpnContent }) => {
   try {
-    // Write .ovpn to a temp file
-    const tmpFile = path.join(os.tmpdir(), `voxvpn-${Date.now()}.ovpn`);
+    // Kill any existing VPN session first
+    disconnectVpn();
+
+    // Write config to a temp file
+    const tmpFile = path.join(os.tmpdir(), 'voxvpn-active.ovpn');
     fs.writeFileSync(tmpFile, ovpnContent, 'utf8');
 
-    // Find openvpn.exe — packaged app bundles it, dev falls back to PATH
-    const bundledOpenvpn = path.join(
-      process.resourcesPath || '',
-      'openvpn',
-      'openvpn.exe'
-    );
-    const openvpnBin = fs.existsSync(bundledOpenvpn) ? bundledOpenvpn : 'openvpn';
+    // Use the CLI openvpn.exe directly — NOT the GUI (openvpn-gui.exe)
+    // Standard install path for OpenVPN Community Edition
+    const candidates = [
+      'C:\\Program Files\\OpenVPN\\bin\\openvpn.exe',
+      'C:\\Program Files (x86)\\OpenVPN\\bin\\openvpn.exe',
+      path.join(process.resourcesPath || '', 'openvpn', 'openvpn.exe'),
+    ];
+    const openvpnBin = candidates.find(p => fs.existsSync(p)) || 'openvpn';
 
-    openvpnProcess = spawn(openvpnBin, ['--config', tmpFile], {
-      windowsHide: true,
+    openvpnProcess = spawn(openvpnBin, [
+      '--config', tmpFile,
+      '--log',    path.join(os.tmpdir(), 'voxvpn.log'),
+    ], {
+      windowsHide: true,   // ← no window, no GUI takeover
+      detached: false,
     });
 
     openvpnProcess.stdout.on('data', (data) => {
       const line = data.toString();
-      console.log('[OpenVPN]', line);
       if (mainWindow) mainWindow.webContents.send('vpn-log', line);
       if (line.includes('Initialization Sequence Completed')) {
         mainWindow?.webContents.send('vpn-status', 'connected');
@@ -83,10 +90,15 @@ ipcMain.handle('vpn-connect', async (_event, { ovpnContent, serverName }) => {
     });
 
     openvpnProcess.stderr.on('data', (data) => {
-      console.error('[OpenVPN stderr]', data.toString());
+      const line = data.toString();
+      if (mainWindow) mainWindow.webContents.send('vpn-log', line);
+      // Some builds write the "Completed" line to stderr
+      if (line.includes('Initialization Sequence Completed')) {
+        mainWindow?.webContents.send('vpn-status', 'connected');
+      }
     });
 
-    openvpnProcess.on('exit', (code) => {
+    openvpnProcess.on('exit', () => {
       openvpnProcess = null;
       fs.unlink(tmpFile, () => {});
       mainWindow?.webContents.send('vpn-status', 'idle');
