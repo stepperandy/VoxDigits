@@ -1,5 +1,6 @@
-; VoxVPN Windows Installer Script (OpenVPN + Electron)
-; Requires Inno Setup 6+ — https://jrsoftware.org/isinfo.php
+; VoxVPN Windows Installer
+; Installs OpenVPN CLI only (NO GUI) + Electron app
+; Requires Inno Setup 6 — https://jrsoftware.org/isinfo.php
 
 #define MyAppName      "VoxVPN"
 #define MyAppVersion   "1.0.0"
@@ -13,8 +14,6 @@ AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
-AppSupportURL={#MyAppURL}/contact
-AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
@@ -33,73 +32,63 @@ UninstallDisplayName={#MyAppName}
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "startupicon"; Description: "Launch VoxVPN on Windows startup"; GroupDescription: "Startup Options:"
+Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional Icons:"; Flags: unchecked
 
 [Files]
 ; Electron app (built by electron-builder --dir)
 Source: "dist\win-unpacked\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
-; OpenVPN installer — download from https://openvpn.net/community-downloads/
+; OpenVPN Community installer (download from openvpn.net/community-downloads)
 Source: "assets\openvpn-installer.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 
-; Server .ovpn configs
+; Server .ovpn config files
 Source: "assets\configs\*.ovpn"; DestDir: "{app}\configs"; Flags: ignoreversion skipifsourcedoesntexist
 
 [Icons]
-Name: "{group}\{#MyAppName}";                    Filename: "{app}\{#MyAppExeName}"
+Name: "{group}\{#MyAppName}";                       Filename: "{app}\{#MyAppExeName}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{commondesktop}\{#MyAppName}";             Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
-Name: "{userstartup}\{#MyAppName}";               Filename: "{app}\{#MyAppExeName}"; Tasks: startupicon
+Name: "{commondesktop}\{#MyAppName}";                Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-; Install OpenVPN CLI + TAP driver silently — GUI is explicitly disabled
-; so it cannot intercept or take over the connection flow
-Filename: "{tmp}\openvpn-installer.exe"; \
-  Parameters: "/S /SELECT_OPENVPN=1 /SELECT_OPENVPNGUI=0 /SELECT_TAP=1 /SELECT_SERVICE=1 /SELECT_OPENSSL_UTILITIES=0 /SELECT_EASY_RSA=0 /SELECT_PATH=1"; \
-  StatusMsg: "Installing OpenVPN (no GUI)..."; \
-  Flags: waitprocfinished
-
-; Kill OpenVPN GUI if it was previously installed and is running
+; ── Step 1: Kill OpenVPN GUI if it's already running ──────────────────────────
 Filename: "taskkill"; Parameters: "/F /IM openvpn-gui.exe"; Flags: runhidden waitprocfinished
 
-; Copy .ovpn configs to OpenVPN config directory
+; ── Step 2: Install OpenVPN CLI + TAP driver silently (NO GUI component) ──────
+; /SELECT_OPENVPN=1   → install openvpn.exe CLI
+; /SELECT_OPENVPNGUI=0 → DO NOT install openvpn-gui.exe
+; /SELECT_TAP=1       → install TAP/TUN driver (required for VPN tunnel)
+; /SELECT_SERVICE=1   → install OpenVPN service (optional but useful)
+; /SELECT_PATH=1      → add openvpn.exe to system PATH
+Filename: "{tmp}\openvpn-installer.exe"; \
+  Parameters: "/S /SELECT_OPENVPN=1 /SELECT_OPENVPNGUI=0 /SELECT_TAP=1 /SELECT_SERVICE=0 /SELECT_OPENSSL_UTILITIES=0 /SELECT_EASY_RSA=0 /SELECT_PATH=1"; \
+  StatusMsg: "Installing OpenVPN driver (no GUI)..."; \
+  Flags: waitprocfinished
+
+; ── Step 3: Copy .ovpn configs to OpenVPN config folder ───────────────────────
 Filename: "xcopy"; \
   Parameters: """{app}\configs\*"" ""{commonappdata}\OpenVPN\config\"" /Y /E /I"; \
   Flags: runhidden waitprocfinished
 
-; Launch VoxVPN after install
+; ── Step 4: Launch VoxVPN after install ───────────────────────────────────────
 Filename: "{app}\{#MyAppExeName}"; \
-  Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; \
+  Description: "Launch VoxVPN"; \
   Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
-Filename: "taskkill"; Parameters: "/F /IM {#MyAppExeName}";  Flags: runhidden waitprocfinished
-Filename: "taskkill"; Parameters: "/F /IM openvpn.exe";      Flags: runhidden waitprocfinished
-Filename: "taskkill"; Parameters: "/F /IM openvpn-gui.exe";  Flags: runhidden waitprocfinished
+Filename: "taskkill"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runhidden waitprocfinished
+Filename: "taskkill"; Parameters: "/F /IM openvpn.exe";     Flags: runhidden waitprocfinished
+Filename: "taskkill"; Parameters: "/F /IM openvpn-gui.exe"; Flags: runhidden waitprocfinished
 
 [Code]
-function OpenVPNInstalled(): Boolean;
-begin
-  Result := RegKeyExists(HKLM, 'SOFTWARE\OpenVPN') or
-            RegKeyExists(HKLM, 'SOFTWARE\WOW6432Node\OpenVPN');
-end;
-
-procedure KillRunningApp();
+procedure KillExisting();
 var RC: Integer;
 begin
   Exec('taskkill', '/F /IM ' + '{#MyAppExeName}', '', SW_HIDE, ewWaitUntilTerminated, RC);
-  Exec('taskkill', '/F /IM openvpn.exe',           '', SW_HIDE, ewWaitUntilTerminated, RC);
+  Exec('taskkill', '/F /IM openvpn-gui.exe',       '', SW_HIDE, ewWaitUntilTerminated, RC);
 end;
 
 function InitializeSetup(): Boolean;
 begin
-  KillRunningApp();
+  KillExisting();
   Result := True;
-end;
-
-procedure CurStepChanged(CurStep: TSetupStep);
-begin
-  if (CurStep = ssInstall) and OpenVPNInstalled() then
-    Log('OpenVPN already installed — skipping OpenVPN installer.');
 end;

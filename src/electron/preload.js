@@ -3,18 +3,19 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronVPN', {
   // Window controls
-  minimize: () => ipcRenderer.send('window-minimize'),
-  close:    () => ipcRenderer.send('window-close'),
+  minimize: () => ipcRenderer.send('win-minimize'),
+  close:    () => ipcRenderer.send('win-close'),
 
   // VPN actions
-  connect:       (opts) => ipcRenderer.invoke('vpn-connect', opts),
-  disconnect:    ()     => ipcRenderer.invoke('vpn-disconnect'),
-  isConnected:   ()     => ipcRenderer.invoke('vpn-is-connected'),
+  connect:    (ovpnContent) => ipcRenderer.invoke('vpn-connect', { ovpnContent }),
+  disconnect: ()            => ipcRenderer.invoke('vpn-disconnect'),
+  getStatus:  ()            => ipcRenderer.invoke('vpn-status'),
+  getLog:     ()            => ipcRenderer.invoke('vpn-get-log'),
 
-  // Listen for status updates pushed from main process
+  // Real-time events from main process
   onStatus: (cb) => ipcRenderer.on('vpn-status', (_e, s) => cb(s)),
   onLog:    (cb) => ipcRenderer.on('vpn-log',    (_e, l) => cb(l)),
 
-  // Cleanup listeners
-  removeAllListeners: (ch) => ipcRenderer.removeAllListeners(ch),
+  // Cleanup
+  off: (channel) => ipcRenderer.removeAllListeners(channel),
 });
