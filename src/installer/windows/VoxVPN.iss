@@ -1,11 +1,11 @@
-; VoxVPN Windows Installer Script (OpenVPN)
-; Requires Inno Setup 6+ from https://jrsoftware.org/isinfo.php
+; VoxVPN Windows Installer Script (OpenVPN + Electron)
+; Requires Inno Setup 6+ — https://jrsoftware.org/isinfo.php
 
-#define MyAppName "VoxVPN"
-#define MyAppVersion "1.0.0"
+#define MyAppName      "VoxVPN"
+#define MyAppVersion   "1.0.0"
 #define MyAppPublisher "VoxVPN"
-#define MyAppURL "https://voxvpn.net"
-#define MyAppExeName "VoxVPN.exe"
+#define MyAppURL       "https://voxvpn.net"
+#define MyAppExeName   "VoxVPN.exe"
 
 [Setup]
 AppId={{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
@@ -18,7 +18,6 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-; Admin required so OpenVPN TAP driver can install
 PrivilegesRequired=admin
 OutputDir=output
 OutputBaseFilename=VoxVPN-Setup-{#MyAppVersion}
@@ -38,52 +37,54 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "startupicon"; Description: "Launch VoxVPN on Windows startup"; GroupDescription: "Startup Options:"
 
 [Files]
-; Main Electron app
+; Electron app (built by electron-builder --dir)
 Source: "dist\win-unpacked\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
-; OpenVPN installer (bundled) — download from https://openvpn.net/community-downloads/
+; OpenVPN installer — download from https://openvpn.net/community-downloads/
 Source: "assets\openvpn-installer.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 
-; Default .ovpn config files — place your server configs here
-Source: "assets\configs\*.ovpn"; DestDir: "{app}\configs"; Flags: ignoreversion
+; Server .ovpn configs
+Source: "assets\configs\*.ovpn"; DestDir: "{app}\configs"; Flags: ignoreversion skipifsourcedoesntexist
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+Name: "{group}\{#MyAppName}";                    Filename: "{app}\{#MyAppExeName}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
-Name: "{userstartup}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: startupicon
+Name: "{commondesktop}\{#MyAppName}";             Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{userstartup}\{#MyAppName}";               Filename: "{app}\{#MyAppExeName}"; Tasks: startupicon
 
 [Run]
-; Install OpenVPN silently first (includes TAP driver)
-Filename: "{tmp}\openvpn-installer.exe"; Parameters: "/S /SELECT_OPENVPN=1 /SELECT_OPENVPNGUI=0 /SELECT_TAP=1 /SELECT_OPENSSL_UTILITIES=0 /SELECT_EASY_RSA=0 /SELECT_PATH=1"; StatusMsg: "Installing OpenVPN TAP driver..."; Flags: waitprocfinished
+; Install OpenVPN + TAP driver silently
+Filename: "{tmp}\openvpn-installer.exe"; \
+  Parameters: "/S /SELECT_OPENVPN=1 /SELECT_OPENVPNGUI=0 /SELECT_TAP=1 /SELECT_OPENSSL_UTILITIES=0 /SELECT_EASY_RSA=0 /SELECT_PATH=1"; \
+  StatusMsg: "Installing OpenVPN TAP driver..."; \
+  Flags: waitprocfinished
 
-; Copy .ovpn configs to OpenVPN config folder
-Filename: "xcopy"; Parameters: """{app}\configs\*"" ""{commonappdata}\OpenVPN\config\"" /Y /E"; Flags: runhidden waitprocfinished
+; Copy .ovpn configs to OpenVPN config directory
+Filename: "xcopy"; \
+  Parameters: """{app}\configs\*"" ""{commonappdata}\OpenVPN\config\"" /Y /E /I"; \
+  Flags: runhidden waitprocfinished
 
 ; Launch VoxVPN after install
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; \
+  Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; \
+  Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
-; Kill VoxVPN before uninstall
 Filename: "taskkill"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runhidden waitprocfinished
-; Kill any running OpenVPN processes
-Filename: "taskkill"; Parameters: "/F /IM openvpn.exe"; Flags: runhidden waitprocfinished
+Filename: "taskkill"; Parameters: "/F /IM openvpn.exe";     Flags: runhidden waitprocfinished
 
 [Code]
-// Check if OpenVPN is already installed
 function OpenVPNInstalled(): Boolean;
 begin
   Result := RegKeyExists(HKLM, 'SOFTWARE\OpenVPN') or
             RegKeyExists(HKLM, 'SOFTWARE\WOW6432Node\OpenVPN');
 end;
 
-// Kill app if already running
 procedure KillRunningApp();
-var
-  ResultCode: Integer;
+var RC: Integer;
 begin
-  Exec('taskkill', '/F /IM ' + '{#MyAppExeName}', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-  Exec('taskkill', '/F /IM openvpn.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Exec('taskkill', '/F /IM ' + '{#MyAppExeName}', '', SW_HIDE, ewWaitUntilTerminated, RC);
+  Exec('taskkill', '/F /IM openvpn.exe',           '', SW_HIDE, ewWaitUntilTerminated, RC);
 end;
 
 function InitializeSetup(): Boolean;
@@ -94,9 +95,6 @@ end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
-  if CurStep = ssInstall then begin
-    if OpenVPNInstalled() then begin
-      Log('OpenVPN already installed, skipping OpenVPN installer...');
-    end;
-  end;
+  if (CurStep = ssInstall) and OpenVPNInstalled() then
+    Log('OpenVPN already installed — skipping OpenVPN installer.');
 end;

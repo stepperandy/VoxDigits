@@ -1,0 +1,66 @@
+{
+  "name": "voxvpn",
+  "version": "1.0.0",
+  "description": "VoxVPN Desktop Client",
+  "main": "electron/main.js",
+  "private": true,
+  "scripts": {
+    "dev":        "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "build":      "vite build",
+    "build:win":  "vite build && electron-builder --win",
+    "build:mac":  "vite build && electron-builder --mac",
+    "build:linux":"vite build && electron-builder --linux"
+  },
+  "build": {
+    "appId": "net.voxvpn.app",
+    "productName": "VoxVPN",
+    "copyright": "Copyright © 2025 VoxVPN",
+    "directories": {
+      "output": "installer/windows/output"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "!electron/backend/**"
+    ],
+    "extraResources": [
+      {
+        "from": "installer/assets/configs",
+        "to":   "configs",
+        "filter": ["**/*.ovpn"]
+      }
+    ],
+    "win": {
+      "target": [
+        { "target": "dir", "arch": ["x64"] }
+      ],
+      "icon": "installer/windows/assets/icon.ico",
+      "requestedExecutionLevel": "requireAdministrator"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "installer/windows/assets/icon.ico",
+      "uninstallerIcon": "installer/windows/assets/icon.ico",
+      "installerHeaderIcon": "installer/windows/assets/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "installer/windows/assets/icon.icns",
+      "category": "public.app-category.utilities"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "installer/windows/assets/icon.png",
+      "category": "Network"
+    }
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "wait-on": "^7.2.0"
+  }
+}
