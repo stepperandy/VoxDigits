@@ -47,8 +47,8 @@ export default function AuthSignup() {
       });
 
       if (res.data?.success) {
-        // Account created successfully - redirect to dashboard
-        navigate('/dashboard');
+        // Account created successfully - redirect to login
+        navigate('/auth-login');
       } else {
         setError(res.data?.error || 'Signup failed');
       }
