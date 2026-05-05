@@ -1,7 +1,12 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
 
 const setupTemplates = {
-  windows: `; VoxVPN WireGuard Installer for Windows
+  windows: `; ╔════════════════════════════════════════════════════════════════╗
+; ║              VoxVPN Secure VPN - Installation Suite              ║
+; ║        https://media.base44.com/images/public/69c84f61d5543b54   ║
+; ║                 fe26e1e5/8e421fdfc_voxmainlogo.png                ║
+; ║                   Premium VPN Protection for Windows               ║
+; ╚════════════════════════════════════════════════════════════════╝
 ; Built with NSIS - Compile to EXE
 ; Download NSIS from https://nsis.sourceforge.io/
 
@@ -21,6 +26,8 @@ InstallDirRegKey HKLM "Software\\VoxVPN" "InstallDir"
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_BITMAP "header.bmp"
 !define MUI_INSTFILESDIR "Installation Progress"
+!define MUI_WELCOMEPAGE_TITLE "VoxVPN - Premium Secure VPN"
+!define MUI_WELCOMEPAGE_TEXT "Welcome to VoxVPN. This installer will help you set up a secure VPN connection.$\\r$\\nVisit https://voxvpn.net for more information."
 
 ; Variables
 Var WireGuardPath
@@ -102,7 +109,15 @@ Section "Uninstall"
   DeleteRegKey HKLM "Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Uninstall\\\\VoxVPN"
 SectionEnd`,
 
-  macos: `[Interface]
+  macos: `# ╔════════════════════════════════════════════════════════════════╗
+# ║         VoxVPN - macOS Configuration Setup                        ║
+# ║  https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/║
+# ║                8e421fdfc_voxmainlogo.png                          ║
+# ║            Premium Secure VPN for macOS                           ║
+# ║         Installation: https://voxvpn.net/support                  ║
+# ╚════════════════════════════════════════════════════════════════╝
+
+[Interface]
 Address = 10.0.0.2/32
 DNS = 8.8.8.8, 8.8.4.4
 PrivateKey = REPLACE_WITH_PRIVATE_KEY
@@ -113,7 +128,15 @@ AllowedIPs = 0.0.0.0/0
 Endpoint = vpn.voxvpn.com:51820
 PersistentKeepalive = 25`,
 
-  linux: `[Interface]
+  linux: `# ╔════════════════════════════════════════════════════════════════╗
+# ║          VoxVPN - Linux Configuration Setup                       ║
+# ║  https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/║
+# ║                8e421fdfc_voxmainlogo.png                          ║
+# ║            Premium Secure VPN for Linux                           ║
+# ║         Installation: https://voxvpn.net/support                  ║
+# ╚════════════════════════════════════════════════════════════════╝
+
+[Interface]
 Address = 10.0.0.2/32
 DNS = 8.8.8.8, 8.8.4.4
 PrivateKey = REPLACE_WITH_PRIVATE_KEY
@@ -124,7 +147,15 @@ AllowedIPs = 0.0.0.0/0
 Endpoint = vpn.voxvpn.com:51820
 PersistentKeepalive = 25`,
 
-  ios: `[Interface]
+  ios: `# ╔════════════════════════════════════════════════════════════════╗
+# ║          VoxVPN - iOS Configuration Setup                         ║
+# ║  https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/║
+# ║                8e421fdfc_voxmainlogo.png                          ║
+# ║             Premium Secure VPN for iOS                            ║
+# ║         Installation: https://voxvpn.net/support                  ║
+# ╚════════════════════════════════════════════════════════════════╝
+
+[Interface]
 Address = 10.0.0.2/32
 DNS = 8.8.8.8, 8.8.4.4
 PrivateKey = REPLACE_WITH_PRIVATE_KEY
@@ -135,7 +166,15 @@ AllowedIPs = 0.0.0.0/0
 Endpoint = vpn.voxvpn.com:51820
 PersistentKeepalive = 25`,
 
-  android: `[Interface]
+  android: `# ╔════════════════════════════════════════════════════════════════╗
+# ║        VoxVPN - Android Configuration Setup                       ║
+# ║  https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/║
+# ║                8e421fdfc_voxmainlogo.png                          ║
+# ║           Premium Secure VPN for Android                          ║
+# ║         Installation: https://voxvpn.net/support                  ║
+# ╚════════════════════════════════════════════════════════════════╝
+
+[Interface]
 Address = 10.0.0.2/32
 DNS = 8.8.8.8, 8.8.4.4
 PrivateKey = REPLACE_WITH_PRIVATE_KEY
@@ -146,7 +185,15 @@ AllowedIPs = 0.0.0.0/0
 Endpoint = vpn.voxvpn.com:51820
 PersistentKeepalive = 25`,
 
-  router: `[Interface]
+  router: `# ╔════════════════════════════════════════════════════════════════╗
+# ║        VoxVPN - Router Configuration Setup                        ║
+# ║  https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/║
+# ║                8e421fdfc_voxmainlogo.png                          ║
+# ║          Premium Secure VPN for Routers                           ║
+# ║         Installation: https://voxvpn.net/support                  ║
+# ╚════════════════════════════════════════════════════════════════╝
+
+[Interface]
 Address = 10.0.0.1/32
 DNS = 8.8.8.8, 8.8.4.4
 PrivateKey = REPLACE_WITH_PRIVATE_KEY
