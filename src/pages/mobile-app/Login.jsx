@@ -1,54 +1,36 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
 const API_BASE = 'https://voxvpn-backend.onrender.com';
 
 export default function Login() {
-  const [tab, setTab] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
     setLoading(true);
     try {
-      const endpoint = tab === 'login' ? '/api/auth/login' : '/api/auth/signup';
-      const res = await fetch(`${API_BASE}${endpoint}`, {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
 
-      if (tab === 'login') {
-        if (!res.ok || !data.token) {
-          setError(data.message || 'Invalid credentials.');
-          return;
-        }
-        localStorage.setItem('vpn_token', data.token);
-        localStorage.setItem('vpn_email', email);
-        navigate('/app/servers');
-      } else {
-        if (data.token) {
-          localStorage.setItem('vpn_token', data.token);
-          localStorage.setItem('vpn_email', email);
-          navigate('/app/servers');
-          return;
-        }
-        if (res.ok || (data.message && data.message.toLowerCase().includes('email'))) {
-          setSuccess(data.message || 'Account created! Check your email to confirm.');
-          return;
-        }
-        setError(data.message || 'Signup failed. Please try again.');
+      if (!res.ok || !data.token) {
+        setError(data.message || 'Invalid credentials.');
+        return;
       }
+      localStorage.setItem('vpn_token', data.token);
+      localStorage.setItem('vpn_email', email);
+      navigate('/app/servers');
     } catch {
       setError('Could not connect to server. Please try again.');
     } finally {
@@ -68,23 +50,15 @@ export default function Login() {
         <p className="text-slate-500 text-sm mt-1">Your privacy, protected</p>
       </div>
 
-      {/* Tab switcher */}
+      {/* Create Account CTA */}
       <div className="mx-6 mb-6">
-        <div className="flex bg-[#0d1120] rounded-2xl p-1 border border-white/5">
-          {['login', 'signup'].map((t) => (
-            <button
-              key={t}
-              onClick={() => { setTab(t); setError(''); setSuccess(''); }}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                tab === t
-                  ? 'bg-cyan-400 text-black shadow'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              {t === 'login' ? 'Sign In' : 'Sign Up'}
-            </button>
-          ))}
-        </div>
+        <p className="text-slate-500 text-xs text-center mb-3">Don't have an account?</p>
+        <button
+          onClick={() => navigate('/auth-signup')}
+          className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-2xl text-sm transition-all shadow-lg shadow-emerald-500/20"
+        >
+          Create Account
+        </button>
       </div>
 
       {/* Form */}
@@ -125,26 +99,13 @@ export default function Login() {
           </div>
         )}
 
-        {success && (
-          <div className="px-4 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
-            {success}
-          </div>
-        )}
-
-        {!success ? (
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-4 bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 text-black font-black rounded-2xl text-base transition-all flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 mt-2"
-          >
-            {loading ? <><Loader2 size={18} className="animate-spin" /> Loading...</> : tab === 'login' ? 'Sign In' : 'Create Account'}
-          </button>
-        ) : (
-          <button type="button" onClick={() => { setTab('login'); setSuccess(''); }}
-            className="w-full py-4 bg-cyan-400 text-black font-black rounded-2xl text-base">
-            Go to Sign In
-          </button>
-        )}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-4 bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 text-black font-black rounded-2xl text-base transition-all flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 mt-2"
+        >
+          {loading ? <><Loader2 size={18} className="animate-spin" /> Signing in...</> : 'Sign In'}
+        </button>
       </form>
 
       <p className="text-center text-slate-600 text-xs pb-12 pt-6">
