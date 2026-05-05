@@ -25,7 +25,8 @@ export default function ServerList() {
   }, []);
 
   const handleSelect = (server) => {
-    navigate(`/app/connect/${server.id}`);
+    // Connection handled by installed app, not this web interface
+    alert('Please use the VoxVPN app to connect to servers.');
   };
 
   const handleLogout = () => {
