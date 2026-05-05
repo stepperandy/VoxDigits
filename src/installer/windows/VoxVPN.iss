@@ -1,5 +1,5 @@
 ; VoxVPN Windows Installer
-; Installs OpenVPN CLI only (NO GUI) + Electron app
+; Installs OpenVPN CLI + GUI + Electron app
 ; Requires Inno Setup 6 — https://jrsoftware.org/isinfo.php
 
 #define MyAppName      "VoxVPN"
@@ -53,15 +53,15 @@ Name: "{commondesktop}\{#MyAppName}";                Filename: "{app}\{#MyAppExe
 ; ── Step 1: Kill OpenVPN GUI if it's already running ──────────────────────────
 Filename: "taskkill"; Parameters: "/F /IM openvpn-gui.exe"; Flags: runhidden waitprocfinished
 
-; ── Step 2: Install OpenVPN CLI + TAP driver silently (NO GUI component) ──────
+; ── Step 2: Install OpenVPN CLI + GUI + TAP driver silently ──────────────────
 ; /SELECT_OPENVPN=1   → install openvpn.exe CLI
-; /SELECT_OPENVPNGUI=0 → DO NOT install openvpn-gui.exe
+; /SELECT_OPENVPNGUI=1 → install openvpn-gui.exe
 ; /SELECT_TAP=1       → install TAP/TUN driver (required for VPN tunnel)
-; /SELECT_SERVICE=1   → install OpenVPN service (optional but useful)
+; /SELECT_SERVICE=1   → install OpenVPN service
 ; /SELECT_PATH=1      → add openvpn.exe to system PATH
 Filename: "{tmp}\openvpn-installer.exe"; \
-  Parameters: "/S /SELECT_OPENVPN=1 /SELECT_OPENVPNGUI=0 /SELECT_TAP=1 /SELECT_SERVICE=0 /SELECT_OPENSSL_UTILITIES=0 /SELECT_EASY_RSA=0 /SELECT_PATH=1"; \
-  StatusMsg: "Installing OpenVPN driver (no GUI)..."; \
+  Parameters: "/S /SELECT_OPENVPN=1 /SELECT_OPENVPNGUI=1 /SELECT_TAP=1 /SELECT_SERVICE=0 /SELECT_OPENSSL_UTILITIES=0 /SELECT_EASY_RSA=0 /SELECT_PATH=1"; \
+  StatusMsg: "Installing OpenVPN with GUI..."; \
   Flags: waitprocfinished
 
 ; ── Step 3: Copy .ovpn configs to OpenVPN config folder ───────────────────────
