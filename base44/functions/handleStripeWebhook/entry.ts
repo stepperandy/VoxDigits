@@ -94,7 +94,7 @@ Deno.serve(async (req) => {
 
       const provisionData = provisionRes?.data || {};
 
-      // Send setup email
+      // Send setup email with dashboard link
       await base44.asServiceRole.functions.invoke('sendBuyerSetups', {
         email: customerEmail,
         orderId: session.id,
@@ -102,6 +102,7 @@ Deno.serve(async (req) => {
         serverRegion: provisionData.serverRegion || 'Auto-selected',
         vpnIp: provisionData.vpnIp || 'Assigned',
         configUrl: provisionData.configUrl || null,
+        dashboardUrl: `${Deno.env.get('APP_URL')}/dashboard`,
       });
 
       // Provision Zendit eSIM (non-fatal)

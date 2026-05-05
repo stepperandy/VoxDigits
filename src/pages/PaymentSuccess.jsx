@@ -27,6 +27,13 @@ export default function PaymentSuccess() {
   const loadUserAndSetups = async () => {
     try {
       const currentUser = await base44.auth.me();
+      
+      // Redirect admins to server downloads page
+      if (currentUser?.role === 'admin') {
+        window.location.href = '/download';
+        return;
+      }
+
       setUser(currentUser);
 
       // Generate setups for all devices
@@ -173,7 +180,7 @@ export default function PaymentSuccess() {
             href="/dashboard"
             className="px-6 py-3 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-center transition-all"
           >
-            Go to Dashboard
+            Go to User Dashboard
           </a>
           <a
             href="/help-center"

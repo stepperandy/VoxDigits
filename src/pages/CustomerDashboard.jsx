@@ -23,21 +23,35 @@ export default function CustomerDashboard() {
   const [downloading, setDownloading] = useState(null);
   const [user, setUser] = useState(null);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [accessDenied, setAccessDenied] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const currentUser = await base44.auth.me();
+        if (!currentUser) {
+          base44.auth.redirectToLogin('/dashboard');
+          return;
+        }
+
         setUser(currentUser);
         const subs = await base44.entities.VPNSubscription.filter({ user_email: currentUser.email });
-        if (subs.length > 0) {
-          setSubscription(subs[0]);
-          const devs = await base44.entities.LinkedDevice.filter({ subscription_id: subs[0].id });
+        const hasPaidSub = subs.some(s => s.status === 'active');
+
+        if (hasPaidSub) {
+          setSubscription(subs.find(s => s.status === 'active'));
+          const devs = await base44.entities.LinkedDevice.filter({ subscription_id: subs.find(s => s.status === 'active').id });
           setDevices(devs);
         } else if (currentUser.role === 'admin') {
-          // Admins get full access without a subscription
+          // Admins bypass restriction
           setSubscription({ plan: 'Admin', status: 'active', billing_cycle: 'yearly', price: 0, max_devices: 999, renewal_date: null });
+        } else {
+          // Non-admin without paid subscription - deny access
+          setAccessDenied(true);
+          setLoading(false);
+          return;
         }
+
         const dlList = await base44.entities.Download.filter({ is_active: true });
         setDownloads(dlList);
       } catch (error) {
@@ -108,6 +122,26 @@ export default function CustomerDashboard() {
           <Loader2 size={32} className="text-cyan-400 animate-spin mx-auto mb-3" />
           <p className="text-slate-400 text-sm">Loading your dashboard…</p>
         </motion.div>
+      </div>
+    );
+  }
+
+  if (accessDenied) {
+    return (
+      <div className="min-h-screen bg-[#060910] pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mx-auto text-center space-y-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <AlertCircle size={64} className="text-amber-400 mx-auto mb-4" />
+            <h1 className="text-3xl font-bold text-white mb-2">Access Restricted</h1>
+            <p className="text-slate-400 text-lg">This dashboard is only available to paid subscribers.</p>
+          </motion.div>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+            <a href="https://voxvpn.net/#pricing"
+              className="inline-block px-8 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl transition-all shadow-lg shadow-cyan-500/20">
+              View Pricing Plans
+            </a>
+          </motion.div>
+        </div>
       </div>
     );
   }
