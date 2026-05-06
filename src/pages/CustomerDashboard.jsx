@@ -267,7 +267,7 @@ export default function CustomerDashboard() {
 
           <div className="pt-4 border-t border-white/5 flex flex-wrap items-center justify-between gap-3">
             {/* Upgrade button */}
-            <a href="https://voxvpn.net/#pricing"
+            <a href="/#pricing"
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black text-sm font-bold transition-all shadow-lg shadow-cyan-500/20">
               <Zap size={14} /> Upgrade Plan
             </a>
