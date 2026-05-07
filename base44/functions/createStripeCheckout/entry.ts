@@ -13,7 +13,7 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
-    const { plan, isBilledYearly } = body;
+    const { plan, isBilledYearly, paymentMethod } = body;
 
     if (!plan || !PLAN_PRICES[plan]) {
       return Response.json({ error: 'Invalid plan name' }, { status: 400 });
@@ -34,8 +34,14 @@ Deno.serve(async (req) => {
     const stripe = await import('npm:stripe@14.0.0');
     const stripeClient = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY'));
 
+    // Map payment method to Stripe types
+    const paymentMethodTypes = ['card'];
+    if (paymentMethod === 'alipay') paymentMethodTypes.push('alipay');
+    if (paymentMethod === 'wechat_pay') paymentMethodTypes.push('wechat_pay');
+
     const session = await stripeClient.checkout.sessions.create({
-      payment_method_types: ['card'],
+      payment_method_types: paymentMethodTypes,
+      ...(paymentMethod === 'wechat_pay' ? { payment_method_options: { wechat_pay: { client: 'web' } } } : {}),
       line_items: [
         {
           price_data: {
