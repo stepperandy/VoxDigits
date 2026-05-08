@@ -46,7 +46,7 @@ const demoProfiles = [
   { os: 'ios',     fileName: 'VoxVPN-iPhone-iPad.conf',  downloadUrl: null, ovpnUrl: null, qrUrl: '', serverName: 'VoxVPN Amsterdam 01' },
 ];
 
-function ProfileCard({ profile, liveMode, availableServers, selectedServerId, onServerChange, serverLoading }) {
+function ProfileCard({ profile, liveMode }) {
   const [showQr, setShowQr] = useState(false);
   const [serverOpen, setServerOpen] = useState(false);
   const isMobile = profile.os === 'android' || profile.os === 'ios';
@@ -73,38 +73,31 @@ function ProfileCard({ profile, liveMode, availableServers, selectedServerId, on
 
       {/* Server location selector */}
       <div>
-        <label className="text-[#a9b7c9] text-xs font-semibold block mb-1.5">
-          Server Location {serverLoading && <span className="text-[#4fd1ff]">(regenerating configs…)</span>}
-        </label>
-        {availableServers.length > 0 ? (
-          isSmallScreen ? (
-            <>
-              <button
-                onClick={() => setServerOpen(true)}
-                className="w-full px-3 py-2 rounded-xl bg-[#0b1a2c] border border-[#24415f] text-[#f4f8fc] text-sm text-left font-medium hover:border-[#0ea5ff] transition-colors"
-              >
-                {availableServers.find(s => s.id === selectedServerId)?.name || profile.serverName || 'Select a server'}
-              </button>
-              <MobileSelectSheet
-                open={serverOpen}
-                onOpenChange={setServerOpen}
-                label="Server Location"
-                options={availableServers.map(s => ({ value: s.id, label: s.name }))}
-                value={selectedServerId}
-                onSelect={(value) => { setServerOpen(false); onServerChange(value); }}
-              />
-            </>
-          ) : (
-            <select
-              value={selectedServerId}
-              onChange={(e) => onServerChange(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-[#0b1a2c] border border-[#24415f] text-[#f4f8fc] text-sm focus:outline-none focus:border-[#0ea5ff]"
+        <label className="text-[#a9b7c9] text-xs font-semibold block mb-1.5">More Server Locations</label>
+        {isSmallScreen ? (
+          <>
+            <button
+              onClick={() => setServerOpen(true)}
+              className="w-full px-3 py-2 rounded-xl bg-[#0b1a2c] border border-[#24415f] text-[#f4f8fc] text-sm text-left font-medium hover:border-[#0ea5ff] transition-colors"
             >
-              {availableServers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
-          )
+              {profile.serverName || 'Select a server'}
+            </button>
+            <MobileSelectSheet
+              open={serverOpen}
+              onOpenChange={setServerOpen}
+              label="Server Location"
+              options={extraServers.map(s => ({ value: s, label: s }))}
+              value={profile.serverName}
+              onSelect={(value) => {
+                setServerOpen(false);
+              }}
+            />
+          </>
         ) : (
-          <p className="text-[#a9b7c9] text-xs">{profile.serverName || 'Auto-selected server'}</p>
+          <select className="w-full px-3 py-2 rounded-xl bg-[#0b1a2c] border border-[#24415f] text-[#f4f8fc] text-sm focus:outline-none focus:border-[#0ea5ff]">
+            <option value="">{profile.serverName || 'Select a server'}</option>
+            {extraServers.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
         )}
       </div>
 
@@ -187,17 +180,12 @@ export default function SetupPortal() {
   const [welcomeText, setWelcomeText] = useState('Loading your secure setup details.');
   const [tokenInput, setTokenInput] = useState('');
   const [liveMode, setLiveMode] = useState(false);
-  const [availableServers, setAvailableServers] = useState([]);
-  const [selectedServerId, setSelectedServerId] = useState('');
-  const [serverLoading, setServerLoading] = useState(false);
 
   const urlParams = new URLSearchParams(window.location.search);
   const urlToken = urlParams.get('token');
 
-  const loadPortal = async (token, serverId = null) => {
-    if (!serverId) setStatus('loading');
-    else setServerLoading(true);
-
+  const loadPortal = async (token) => {
+    setStatus('loading');
     if (!token) {
       setWelcomeText('No secure token detected. Showing demo setup portal.');
       setProfiles(demoProfiles);
@@ -207,9 +195,7 @@ export default function SetupPortal() {
     }
     setTokenInput(token);
     try {
-      const payload = { token };
-      if (serverId) payload.server_id = serverId;
-      const res = await base44.functions.invoke('setupPortal', payload);
+      const res = await base44.functions.invoke('setupPortal', { token });
       const data = res.data;
       const mapped = (data.profiles || []).map(p => ({
         os: p.os,
@@ -224,21 +210,12 @@ export default function SetupPortal() {
       setProfiles(mapped);
       setLiveMode(true);
       setStatus('ok');
-      if (data.availableServers?.length > 0) setAvailableServers(data.availableServers);
-      if (data.selectedServerId) setSelectedServerId(data.selectedServerId);
     } catch {
       setWelcomeText('Unable to load live data. Showing demo portal instead.');
       setProfiles(demoProfiles);
       setLiveMode(false);
       setStatus('demo');
-    } finally {
-      setServerLoading(false);
     }
-  };
-
-  const handleServerChange = (serverId) => {
-    setSelectedServerId(serverId);
-    loadPortal(urlToken || tokenInput, serverId);
   };
 
   useEffect(() => { loadPortal(urlToken); }, []);
@@ -330,15 +307,7 @@ export default function SetupPortal() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {profiles.map((p) => (
-                  <ProfileCard
-                    key={p.os}
-                    profile={p}
-                    liveMode={liveMode}
-                    availableServers={availableServers}
-                    selectedServerId={selectedServerId}
-                    onServerChange={handleServerChange}
-                    serverLoading={serverLoading}
-                  />
+                  <ProfileCard key={p.os} profile={p} liveMode={liveMode} />
                 ))}
               </div>
             )}
