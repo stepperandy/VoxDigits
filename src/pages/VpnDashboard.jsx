@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
-  Shield, LogOut, Wifi, WifiOff, Loader2, AlertTriangle,
-  RefreshCw, CheckCircle2, Lock
+  Shield, LogOut, Loader2, AlertTriangle,
+  RefreshCw, Download
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Link, useNavigate } from 'react-router-dom';
@@ -37,7 +37,7 @@ export default function VpnDashboard() {
   const [subscription, setSubscription] = useState(null);
   const [servers, setServers] = useState(FALLBACK_SERVERS);
   const [selectedServer, setSelectedServer] = useState(FALLBACK_SERVERS[0]);
-  const [status, setStatus] = useState('idle'); // idle | connecting | connected | disconnecting
+  const [status, setStatus] = useState('idle');
   const [loadingInit, setLoadingInit] = useState(true);
   const [error, setError] = useState('');
 
@@ -82,17 +82,9 @@ export default function VpnDashboard() {
   };
 
   const handleConnect = () => {
-    if ((!subscription && user?.role !== 'admin') || status === 'connected') return;
-    setStatus('connecting');
-    setError('');
-    // Simulate brief connection handshake, then mark connected
-    setTimeout(() => setStatus('connected'), 1200);
-  };
-
-  const handleDisconnect = () => {
-    setStatus('disconnecting');
-    setError('');
-    setTimeout(() => setStatus('idle'), 800);
+    // Real VPN connections require the WireGuard/OpenVPN client app.
+    // Redirect to the setup portal to download configs.
+    window.location.href = '/setup';
   };
 
   if (loadingInit) {
@@ -108,9 +100,6 @@ export default function VpnDashboard() {
     );
   }
 
-  const isConnected = status === 'connected';
-  const isConnecting = status === 'connecting';
-  const isDisconnecting = status === 'disconnecting';
   const hasSubscription = !!subscription;
 
   return (
@@ -240,29 +229,11 @@ export default function VpnDashboard() {
 
           {/* Logo / status ring */}
           <div className="flex flex-col items-center mb-2">
-            <div className={`relative w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500
-              ${isConnected
-                ? 'bg-cyan-500/10 shadow-[0_0_40px_rgba(6,182,212,0.25)] border-2 border-cyan-500/50'
-                : 'bg-white/3 border-2 border-white/10'
-              }`}
-            >
-              {/* Animated ring when connecting */}
-              {(isConnecting || isDisconnecting) && (
-                <div className="absolute inset-0 rounded-full border-2 border-cyan-400/40 animate-ping" />
-              )}
-              <Shield size={48} className={`transition-colors duration-300 ${isConnected ? 'text-cyan-400' : 'text-slate-600'}`} />
+            <div className="relative w-32 h-32 rounded-full flex items-center justify-center bg-white/3 border-2 border-white/10">
+              <Shield size={48} className="text-slate-600" />
             </div>
-
             <div className="mt-3 text-center">
-              {isConnecting && <p className="text-cyan-400 text-sm font-semibold animate-pulse">Connecting…</p>}
-              {isDisconnecting && <p className="text-amber-400 text-sm font-semibold animate-pulse">Disconnecting…</p>}
-              {isConnected && (
-                <div className="flex items-center gap-1.5 justify-center">
-                  <CheckCircle2 size={14} className="text-emerald-400" />
-                  <p className="text-emerald-400 text-sm font-bold">Protected</p>
-                </div>
-              )}
-              {status === 'idle' && <p className="text-slate-500 text-sm">Not Connected</p>}
+              <p className="text-slate-500 text-sm">Use WireGuard or OpenVPN to connect</p>
             </div>
           </div>
 
@@ -299,58 +270,37 @@ export default function VpnDashboard() {
             selectedServer={selectedServer}
             onSelect={(server) => {
               setSelectedServer(server);
-              if (isConnected) setStatus('idle');
+              setStatus('idle');
             }}
           />
 
-          {/* Connect / Disconnect button */}
-          {!isConnected ? (
-            <button
-              onClick={handleConnect}
-              disabled={!hasSubscription || isConnecting}
-              className="w-full py-4 rounded-xl font-black text-base transition-all flex items-center justify-center gap-2
-                bg-cyan-400 hover:bg-cyan-300 text-black shadow-lg shadow-cyan-500/20
-                disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
-            >
-              {isConnecting
-                ? <><Loader2 size={18} className="animate-spin" /> Connecting…</>
-                : <><Lock size={18} /> Connect</>
-              }
-            </button>
-          ) : (
-            <button
-              onClick={handleDisconnect}
-              disabled={isDisconnecting}
-              className="w-full py-4 rounded-xl font-black text-base transition-all flex items-center justify-center gap-2
-                bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400
-                disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {isDisconnecting
-                ? <><Loader2 size={18} className="animate-spin" /> Disconnecting…</>
-                : <><WifiOff size={18} /> Disconnect</>
-              }
-            </button>
-          )}
+          {/* How to connect */}
+          <div className="rounded-xl border border-white/5 bg-[#0d1120] p-4 space-y-2">
+            <p className="text-white text-xs font-bold mb-2">How to Connect</p>
+            <ol className="text-slate-400 text-xs space-y-2 list-decimal list-inside">
+              <li>Download your VPN config from the Setup Portal below.</li>
+              <li>Install <span className="text-white font-semibold">WireGuard</span> or <span className="text-white font-semibold">OpenVPN Connect</span> (free).</li>
+              <li>Import your config file into the app.</li>
+              <li>Select a server and tap <span className="text-cyan-400 font-semibold">Activate / Connect</span>.</li>
+            </ol>
+          </div>
+
+          {/* CTA */}
+          <button
+            onClick={handleConnect}
+            disabled={!hasSubscription}
+            className="w-full py-4 rounded-xl font-black text-base transition-all flex items-center justify-center gap-2
+              bg-cyan-400 hover:bg-cyan-300 text-black shadow-lg shadow-cyan-500/20
+              disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+          >
+            <Download size={18} /> Go to Setup Portal
+          </button>
 
           {/* Error */}
           {error && (
             <div className="flex items-center gap-2 px-4 py-3 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-400 text-sm">
               <AlertTriangle size={14} className="flex-shrink-0" />
               {error}
-            </div>
-          )}
-
-          {/* Connected info */}
-          {isConnected && (
-            <div className="grid grid-cols-2 gap-3">
-              <div className="px-4 py-3 rounded-xl border border-white/5 bg-[#0d1120] text-center">
-                <p className="text-slate-500 text-xs mb-1">Server</p>
-                <p className="text-white font-bold text-sm">{selectedServer.city}</p>
-              </div>
-              <div className="px-4 py-3 rounded-xl border border-white/5 bg-[#0d1120] text-center">
-                <p className="text-slate-500 text-xs mb-1">Protocol</p>
-                <p className="text-white font-bold text-sm">WireGuard</p>
-              </div>
             </div>
           )}
 
