@@ -1,26 +1,26 @@
 import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Download, Monitor, Terminal, Smartphone, Loader2, Shield, Globe, CheckCircle2, Wifi } from 'lucide-react';
+import { Download, Monitor, Terminal, Smartphone, Loader2, Shield, Wifi, Globe } from 'lucide-react';
 
 const PLATFORMS = [
-  { id: 'windows', label: 'Windows', icon: <Monitor size={18} className="text-blue-400" /> },
-  { id: 'macos',   label: 'macOS',   icon: <Monitor size={18} className="text-slate-300" /> },
-  { id: 'linux',   label: 'Linux',   icon: <Terminal size={18} className="text-orange-400" /> },
-  { id: 'android', label: 'Android', icon: <Smartphone size={18} className="text-emerald-400" /> },
-  { id: 'ios',     label: 'iPhone / iPad', icon: <Smartphone size={18} className="text-cyan-400" /> },
-  { id: 'router',  label: 'Router',  icon: <Wifi size={18} className="text-violet-400" /> },
+  { id: 'windows', label: 'Windows',       icon: Monitor,    color: 'text-blue-400',    desc: 'Windows 10 / 11' },
+  { id: 'macos',   label: 'macOS',          icon: Monitor,    color: 'text-slate-300',   desc: 'macOS 12+' },
+  { id: 'linux',   label: 'Linux',          icon: Terminal,   color: 'text-orange-400',  desc: 'Ubuntu / Debian / Arch' },
+  { id: 'android', label: 'Android',        icon: Smartphone, color: 'text-emerald-400', desc: 'Android 7+' },
+  { id: 'ios',     label: 'iPhone / iPad',  icon: Smartphone, color: 'text-cyan-400',    desc: 'iOS 14+' },
+  { id: 'router',  label: 'Router',         icon: Wifi,       color: 'text-violet-400',  desc: 'OpenWrt / DD-WRT' },
 ];
 
 export default function SetupPortal() {
   const [status, setStatus] = useState('loading');
   const [welcomeText, setWelcomeText] = useState('Loading your secure setup details.');
   const [tokenInput, setTokenInput] = useState('');
-  const [servers, setServers] = useState([]);
-  const [selectedServer, setSelectedServer] = useState(null);
-  const [selectedPlatform, setSelectedPlatform] = useState(null);
-  const [downloading, setDownloading] = useState(null); // 'wireguard' | 'openvpn'
-  const [liveMode, setLiveMode] = useState(false);
   const [token, setToken] = useState('');
+  const [liveMode, setLiveMode] = useState(false);
+  const [serverCount, setServerCount] = useState(0);
+  const [servers, setServers] = useState([]);
+  const [selectedPlatform, setSelectedPlatform] = useState(null);
+  const [downloading, setDownloading] = useState(null);
 
   const urlParams = new URLSearchParams(window.location.search);
   const urlToken = urlParams.get('token');
@@ -28,15 +28,12 @@ export default function SetupPortal() {
   const loadPortal = async (tok) => {
     setStatus('loading');
     if (!tok) {
-      setWelcomeText('No secure token detected. Showing demo setup portal.');
-      // Demo servers
+      setWelcomeText('No token detected. Showing demo portal.');
+      setServerCount(6);
       setServers([
-        { id: 'demo-1', name: 'New York', country: 'US', load: 22 },
-        { id: 'demo-2', name: 'London', country: 'UK', load: 45 },
-        { id: 'demo-3', name: 'Frankfurt', country: 'DE', load: 31 },
-        { id: 'demo-4', name: 'Singapore', country: 'SG', load: 58 },
-        { id: 'demo-5', name: 'Tokyo', country: 'JP', load: 19 },
-        { id: 'demo-6', name: 'Amsterdam', country: 'NL', load: 37 },
+        { name: 'New York', country: 'US' }, { name: 'London', country: 'UK' },
+        { name: 'Frankfurt', country: 'DE' }, { name: 'Singapore', country: 'SG' },
+        { name: 'Tokyo', country: 'JP' }, { name: 'Amsterdam', country: 'NL' },
       ]);
       setLiveMode(false);
       setStatus('demo');
@@ -47,16 +44,17 @@ export default function SetupPortal() {
     try {
       const res = await base44.functions.invoke('setupPortal', { token: tok });
       const data = res.data;
-      setWelcomeText(`Setup ready for ${data.email || 'buyer'} · Plan: ${data.plan || 'Basic'}`);
+      setWelcomeText(`Setup ready · ${data.email} · Plan: ${data.plan}`);
+      setServerCount(data.serverCount || 0);
       setServers(data.servers || []);
       setLiveMode(true);
       setStatus('ok');
     } catch {
-      setWelcomeText('Unable to load live data. Showing demo portal instead.');
+      setWelcomeText('Unable to load live data. Showing demo portal.');
+      setServerCount(6);
       setServers([
-        { id: 'demo-1', name: 'New York', country: 'US', load: 22 },
-        { id: 'demo-2', name: 'London', country: 'UK', load: 45 },
-        { id: 'demo-3', name: 'Frankfurt', country: 'DE', load: 31 },
+        { name: 'New York', country: 'US' }, { name: 'London', country: 'UK' },
+        { name: 'Frankfurt', country: 'DE' }, { name: 'Singapore', country: 'SG' },
       ]);
       setLiveMode(false);
       setStatus('demo');
@@ -66,18 +64,13 @@ export default function SetupPortal() {
   useEffect(() => { loadPortal(urlToken); }, []);
 
   const handleDownload = async (proto) => {
-    if (!liveMode) {
-      alert('Please load your setup with a valid token first.');
-      return;
-    }
-    if (!selectedServer) { alert('Please select a server first.'); return; }
+    if (!liveMode) { alert('Please load your setup with a valid token first.'); return; }
     if (!selectedPlatform) { alert('Please select your device platform.'); return; }
 
     setDownloading(proto);
     try {
       const res = await base44.functions.invoke('setupPortal', {
         token,
-        server_id: selectedServer.id,
         platform: selectedPlatform,
         proto,
       });
@@ -102,12 +95,6 @@ export default function SetupPortal() {
     window.location.href = next.toString();
   };
 
-  const loadColor = (load) => {
-    if (load < 40) return 'text-emerald-400';
-    if (load < 70) return 'text-amber-400';
-    return 'text-rose-400';
-  };
-
   return (
     <div className="min-h-screen text-[#f4f8fc]" style={{ background: 'linear-gradient(180deg,#081120,#0d1b2f)', fontFamily: 'Arial, Helvetica, sans-serif' }}>
 
@@ -115,19 +102,17 @@ export default function SetupPortal() {
       <header className="px-4 sm:px-6 lg:px-8 pt-14 pb-8 border-b border-white/5"
         style={{ background: 'radial-gradient(circle at top right, rgba(79,209,255,.15), transparent 30%), radial-gradient(circle at top left, rgba(14,165,255,.18), transparent 24%)' }}>
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-4 mb-5">
-            <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png" alt="VoxVPN" className="h-16 w-auto" />
-          </div>
-          <h1 className="text-4xl sm:text-5xl font-black text-white mb-3 leading-tight">Set Up VoxVPN On Any Device</h1>
+          <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png" alt="VoxVPN" className="h-16 w-auto mb-5" />
+          <h1 className="text-4xl sm:text-5xl font-black text-white mb-3 leading-tight">VoxVPN Setup Portal</h1>
           <p className="text-[#a9b7c9] text-base max-w-2xl leading-relaxed">
-            Choose your server, choose your device, download your config — and connect in minutes.
+            One download. All {serverCount > 0 ? serverCount : ''} servers included. Switch locations freely inside your VPN app — just like ExpressVPN.
           </p>
         </div>
       </header>
 
       <main className="px-4 sm:px-6 lg:px-8 py-8 pb-20 max-w-4xl mx-auto space-y-6">
 
-        {/* Status + token */}
+        {/* Token / Status */}
         <div className="rounded-[20px] border border-[#223654] p-6 space-y-4"
           style={{ background: 'linear-gradient(180deg,#101d31,#13243d)', boxShadow: '0 20px 50px rgba(0,0,0,.35)' }}>
           <div>
@@ -147,6 +132,7 @@ export default function SetupPortal() {
               placeholder="Paste your secure VoxVPN access token"
               value={tokenInput}
               onChange={(e) => setTokenInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && reloadWithToken()}
               className="flex-1 min-w-0 px-4 py-3 rounded-xl border border-[#223654] bg-[#091423] text-white placeholder-[#4a5e75] text-sm focus:outline-none focus:border-[#0ea5ff]"
             />
             <button onClick={reloadWithToken}
@@ -163,86 +149,112 @@ export default function SetupPortal() {
           </div>
         ) : (
           <>
-            {/* Step 1 — Pick Server */}
+            {/* Included servers badge */}
+            {servers.length > 0 && (
+              <div className="rounded-[16px] border border-[#223654] p-4 bg-[#0b1627]">
+                <div className="flex items-center gap-2 mb-3">
+                  <Globe size={15} className="text-[#4fd1ff]" />
+                  <p className="text-white text-sm font-bold">{servers.length} Server Locations Included in Every Download</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {servers.map((s, i) => (
+                    <span key={i} className="text-[11px] px-2.5 py-1 rounded-full bg-[#0d1e38] border border-[#223654] text-[#4fd1ff] font-semibold">
+                      {s.name}, {s.country}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Step 1 — Pick Platform */}
             <div className="rounded-[18px] border border-[#223654] p-6"
               style={{ background: 'linear-gradient(180deg,#101d31,#13243d)' }}>
               <div className="flex items-center gap-2 mb-4">
-                <span className="w-6 h-6 rounded-full bg-[#0ea5ff] text-[#02111d] text-xs font-black flex items-center justify-center flex-shrink-0">1</span>
-                <h2 className="text-white font-bold text-base m-0">Choose a Server</h2>
+                <span className="w-6 h-6 rounded-full bg-[#0ea5ff] text-[#02111d] text-xs font-black flex items-center justify-center">1</span>
+                <h2 className="text-white font-bold text-base m-0">Select Your Device</h2>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {servers.map(s => (
-                  <button key={s.id}
-                    onClick={() => setSelectedServer(s)}
-                    className={`flex items-center gap-2 px-3 py-3 rounded-xl border text-left transition-all ${
-                      selectedServer?.id === s.id
-                        ? 'border-[#0ea5ff] bg-[#0ea5ff]/10'
-                        : 'border-[#223654] bg-[#0b1627] hover:border-[#324e74]'
-                    }`}>
-                    <Globe size={14} className="text-[#4fd1ff] flex-shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-white text-sm font-semibold truncate">{s.name}</p>
-                      <p className="text-[#a9b7c9] text-xs">{s.country} · <span className={loadColor(s.load || 0)}>{s.load || 0}% load</span></p>
-                    </div>
-                    {selectedServer?.id === s.id && <CheckCircle2 size={14} className="text-[#0ea5ff] ml-auto flex-shrink-0" />}
-                  </button>
-                ))}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {PLATFORMS.map(p => {
+                  const Icon = p.icon;
+                  return (
+                    <button key={p.id}
+                      onClick={() => setSelectedPlatform(p.id)}
+                      className={`flex flex-col items-start gap-1.5 px-4 py-4 rounded-xl border text-left transition-all ${
+                        selectedPlatform === p.id
+                          ? 'border-[#0ea5ff] bg-[#0ea5ff]/10'
+                          : 'border-[#223654] bg-[#0b1627] hover:border-[#324e74]'
+                      }`}>
+                      <Icon size={20} className={p.color} />
+                      <p className="text-white text-sm font-bold">{p.label}</p>
+                      <p className="text-[#a9b7c9] text-xs">{p.desc}</p>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Step 2 — Pick Platform */}
+            {/* Step 2 — Download */}
             <div className="rounded-[18px] border border-[#223654] p-6"
               style={{ background: 'linear-gradient(180deg,#101d31,#13243d)' }}>
               <div className="flex items-center gap-2 mb-4">
-                <span className="w-6 h-6 rounded-full bg-[#0ea5ff] text-[#02111d] text-xs font-black flex items-center justify-center flex-shrink-0">2</span>
-                <h2 className="text-white font-bold text-base m-0">Choose Your Device</h2>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {PLATFORMS.map(p => (
-                  <button key={p.id}
-                    onClick={() => setSelectedPlatform(p.id)}
-                    className={`flex items-center gap-2 px-3 py-3 rounded-xl border text-left transition-all ${
-                      selectedPlatform === p.id
-                        ? 'border-[#0ea5ff] bg-[#0ea5ff]/10'
-                        : 'border-[#223654] bg-[#0b1627] hover:border-[#324e74]'
-                    }`}>
-                    {p.icon}
-                    <span className="text-white text-sm font-semibold">{p.label}</span>
-                    {selectedPlatform === p.id && <CheckCircle2 size={14} className="text-[#0ea5ff] ml-auto flex-shrink-0" />}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Step 3 — Download */}
-            <div className="rounded-[18px] border border-[#223654] p-6"
-              style={{ background: 'linear-gradient(180deg,#101d31,#13243d)' }}>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="w-6 h-6 rounded-full bg-[#0ea5ff] text-[#02111d] text-xs font-black flex items-center justify-center flex-shrink-0">3</span>
-                <h2 className="text-white font-bold text-base m-0">Download Config</h2>
+                <span className="w-6 h-6 rounded-full bg-[#0ea5ff] text-[#02111d] text-xs font-black flex items-center justify-center">2</span>
+                <h2 className="text-white font-bold text-base m-0">Download VPN Config</h2>
               </div>
 
-              {selectedServer && selectedPlatform ? (
-                <div className="space-y-3">
+              {!selectedPlatform ? (
+                <p className="text-[#4a5e75] text-sm">Select your device above first.</p>
+              ) : (
+                <div className="space-y-4">
                   <p className="text-[#a9b7c9] text-sm">
-                    Downloading for <strong className="text-white">{PLATFORMS.find(p => p.id === selectedPlatform)?.label}</strong> → <strong className="text-[#4fd1ff]">{selectedServer.name}, {selectedServer.country}</strong>
+                    Both files below include <strong className="text-white">all {serverCount || servers.length} server locations</strong>. Pick your preferred protocol:
                   </p>
-                  <div className="flex flex-wrap gap-3">
-                    <button onClick={() => handleDownload('wireguard')} disabled={!!downloading}
-                      className="flex items-center gap-2 px-5 py-3 rounded-xl font-extrabold text-sm text-[#02111d] disabled:opacity-50 transition-all"
-                      style={{ background: 'linear-gradient(135deg,#0ea5ff,#4fd1ff)' }}>
-                      {downloading === 'wireguard' ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
-                      WireGuard (.conf)
-                    </button>
-                    <button onClick={() => handleDownload('openvpn')} disabled={!!downloading}
-                      className="flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm text-[#4fd1ff] border border-[#28425f] bg-[#0b1627] hover:bg-[#0d1e38] disabled:opacity-50 transition-all">
-                      {downloading === 'openvpn' ? <Loader2 size={14} className="animate-spin" /> : <Shield size={14} />}
-                      OpenVPN (.ovpn)
-                    </button>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* OpenVPN */}
+                    <div className="rounded-[14px] border border-[#223654] p-5 bg-[#0b1627] space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Shield size={16} className="text-[#4fd1ff]" />
+                        <p className="text-white font-bold text-sm">OpenVPN</p>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/20">Recommended</span>
+                      </div>
+                      <p className="text-[#a9b7c9] text-xs leading-relaxed">
+                        One <code className="text-[#4fd1ff]">.ovpn</code> file with all servers. Import into <strong className="text-white">OpenVPN Connect</strong> (free) — switch servers from the app's server list.
+                      </p>
+                      <button onClick={() => handleDownload('openvpn')} disabled={!!downloading}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm text-[#02111d] disabled:opacity-50 transition-all"
+                        style={{ background: 'linear-gradient(135deg,#0ea5ff,#4fd1ff)' }}>
+                        {downloading === 'openvpn' ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+                        Download .ovpn (All Servers)
+                      </button>
+                    </div>
+
+                    {/* WireGuard */}
+                    <div className="rounded-[14px] border border-[#223654] p-5 bg-[#0b1627] space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Shield size={16} className="text-violet-400" />
+                        <p className="text-white font-bold text-sm">WireGuard</p>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400 font-bold border border-violet-500/20">Fastest</span>
+                      </div>
+                      <p className="text-[#a9b7c9] text-xs leading-relaxed">
+                        A setup script that installs one tunnel per server into <strong className="text-white">WireGuard</strong> (free). Each server appears as a separate tunnel — activate any one instantly.
+                      </p>
+                      <button onClick={() => handleDownload('wireguard')} disabled={!!downloading}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm text-violet-300 border border-violet-500/30 bg-violet-500/10 hover:bg-violet-500/20 disabled:opacity-50 transition-all">
+                        {downloading === 'wireguard' ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+                        Download Setup Script
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Install instructions */}
+                  <div className="rounded-[14px] border border-[#223654] p-4 bg-[#091423] space-y-2">
+                    <p className="text-white text-xs font-bold">After Downloading:</p>
+                    <ol className="text-[#a9b7c9] text-xs space-y-1 list-decimal list-inside">
+                      <li><strong className="text-white">OpenVPN:</strong> Install <a href="https://openvpn.net/client/" target="_blank" rel="noreferrer" className="text-[#4fd1ff] underline">OpenVPN Connect</a> → Import the .ovpn file → Choose a server → Connect.</li>
+                      <li><strong className="text-white">WireGuard:</strong> Install <a href="https://www.wireguard.com/install/" target="_blank" rel="noreferrer" className="text-[#4fd1ff] underline">WireGuard</a> → Run the setup script → Each server tunnel appears in the app → Click any to activate.</li>
+                    </ol>
                   </div>
                 </div>
-              ) : (
-                <p className="text-[#4a5e75] text-sm">Select a server and device above to enable download.</p>
               )}
             </div>
           </>
@@ -250,13 +262,13 @@ export default function SetupPortal() {
 
         {/* Support */}
         <div className="rounded-[14px] border border-[#234a69] p-4 bg-[#0d2638] text-center">
-          <p className="text-[#4fd1ff] text-sm font-bold mb-1">Need help?</p>
+          <p className="text-[#4fd1ff] text-sm font-bold mb-1">Need help setting up?</p>
           <a href="mailto:support@voxdigits.com" className="text-[#a9b7c9] text-xs hover:text-[#4fd1ff] transition-colors">support@voxdigits.com</a>
         </div>
       </main>
 
       <footer className="text-center py-8 text-[#a9b7c9] text-sm border-t border-[#223654]">
-        © 2026 VoxDigits Communications LLC. Secure setup delivery portal. www.voxvpn.net
+        © 2026 VoxDigits Communications LLC · www.voxvpn.net
       </footer>
     </div>
   );
