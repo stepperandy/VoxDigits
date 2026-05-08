@@ -1,26 +1,53 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-// Build a WireGuard .conf for a given device + server
-function buildWireGuardConfig(device, server, vpnIp) {
-  return `[Interface]
+// Build a WireGuard .conf with ALL servers as named [Peer] blocks
+// WireGuard doesn't natively support multiple peers for road-warrior use,
+// so we embed each server as a commented profile block the user can copy-paste or use with wg-quick.
+// The first (lowest-load) server is the active [Peer]; the rest are listed as commented alternatives.
+function buildWireGuardConfig(device, servers, primaryServer, vpnIp) {
+  const iface = `[Interface]
+# VoxVPN WireGuard Config — All Servers Included
+# To switch server: replace the [Peer] block below with your chosen server block from the list.
 PrivateKey = ${device.vpn_profile_key || 'REPLACE_WITH_YOUR_PRIVATE_KEY'}
 Address = ${vpnIp || device.ip_address || '10.8.0.2'}/32
 DNS = 8.8.8.8, 1.1.1.1
+`;
 
+  const activePeer = `
+# ── ACTIVE SERVER: ${primaryServer?.city || primaryServer?.region || 'VoxVPN'} (${primaryServer?.country || ''}) ──
 [Peer]
-PublicKey = ${server?.public_key || 'REPLACE_WITH_SERVER_PUBLIC_KEY'}
-Endpoint = ${server?.ip_address || 'vpn.voxvpn.net'}:${server?.port || 51820}
+PublicKey = ${primaryServer?.public_key || 'REPLACE_WITH_SERVER_PUBLIC_KEY'}
+Endpoint = ${primaryServer?.ip_address || 'vpn.voxvpn.net'}:${primaryServer?.port || 51820}
 AllowedIPs = 0.0.0.0/0, ::/0
 PersistentKeepalive = 25
 `;
+
+  const altPeers = servers
+    .filter(s => s.id !== primaryServer?.id && s.ip_address)
+    .map(s => `
+# ── ALTERNATIVE: ${s.city || s.region || 'Server'} (${s.country || ''}) ──
+# [Peer]
+# PublicKey = ${s.public_key || 'REPLACE_WITH_SERVER_PUBLIC_KEY'}
+# Endpoint = ${s.ip_address}:${s.port || 51820}
+# AllowedIPs = 0.0.0.0/0, ::/0
+# PersistentKeepalive = 25`).join('\n');
+
+  return iface + activePeer + (altPeers ? '\n' + altPeers + '\n' : '');
 }
 
-// Build a simple OpenVPN .ovpn for fallback
-function buildOpenVPNConfig(server, email) {
+// Build an OpenVPN .ovpn with ALL servers as remote directives (OpenVPN supports multiple remotes natively)
+function buildOpenVPNConfig(servers, primaryServer, email) {
+  const remotes = servers
+    .filter(s => s.ip_address)
+    .map(s => `remote ${s.ip_address} ${s.port || 1194} ${s.proto || 'udp'}  # ${s.city || s.region || 'Server'}, ${s.country || ''}`)
+    .join('\n');
+
   return `client
 dev tun
-proto ${server?.proto || 'udp'}
-remote ${server?.ip_address || 'vpn.voxvpn.net'} ${server?.port || 1194}
+proto ${primaryServer?.proto || 'udp'}
+# VoxVPN — All Servers Listed. OpenVPN will try each in order and auto-failover.
+${remotes}
+remote-random
 resolv-retry infinite
 nobind
 persist-key
@@ -34,8 +61,8 @@ verb 3
 # Generated: ${new Date().toISOString()}
 auth-user-pass
 # Use your VoxVPN email + password to authenticate.
-${server?.ca_cert ? `\n<ca>\n${server.ca_cert.trim()}\n</ca>` : ''}
-${server?.tls_auth_key ? `\n<tls-auth>\n${server.tls_auth_key.trim()}\n</tls-auth>\nkey-direction 1` : ''}
+${primaryServer?.ca_cert ? `\n<ca>\n${primaryServer.ca_cert.trim()}\n</ca>` : ''}
+${primaryServer?.tls_auth_key ? `\n<tls-auth>\n${primaryServer.tls_auth_key.trim()}\n</tls-auth>\nkey-direction 1` : ''}
 `;
 }
 
@@ -87,8 +114,8 @@ Deno.serve(async (req) => {
       // Find the user's device for this platform
       const device = devices.find(d => d.device_type === deviceType);
 
-      // Build WireGuard config (device may be null)
-      const wgConfig = buildWireGuardConfig(device || {}, server, device?.ip_address);
+      // Build WireGuard config with ALL servers embedded
+      const wgConfig = buildWireGuardConfig(device || {}, servers, server, device?.ip_address);
       const wgFile = new File([wgConfig], `VoxVPN-${label}.conf`, { type: 'text/plain' });
 
       let wgUrl = null;
@@ -97,8 +124,8 @@ Deno.serve(async (req) => {
         wgUrl = upload.file_url;
       } catch (_) { /* non-fatal */ }
 
-      // Build OpenVPN config
-      const ovpnConfig = buildOpenVPNConfig(server, email || 'user@voxvpn.net');
+      // Build OpenVPN config with ALL servers as remote directives
+      const ovpnConfig = buildOpenVPNConfig(servers, server, email || 'user@voxvpn.net');
       const ovpnFile = new File([ovpnConfig], `VoxVPN-${label}.ovpn`, { type: 'text/plain' });
 
       let ovpnUrl = null;
