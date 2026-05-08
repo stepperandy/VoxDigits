@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Download, Trash2, Loader2, Check, AlertCircle, Smartphone, Monitor, Wifi, CreditCard, ExternalLink, UserCircle, Gift, Globe, Zap, Circle } from 'lucide-react';
+import { Download, Trash2, Loader2, Check, AlertCircle, Smartphone, Monitor, Wifi, CreditCard, ExternalLink, UserCircle, Gift, Globe, Zap, Circle, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import UsageCharts from '@/components/dashboard/UsageCharts';
@@ -66,17 +66,26 @@ export default function CustomerDashboard() {
   const downloadConfig = async (platform, fileUrl) => {
     setDownloading(platform);
     try {
-      if (fileUrl) {
+      // If there's a direct file URL stored in the Download entity, use it
+      if (fileUrl && fileUrl !== '#') {
         const a = document.createElement('a');
         a.href = fileUrl;
-        a.download = fileUrl.split('/').pop();
+        a.download = fileUrl.split('/').pop() || `VoxVPN-${platform}.conf`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         return;
       }
-      const res = await base44.functions.invoke('downloadVpnConfig', { platform });
-      const blob = new Blob([res.data], { type: 'text/plain' });
+
+      // Otherwise generate a fresh .ovpn via the backend (OpenVPN protocol)
+      const res = await base44.functions.invoke('downloadVpnConfig', {
+        platform: platform?.toLowerCase() || 'windows',
+        proto: 'udp',
+      });
+
+      // The function returns raw .ovpn text in res.data
+      const content = typeof res.data === 'string' ? res.data : JSON.stringify(res.data);
+      const blob = new Blob([content], { type: 'application/x-openvpn-profile' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -85,6 +94,43 @@ export default function CustomerDashboard() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    } catch (error) {
+      alert('Failed to download config: ' + error.message);
+    } finally {
+      setDownloading(null);
+    }
+  };
+
+  // Download WireGuard config for the user's active subscription devices
+  const downloadWireGuardConfig = async (platform) => {
+    setDownloading('wg-' + platform);
+    try {
+      // Find the linked device for this platform
+      const matchingDevice = devices.find(d => d.device_type === platform?.toLowerCase());
+      if (matchingDevice?.vpn_profile_key) {
+        // Build WireGuard config from device data
+        const wgConfig = `[Interface]
+PrivateKey = ${matchingDevice.vpn_profile_key}
+Address = ${matchingDevice.ip_address || '10.8.0.2'}/32
+DNS = 8.8.8.8, 1.1.1.1
+
+[Peer]
+# Connect at voxvpn.net — import this file into WireGuard app
+AllowedIPs = 0.0.0.0/0, ::/0
+PersistentKeepalive = 25
+`;
+        const blob = new Blob([wgConfig], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `VoxVPN-${platform.charAt(0).toUpperCase() + platform.slice(1)}.conf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } else {
+        alert('No WireGuard profile found for this platform. Please contact support.');
+      }
     } catch (error) {
       alert('Failed to download: ' + error.message);
     } finally {
@@ -298,27 +344,44 @@ export default function CustomerDashboard() {
             <h3 className="text-lg font-bold text-white mb-1">Download VPN Config</h3>
             <p className="text-slate-400 text-sm mb-5">Get the config file for your device.</p>
             <div className="space-y-3">
-              {downloads.length === 0 ? (
-                <p className="text-slate-500 text-sm">No downloads available at this time.</p>
-              ) : (
-                downloads.map((dl) => {
-                  const Icon = platformIcons[dl.platform] || Download;
-                  const colorClass = platformColors[dl.platform] || 'border-white/10 bg-white/5 text-slate-400';
-                  return (
-                    <motion.button key={dl.id} whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.985 }}
-                      onClick={() => downloadConfig(dl.platform?.toLowerCase() || 'windows', dl.file_url)}
-                      disabled={downloading === dl.id || !dl.file_url}
-                      className={`w-full p-3.5 rounded-xl border hover:opacity-90 transition-all flex items-center gap-3 disabled:opacity-50 ${colorClass}`}>
-                      <Icon size={20} />
-                      <div className="text-left flex-1">
-                        <p className="text-white font-semibold text-sm">{dl.name}</p>
-                        <p className="text-slate-500 text-xs">{dl.version && `v${dl.version} · `}{dl.is_free ? 'Free' : `$${dl.price}`}</p>
-                      </div>
-                      {downloading === dl.id ? <Loader2 size={16} className="ml-auto animate-spin text-cyan-400" /> : <Download size={16} className="ml-auto text-slate-500" />}
-                    </motion.button>
-                  );
-                })
-              )}
+              {/* Always show per-platform download options */}
+              {[
+                { platform: 'Windows', type: 'windows' },
+                { platform: 'macOS', type: 'macos' },
+                { platform: 'Linux', type: 'linux' },
+                { platform: 'iOS', type: 'ios' },
+                { platform: 'Android', type: 'android' },
+              ].map(({ platform, type }) => {
+                const Icon = platformIcons[platform] || Download;
+                const colorClass = platformColors[platform] || 'border-white/10 bg-white/5 text-slate-400';
+                const dlEntry = downloads.find(d => d.platform === platform);
+                return (
+                  <div key={platform} className={`p-3.5 rounded-xl border ${colorClass}`}>
+                    <div className="flex items-center gap-3 mb-2">
+                      <Icon size={18} />
+                      <p className="text-white font-semibold text-sm flex-1">{platform}</p>
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                      {/* OpenVPN */}
+                      <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                        onClick={() => downloadConfig(type, dlEntry?.file_url || null)}
+                        disabled={downloading === type}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold hover:bg-cyan-500/20 transition-all disabled:opacity-50">
+                        {downloading === type ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
+                        OpenVPN (.ovpn)
+                      </motion.button>
+                      {/* WireGuard */}
+                      <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                        onClick={() => downloadWireGuardConfig(type)}
+                        disabled={downloading === 'wg-' + type}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/10 border border-violet-500/30 text-violet-400 text-xs font-semibold hover:bg-violet-500/20 transition-all disabled:opacity-50">
+                        {downloading === 'wg-' + type ? <Loader2 size={12} className="animate-spin" /> : <Shield size={12} />}
+                        WireGuard (.conf)
+                      </motion.button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </motion.div>
 

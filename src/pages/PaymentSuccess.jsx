@@ -49,18 +49,25 @@ export default function PaymentSuccess() {
   const handleDownload = async (deviceId) => {
     setDownloading(prev => ({ ...prev, [deviceId]: true }));
     try {
-      const res = await base44.functions.invoke('generateSetupFiles', {
-        device_type: deviceId,
+      // Generate fresh OpenVPN config
+      const res = await base44.functions.invoke('downloadVpnConfig', {
+        platform: deviceId,
+        proto: 'udp',
       });
 
-      // Create download link
+      const content = typeof res.data === 'string' ? res.data : JSON.stringify(res.data);
+      const blob = new Blob([content], { type: 'application/x-openvpn-profile' });
+      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = res.data?.download_url || '#';
-      link.download = `VoxVPN-${deviceId}-setup.zip`;
+      link.href = url;
+      link.download = `VoxVPN-${deviceId}.ovpn`;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     } catch (err) {
       console.error(`Failed to download ${deviceId}:`, err);
-      alert(`Failed to download setup for ${deviceId}`);
+      alert(`Failed to download config for ${deviceId}. Please try from your dashboard.`);
     } finally {
       setDownloading(prev => ({ ...prev, [deviceId]: false }));
     }

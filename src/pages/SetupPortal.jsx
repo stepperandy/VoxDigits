@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Download, QrCode, Monitor, Terminal, Smartphone, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import { Download, QrCode, Monitor, Terminal, Smartphone, ChevronDown, ChevronUp, Loader2, Shield } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import MobileSelectSheet from '@/mobile/MobileSelectSheet';
 
@@ -39,11 +39,11 @@ const osIcon = (os) => {
 };
 
 const demoProfiles = [
-  { os: 'windows', fileName: 'VoxVPN-Windows-Setup.nsi',      downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN New York 01' },
-  { os: 'macos',   fileName: 'VoxVPN-macOS-Setup.conf',       downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN London 01' },
-  { os: 'linux',   fileName: 'VoxVPN-Linux-Setup.conf',       downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN Frankfurt 01' },
-  { os: 'android', fileName: 'VoxVPN-Android-Setup.conf',     downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN Toronto 01' },
-  { os: 'ios',     fileName: 'VoxVPN-iPhone-iPad-Setup.conf', downloadUrl: '#', qrUrl: '', serverName: 'VoxVPN Amsterdam 01' },
+  { os: 'windows', fileName: 'VoxVPN-Windows.conf',      downloadUrl: null, ovpnUrl: null, qrUrl: '', serverName: 'VoxVPN New York 01' },
+  { os: 'macos',   fileName: 'VoxVPN-macOS.conf',        downloadUrl: null, ovpnUrl: null, qrUrl: '', serverName: 'VoxVPN London 01' },
+  { os: 'linux',   fileName: 'VoxVPN-Linux.conf',        downloadUrl: null, ovpnUrl: null, qrUrl: '', serverName: 'VoxVPN Frankfurt 01' },
+  { os: 'android', fileName: 'VoxVPN-Android.conf',      downloadUrl: null, ovpnUrl: null, qrUrl: '', serverName: 'VoxVPN Toronto 01' },
+  { os: 'ios',     fileName: 'VoxVPN-iPhone-iPad.conf',  downloadUrl: null, ovpnUrl: null, qrUrl: '', serverName: 'VoxVPN Amsterdam 01' },
 ];
 
 function ProfileCard({ profile, liveMode }) {
@@ -127,13 +127,24 @@ function ProfileCard({ profile, liveMode }) {
       </div>
 
       <div className="flex flex-wrap gap-2 mt-1">
+        {/* WireGuard config */}
         <a
-          href={liveMode ? profile.downloadUrl : '#'}
-          onClick={!liveMode ? (e) => e.preventDefault() : undefined}
+          href={liveMode && profile.downloadUrl ? profile.downloadUrl : '#'}
+          onClick={(!liveMode || !profile.downloadUrl) ? (e) => e.preventDefault() : undefined}
+          download={`VoxVPN-${osLabel(profile.os)}.conf`}
           className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-extrabold text-sm text-[#02111d] transition-all"
           style={{ background: 'linear-gradient(135deg,#0ea5ff,#4fd1ff)' }}
         >
-          <Download size={13} /> Download Setup
+          <Download size={13} /> WireGuard Config
+        </a>
+        {/* OpenVPN config */}
+        <a
+          href={liveMode && profile.ovpnUrl ? profile.ovpnUrl : '#'}
+          onClick={(!liveMode || !profile.ovpnUrl) ? (e) => e.preventDefault() : undefined}
+          download={`VoxVPN-${osLabel(profile.os)}.ovpn`}
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-sm text-[#4fd1ff] border border-[#28425f] bg-[#0b1627] transition-all hover:bg-[#0d1e38]"
+        >
+          <Shield size={13} /> OpenVPN Config
         </a>
         {isMobile && (
           <button
@@ -189,11 +200,11 @@ export default function SetupPortal() {
       const mapped = (data.profiles || []).map(p => ({
         os: p.os,
         fileName: p.fileName || `VoxVPN-${p.os}-Setup.conf`,
-        downloadUrl: `/api/setup/download/${token}?os=${p.os}`,
+        downloadUrl: p.downloadUrl || null,
+        ovpnUrl: p.ovpnUrl || null,
         serverName: p.serverName || 'VoxVPN Private Server',
-        qrUrl: (p.os === 'android' || p.os === 'ios')
-          ? `/api/setup/qr/${token}?os=${p.os}`
-          : '',
+        hasPersonalizedConfig: p.hasPersonalizedConfig || false,
+        qrUrl: (p.os === 'android' || p.os === 'ios') && p.downloadUrl ? p.downloadUrl : '',
       }));
       setWelcomeText(`Setup ready for ${data.email || 'buyer'}${data.orderId ? ` · Order: ${data.orderId}` : ''}`);
       setProfiles(mapped);
