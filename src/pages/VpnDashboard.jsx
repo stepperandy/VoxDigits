@@ -82,8 +82,7 @@ export default function VpnDashboard() {
   };
 
   const handleConnect = () => {
-    // Real VPN connections require the WireGuard/OpenVPN client app.
-    // Redirect to the setup portal to download configs.
+    // Redirect to the setup portal to download VoxVPN configs.
     window.location.href = '/setup';
   };
 
@@ -233,7 +232,7 @@ export default function VpnDashboard() {
               <Shield size={48} className="text-slate-600" />
             </div>
             <div className="mt-3 text-center">
-              <p className="text-slate-500 text-sm">Use WireGuard or OpenVPN to connect</p>
+              <p className="text-slate-500 text-sm">Connect using the VoxVPN app</p>
             </div>
           </div>
 
@@ -278,10 +277,10 @@ export default function VpnDashboard() {
           <div className="rounded-xl border border-white/5 bg-[#0d1120] p-4 space-y-2">
             <p className="text-white text-xs font-bold mb-2">How to Connect</p>
             <ol className="text-slate-400 text-xs space-y-2 list-decimal list-inside">
-              <li>Download your VPN config from the Setup Portal below.</li>
-              <li>Install <span className="text-white font-semibold">WireGuard</span> or <span className="text-white font-semibold">OpenVPN Connect</span> (free).</li>
-              <li>Import your config file into the app.</li>
-              <li>Select a server and tap <span className="text-cyan-400 font-semibold">Activate / Connect</span>.</li>
+              <li>Go to the Setup Portal below.</li>
+              <li>Download the <span className="text-white font-semibold">VoxVPN</span> config for your device.</li>
+              <li>Open the <span className="text-white font-semibold">VoxVPN</span> app and import your config.</li>
+              <li>Select a server and tap <span className="text-cyan-400 font-semibold">Connect</span>.</li>
             </ol>
           </div>
 
