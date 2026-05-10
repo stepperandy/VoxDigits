@@ -181,12 +181,12 @@ export default function UserDashboard() {
 
           {/* Download button */}
           {hasAccess ? (
-            <a href={downloadUrl} target="_blank" rel="noopener noreferrer"
+            <Link to="/download"
               className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-black text-base transition-all"
               style={{ background: 'linear-gradient(135deg, #00d4ff, #0080ff)', boxShadow: '0 6px 24px rgba(0,212,255,0.25)' }}>
               <Download size={20} />
-              Download VoxVPN for Windows
-            </a>
+              Download VoxVPN
+            </Link>
           ) : (
             <div className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-slate-600 text-base border border-white/5 bg-white/2 cursor-not-allowed select-none">
               <Download size={20} />
@@ -245,7 +245,7 @@ export default function UserDashboard() {
             style={{ background: 'linear-gradient(135deg, rgba(0,212,255,0.05), rgba(0,80,160,0.05))' }}>
             <Shield size={32} className="mx-auto mb-3" style={{ color: '#00d4ff' }} />
             <h3 className="text-white font-black text-lg mb-1">Get Protected Today</h3>
-            <p className="text-slate-400 text-sm mb-4">Choose a plan and get instant access to the VoxVPN Windows installer.</p>
+            <p className="text-slate-400 text-sm mb-4">Choose a plan and get instant access to VoxVPN for Windows, Android, iOS & macOS.</p>
             <a href="/#pricing" onClick={(e) => { e.preventDefault(); window.location.assign('/#pricing'); }}
               className="inline-block px-8 py-3 rounded-xl font-bold text-black text-sm transition-all"
               style={{ background: '#00d4ff' }}>
