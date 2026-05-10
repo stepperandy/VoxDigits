@@ -120,12 +120,18 @@ export default function DownloadPage() {
       const data = res.data;
       if (data?.error) { alert('Download failed: ' + data.error); return; }
       const { url, fileName } = data;
+      // Fetch file content and create a blob to force browser download
+      const fileRes = await fetch(url);
+      const text = await fileRes.text();
+      const blob = new Blob([text], { type: 'application/x-openvpn-profile' });
+      const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url;
+      a.href = blobUrl;
       a.download = fileName || `VoxVPN-${platformId}.ovpn`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
     } catch (err) {
       alert('Download failed: ' + err.message);
     } finally {
