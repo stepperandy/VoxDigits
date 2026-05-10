@@ -143,22 +143,12 @@ function PlanCard({ plan, yearly, onSelectPlan }) {
         {yearly && <span className="ml-2 text-emerald-400 font-semibold">Save {Math.round((1 - plan.yearlyPrice / plan.monthlyPrice) * 100)}%</span>}
       </p>
 
-      {plan.name !== 'Enterprise' && (
-        <button
-          onClick={() => onSelectPlan(plan, yearly)}
-          className={`w-full py-2.5 rounded-lg text-sm font-bold mb-5 transition-all ${plan.btnClass}`}
-        >
-          `Get ${plan.name}`
-        </button>
-      )}
-      {plan.name === 'Enterprise' && (
-        <button
-          onClick={() => onSelectPlan(plan, yearly)}
-          className={`w-full py-2.5 rounded-lg text-sm font-bold mb-5 transition-all ${plan.btnClass}`}
-        >
-          Contact Sales
-        </button>
-      )}
+      <button
+        onClick={() => onSelectPlan(plan, yearly)}
+        className={`w-full py-2.5 rounded-lg text-sm font-bold mb-5 transition-all ${plan.btnClass}`}
+      >
+        `Get ${plan.name}`
+      </button>
 
       <ul className="space-y-2.5 flex-1">
         {plan.features.map((f, fi) => (
