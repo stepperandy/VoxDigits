@@ -17,10 +17,19 @@ const PLATFORMS = [
     border: 'border-blue-500/30',
     bg: 'bg-blue-500/5',
     badge: 'Windows 10 / 11',
-    file: 'VoxVPN-Setup.exe',
-    directUrl: 'https://voxvpn.net/downloads/VoxVPN-Setup.exe',
-    desc: 'One-click installer for Windows 10 and 11. Installs OpenVPN and configures your VoxVPN connection automatically.',
-    steps: ['Download VoxVPN-Setup.exe', 'Double-click the installer and follow the prompts', 'VoxVPN installs OpenVPN and connects automatically', 'Look for VoxVPN in your system tray'],
+    file: 'VoxVPN-Setup-v1.5.exe',
+    directUrl: 'https://voxvpn.net/downloads/VoxVPN-Setup-v1.5.exe',
+    version: 'v1.5',
+    size: '~45 MB',
+    featured: true,
+    desc: 'The full VoxVPN desktop app for Windows. One-click installer — includes the VPN engine, server list, login screen, and system tray controls. Supports server switching without any manual config.',
+    steps: [
+      'Download VoxVPN-Setup-v1.5.exe (free, ~45 MB)',
+      'Run the installer — click through the setup wizard (admin rights required)',
+      'VoxVPN installs silently alongside the VPN engine',
+      'Launch VoxVPN from your desktop or system tray',
+      'Log in with your VoxVPN account, pick a server, and connect',
+    ],
   },
   {
     id: 'macos',
@@ -162,31 +171,86 @@ export default function DownloadPage() {
       <div className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
 
         {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 text-xs font-medium mb-4">
-            <Download size={12} /> Download VoxVPN
+            <Download size={12} /> Official Download
           </div>
           <h1 className="text-4xl sm:text-6xl font-black text-white mb-4 leading-tight">
-            Get <span className="text-cyan-400">VoxVPN</span>
+            Download <span className="text-cyan-400">VoxVPN</span>
           </h1>
           <p className="text-slate-400 text-lg max-w-xl mx-auto">
-            Secure. Fast. Global.
+            The full VoxVPN desktop app — installs in seconds, connects in one click.
           </p>
         </motion.div>
 
-        {/* Subscription required banner */}
+        {/* Featured Windows installer hero card */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="max-w-2xl mx-auto mb-14 p-6 rounded-2xl border border-cyan-500/20 bg-[#0d1a20] text-center">
-          <Shield size={28} className="text-cyan-400 mx-auto mb-3" />
-          <h2 className="text-white font-bold text-lg mb-1">Active Subscription Required</h2>
-          <p className="text-slate-400 text-sm mb-5">A VoxVPN subscription unlocks your personal config file and the Windows installer. Plans start at $2.49/mo.</p>
-          <a href="/#pricing" onClick={(e) => { e.preventDefault(); window.location.assign('/#pricing'); }}
-            className="inline-flex items-center gap-2 px-7 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl text-sm transition-all">
-            View Plans →
-          </a>
+          className="max-w-3xl mx-auto mb-12 rounded-2xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-[#0d1120] p-8">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+            <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+              <Monitor size={32} className="text-blue-400" />
+            </div>
+            <div className="flex-1 text-center sm:text-left">
+              <div className="flex items-center justify-center sm:justify-start gap-2 mb-1 flex-wrap">
+                <h2 className="text-white font-black text-2xl">VoxVPN for Windows</h2>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 font-bold">v1.5</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">Latest</span>
+              </div>
+              <p className="text-slate-400 text-sm mb-1">Windows 10 / 11 · ~45 MB · Free installer</p>
+              <p className="text-slate-500 text-sm mb-5">Full desktop app with built-in VPN engine, server selector, login screen, and system tray icon. No manual config needed.</p>
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
+                {loadingUser ? (
+                  <div className="flex items-center gap-2 text-slate-400 text-sm"><Loader2 size={14} className="animate-spin" /> Checking account…</div>
+                ) : !user ? (
+                  <>
+                    <button onClick={() => base44.auth.redirectToLogin(window.location.href)}
+                      className="flex items-center gap-2 px-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl text-sm transition-all shadow-lg shadow-cyan-500/20">
+                      <Download size={16} /> Log In to Download
+                    </button>
+                    <a href="/#pricing" onClick={(e) => { e.preventDefault(); window.location.assign('/#pricing'); }}
+                      className="px-5 py-3 border border-white/15 hover:border-white/30 text-white font-semibold rounded-xl text-sm transition-all">
+                      View Plans
+                    </a>
+                  </>
+                ) : !hasSub ? (
+                  <>
+                    <a href="/#pricing" onClick={(e) => { e.preventDefault(); window.location.assign('/#pricing'); }}
+                      className="flex items-center gap-2 px-6 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl text-sm transition-all shadow-lg shadow-cyan-500/20">
+                      Subscribe &amp; Download
+                    </a>
+                    <p className="text-amber-400 text-xs">Subscription required · Plans from $2.49/mo</p>
+                  </>
+                ) : (
+                  <>
+                    <a href="https://voxvpn.net/downloads/VoxVPN-Setup-v1.5.exe"
+                      className="flex items-center gap-2 px-7 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-black rounded-xl text-base transition-all shadow-lg shadow-cyan-500/20">
+                      <Download size={18} /> Download VoxVPN-Setup-v1.5.exe
+                    </a>
+                    <span className="text-emerald-400 text-xs font-semibold flex items-center gap-1"><CheckCircle2 size={12} /> Active subscription</span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="mt-6 pt-6 border-t border-white/5 grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              { label: 'Includes VPN Engine', icon: '⚡' },
+              { label: 'Server Selector UI', icon: '🌍' },
+              { label: 'System Tray Controls', icon: '🖥️' },
+              { label: 'Auto-start on Boot', icon: '🔄' },
+            ].map(f => (
+              <div key={f.label} className="flex items-center gap-2 text-slate-400 text-xs">
+                <span>{f.icon}</span> {f.label}
+              </div>
+            ))}
+          </div>
         </motion.div>
 
-        <hr className="border-white/5 mb-14" />
+        <div className="text-center text-slate-600 text-xs mb-10">
+          Other platforms — use the VPN config files below (requires a VPN client app)
+        </div>
+
+        <hr className="border-white/5 mb-10" />
 
         {/* Platform selector */}
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-10">
@@ -282,10 +346,17 @@ export default function DownloadPage() {
                   <div className="flex items-center gap-2 text-emerald-400 text-xs font-semibold">
                     <CheckCircle2 size={13} /> Active subscription
                   </div>
-                  <button onClick={handleDownload} disabled={downloading}
-                    className="w-full py-3 bg-cyan-400 hover:bg-cyan-300 disabled:opacity-60 text-black font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2">
-                    {downloading ? <><Loader2 size={15} className="animate-spin" /> Generating…</> : <><Download size={15} /> Download {platform.file}</>}
-                  </button>
+                  {platform.directUrl ? (
+                    <a href={platform.directUrl}
+                      className="w-full py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+                      <Download size={15} /> Download {platform.file}
+                    </a>
+                  ) : (
+                    <button onClick={handleDownload} disabled={downloading}
+                      className="w-full py-3 bg-cyan-400 hover:bg-cyan-300 disabled:opacity-60 text-black font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+                      {downloading ? <><Loader2 size={15} className="animate-spin" /> Generating…</> : <><Download size={15} /> Download {platform.file}</>}
+                    </button>
+                  )}
                 </div>
               )}
 
