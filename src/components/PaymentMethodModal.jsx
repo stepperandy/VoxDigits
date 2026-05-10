@@ -18,8 +18,11 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
           plan: plan?.name,
           isBilledYearly: !!isBilledYearly,
         });
-        if (res.data?.url) window.location.href = res.data.url;
-        else alert('Hubtel error: ' + (res.data?.error || 'Unknown error'));
+        if (res.data?.url) {
+          window.location.href = res.data.url;
+        } else {
+          alert('Hubtel error: ' + (res.data?.error || 'Unknown error'));
+        }
         return;
       }
       // Stripe with card only (payment method selection happens in Stripe gateway)
@@ -34,8 +37,10 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
       } else {
         const errorMsg = res?.data?.error || res?.data?.message || 'Unknown error';
         alert('Payment error: ' + errorMsg);
+        setLoading(false);
       }
-    } finally {
+    } catch (error) {
+      alert('Error: ' + error.message);
       setLoading(false);
     }
   };
