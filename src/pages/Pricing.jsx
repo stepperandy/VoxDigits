@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import { motion } from 'framer-motion';
+import PaymentMethodModal from '@/components/PaymentMethodModal';
 
 const PLANS = [
   {
@@ -117,35 +118,8 @@ const PLANS = [
   },
 ];
 
-function PlanCard({ plan, yearly, onCheckout }) {
-  const [loading, setLoading] = useState(false);
+function PlanCard({ plan, yearly, onSelectPlan }) {
   const price = yearly ? plan.yearlyPrice : plan.monthlyPrice;
-
-  const handleClick = async () => {
-    setLoading(true);
-    try {
-      const res = await base44.functions.invoke('createStripeCheckout', {
-        plan: plan.name,
-        isBilledYearly: yearly,
-      });
-      // Handle axios response structure
-      const data = res?.data;
-      console.log('Checkout response:', { res, data });
-      
-      if (data?.url) {
-        window.location.href = data.url;
-      } else if (data?.error) {
-        alert('Payment error: ' + data.error);
-      } else {
-        alert('Payment error: Unable to process request');
-      }
-    } catch (err) {
-      console.error('Checkout error:', err);
-      alert('Error: ' + (err?.message || 'Unknown error occurred'));
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className={`relative rounded-xl p-6 flex flex-col ${plan.color}`}>
@@ -170,11 +144,10 @@ function PlanCard({ plan, yearly, onCheckout }) {
       </p>
 
       <button
-        onClick={handleClick}
-        disabled={loading}
-        className={`w-full py-2.5 rounded-lg text-sm font-bold mb-5 transition-all disabled:opacity-50 ${plan.btnClass}`}
+        onClick={() => onSelectPlan(plan, yearly)}
+        className={`w-full py-2.5 rounded-lg text-sm font-bold mb-5 transition-all ${plan.btnClass}`}
       >
-        {loading ? <Loader2 size={14} className="animate-spin mx-auto" /> : `Get ${plan.name}`}
+        `Get ${plan.name}`
       </button>
 
       <ul className="space-y-2.5 flex-1">
@@ -192,12 +165,21 @@ function PlanCard({ plan, yearly, onCheckout }) {
 export default function Pricing() {
   const [yearly, setYearly] = useState(false);
   const [user, setUser] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [selectedYearly, setSelectedYearly] = useState(false);
 
   useEffect(() => {
     base44.auth.me()
       .then(u => setUser(u))
       .catch(() => {});
   }, []);
+
+  const handleSelectPlan = (plan, isYearly) => {
+    setSelectedPlan(plan);
+    setSelectedYearly(isYearly);
+    setModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-[#060c1a]">
@@ -236,10 +218,19 @@ export default function Pricing() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-12">
             {PLANS.map((plan, i) => (
               <motion.div key={plan.name} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 + i * 0.05 }}>
-                <PlanCard plan={plan} yearly={yearly} />
+                <PlanCard plan={plan} yearly={yearly} onSelectPlan={handleSelectPlan} />
               </motion.div>
             ))}
           </div>
+
+          {/* Payment method modal */}
+          <PaymentMethodModal
+            isOpen={modalOpen}
+            onClose={() => setModalOpen(false)}
+            plan={selectedPlan}
+            isBilledYearly={selectedYearly}
+            isAdmin={user?.role === 'admin'}
+          />
 
           {/* Trust bar */}
           <div className="flex flex-wrap items-center justify-center gap-6 text-slate-600 text-xs">
