@@ -107,36 +107,12 @@ export default function DownloadPage() {
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activePlatform, setActivePlatform] = useState('windows');
-  const [downloading, setDownloading] = useState(false);
   const justPaid = new URLSearchParams(window.location.search).get('payment') === 'success';
 
-  const handleDownload = async (platformId) => {
-    setDownloading(true);
-    try {
-      const res = await base44.functions.invoke('setupPortal', {
-        platform: platformId,
-        proto: 'openvpn',
-      });
-      const data = res.data;
-      if (data?.error) { alert('Download failed: ' + data.error); return; }
-      const { url, fileName } = data;
-      // Fetch file content and create a blob to force browser download
-      const fileRes = await fetch(url);
-      const text = await fileRes.text();
-      const blob = new Blob([text], { type: 'application/x-openvpn-profile' });
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = fileName || `VoxVPN-${platformId}.ovpn`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(blobUrl);
-    } catch (err) {
-      alert('Download failed: ' + err.message);
-    } finally {
-      setDownloading(false);
-    }
+  const GITHUB_RELEASE = 'https://github.com/stepperandy/VoxVPN-Setup-1.5/releases/tag/v1.5';
+
+  const handleDownload = (platformId) => {
+    window.open(GITHUB_RELEASE, '_blank');
   };
 
   useEffect(() => {
@@ -330,12 +306,11 @@ export default function DownloadPage() {
 
                         <button
                           onClick={() => handleDownload(p.id)}
-                          disabled={downloading}
-                          className="inline-flex items-center justify-center gap-3 px-10 py-4 rounded-xl font-black text-base text-black transition-all shadow-2xl w-full sm:w-auto disabled:opacity-60"
+                          className="inline-flex items-center justify-center gap-3 px-10 py-4 rounded-xl font-black text-base text-black transition-all shadow-2xl w-full sm:w-auto"
                           style={{ background: `linear-gradient(135deg, ${p.color}, ${p.color}bb)`, boxShadow: `0 8px 30px ${p.color}40` }}
                         >
-                          {downloading ? <Loader2 size={20} className="animate-spin" /> : <Download size={20} />}
-                          {downloading ? 'Preparing...' : p.btnLabel}
+                          <Download size={20} />
+                          {p.btnLabel}
                         </button>
 
                         {p.appStoreUrl && (
