@@ -1,8 +1,38 @@
 import Navbar from '@/components/landing/Navbar.jsx';
 import Footer from '@/components/landing/Footer.jsx';
-import { Mail, Phone, MessageSquare, Clock } from 'lucide-react';
+import { Mail, Phone, MessageSquare, Clock, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { base44 } from '@/api/base44Client';
 
 export default function ContactUs() {
+  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      setStatus('error: all fields required');
+      return;
+    }
+    setLoading(true);
+    try {
+      await base44.integrations.Core.SendEmail({
+        to: 'support@voxdigits.com',
+        subject: `Contact Form: ${formData.subject}`,
+        body: `From: ${formData.name} (${formData.email})\n\nMessage:\n${formData.message}`,
+      });
+      setStatus('success');
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      setTimeout(() => setStatus(''), 3000);
+    } catch (err) {
+      setStatus('error: failed to send');
+      setTimeout(() => setStatus(''), 3000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-[#080c18] min-h-screen">
       <Navbar />
@@ -15,7 +45,7 @@ export default function ContactUs() {
           {[
             { icon: Mail, title: 'Email Support', desc: 'support@voxdigits.com', sub: 'We reply within 24 hours' },
             { icon: MessageSquare, title: 'Live Chat', desc: 'Available in the app', sub: 'Monday–Friday, 9am–6pm UTC' },
-            { icon: Phone, title: 'Phone', desc: '+1 (555) 123-4567', sub: 'Business hours only' },
+            { icon: Phone, title: 'Phone', desc: '+1 207-287-1513', sub: 'Business hours only' },
             { icon: Clock, title: 'Response Time', desc: '< 24 hours', sub: 'Average response time' },
           ].map(({ icon: Icon, title, desc, sub }) => (
             <div key={title} className="p-6 rounded-xl border border-white/5 bg-[#0d1120] flex items-start gap-4">
@@ -32,15 +62,47 @@ export default function ContactUs() {
         </div>
         <div className="rounded-2xl border border-white/5 bg-[#0d1120] p-8">
           <h2 className="text-white font-bold text-lg mb-6">Send Us a Message</h2>
-          <div className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <input placeholder="Your name" className="px-4 py-3 rounded-xl bg-[#060910] border border-white/10 text-white placeholder-slate-600 text-sm focus:outline-none focus:border-cyan-500/50" />
-              <input placeholder="Your email" className="px-4 py-3 rounded-xl bg-[#060910] border border-white/10 text-white placeholder-slate-600 text-sm focus:outline-none focus:border-cyan-500/50" />
+              <input 
+                placeholder="Your name" 
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                className="px-4 py-3 rounded-xl bg-[#060910] border border-white/10 text-white placeholder-slate-600 text-sm focus:outline-none focus:border-cyan-500/50" 
+              />
+              <input 
+                placeholder="Your email" 
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                className="px-4 py-3 rounded-xl bg-[#060910] border border-white/10 text-white placeholder-slate-600 text-sm focus:outline-none focus:border-cyan-500/50" 
+              />
             </div>
-            <input placeholder="Subject" className="w-full px-4 py-3 rounded-xl bg-[#060910] border border-white/10 text-white placeholder-slate-600 text-sm focus:outline-none focus:border-cyan-500/50" />
-            <textarea placeholder="Your message..." rows={5} className="w-full px-4 py-3 rounded-xl bg-[#060910] border border-white/10 text-white placeholder-slate-600 text-sm focus:outline-none focus:border-cyan-500/50 resize-none" />
-            <button className="px-8 py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-full transition-all">Send Message</button>
-          </div>
+            <input 
+              placeholder="Subject" 
+              value={formData.subject}
+              onChange={(e) => setFormData({...formData, subject: e.target.value})}
+              className="w-full px-4 py-3 rounded-xl bg-[#060910] border border-white/10 text-white placeholder-slate-600 text-sm focus:outline-none focus:border-cyan-500/50" 
+            />
+            <textarea 
+              placeholder="Your message..." 
+              rows={5} 
+              value={formData.message}
+              onChange={(e) => setFormData({...formData, message: e.target.value})}
+              className="w-full px-4 py-3 rounded-xl bg-[#060910] border border-white/10 text-white placeholder-slate-600 text-sm focus:outline-none focus:border-cyan-500/50 resize-none" 
+            />
+            {status && (
+              <p className={`text-sm font-semibold ${status.includes('success') ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {status.includes('success') ? '✓ Message sent successfully!' : status}
+              </p>
+            )}
+            <button 
+              type="submit"
+              disabled={loading}
+              className="px-8 py-3 bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 text-black font-bold rounded-full transition-all flex items-center justify-center gap-2"
+            >
+              {loading ? <Loader2 size={14} className="animate-spin" /> : 'Send Message'}
+            </button>
+          </form>
         </div>
       </div>
       <Footer />
