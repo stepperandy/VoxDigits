@@ -32,10 +32,10 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
         paymentMethod: 'card',
       });
       const url = res?.data?.url;
-      if (url) {
-        window.location.href = url;
+      if (url && url.startsWith('https://')) {
+        window.location.replace(url);
       } else {
-        const errorMsg = res?.data?.error || res?.data?.message || 'Unknown error';
+        const errorMsg = res?.data?.error || 'Failed to open checkout gateway';
         alert('Payment error: ' + errorMsg);
         setLoading(false);
       }

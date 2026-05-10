@@ -86,6 +86,10 @@ Deno.serve(async (req) => {
 
     const session = await stripeClient.checkout.sessions.create(sessionConfig);
 
+    if (!session || !session.url) {
+      return Response.json({ error: 'Failed to create checkout session' }, { status: 500 });
+    }
+
     return Response.json({
       sessionId: session.id,
       url: session.url,
