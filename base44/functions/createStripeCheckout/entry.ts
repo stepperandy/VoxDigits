@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
       ],
       mode: 'payment',
       success_url: `${Deno.env.get('APP_URL')}/download?payment=success`,
-      cancel_url: `${Deno.env.get('APP_URL')}/#pricing`,
+      cancel_url: `${Deno.env.get('APP_URL')}/pricing`,
       ...(customerEmail ? { customer_email: customerEmail } : {}),
       ...(paymentMethod === 'wechat_pay' ? { payment_method_options: { wechat_pay: { client: 'web' } } } : {}),
       metadata: {
