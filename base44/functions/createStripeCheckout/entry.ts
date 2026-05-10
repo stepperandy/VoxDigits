@@ -29,7 +29,8 @@ Deno.serve(async (req) => {
     }
 
     // Determine currency and validate payment method combo
-    const isCNY = currency === 'CNY' || paymentMethod === 'alipay' || paymentMethod === 'wechat_pay';
+    // Alipay and WeChat require USD on Stripe (they handle currency conversion)
+    const isCNY = currency === 'CNY' && paymentMethod !== 'alipay' && paymentMethod !== 'wechat_pay';
     const finalCurrency = isCNY ? 'CNY' : 'USD';
     const prices = isCNY ? PLAN_PRICES_CNY : PLAN_PRICES;
 
@@ -83,7 +84,18 @@ Deno.serve(async (req) => {
       },
     };
 
-    const session = await stripeClient.checkout.sessions.create(sessionConfig);
+    let session;
+    try {
+      session = await stripeClient.checkout.sessions.create(sessionConfig);
+    } catch (err) {
+      // If Alipay/WeChat fails, fallback to card
+      if ((paymentMethod === 'alipay' || paymentMethod === 'wechat_pay') && err.message.includes('invalid')) {
+        sessionConfig.payment_method_types = ['card'];
+        session = await stripeClient.checkout.sessions.create(sessionConfig);
+      } else {
+        throw err;
+      }
+    }
 
     return Response.json({
       sessionId: session.id,
