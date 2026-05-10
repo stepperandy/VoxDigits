@@ -31,16 +31,16 @@ Deno.serve(async (req) => {
     const clientId = Deno.env.get('HUBTEL_CLIENT_ID');
     const clientSecret = Deno.env.get('HUBTEL_CLIENT_SECRET');
     const merchantAccount = Deno.env.get('HUBTEL_MERCHANT_ACCOUNT');
-    const appUrl = Deno.env.get('APP_URL');
+    const origin = req.headers.get('origin') || Deno.env.get('APP_URL') || 'https://voxvpn.net';
 
     const credentials = btoa(`${clientId}:${clientSecret}`);
 
     const payload = {
       totalAmount: amountGHS,
       description: `VoxVPN ${plan} Plan — ${isBilledYearly ? 'Yearly' : 'Monthly'}`,
-      callbackUrl: `${appUrl}/dashboard`,
-      returnUrl: `${appUrl}/dashboard`,
-      cancellationUrl: `${appUrl}/#pricing`,
+      callbackUrl: `${origin}/dashboard`,
+      returnUrl: `${origin}/dashboard`,
+      cancellationUrl: `${origin}/#pricing`,
       merchantAccountNumber: merchantAccount,
       clientReference: `voxvpn-${plan.toLowerCase()}-${Date.now()}`,
       ...(user?.email ? { customerEmail: user.email } : {}),
