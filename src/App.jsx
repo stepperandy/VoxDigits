@@ -87,6 +87,7 @@ const AffiliateDashboard = lazy(() => import('./pages/AffiliateDashboard.jsx'));
 const Blog = lazy(() => import('./pages/Blog.jsx'));
 const BlogPost = lazy(() => import('./pages/BlogPost.jsx'));
 const Press = lazy(() => import('./pages/Press.jsx'));
+const Pricing = lazy(() => import('./pages/Pricing.jsx'));
 
 const PageTransition = ({ children }) => (
   <motion.div
@@ -192,6 +193,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} />
           <Route path="/blog/:slug" element={<PageTransition><BlogPost /></PageTransition>} />
           <Route path="/press" element={<PageTransition><Press /></PageTransition>} />
+          <Route path="/pricing" element={<PageTransition><Pricing /></PageTransition>} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Suspense>

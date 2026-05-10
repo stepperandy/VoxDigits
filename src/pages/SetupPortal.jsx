@@ -127,10 +127,10 @@ export default function SetupPortal() {
           <AlertCircle size={48} className="text-amber-400 mx-auto" />
           <h1 className="text-3xl font-black text-white">No Active Subscription</h1>
           <p className="text-slate-400">You need an active VoxVPN plan to download your config files.</p>
-          <a href="/#pricing" onClick={(e) => { e.preventDefault(); window.location.hash = 'pricing'; }}
+          <Link to="/pricing"
             className="block w-full py-3.5 bg-cyan-400 hover:bg-cyan-300 text-black font-bold rounded-xl transition-all">
             View Plans →
-          </a>
+          </Link>
           <Link to="/dashboard" className="block text-slate-500 text-sm hover:text-white transition-colors">
             Go to Dashboard
           </Link>

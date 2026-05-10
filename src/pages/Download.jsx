@@ -157,10 +157,10 @@ export default function DownloadPage() {
             className="w-full py-3.5 bg-[#00d4ff] hover:bg-[#00c4ee] text-black font-bold rounded-xl transition-all shadow-lg shadow-cyan-500/20">
             Log In to Download
           </button>
-          <a href="/#pricing" onClick={(e) => { e.preventDefault(); window.location.hash = 'pricing'; }}
+          <Link to="/pricing"
             className="block w-full py-3 border border-white/10 hover:border-white/20 text-slate-400 font-semibold rounded-xl text-sm transition-all text-center">
             Choose a Plan
-          </a>
+          </Link>
         </div>
         <Footer />
       </div>
@@ -218,11 +218,11 @@ export default function DownloadPage() {
                 <AlertCircle size={44} className="text-amber-400 mx-auto" />
                 <h2 className="text-white font-bold text-xl">No Active Subscription</h2>
                 <p className="text-slate-400 text-sm">An active VoxVPN plan is required to download the Windows installer.</p>
-                <a href="/#pricing" onClick={(e) => { e.preventDefault(); window.location.hash = 'pricing'; }}
+                <Link to="/pricing"
                   className="inline-block px-8 py-3 rounded-xl font-bold text-black text-sm transition-all"
                   style={{ background: '#00d4ff' }}>
                   Choose a Plan →
-                </a>
+                </Link>
               </motion.div>
             )}
 
@@ -245,11 +245,11 @@ export default function DownloadPage() {
                   </p>
                 )}
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <a href="/#pricing" onClick={(e) => { e.preventDefault(); window.location.hash = 'pricing'; }}
+                  <Link to="/pricing"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-black text-sm"
                     style={{ background: '#00d4ff' }}>
                     <RefreshCw size={15} /> Renew Subscription
-                  </a>
+                  </Link>
                   <Link to="/dashboard"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-white/10 text-slate-400 hover:text-white font-bold text-sm transition-all">
                     Go to Dashboard

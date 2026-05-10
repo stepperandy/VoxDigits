@@ -7,7 +7,7 @@ const navLinks = [
   { label: 'Home', href: '/' },
   { label: 'Features', href: '#features' },
   { label: 'Servers', href: '#servers' },
-  { label: 'Pricing', href: '#pricing' },
+  { label: 'Pricing', href: '/pricing' },
   { label: 'eSIM', href: 'https://voxdigits.com', external: true },
   { label: 'Virtual Numbers', href: 'https://voxdigits.com', external: true },
   { label: 'Support', href: '/contact' },
@@ -135,13 +135,12 @@ export default function Navbar() {
                   </Link>
                 </>
               )}
-              <a
-                href="#pricing"
-                onClick={() => handleNavClick('#pricing')}
+              <Link
+                to="/pricing"
                 className="px-4 py-1.5 bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-bold rounded-full transition-all shadow-lg shadow-cyan-500/20 whitespace-nowrap"
               >
                 Choose a Plan
-              </a>
+              </Link>
             </div>
 
             {/* Mobile toggle */}
@@ -188,9 +187,9 @@ export default function Navbar() {
                   </>
                 )}
               </div>
-              <a href="#pricing" onClick={() => handleNavClick('#pricing')} className="block mt-1 py-2 text-center bg-cyan-400 text-black text-sm font-bold rounded-full">
+              <Link to="/pricing" onClick={() => setMobileOpen(false)} className="block mt-1 py-2 text-center bg-cyan-400 text-black text-sm font-bold rounded-full">
                 Choose a Plan
-              </a>
+              </Link>
             </div>
           )}
         </div>
