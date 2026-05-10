@@ -228,52 +228,34 @@ export default function SetupPortal() {
           ) : (
             <div className="space-y-4">
               <p className="text-slate-400 text-sm">
-                Both files include all <strong className="text-white">{serverCount || servers.length} server locations</strong>. Choose your preferred protocol:
+                Your VoxVPN config includes all <strong className="text-white">{serverCount || servers.length} server locations</strong>.
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* OpenVPN */}
-                <div className="rounded-xl border border-white/5 bg-[#0a1020] p-5 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Shield size={16} className="text-cyan-400" />
-                    <p className="text-white font-bold text-sm">OpenVPN</p>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold">Recommended</span>
-                  </div>
-                  <p className="text-slate-400 text-xs leading-relaxed">
-                    A <code className="text-cyan-400">.ovpn</code> file for all servers. Import into <strong className="text-white">OpenVPN Connect</strong> (free) and log in with your VoxVPN email & password.
-                  </p>
-                  <button onClick={() => handleDownload('openvpn')} disabled={!!downloading}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm text-black disabled:opacity-50 transition-all"
-                    style={{ background: 'linear-gradient(135deg, #00d4ff, #0080ff)' }}>
-                    {downloading === 'openvpn' ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
-                    Download .ovpn
-                  </button>
+              <div className="rounded-xl border border-cyan-500/20 bg-[#0a1020] p-5 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Shield size={16} className="text-cyan-400" />
+                  <p className="text-white font-bold text-sm">VoxVPN Config File</p>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold">All Servers Included</span>
                 </div>
-
-                {/* WireGuard */}
-                <div className="rounded-xl border border-white/5 bg-[#0a1020] p-5 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Shield size={16} className="text-violet-400" />
-                    <p className="text-white font-bold text-sm">WireGuard</p>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400 font-bold">Fastest</span>
-                  </div>
-                  <p className="text-slate-400 text-xs leading-relaxed">
-                    A <code className="text-violet-400">.conf</code> file for <strong className="text-white">WireGuard</strong> (free). Import it into WireGuard and activate.
-                  </p>
-                  <button onClick={() => handleDownload('wireguard')} disabled={!!downloading}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm text-violet-300 border border-violet-500/30 bg-violet-500/10 hover:bg-violet-500/20 disabled:opacity-50 transition-all">
-                    {downloading === 'wireguard' ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
-                    Download .conf
-                  </button>
-                </div>
+                <p className="text-slate-400 text-xs leading-relaxed">
+                  Download your personal <code className="text-cyan-400">.ovpn</code> config file. Import it into the <strong className="text-white">VoxVPN app</strong> and log in with your VoxVPN email &amp; password to connect.
+                </p>
+                <button onClick={() => handleDownload('openvpn')} disabled={!!downloading}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm text-black disabled:opacity-50 transition-all"
+                  style={{ background: 'linear-gradient(135deg, #00d4ff, #0080ff)' }}>
+                  {downloading === 'openvpn' ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+                  Download VoxVPN Config
+                </button>
               </div>
 
-              {/* After downloading instructions */}
+              {/* Instructions */}
               <div className="rounded-xl border border-white/5 bg-[#0a1020] p-4 space-y-2">
-                <p className="text-white text-xs font-bold">After Downloading:</p>
+                <p className="text-white text-xs font-bold">How to Connect:</p>
                 <ol className="text-slate-400 text-xs space-y-1 list-decimal list-inside">
-                  <li><strong className="text-white">OpenVPN:</strong> Install <a href="https://openvpn.net/client/" target="_blank" rel="noreferrer" className="text-cyan-400 underline">OpenVPN Connect</a> → Import .ovpn → Log in with your VoxVPN email & password → Connect.</li>
-                  <li><strong className="text-white">WireGuard:</strong> Install <a href="https://www.wireguard.com/install/" target="_blank" rel="noreferrer" className="text-cyan-400 underline">WireGuard</a> → Import .conf → Activate the tunnel.</li>
+                  <li>Download your VoxVPN config file above.</li>
+                  <li>Install <a href="https://openvpn.net/client/" target="_blank" rel="noreferrer" className="text-cyan-400 underline">VoxVPN app</a> on your device (free).</li>
+                  <li>Open the app → Import the config file.</li>
+                  <li>Log in with your VoxVPN email &amp; password → Connect.</li>
                 </ol>
               </div>
             </div>
