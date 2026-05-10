@@ -241,8 +241,25 @@ export default function Pricing() {
 
           {/* Currency Info */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.03 }}
-            className="text-center mb-6">
+            className="text-center mb-6 flex items-center justify-center gap-2">
             <p className="text-slate-500 text-xs">Prices shown in <span className="text-cyan-400 font-semibold">{currency.code}</span></p>
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch('https://ipapi.co/json/');
+                  const data = await res.json();
+                  const code = data.country_code || 'US';
+                  const detected = CURRENCY_RATES[code] || CURRENCY_RATES['US'];
+                  setCurrency(detected);
+                  setCountryCode(code);
+                } catch {
+                  setCurrency(CURRENCY_RATES['US']);
+                }
+              }}
+              className="text-cyan-400 hover:text-cyan-300 text-xs font-semibold ml-1"
+            >
+              (refresh)
+            </button>
           </motion.div>
 
           {/* Toggle */}
