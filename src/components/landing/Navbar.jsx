@@ -1,7 +1,8 @@
 import { Menu, X, LogOut, Shield, Globe } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { LanguageContext } from '@/lib/LanguageContext';
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -26,11 +27,11 @@ const LANGUAGES = [
 ];
 
 export default function Navbar() {
+  const { language, changeLanguage } = useContext(LanguageContext);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [activeHash, setActiveHash] = useState('');
   const [announcementVisible, setAnnouncementVisible] = useState(true);
-  const [language, setLanguage] = useState('en');
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const location = useLocation();
 
@@ -125,7 +126,7 @@ export default function Navbar() {
                       <button
                         key={lang.code}
                         onClick={() => {
-                          setLanguage(lang.code);
+                          changeLanguage(lang.code);
                           setLangDropdownOpen(false);
                         }}
                         className={`w-full flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
@@ -220,7 +221,7 @@ export default function Navbar() {
                     <button
                       key={lang.code}
                       onClick={() => {
-                        setLanguage(lang.code);
+                        changeLanguage(lang.code);
                         setMobileOpen(false);
                       }}
                       className={`w-full flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors ${

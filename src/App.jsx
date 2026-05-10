@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import ThemeProvider from '@/lib/ThemeProvider';
 import { TabProvider } from '@/mobile/MobileTabContext';
 import FloatingAssistant from '@/components/FloatingAssistant';
+import { LanguageProvider } from '@/lib/LanguageContext';
 
 // Lazy-loaded pages
 const Home = lazy(() => import('./pages/Home'));
@@ -218,19 +219,21 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider>
-      <TabProvider>
-        <AuthProvider>
-          <QueryClientProvider client={queryClientInstance}>
-            <Router>
-              <AuthenticatedAppWrapper isMobileDevice={isMobileDevice} />
-              <FloatingAssistant />
-            </Router>
-            <Toaster />
-          </QueryClientProvider>
-        </AuthProvider>
-      </TabProvider>
-    </ThemeProvider>
+    <LanguageProvider>
+      <ThemeProvider>
+        <TabProvider>
+          <AuthProvider>
+            <QueryClientProvider client={queryClientInstance}>
+              <Router>
+                <AuthenticatedAppWrapper isMobileDevice={isMobileDevice} />
+                <FloatingAssistant />
+              </Router>
+              <Toaster />
+            </QueryClientProvider>
+          </AuthProvider>
+        </TabProvider>
+      </ThemeProvider>
+    </LanguageProvider>
   )
 }
 
