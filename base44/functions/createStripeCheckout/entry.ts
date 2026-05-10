@@ -51,10 +51,15 @@ Deno.serve(async (req) => {
     const stripe = await import('npm:stripe@14.0.0');
     const stripeClient = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY'));
 
+    // Determine payment method types based on selected method
+    let paymentMethodTypes = ['card'];
+    if (paymentMethod === 'alipay') paymentMethodTypes = ['alipay'];
+    if (paymentMethod === 'wechat_pay') paymentMethodTypes = ['wechat_pay'];
+
     // Always use payment mode (one-time)
     const sessionConfig = {
       mode: 'payment',
-      payment_method_types: ['card'],
+      payment_method_types: paymentMethodTypes,
       line_items: [
         {
           price_data: {
