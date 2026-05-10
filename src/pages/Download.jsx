@@ -37,15 +37,17 @@ const PLATFORMS = [
     title: 'VoxVPN for Android',
     subtitle: 'Protect your Android phone or tablet with military-grade encryption',
     specs: 'Android 8.0+',
-    btnLabel: 'Get on Google Play',
-    url: 'https://play.google.com/store/apps/details?id=net.openvpn.openvpn',
-    isExternal: true,
-    note: 'Uses OpenVPN Connect. Import your VoxVPN profile after installing.',
+    btnLabel: 'Get Your Android Config',
+    url: '/setup',
+    isExternal: false,
+    note: 'Step 1: Install OpenVPN Connect (free) from Google Play. Step 2: Use the Setup Portal to download your personal .ovpn config file.',
+    appStoreUrl: 'https://play.google.com/store/apps/details?id=net.openvpn.openvpn',
+    appStoreLabel: 'Install OpenVPN Connect on Google Play →',
     steps: [
-      'Download OpenVPN Connect from Google Play',
-      'Open the app and tap "Import Profile"',
-      'Sign in at voxvpn.net/setup to get your config file',
-      'Import the .ovpn file and tap Connect',
+      'Install OpenVPN Connect (free) from Google Play',
+      'Click "Get Your Android Config" above to open the Setup Portal',
+      'Select "Android" as your platform and download the .ovpn file',
+      'In OpenVPN Connect, tap "+" → Import → select the .ovpn file → Connect',
     ],
   },
   {
@@ -56,15 +58,17 @@ const PLATFORMS = [
     title: 'VoxVPN for iPhone & iPad',
     subtitle: 'Secure, private browsing on all your Apple mobile devices',
     specs: 'iOS 14+',
-    btnLabel: 'Get on App Store',
-    url: 'https://apps.apple.com/app/openvpn-connect/id590379981',
-    isExternal: true,
-    note: 'Uses OpenVPN Connect. Import your VoxVPN profile after installing.',
+    btnLabel: 'Get Your iOS Config',
+    url: '/setup',
+    isExternal: false,
+    note: 'Step 1: Install OpenVPN Connect (free) from the App Store. Step 2: Use the Setup Portal to download your personal .ovpn config file.',
+    appStoreUrl: 'https://apps.apple.com/app/openvpn-connect/id590379981',
+    appStoreLabel: 'Install OpenVPN Connect on App Store →',
     steps: [
-      'Download OpenVPN Connect from the App Store',
-      'Open the app and tap "Import Profile"',
-      'Sign in at voxvpn.net/setup to get your config file',
-      'Import the .ovpn file and tap Connect',
+      'Install OpenVPN Connect (free) from the App Store',
+      'Click "Get Your iOS Config" above to open the Setup Portal',
+      'Select "iPhone / iPad" as your platform and download the .ovpn file',
+      'In OpenVPN Connect, tap "+" → Import → select the .ovpn file → Connect',
     ],
   },
   {
@@ -75,15 +79,17 @@ const PLATFORMS = [
     title: 'VoxVPN for macOS',
     subtitle: 'Secure your Mac with VoxVPN using OpenVPN Connect',
     specs: 'macOS 11+',
-    btnLabel: 'Get on Mac App Store',
-    url: 'https://apps.apple.com/app/openvpn-connect/id1559693890',
-    isExternal: true,
-    note: 'Uses OpenVPN Connect for Mac. Import your VoxVPN .ovpn config file after installing.',
+    btnLabel: 'Get Your macOS Config',
+    url: '/setup',
+    isExternal: false,
+    note: 'Step 1: Install OpenVPN Connect (free) from the Mac App Store. Step 2: Use the Setup Portal to download your personal .ovpn config file.',
+    appStoreUrl: 'https://apps.apple.com/app/openvpn-connect/id1559693890',
+    appStoreLabel: 'Install OpenVPN Connect on Mac App Store →',
     steps: [
-      'Download OpenVPN Connect from the Mac App Store',
-      'Open the app and click "Import Profile"',
-      'Sign in at voxvpn.net/setup to download your config',
-      'Import the .ovpn file and click Connect',
+      'Install OpenVPN Connect (free) from the Mac App Store',
+      'Click "Get Your macOS Config" above to open the Setup Portal',
+      'Select "macOS" as your platform and download the .ovpn file',
+      'In OpenVPN Connect, click "+" → Import → select the .ovpn file → Connect',
     ],
   },
 ];
@@ -292,17 +298,36 @@ export default function DownloadPage() {
                           <span>20+ Server Locations</span>
                         </div>
 
-                        <a
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-3 px-10 py-4 rounded-xl font-black text-base text-black transition-all shadow-2xl w-full sm:w-auto"
-                          style={{ background: `linear-gradient(135deg, ${p.color}, ${p.color}bb)`, boxShadow: `0 8px 30px ${p.color}40` }}
-                        >
-                          <Download size={20} />
-                          {p.btnLabel}
-                          <ExternalLink size={15} className="opacity-70" />
-                        </a>
+                        {p.isExternal ? (
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-3 px-10 py-4 rounded-xl font-black text-base text-black transition-all shadow-2xl w-full sm:w-auto"
+                            style={{ background: `linear-gradient(135deg, ${p.color}, ${p.color}bb)`, boxShadow: `0 8px 30px ${p.color}40` }}
+                          >
+                            <Download size={20} />
+                            {p.btnLabel}
+                            <ExternalLink size={15} className="opacity-70" />
+                          </a>
+                        ) : (
+                          <Link
+                            to={url}
+                            className="inline-flex items-center justify-center gap-3 px-10 py-4 rounded-xl font-black text-base text-black transition-all shadow-2xl w-full sm:w-auto"
+                            style={{ background: `linear-gradient(135deg, ${p.color}, ${p.color}bb)`, boxShadow: `0 8px 30px ${p.color}40` }}
+                          >
+                            <Download size={20} />
+                            {p.btnLabel}
+                          </Link>
+                        )}
+
+                        {p.appStoreUrl && (
+                          <a href={p.appStoreUrl} target="_blank" rel="noopener noreferrer"
+                            className="text-xs mt-1 inline-flex items-center gap-1 opacity-60 hover:opacity-100 transition-opacity"
+                            style={{ color: p.color }}>
+                            {p.appStoreLabel} <ExternalLink size={11} />
+                          </a>
+                        )}
 
                         <p className="text-slate-600 text-xs">{p.note}</p>
                       </div>
