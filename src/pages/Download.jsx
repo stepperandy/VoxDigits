@@ -3,11 +3,90 @@ import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { Download, Loader2, AlertCircle, Shield, Lock, CheckCircle2, Monitor, RefreshCw, ExternalLink } from 'lucide-react';
+import { Download, Loader2, AlertCircle, Shield, Lock, CheckCircle2, Monitor, RefreshCw, ExternalLink, Smartphone, Apple } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const INSTALLER_URL = 'https://github.com/stepperandy/VoxVPN-Setup-1.5/releases/tag/v1.5';
 const INSTALLER_VERSION = 'v1.5';
+
+const PLATFORMS = [
+  {
+    id: 'windows',
+    label: 'Windows',
+    icon: Monitor,
+    color: '#00d4ff',
+    title: 'VoxVPN for Windows',
+    subtitle: 'Full desktop installer — installs in seconds, connects in one click',
+    specs: 'Windows 10 / 11',
+    btnLabel: 'Download VoxVPN for Windows',
+    url: INSTALLER_URL,
+    isExternal: true,
+    note: 'Clicking opens the GitHub release page. Select VoxVPN-Setup-v1.5.exe to download.',
+    steps: [
+      'Download the installer using the button above',
+      'Run VoxVPN-Setup-v1.5.exe (allow admin prompt if asked)',
+      'Sign in with your VoxVPN account credentials',
+      'Choose a server location and click Connect',
+    ],
+  },
+  {
+    id: 'android',
+    label: 'Android',
+    icon: Smartphone,
+    color: '#34A853',
+    title: 'VoxVPN for Android',
+    subtitle: 'Protect your Android phone or tablet with military-grade encryption',
+    specs: 'Android 8.0+',
+    btnLabel: 'Get on Google Play',
+    url: 'https://play.google.com/store/apps/details?id=net.openvpn.openvpn',
+    isExternal: true,
+    note: 'Uses OpenVPN Connect. Import your VoxVPN profile after installing.',
+    steps: [
+      'Download OpenVPN Connect from Google Play',
+      'Open the app and tap "Import Profile"',
+      'Sign in at voxvpn.net/setup to get your config file',
+      'Import the .ovpn file and tap Connect',
+    ],
+  },
+  {
+    id: 'ios',
+    label: 'iOS',
+    icon: Apple,
+    color: '#A2AAAD',
+    title: 'VoxVPN for iPhone & iPad',
+    subtitle: 'Secure, private browsing on all your Apple mobile devices',
+    specs: 'iOS 14+',
+    btnLabel: 'Get on App Store',
+    url: 'https://apps.apple.com/app/openvpn-connect/id590379981',
+    isExternal: true,
+    note: 'Uses OpenVPN Connect. Import your VoxVPN profile after installing.',
+    steps: [
+      'Download OpenVPN Connect from the App Store',
+      'Open the app and tap "Import Profile"',
+      'Sign in at voxvpn.net/setup to get your config file',
+      'Import the .ovpn file and tap Connect',
+    ],
+  },
+  {
+    id: 'macos',
+    label: 'macOS',
+    icon: Monitor,
+    color: '#A2AAAD',
+    title: 'VoxVPN for macOS',
+    subtitle: 'Secure your Mac with VoxVPN using OpenVPN Connect',
+    specs: 'macOS 11+',
+    btnLabel: 'Get on Mac App Store',
+    url: 'https://apps.apple.com/app/openvpn-connect/id1559693890',
+    isExternal: true,
+    note: 'Uses OpenVPN Connect for Mac. Import your VoxVPN .ovpn config file after installing.',
+    steps: [
+      'Download OpenVPN Connect from the Mac App Store',
+      'Open the app and click "Import Profile"',
+      'Sign in at voxvpn.net/setup to download your config',
+      'Import the .ovpn file and click Connect',
+    ],
+  },
+];
 
 const ACTIVE_STATUSES = ['active', 'trial'];
 
@@ -20,6 +99,7 @@ export default function DownloadPage() {
   const [user, setUser] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activePlatform, setActivePlatform] = useState('windows');
   const justPaid = new URLSearchParams(window.location.search).get('payment') === 'success';
 
   useEffect(() => {
@@ -74,7 +154,7 @@ export default function DownloadPage() {
     <div className="min-h-screen bg-[#060c1a]">
       <Navbar />
 
-      <div className="pt-28 pb-24 px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto">
+      <div className="pt-28 pb-24 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto">
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
@@ -161,70 +241,90 @@ export default function DownloadPage() {
               </motion.div>
             )}
 
-            {/* Active — show download */}
+            {/* Active — show download with platform tabs */}
             {canDownload(subscription) && (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-                {/* Main download card */}
-                <div className="rounded-2xl border border-[#00d4ff]/30 bg-[#0d1420] p-8 mb-6 text-center space-y-6"
-                  style={{ boxShadow: '0 0 40px rgba(0,212,255,0.06)' }}>
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-20 h-20 rounded-2xl flex items-center justify-center"
-                      style={{ background: 'linear-gradient(135deg, rgba(0,212,255,0.15), rgba(0,100,200,0.1))', border: '1px solid rgba(0,212,255,0.2)' }}>
-                      <Monitor size={36} style={{ color: '#00d4ff' }} />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-black text-white">VoxVPN for Windows</h2>
-                      <p className="text-slate-400 text-sm mt-1">Full desktop installer — installs in seconds, connects in one click</p>
-                    </div>
-                  </div>
 
-                  <div className="flex items-center justify-center gap-4 text-xs text-slate-500 flex-wrap">
-                    <span className="flex items-center gap-1.5"><Shield size={11} className="text-emerald-400" /> AES-256 Encrypted</span>
-                    <span>·</span>
-                    <span>Windows 10 / 11</span>
-                    <span>·</span>
-                    <span>Version {INSTALLER_VERSION}</span>
-                    <span>·</span>
-                    <span>20+ Server Locations</span>
-                  </div>
-
-                  <a
-                    href={downloadUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-3 px-10 py-4 rounded-xl font-black text-lg text-black transition-all shadow-2xl w-full sm:w-auto"
-                    style={{ background: 'linear-gradient(135deg, #00d4ff, #0080ff)', boxShadow: '0 8px 30px rgba(0,212,255,0.3)' }}
-                  >
-                    <Download size={22} />
-                    Download VoxVPN for Windows
-                    <ExternalLink size={16} className="opacity-70" />
-                  </a>
-
-                  <p className="text-slate-600 text-xs">
-                    Clicking will open the GitHub release page. Select <strong className="text-slate-400">VoxVPN-Setup-v1.5.exe</strong> to download.
-                  </p>
+                {/* Platform Tabs */}
+                <div className="flex gap-2 mb-4 bg-[#0d1420] p-1.5 rounded-2xl border border-white/5 flex-wrap">
+                  {PLATFORMS.map((p) => {
+                    const Icon = p.icon;
+                    const isActive = activePlatform === p.id;
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => setActivePlatform(p.id)}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-sm font-bold transition-all min-w-[80px] ${
+                          isActive ? 'bg-[#060c1a] text-white border border-white/10' : 'text-slate-500 hover:text-slate-300'
+                        }`}
+                      >
+                        <Icon size={15} style={{ color: isActive ? p.color : undefined }} />
+                        {p.label}
+                      </button>
+                    );
+                  })}
                 </div>
 
-                {/* Install steps */}
-                <div className="rounded-2xl border border-white/5 bg-[#0d1420] p-6 mb-6">
-                  <h3 className="text-white font-bold text-sm mb-4">How to Install</h3>
-                  <ol className="space-y-3">
-                    {[
-                      'Download the installer using the button above',
-                      'Run VoxVPN-Setup-v1.5.exe (allow admin prompt if asked)',
-                      'Sign in with your VoxVPN account credentials',
-                      'Choose a server location and click Connect',
-                    ].map((step, i) => (
-                      <li key={i} className="flex items-start gap-3">
-                        <span className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-black text-black"
-                          style={{ background: '#00d4ff', marginTop: '1px' }}>
-                          {i + 1}
-                        </span>
-                        <span className="text-slate-400 text-sm leading-relaxed">{step}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
+                {/* Platform Card */}
+                {PLATFORMS.filter(p => p.id === activePlatform).map((p) => {
+                  const Icon = p.icon;
+                  const url = p.id === 'windows' ? downloadUrl : p.url;
+                  return (
+                    <div key={p.id}>
+                      <div className="rounded-2xl border bg-[#0d1420] p-8 mb-6 text-center space-y-6"
+                        style={{ borderColor: `${p.color}40`, boxShadow: `0 0 40px ${p.color}0a` }}>
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="w-20 h-20 rounded-2xl flex items-center justify-center"
+                            style={{ background: `linear-gradient(135deg, ${p.color}25, ${p.color}10)`, border: `1px solid ${p.color}30` }}>
+                            <Icon size={36} style={{ color: p.color }} />
+                          </div>
+                          <div>
+                            <h2 className="text-2xl font-black text-white">{p.title}</h2>
+                            <p className="text-slate-400 text-sm mt-1">{p.subtitle}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-center gap-4 text-xs text-slate-500 flex-wrap">
+                          <span className="flex items-center gap-1.5"><Shield size={11} className="text-emerald-400" /> AES-256 Encrypted</span>
+                          <span>·</span>
+                          <span>{p.specs}</span>
+                          <span>·</span>
+                          <span>20+ Server Locations</span>
+                        </div>
+
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-3 px-10 py-4 rounded-xl font-black text-base text-black transition-all shadow-2xl w-full sm:w-auto"
+                          style={{ background: `linear-gradient(135deg, ${p.color}, ${p.color}bb)`, boxShadow: `0 8px 30px ${p.color}40` }}
+                        >
+                          <Download size={20} />
+                          {p.btnLabel}
+                          <ExternalLink size={15} className="opacity-70" />
+                        </a>
+
+                        <p className="text-slate-600 text-xs">{p.note}</p>
+                      </div>
+
+                      {/* Install steps */}
+                      <div className="rounded-2xl border border-white/5 bg-[#0d1420] p-6 mb-6">
+                        <h3 className="text-white font-bold text-sm mb-4">How to Install</h3>
+                        <ol className="space-y-3">
+                          {p.steps.map((step, i) => (
+                            <li key={i} className="flex items-start gap-3">
+                              <span className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-black text-black"
+                                style={{ background: p.color, marginTop: '1px' }}>
+                                {i + 1}
+                              </span>
+                              <span className="text-slate-400 text-sm leading-relaxed">{step}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    </div>
+                  );
+                })}
 
                 {/* Actions row */}
                 <div className="flex flex-col sm:flex-row gap-3">
