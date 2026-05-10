@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
           quantity: 1,
         },
       ],
-      success_url: `${origin}/download?payment=success`,
+      success_url: `${origin}/payment-success`,
       cancel_url: `${origin}/pricing`,
       ...(customerEmail ? { customer_email: customerEmail } : {}),
       metadata: {
