@@ -168,11 +168,25 @@ const CURRENCY_RATES = {
   'CN': { code: 'CNY', rate: 7.3, symbol: '¥' },
   'US': { code: 'USD', rate: 1, symbol: '$' },
   'GB': { code: 'GBP', rate: 0.79, symbol: '£' },
-  'EU': { code: 'EUR', rate: 0.92, symbol: '€' },
   'JP': { code: 'JPY', rate: 155, symbol: '¥' },
   'IN': { code: 'INR', rate: 83, symbol: '₹' },
   'BR': { code: 'BRL', rate: 4.97, symbol: 'R$' },
   'AU': { code: 'AUD', rate: 1.50, symbol: 'A$' },
+  // EU countries
+  'FR': { code: 'EUR', rate: 0.92, symbol: '€' },
+  'DE': { code: 'EUR', rate: 0.92, symbol: '€' },
+  'IT': { code: 'EUR', rate: 0.92, symbol: '€' },
+  'ES': { code: 'EUR', rate: 0.92, symbol: '€' },
+  'NL': { code: 'EUR', rate: 0.92, symbol: '€' },
+  'BE': { code: 'EUR', rate: 0.92, symbol: '€' },
+  'AT': { code: 'EUR', rate: 0.92, symbol: '€' },
+  'IE': { code: 'EUR', rate: 0.92, symbol: '€' },
+  'PT': { code: 'EUR', rate: 0.92, symbol: '€' },
+  'GR': { code: 'EUR', rate: 0.92, symbol: '€' },
+  'PL': { code: 'EUR', rate: 0.92, symbol: '€' },
+  'SE': { code: 'EUR', rate: 0.92, symbol: '€' },
+  'NO': { code: 'EUR', rate: 0.92, symbol: '€' },
+  'CH': { code: 'EUR', rate: 0.92, symbol: '€' },
 };
 
 export default function Pricing() {
