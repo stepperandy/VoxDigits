@@ -246,7 +246,7 @@ export default function UserDashboard() {
             <Shield size={32} className="mx-auto mb-3" style={{ color: '#00d4ff' }} />
             <h3 className="text-white font-black text-lg mb-1">Get Protected Today</h3>
             <p className="text-slate-400 text-sm mb-4">Choose a plan and get instant access to VoxVPN for Windows, Android, iOS & macOS.</p>
-            <a href="/#pricing" onClick={(e) => { e.preventDefault(); window.location.assign('/#pricing'); }}
+            <a href="/#pricing" onClick={(e) => { e.preventDefault(); window.location.hash = 'pricing'; }}
               className="inline-block px-8 py-3 rounded-xl font-bold text-black text-sm transition-all"
               style={{ background: '#00d4ff' }}>
               View Plans →
