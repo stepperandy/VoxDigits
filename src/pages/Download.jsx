@@ -109,10 +109,15 @@ export default function DownloadPage() {
   const [activePlatform, setActivePlatform] = useState('windows');
   const justPaid = new URLSearchParams(window.location.search).get('payment') === 'success';
 
-  const GITHUB_RELEASE = 'https://github.com/stepperandy/VoxVPN-Setup-1.5/releases/tag/v1.5';
+  const DIRECT_DOWNLOAD_URL = 'https://github.com/stepperandy/VoxVPN-Setup-1.5/releases/download/v1.5/VoxVPN-Setup-v1.5.exe';
 
   const handleDownload = (platformId) => {
-    window.open(GITHUB_RELEASE, '_blank');
+    const a = document.createElement('a');
+    a.href = DIRECT_DOWNLOAD_URL;
+    a.download = 'VoxVPN-Setup-v1.5.exe';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   useEffect(() => {

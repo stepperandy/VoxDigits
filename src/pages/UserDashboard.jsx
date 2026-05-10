@@ -9,7 +9,7 @@ import {
   CreditCard, HeadphonesIcon, Clock, XCircle, Calendar, LogOut, User
 } from 'lucide-react';
 
-const INSTALLER_URL = 'https://github.com/stepperandy/VoxVPN-Setup-1.5/releases/tag/v1.5';
+const INSTALLER_URL = 'https://github.com/stepperandy/VoxVPN-Setup-1.5/releases/download/v1.5/VoxVPN-Setup-v1.5.exe';
 
 const STATUS_CONFIG = {
   active:    { label: 'Active',    color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30', dot: 'bg-emerald-400' },
@@ -181,12 +181,12 @@ export default function UserDashboard() {
 
           {/* Download button */}
           {hasAccess ? (
-            <Link to="/download"
+            <a href={downloadUrl} download="VoxVPN-Setup-v1.5.exe"
               className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-black text-base transition-all"
               style={{ background: 'linear-gradient(135deg, #00d4ff, #0080ff)', boxShadow: '0 6px 24px rgba(0,212,255,0.25)' }}>
               <Download size={20} />
               Download VoxVPN
-            </Link>
+            </a>
           ) : (
             <div className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-slate-600 text-base border border-white/5 bg-white/2 cursor-not-allowed select-none">
               <Download size={20} />
