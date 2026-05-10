@@ -140,7 +140,7 @@ export default function Navbar() {
                 onClick={() => handleNavClick('#pricing')}
                 className="px-4 py-1.5 bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-bold rounded-full transition-all shadow-lg shadow-cyan-500/20 whitespace-nowrap"
               >
-                Get Protected
+                Choose a Plan
               </a>
             </div>
 
@@ -189,7 +189,7 @@ export default function Navbar() {
                 )}
               </div>
               <a href="#pricing" onClick={() => handleNavClick('#pricing')} className="block mt-1 py-2 text-center bg-cyan-400 text-black text-sm font-bold rounded-full">
-                Get Protected
+                Choose a Plan
               </a>
             </div>
           )}
