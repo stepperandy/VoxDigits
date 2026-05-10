@@ -29,11 +29,10 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: plan?.name,
         isBilledYearly: !!isBilledYearly,
-        paymentMethod: 'card',
       });
       const url = res?.data?.url;
-      if (url && url.startsWith('https://')) {
-        window.location.replace(url);
+      if (url) {
+        window.location.href = url;
       } else {
         const errorMsg = res?.data?.error || 'Failed to open checkout gateway';
         alert('Payment error: ' + errorMsg);
