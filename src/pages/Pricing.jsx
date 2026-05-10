@@ -128,12 +128,14 @@ function PlanCard({ plan, yearly, onCheckout }) {
         plan: plan.name,
         isBilledYearly: yearly,
       });
+      console.log('Checkout response:', res);
       if (res.data?.url) {
         window.location.href = res.data.url;
       } else {
-        alert('Payment error: ' + (res.data?.error || 'Unknown error'));
+        alert('Payment error: ' + (res.data?.error || JSON.stringify(res.data)));
       }
     } catch (err) {
+      console.error('Checkout error:', err);
       alert('Error: ' + err.message);
     } finally {
       setLoading(false);
