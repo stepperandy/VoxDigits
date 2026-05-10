@@ -230,6 +230,7 @@ export default function Pricing() {
             plan={selectedPlan}
             isBilledYearly={selectedYearly}
             isAdmin={user?.role === 'admin'}
+            onProceed={() => setModalOpen(false)}
           />
 
           {/* Trust bar */}
