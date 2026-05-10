@@ -84,18 +84,7 @@ Deno.serve(async (req) => {
       },
     };
 
-    let session;
-    try {
-      session = await stripeClient.checkout.sessions.create(sessionConfig);
-    } catch (err) {
-      // If Alipay/WeChat fails, fallback to card
-      if ((paymentMethod === 'alipay' || paymentMethod === 'wechat_pay') && err.message.includes('invalid')) {
-        sessionConfig.payment_method_types = ['card'];
-        session = await stripeClient.checkout.sessions.create(sessionConfig);
-      } else {
-        throw err;
-      }
-    }
+    const session = await stripeClient.checkout.sessions.create(sessionConfig);
 
     return Response.json({
       sessionId: session.id,
