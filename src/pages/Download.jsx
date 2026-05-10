@@ -6,7 +6,7 @@ import { base44 } from '@/api/base44Client';
 import { Monitor, Download, CheckCircle2, Loader2, AlertCircle, Shield } from 'lucide-react';
 
 // ── UPDATE THIS URL when the new installer is uploaded ──────────────────────
-const INSTALLER_URL = 'https://github.com/stepperandy/voxvpn-backnd/releases/download/v1.5/VoxVPN-Setup-v1.5.exe';
+const INSTALLER_URL = 'https://github.com/stepperandy/VoxVPN-Setup-1.5/releases/download/v1.5/VoxVPN-Setup-v1.5.exe';
 const INSTALLER_FILE = 'VoxVPN-Setup-v1.5.exe';
 const INSTALLER_VERSION = 'v1.5';
 const INSTALLER_SIZE = '';
