@@ -216,17 +216,59 @@ export default function DownloadPage() {
           </div>
         </motion.div>
 
-        {/* Other platforms coming soon */}
+        {/* macOS, Linux, Router */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
-          className="rounded-2xl border border-white/5 bg-[#0d1120] p-6 mb-6">
-          <h3 className="text-white font-bold text-base mb-4">Other Platforms</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {['macOS', 'Linux', 'Router'].map(platform => (
-              <div key={platform} className="flex items-center justify-between px-4 py-3 rounded-xl border border-white/5 bg-[#0a1020]">
-                <span className="text-slate-400 text-sm">{platform}</span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold">Coming Soon</span>
+          className="rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/5 to-[#0d1120] p-6 mb-6">
+          <h3 className="text-white font-bold text-base mb-1">macOS, Linux & Router</h3>
+          <p className="text-slate-400 text-xs mb-5">Use your VPN config from the Setup Portal with any OpenVPN or WireGuard client.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* macOS */}
+            <div className="rounded-xl border border-white/5 bg-[#0a1020] p-4 space-y-2">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">🍏</span>
+                <p className="text-white font-bold text-sm">macOS</p>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 font-bold">Available</span>
               </div>
-            ))}
+              <ol className="text-slate-400 text-xs space-y-1 list-decimal list-inside">
+                <li>Install <a href="https://tunnelblick.net" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Tunnelblick</a> (OpenVPN) or <a href="https://www.wireguard.com/install/" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">WireGuard</a></li>
+                <li>Go to your <a href="/setup" className="text-cyan-400 hover:underline">Setup Portal</a> and download your config</li>
+                <li>Double-click the config file to import</li>
+                <li>Click <strong className="text-white">Connect</strong></li>
+              </ol>
+            </div>
+            {/* Linux */}
+            <div className="rounded-xl border border-white/5 bg-[#0a1020] p-4 space-y-2">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">🐧</span>
+                <p className="text-white font-bold text-sm">Linux</p>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 font-bold">Available</span>
+              </div>
+              <ol className="text-slate-400 text-xs space-y-1 list-decimal list-inside">
+                <li>Install OpenVPN: <code className="text-cyan-400">sudo apt install openvpn</code></li>
+                <li>Go to your <a href="/setup" className="text-cyan-400 hover:underline">Setup Portal</a> and download your config</li>
+                <li>Run: <code className="text-cyan-400">sudo openvpn --config VoxVPN.ovpn</code></li>
+                <li>Or use WireGuard: run the setup script as root</li>
+              </ol>
+            </div>
+            {/* Router */}
+            <div className="rounded-xl border border-white/5 bg-[#0a1020] p-4 space-y-2">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">📡</span>
+                <p className="text-white font-bold text-sm">Router</p>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 font-bold">Available</span>
+              </div>
+              <ol className="text-slate-400 text-xs space-y-1 list-decimal list-inside">
+                <li>Ensure your router runs OpenWrt or DD-WRT</li>
+                <li>Go to your <a href="/setup" className="text-cyan-400 hover:underline">Setup Portal</a> and download your config</li>
+                <li>Upload the <code className="text-cyan-400">.ovpn</code> file to your router's VPN client section</li>
+                <li>Enable the tunnel — all devices on your network are protected</li>
+              </ol>
+            </div>
+          </div>
+          <div className="mt-4 text-center">
+            <a href="/setup" className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/30 text-violet-300 font-semibold text-sm rounded-xl transition-all">
+              Go to Setup Portal →
+            </a>
           </div>
         </motion.div>
 
