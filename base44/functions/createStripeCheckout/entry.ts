@@ -34,13 +34,8 @@ Deno.serve(async (req) => {
     const stripe = await import('npm:stripe@14.0.0');
     const stripeClient = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY'));
 
-    // Alipay and WeChat Pay don't support subscription mode — always use one-time payment mode
-    // When card is selected, show all payment options so user can choose on Stripe's page
-    const isAlternativeMethod = paymentMethod === 'alipay' || paymentMethod === 'wechat_pay';
-
-    const paymentMethodTypes = isAlternativeMethod
-      ? [paymentMethod]
-      : ['card', 'alipay', 'wechat_pay'];
+    // Only use card for now (alipay and wechat_pay require account activation in Stripe)
+    const paymentMethodTypes = ['card'];
 
     // Always use payment mode (one-time) since alipay/wechat don't support subscriptions
     const sessionConfig = {
@@ -62,7 +57,7 @@ Deno.serve(async (req) => {
       success_url: `${Deno.env.get('APP_URL')}/download?payment=success`,
       cancel_url: `${Deno.env.get('APP_URL')}/pricing`,
       ...(customerEmail ? { customer_email: customerEmail } : {}),
-      ...(paymentMethod === 'wechat_pay' ? { payment_method_options: { wechat_pay: { client: 'web' } } } : {}),
+
       metadata: {
         plan: plan,
         billing: isBilledYearly ? 'yearly' : 'monthly',
