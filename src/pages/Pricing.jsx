@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Check, Zap, Loader2 } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
@@ -8,57 +8,56 @@ import PaymentMethodModal from '@/components/PaymentMethodModal';
 
 const PLANS = [
   {
-    name: 'Basic',
-    monthlyPrice: 2.59,
-    yearlyPrice: 2.09,
-    yearlyTotal: 25.08,
-    devices: 3,
+    name: '1 Month',
+    duration: '30 Days',
+    stripePlanName: 'Basic',
+    totalPrice: 2.59,
+    perMonthPrice: 2.59,
+    months: 1,
     color: 'border-white/5 bg-[#0d1120]',
     btnClass: 'border border-slate-700 hover:border-cyan-500 text-white hover:text-cyan-400',
     features: [
-      '1 Device',
-      '20 Server Locations',
       'Unlimited Bandwidth',
       'AES-256 Encryption',
       'No-Logs Policy',
-      'VoxVPN Protocol',
-    ],
-  },
-  {
-    name: 'Standard',
-    monthlyPrice: 6.59,
-    yearlyPrice: 4.09,
-    yearlyTotal: 49.08,
-    devices: 5,
-    color: 'border-white/5 bg-[#0d1120]',
-    btnClass: 'border border-slate-700 hover:border-cyan-500 text-white hover:text-cyan-400',
-    features: [
-      '3 Devices',
-      '20+ Server Locations',
-      'Unlimited Bandwidth',
-      'AES-256 Encryption',
-      'No-Logs Policy',
-      'VoxVPN Protocol',
+      'All Server Locations',
       'Kill Switch',
     ],
   },
   {
-    name: 'Premium',
-    monthlyPrice: 9.59,
-    yearlyPrice: 6.09,
-    yearlyTotal: 73.08,
-    devices: 8,
+    name: '3 Months',
+    duration: '90 Days',
+    stripePlanName: 'Standard',
+    totalPrice: 6.59,
+    perMonthPrice: 2.20,
+    months: 3,
+    color: 'border-white/5 bg-[#0d1120]',
+    btnClass: 'border border-slate-700 hover:border-cyan-500 text-white hover:text-cyan-400',
+    features: [
+      'Unlimited Bandwidth',
+      'AES-256 Encryption',
+      'No-Logs Policy',
+      'All Server Locations',
+      'Kill Switch',
+      'Split Tunneling',
+    ],
+  },
+  {
+    name: '6 Months',
+    duration: '180 Days',
+    stripePlanName: 'Premium',
+    totalPrice: 12.59,
+    perMonthPrice: 2.10,
+    months: 6,
     badge: 'Most Popular',
     badgeColor: 'bg-cyan-500 text-black',
     color: 'border-2 border-cyan-500 bg-[#0d1a20] shadow-lg shadow-cyan-500/10',
     btnClass: 'bg-cyan-500 hover:bg-cyan-400 text-black',
     features: [
-      '5 Devices',
-      '20+ Server Locations',
       'Unlimited Bandwidth',
       'AES-256 Encryption',
       'No-Logs Policy',
-      'VoxVPN Protocol',
+      'All Server Locations',
       'Kill Switch',
       'Split Tunneling',
       'DNS Leak Protection',
@@ -66,62 +65,56 @@ const PLANS = [
     ],
   },
   {
-    name: 'Advanced',
-    monthlyPrice: 14.59,
-    yearlyPrice: 9.59,
-    yearlyTotal: 115.08,
-    devices: 10,
+    name: '1 Year',
+    duration: '365 Days',
+    stripePlanName: 'Advanced',
+    totalPrice: 22.59,
+    perMonthPrice: 1.88,
+    months: 12,
     badge: 'Best Value',
     badgeColor: 'bg-emerald-500 text-black',
     color: 'border-white/5 bg-[#0d1120]',
     btnClass: 'border border-slate-700 hover:border-cyan-500 text-white hover:text-cyan-400',
     features: [
-      '10 Devices',
-      '20 Server Locations',
       'Unlimited Bandwidth',
       'AES-256 Encryption',
       'No-Logs Policy',
-      'VoxVPN Protocol',
+      'All Server Locations',
       'Kill Switch',
       'Split Tunneling',
-      'DNS Leak Protection',
+      'DNS & IPv6 Leak Protection',
       'Dedicated IP Address',
       '24/7 Priority Support',
-      'Double VPN (Multi-hop)',
     ],
   },
   {
-    name: 'Enterprise',
-    monthlyPrice: 29.59,
-    yearlyPrice: 19.59,
-    yearlyTotal: 235.08,
-    devices: 'Unlimited',
+    name: '2 Years',
+    duration: '730 Days',
+    stripePlanName: 'Enterprise',
+    totalPrice: 38.59,
+    perMonthPrice: 1.61,
+    months: 24,
     color: 'border-violet-500/30 bg-[#120d1a] shadow-lg shadow-violet-500/5',
     btnClass: 'bg-violet-600 hover:bg-violet-500 text-white',
     features: [
-      'Unlimited Devices',
-      'All 20 Server Locations',
       'Unlimited Bandwidth',
       'AES-256 Encryption',
       'No-Logs Policy',
-      'VoxVPN Protocol',
+      'All Server Locations',
       'Kill Switch',
       'Split Tunneling',
       'DNS & IPv6 Leak Protection',
       'Static Dedicated IP',
-      'Dedicated Account Manager',
       'Double VPN (Multi-hop)',
-      'Custom DNS Settings',
-      'Team Management Dashboard',
-      'SLA Guarantee',
+      'Dedicated Account Manager',
     ],
   },
 ];
 
-function PlanCard({ plan, yearly, onSelectPlan, currency, convertPrice }) {
-  const price = yearly ? plan.yearlyPrice : plan.monthlyPrice;
-  const convertedPrice = convertPrice(price);
-  const convertedTotal = yearly ? convertPrice(plan.yearlyPrice * 12) : convertPrice(price);
+function PlanCard({ plan, onSelectPlan, currency, convertPrice }) {
+  const convertedTotal = convertPrice(plan.totalPrice);
+  const convertedPerMonth = convertPrice(plan.perMonthPrice);
+  const savePct = Math.round((1 - plan.perMonthPrice / PLANS[0].perMonthPrice) * 100);
 
   return (
     <div className={`relative rounded-xl p-6 flex flex-col ${plan.color}`}>
@@ -133,23 +126,25 @@ function PlanCard({ plan, yearly, onSelectPlan, currency, convertPrice }) {
 
       <div className="mb-4">
         <h3 className="text-white font-bold text-base mb-0.5">{plan.name}</h3>
-        <p className="text-slate-600 text-xs">{plan.devices} {typeof plan.devices === 'number' ? 'device' + (plan.devices > 1 ? 's' : '') : 'devices'}</p>
+        <p className="text-slate-500 text-xs">{plan.duration} Unlimited</p>
       </div>
 
       <div className="flex items-baseline gap-1 mb-1">
-        <span className="text-3xl font-extrabold text-white">{currency.symbol}{convertedPrice}</span>
-        <span className="text-slate-500 text-xs">/mo</span>
+        <span className="text-3xl font-extrabold text-white">{currency.symbol}{convertedTotal}</span>
       </div>
-      <p className="text-slate-600 text-xs mb-5">
-        {yearly ? `Billed ${currency.symbol}${convertedTotal}/${currency.code === 'JPY' || currency.code === 'INR' ? 'year' : 'year'}` : 'Billed monthly'}
-        {yearly && <span className="ml-2 text-emerald-400 font-semibold">Save {Math.round((1 - plan.yearlyPrice / plan.monthlyPrice) * 100)}%</span>}
+      <p className="text-slate-600 text-xs mb-1">
+        {currency.symbol}{convertedPerMonth}/mo
       </p>
+      {savePct > 0 && (
+        <p className="text-emerald-400 text-xs font-semibold mb-4">Save {savePct}% vs monthly</p>
+      )}
+      {savePct === 0 && <div className="mb-4" />}
 
       <button
-        onClick={() => onSelectPlan(plan, yearly)}
+        onClick={() => onSelectPlan(plan)}
         className={`w-full py-2.5 rounded-lg text-sm font-bold mb-5 transition-all ${plan.btnClass}`}
       >
-        `Get ${plan.name}`
+        Get {plan.name}
       </button>
 
       <ul className="space-y-2.5 flex-1">
@@ -190,11 +185,9 @@ const CURRENCY_RATES = {
 };
 
 export default function Pricing() {
-  const [yearly, setYearly] = useState(false);
   const [user, setUser] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const [selectedYearly, setSelectedYearly] = useState(false);
   const [currency, setCurrency] = useState({ code: 'USD', rate: 1, symbol: '$' });
   const [countryCode, setCountryCode] = useState('US');
 
@@ -217,9 +210,9 @@ export default function Pricing() {
       .catch(() => {});
   }, []);
 
-  const handleSelectPlan = (plan, isYearly) => {
-    setSelectedPlan(plan);
-    setSelectedYearly(isYearly);
+  const handleSelectPlan = (plan) => {
+    // Map duration plan to a stripe plan name
+    setSelectedPlan({ ...plan, name: plan.stripePlanName });
     setModalOpen(true);
   };
 
@@ -241,7 +234,7 @@ export default function Pricing() {
 
           {/* Currency Info */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.03 }}
-            className="text-center mb-6 flex items-center justify-center gap-2">
+            className="text-center mb-10 flex items-center justify-center gap-2">
             <p className="text-slate-500 text-xs">Prices shown in <span className="text-cyan-400 font-semibold">{currency.code}</span></p>
             <button
               onClick={async () => {
@@ -262,32 +255,11 @@ export default function Pricing() {
             </button>
           </motion.div>
 
-          {/* Toggle */}
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }} className="flex justify-center mb-10">
-            <div className="flex items-center gap-1 bg-[#0d1120] border border-white/10 rounded-full p-1">
-              <button
-                onClick={() => setYearly(false)}
-                className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${!yearly ? 'bg-cyan-500 text-black' : 'text-slate-400 hover:text-white'}`}
-              >
-                Monthly
-              </button>
-              <button
-                onClick={() => setYearly(true)}
-                className={`px-5 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${yearly ? 'bg-cyan-500 text-black' : 'text-slate-400 hover:text-white'}`}
-              >
-                Yearly
-                <span className={`text-xs font-black px-2 py-0.5 rounded-full ${yearly ? 'bg-black/20 text-black' : 'bg-emerald-500/20 text-emerald-400'}`}>
-                  <Zap size={10} className="inline mr-0.5" />Save up to 33%
-                </span>
-              </button>
-            </div>
-          </motion.div>
-
           {/* Plans grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-12">
             {PLANS.map((plan, i) => (
               <motion.div key={plan.name} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 + i * 0.05 }}>
-                <PlanCard plan={plan} yearly={yearly} onSelectPlan={handleSelectPlan} currency={currency} convertPrice={convertPrice} />
+                <PlanCard plan={plan} onSelectPlan={handleSelectPlan} currency={currency} convertPrice={convertPrice} />
               </motion.div>
             ))}
           </div>
@@ -297,7 +269,7 @@ export default function Pricing() {
             isOpen={modalOpen}
             onClose={() => setModalOpen(false)}
             plan={selectedPlan}
-            isBilledYearly={selectedYearly}
+            isBilledYearly={false}
             isAdmin={user?.role === 'admin'}
             onProceed={() => setModalOpen(false)}
             currency={currency}
