@@ -36,12 +36,6 @@ export default function FloatingAssistant() {
     setInitializing(true);
     setError(null);
     try {
-      const isAuthed = await base44.auth.isAuthenticated();
-      if (!isAuthed) {
-        setError('login_required');
-        setInitializing(false);
-        return;
-      }
       const convo = await base44.agents.createConversation({
         agent_name: AGENT_NAME,
         metadata: { name: 'VoxVPN Chat' },
@@ -117,18 +111,6 @@ export default function FloatingAssistant() {
               <div className="flex flex-col items-center justify-center h-full gap-2">
                 <Loader2 size={20} className="text-cyan-400 animate-spin" />
                 <p className="text-slate-500 text-xs">Starting assistant...</p>
-              </div>
-            ) : error === 'login_required' ? (
-              <div className="flex flex-col items-center justify-center h-full text-center px-4 gap-3">
-                <Shield size={28} className="text-slate-600 mb-1" />
-                <p className="text-slate-300 text-sm font-semibold">Sign in to chat with us</p>
-                <p className="text-slate-500 text-xs">Log in to access the VoxVPN AI assistant.</p>
-                <button
-                  onClick={() => base44.auth.redirectToLogin(window.location.href)}
-                  className="px-5 py-2 bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-bold rounded-full transition-all"
-                >
-                  Log In
-                </button>
               </div>
             ) : error ? (
               <div className="flex flex-col items-center justify-center h-full text-center px-4 gap-3">
