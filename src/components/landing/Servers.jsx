@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
 import { Signal, Loader2, Globe, Zap, Shield, Wifi } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { base44 } from '@/api/base44Client';
-import WorldMap from './WorldMap';
+
+const WorldMap = lazy(() => import('./WorldMap'));
 
 const regionNames = {
   amsterdam:    { name: 'Amsterdam',    country: 'Netherlands',    flag: '🇳🇱', region: 'Europe' },
@@ -123,7 +124,14 @@ export default function Servers() {
               <p className="text-slate-400 text-sm">Loading live server network…</p>
             </div>
           ) : (
-            <WorldMap servers={servers} />
+            <Suspense fallback={
+              <div className="flex flex-col items-center justify-center py-32 rounded-3xl border border-white/5 bg-[#040810]">
+                <Loader2 size={32} className="animate-spin text-cyan-400 mb-3" />
+                <p className="text-slate-400 text-sm">Loading map…</p>
+              </div>
+            }>
+              <WorldMap servers={servers} />
+            </Suspense>
           )}
         </motion.div>
 

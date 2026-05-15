@@ -73,7 +73,10 @@ export default function WorldMap({ servers = [] }) {
         <defs>
           <filter id="glow">
             <feGaussianBlur stdDeviation="0.4" result="blur" />
-            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
           </filter>
         </defs>
 
