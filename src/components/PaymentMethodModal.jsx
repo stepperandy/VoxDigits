@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CreditCard, X, Smartphone } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+// v2
 
 export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, isAdmin, isBilledYearly, currency, countryCode }) {
   const [selectedMethod, setSelectedMethod] = useState('stripe');
