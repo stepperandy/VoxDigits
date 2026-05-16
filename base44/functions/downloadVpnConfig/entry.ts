@@ -80,13 +80,23 @@ function generateOvpn({ server, user, device = null, proto = 'udp' }) {
   return lines.join('\n') + '\n';
 }
 
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+const INACTIVE_STATUSES = ['expired', 'cancelled', 'paused'];
+
 Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
+
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
 
     if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return Response.json({ error: 'Unauthorized' }, { status: 401, headers: CORS });
     }
 
     const body = await req.json().catch(() => ({}));
@@ -95,9 +105,13 @@ Deno.serve(async (req) => {
     // Verify active subscription (admins bypass)
     if (user.role !== 'admin') {
       const subs = await base44.entities.VPNSubscription.filter({ user_email: user.email });
-      const active = subs?.find(s => s.status === 'active');
+      const active = subs?.find(s => ['active', 'trial'].includes(s.status));
       if (!active) {
-        return Response.json({ error: 'No active subscription found' }, { status: 403 });
+        const blocked = subs?.find(s => INACTIVE_STATUSES.includes(s.status));
+        const reason = blocked
+          ? `Subscription is ${blocked.status}. Please renew at voxvpn.net.`
+          : 'No active subscription found.';
+        return Response.json({ error: reason }, { status: 403, headers: CORS });
       }
     }
 
