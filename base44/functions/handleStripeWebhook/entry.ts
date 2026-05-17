@@ -10,34 +10,39 @@ const PLAN_DEVICES = {
 };
 
 async function syncSubscription(base44, customerEmail, plan, stripeSubscriptionId, status, billingCycle) {
-  // Find existing subscription record
   const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: customerEmail });
   const existing = subs.find(s => s.stripe_subscription_id === stripeSubscriptionId) || subs[0];
 
-  const renewalDate = new Date();
+  // Calculate exact renewal date from NOW based on billing cycle
+  const startDate = new Date();
+  const renewalDate = new Date(startDate);
   if (billingCycle === 'yearly') {
     renewalDate.setFullYear(renewalDate.getFullYear() + 1);
   } else {
     renewalDate.setMonth(renewalDate.getMonth() + 1);
   }
 
+  const resolvedPlan = plan || existing?.plan || 'Basic';
+  const resolvedCycle = billingCycle || existing?.billing_cycle || 'monthly';
+
   const subData = {
     user_email: customerEmail,
-    plan: plan || existing?.plan || 'Basic',
+    plan: resolvedPlan,
     status: status,
-    billing_cycle: billingCycle || existing?.billing_cycle || 'monthly',
+    billing_cycle: resolvedCycle,
     stripe_subscription_id: stripeSubscriptionId,
+    start_date: startDate.toISOString(),
     renewal_date: renewalDate.toISOString(),
-    max_devices: PLAN_DEVICES[plan || existing?.plan || 'Basic'] || 1,
+    max_devices: PLAN_DEVICES[resolvedPlan] || 1,
     price: 0,
   };
 
   if (existing) {
     await base44.asServiceRole.entities.VPNSubscription.update(existing.id, subData);
-    console.log(`Updated subscription for ${customerEmail}: ${status}`);
+    console.log(`Updated subscription for ${customerEmail}: ${status} until ${renewalDate.toDateString()}`);
   } else {
     await base44.asServiceRole.entities.VPNSubscription.create(subData);
-    console.log(`Created subscription for ${customerEmail}: ${status}`);
+    console.log(`Created subscription for ${customerEmail}: ${status} until ${renewalDate.toDateString()}`);
   }
 }
 

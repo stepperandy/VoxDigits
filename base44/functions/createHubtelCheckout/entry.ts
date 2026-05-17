@@ -38,14 +38,17 @@ Deno.serve(async (req) => {
 
     const credentials = btoa(`${clientId}:${clientSecret}`);
 
+    const billingCycle = isBilledYearly ? 'yearly' : 'monthly';
+    const clientRef = `voxvpn-${plan.toLowerCase()}-${billingCycle}-${Date.now()}`;
+
     const payload = {
       totalAmount: amountGHS,
       description: `VoxVPN ${plan} Plan — ${isBilledYearly ? 'Yearly' : 'Monthly'}`,
-      callbackUrl: `${origin}/dashboard`,
-      returnUrl: `${origin}/dashboard`,
-      cancellationUrl: `${origin}/#pricing`,
+      callbackUrl: `${origin}/dashboard?payment=success&plan=${encodeURIComponent(plan)}`,
+      returnUrl: `${origin}/dashboard?payment=success&plan=${encodeURIComponent(plan)}`,
+      cancellationUrl: `${origin}/payment-failed`,
       merchantAccountNumber: merchantAccount,
-      clientReference: `voxvpn-${plan.toLowerCase()}-${Date.now()}`,
+      clientReference: clientRef,
       ...(user?.email ? { customerEmail: user.email } : {}),
     };
 
@@ -67,7 +70,7 @@ Deno.serve(async (req) => {
 
     return Response.json({
       url: data.data.checkoutDirectUrl,
-      clientReference: payload.clientReference,
+      clientReference: clientRef,
       amountGHS,
     });
   } catch (error) {

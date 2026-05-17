@@ -41,6 +41,7 @@ export default function UserDashboard() {
   const [portalLoading, setPortalLoading] = useState(false);
   const location = useLocation();
   const justPaid = new URLSearchParams(location.search).get('payment') === 'success';
+  const pendingPlan = new URLSearchParams(location.search).get('plan');
 
   useEffect(() => {
     const init = async () => {
@@ -61,6 +62,21 @@ export default function UserDashboard() {
           || subs?.[0]
           || null;
         setSubscription(best);
+
+        // If user just paid via Hubtel but has no active subscription yet, auto-provision
+        if (justPaid && (!best || !['active', 'trial'].includes(best?.status))) {
+          try {
+            await base44.functions.invoke('recoverPaidUser', {
+              email: me.email,
+              plan: pendingPlan || best?.plan || 'Standard',
+              billing_cycle: 'monthly',
+            });
+            // Re-fetch subscription
+            const subs2 = await base44.entities.VPNSubscription.filter({ user_email: me.email });
+            const best2 = subs2?.find(s => s.status === 'active') || subs2?.[0] || null;
+            setSubscription(best2);
+          } catch (_) { /* non-fatal */ }
+        }
       } catch {
         // ignore
       } finally {

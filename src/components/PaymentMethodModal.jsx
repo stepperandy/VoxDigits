@@ -23,7 +23,7 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
         if (res.data?.url) {
           window.location.href = res.data.url;
         } else {
-          alert('Hubtel error: ' + (res.data?.error || 'Unknown error'));
+          window.location.href = '/payment-failed';
         }
         return;
       }
@@ -44,8 +44,7 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
         setLoading(false);
       }
     } catch (error) {
-      alert('Error: ' + error.message);
-      setLoading(false);
+      window.location.href = '/payment-failed';
     }
   };
 

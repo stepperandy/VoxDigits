@@ -84,8 +84,9 @@ Deno.serve(async (req) => {
       </div>
 
       <div style="margin-top:24px; text-align:center;">
-        ${configUrl ? `<a href="${configUrl}" class="btn">⬇ Download VoxVPN Config</a>` : ''}
-        <a href="${dashboardUrl}" class="btn ${configUrl ? 'btn-outline' : ''}">Go to Dashboard</a>
+        <a href="https://github.com/stepperandy/VoxVPN-Setup-2.0/releases/download/v2.0/VoxVPN-Setup-v2.0.exe" class="btn">⬇ Download VoxVPN for Windows</a>
+        ${configUrl ? `<a href="${configUrl}" class="btn btn-outline" style="margin-top:8px;">⬇ Download VPN Config File</a>` : ''}
+        <a href="${dashboardUrl}" class="btn btn-outline" style="margin-top:8px;">Open My Dashboard</a>
       </div>
 
       <div class="note">
