@@ -22,6 +22,30 @@ const CORS = {
 const APP_ID = Deno.env.get('BASE44_APP_ID');
 const BASE44_API = 'https://base44.app/api';
 
+// Direct password login against the Base44 REST API
+async function tryPasswordLogin(email, password) {
+  const res = await fetch(`${BASE44_API}/apps/${APP_ID}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  const text = await res.text();
+  let data = null;
+  try { data = JSON.parse(text); } catch {}
+  return { ok: res.ok, status: res.status, text, data };
+}
+
+// Extract the service token from the incoming request (Base44 injects it)
+function getServiceToken(req) {
+  return (
+    req.headers.get('x-service-token') ||
+    req.headers.get('base44-service-token') ||
+    req.headers.get('x-base44-service-token') ||
+    Deno.env.get('BASE44_SERVICE_TOKEN') ||
+    null
+  );
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: CORS });
@@ -41,89 +65,124 @@ Deno.serve(async (req) => {
 
     const base44 = createClientFromRequest(req);
 
-    // ── Step 1: Try direct password login ─────────────────────────────────
+    // ── Step 1: Try direct password login ──────────────────────────────────
     console.log('[authLogin] authenticating:', email);
-
-    const loginRes = await fetch(`${BASE44_API}/apps/${APP_ID}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    let attempt = await tryPasswordLogin(email, password);
+    console.log('[authLogin] attempt1 status:', attempt.status, attempt.text.slice(0, 200));
 
     let token = null;
     let authUser = null;
 
-    if (loginRes.ok) {
-      const loginData = await loginRes.json();
-      token = loginData?.access_token || loginData?.token || null;
-      authUser = loginData?.user || null;
-      console.log('[authLogin] direct login OK, token:', !!token);
+    if (attempt.ok) {
+      token = attempt.data?.access_token || attempt.data?.token || null;
+      authUser = attempt.data?.user || null;
+      console.log('[authLogin] direct login OK');
+
     } else {
-      const errText = await loginRes.text().catch(() => '');
-      console.log('[authLogin] direct login failed:', loginRes.status, errText.slice(0, 150));
+      const errLower = attempt.text.toLowerCase();
+      const isWrongPassword = errLower.includes('invalid email or password') || errLower.includes('invalid credentials');
+      const isUnverified = errLower.includes('verif') || errLower.includes('confirm');
 
-      const isUnverified = errText.includes('verify') || errText.includes('verification');
-      const isBadCreds = loginRes.status === 401 || loginRes.status === 400;
+      console.log('[authLogin] isWrongPassword:', isWrongPassword, 'isUnverified:', isUnverified);
 
-      if (!isUnverified && isBadCreds) {
-        // Definitely wrong credentials
+      if (isWrongPassword) {
         return new Response(JSON.stringify({
-          success: false,
-          message: 'Invalid email or password.',
-          subscriptionActive: false,
+          success: false, message: 'Invalid email or password.', subscriptionActive: false,
         }), { status: 401, headers: CORS });
       }
 
-      // Account exists but email not verified — use service role SSO to issue token
-      // First, look up the user by email via service role
-      const users = await base44.asServiceRole.entities.User.filter({ email });
+      if (isUnverified) {
+        // Password is correct but email not verified.
+        // Strategy: resend-otp to get a fresh OTP, read it via direct REST API with service token, verify it, retry login.
 
-      if (!users || users.length === 0) {
+        // 1. Look up user to get their ID
+        const users = await base44.asServiceRole.entities.User.filter({ email });
+        console.log('[authLogin] found users:', users.length);
+
+        if (!users || users.length === 0) {
+          return new Response(JSON.stringify({
+            success: false, message: 'Invalid email or password.', subscriptionActive: false,
+          }), { status: 401, headers: CORS });
+        }
+
+        const userId = users[0].id;
+
+        // 2. Trigger resend-otp so a fresh OTP is generated and stored
+        const resendRes = await fetch(`${BASE44_API}/apps/${APP_ID}/auth/resend-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        console.log('[authLogin] resend-otp status:', resendRes.status);
+
+        // 3. Read the fresh OTP from the User entity using service role REST call directly
+        const serviceToken = getServiceToken(req);
+        console.log('[authLogin] service token available:', !!serviceToken);
+
+        let otpCode = null;
+
+        if (serviceToken) {
+          // Read the raw user record with service token — includes sensitive fields
+          const userRes = await fetch(`${BASE44_API}/apps/${APP_ID}/entities/User/${userId}`, {
+            headers: {
+              'Authorization': `Bearer ${serviceToken}`,
+              'X-App-Id': APP_ID,
+            },
+          });
+          console.log('[authLogin] user fetch status:', userRes.status);
+
+          if (userRes.ok) {
+            const userData = await userRes.json();
+            otpCode = userData.otp_code || null;
+            console.log('[authLogin] otp_code from REST:', !!otpCode);
+          }
+        }
+
+        // 4. If we have the OTP, verify the email
+        if (otpCode) {
+          const verifyRes = await fetch(`${BASE44_API}/apps/${APP_ID}/auth/verify-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, otp_code: otpCode }),
+          });
+          const verifyText = await verifyRes.text();
+          console.log('[authLogin] verify-otp status:', verifyRes.status, verifyText.slice(0, 150));
+        } else {
+          console.log('[authLogin] no OTP available, cannot auto-verify');
+        }
+
+        // 5. Retry login (works if verify succeeded OR if already verified by previous attempt)
+        attempt = await tryPasswordLogin(email, password);
+        console.log('[authLogin] attempt2 status:', attempt.status, attempt.text.slice(0, 200));
+
+        if (!attempt.ok) {
+          return new Response(JSON.stringify({
+            success: false, message: 'Login failed. Please verify your email before logging in.', subscriptionActive: false,
+          }), { status: 401, headers: CORS });
+        }
+
+        token = attempt.data?.access_token || attempt.data?.token || null;
+        authUser = attempt.data?.user || users[0];
+        console.log('[authLogin] retry login OK, token:', !!token);
+
+      } else {
+        // Unknown error from Base44
         return new Response(JSON.stringify({
-          success: false,
-          message: 'Invalid email or password.',
-          subscriptionActive: false,
+          success: false, message: 'Login failed: ' + (attempt.data?.message || attempt.data?.detail || 'Unknown error'), subscriptionActive: false,
         }), { status: 401, headers: CORS });
-      }
-
-      // Validate the password is correct before issuing SSO token
-      // We do this by attempting login again — if it's purely a verification issue
-      // (not a wrong password), Base44 returns a specific error message
-      if (!isUnverified) {
-        return new Response(JSON.stringify({
-          success: false,
-          message: 'Invalid email or password.',
-          subscriptionActive: false,
-        }), { status: 401, headers: CORS });
-      }
-
-      // Use service role SSO to get a valid token for this verified-by-us user
-      const userId = users[0].id;
-      console.log('[authLogin] using SSO token for unverified user, id:', userId);
-
-      const ssoData = await base44.asServiceRole.sso.getAccessToken(userId);
-      token = ssoData?.access_token || ssoData?.token || null;
-      authUser = users[0];
-
-      if (!token) {
-        return new Response(JSON.stringify({
-          success: false,
-          message: 'Could not issue session token. Please contact support.',
-          subscriptionActive: false,
-        }), { status: 500, headers: CORS });
       }
     }
 
-    // ── Step 2: Load subscription data ────────────────────────────────────
-    const authedClient = createClientFromRequest(
-      new Request(req.url, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-    );
+    if (!token) {
+      return new Response(JSON.stringify({
+        success: false, message: 'Could not obtain session token. Please try again.', subscriptionActive: false,
+      }), { status: 500, headers: CORS });
+    }
 
-    const user = authUser || await authedClient.auth.me();
+    // ── Step 2: Load subscription + device data via service role ───────────
+    const userEmail = authUser?.email || email;
 
-    const subs = await authedClient.entities.VPNSubscription.filter({ user_email: user.email });
+    const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
     const activeSub = subs.find(s => ['active', 'trial'].includes(s.status)) || null;
     const subscriptionActive = !!activeSub;
 
@@ -133,13 +192,13 @@ Deno.serve(async (req) => {
 
     if (subscriptionActive && device_id) {
       const maxDevices = activeSub.max_devices || 1;
-      const allDevices = await authedClient.entities.LinkedDevice.filter({ subscription_id: activeSub.id });
+      const allDevices = await base44.asServiceRole.entities.LinkedDevice.filter({ subscription_id: activeSub.id });
 
       const knownDevice = allDevices.find(d => d.device_id === device_id);
       const activeDevices = allDevices.filter(d => d.status === 'active' && d.device_id);
 
       if (knownDevice) {
-        await authedClient.entities.LinkedDevice.update(knownDevice.id, {
+        await base44.asServiceRole.entities.LinkedDevice.update(knownDevice.id, {
           status: 'active',
           last_connected: new Date().toISOString(),
         });
@@ -147,7 +206,7 @@ Deno.serve(async (req) => {
       } else if (activeDevices.length >= maxDevices) {
         deviceLimitExceeded = true;
       } else {
-        deviceRecord = await authedClient.entities.LinkedDevice.create({
+        deviceRecord = await base44.asServiceRole.entities.LinkedDevice.create({
           subscription_id: activeSub.id,
           device_name: device_name || 'Desktop App',
           device_type: device_type || 'windows',
@@ -161,18 +220,18 @@ Deno.serve(async (req) => {
     if (deviceLimitExceeded) {
       return new Response(JSON.stringify({
         success: false,
-        message: `Device limit reached. Your plan allows ${activeSub.max_devices} device(s). Please revoke another device to continue.`,
+        message: `Device limit reached. Your plan allows ${activeSub.max_devices} device(s). Please revoke another device.`,
         subscriptionActive: true,
         deviceLimitExceeded: true,
       }), { status: 403, headers: CORS });
     }
 
-    console.log(`[authLogin] success: user=${user.email} sub=${subscriptionActive}`);
+    console.log(`[authLogin] SUCCESS user=${userEmail} sub=${subscriptionActive}`);
 
     return new Response(JSON.stringify({
       success: true,
       message: subscriptionActive ? 'Login successful.' : 'Login successful, but no active subscription.',
-      user: { email: user.email, name: user.full_name },
+      user: { email: userEmail, name: authUser?.full_name || null },
       subscriptionActive,
       token,
       ...(activeSub && {
@@ -194,7 +253,7 @@ Deno.serve(async (req) => {
     }), { status: 200, headers: CORS });
 
   } catch (error) {
-    console.error('[authLogin] error:', error.message);
+    console.error('[authLogin] error:', error.message, error.stack?.slice(0, 300));
     return new Response(JSON.stringify({
       success: false,
       message: 'Server error: ' + error.message,
