@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Plus, Pencil, Trash2, Download, DollarSign, Check, X, ExternalLink, Loader2, Monitor, Apple, Terminal, Smartphone, Wifi, Router, Link } from 'lucide-react';
+import { Plus, Pencil, Trash2, Download, DollarSign, Check, X, ExternalLink, Loader2, Monitor, Apple, Terminal, Smartphone, Wifi, Router, Link, Upload, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const platformIcons = {
@@ -30,6 +30,25 @@ const emptyForm = {
 function DownloadForm({ initial, onSave, onCancel, saving }) {
   const [form, setForm] = useState(initial || emptyForm);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const [uploading, setUploading] = useState(false);
+  const [uploadDone, setUploadDone] = useState(false);
+  const fileRef = useRef();
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadDone(false);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      set('file_url', file_url);
+      setUploadDone(true);
+    } catch (err) {
+      alert('Upload failed: ' + err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
@@ -67,10 +86,24 @@ function DownloadForm({ initial, onSave, onCancel, saving }) {
             className="w-full px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50" />
         </div>
         <div className="sm:col-span-2">
-          <label className="text-slate-500 text-xs uppercase tracking-wider mb-1.5 block">{form.type === 'setup' ? 'Setup Portal URL' : 'Download URL'}</label>
-          <input value={form.file_url} onChange={e => set('file_url', e.target.value)} 
-            placeholder={form.type === 'setup' ? 'https://app.example.com/setup?token=ABC123' : 'https://cdn.example.com/voxvpn-setup.exe'}
-            className="w-full px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50" />
+          <label className="text-slate-500 text-xs uppercase tracking-wider mb-1.5 block">{form.type === 'setup' ? 'Setup Portal URL' : 'Download URL / File'}</label>
+          <div className="flex gap-2">
+            <input value={form.file_url} onChange={e => { set('file_url', e.target.value); setUploadDone(false); }}
+              placeholder={form.type === 'setup' ? 'https://app.example.com/setup?token=ABC123' : 'https://cdn.example.com/voxvpn-setup.exe or upload below'}
+              className="flex-1 px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50" />
+            <input type="file" ref={fileRef} onChange={handleFileUpload} className="hidden" accept=".exe,.dmg,.pkg,.deb,.rpm,.apk,.ipa,.zip" />
+            <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex-shrink-0 ${
+                uploadDone
+                  ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
+                  : 'bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20'
+              } disabled:opacity-50`}>
+              {uploading ? <Loader2 size={14} className="animate-spin" /> : uploadDone ? <CheckCircle2 size={14} /> : <Upload size={14} />}
+              {uploading ? 'Uploading…' : uploadDone ? 'Uploaded!' : 'Upload File'}
+            </button>
+          </div>
+          {uploading && <p className="text-slate-500 text-xs mt-1.5">Uploading your file, please wait…</p>}
+          {uploadDone && <p className="text-emerald-400 text-xs mt-1.5">✓ File uploaded successfully! URL has been filled in above.</p>}
         </div>
         <div className="sm:col-span-2">
           <label className="text-slate-500 text-xs uppercase tracking-wider mb-1.5 block">Payment Link (Stripe / PayPal)</label>
