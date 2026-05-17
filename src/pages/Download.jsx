@@ -3,8 +3,7 @@ import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { Download, Loader2, AlertCircle, Shield, Lock, CheckCircle2, Monitor, RefreshCw, ExternalLink, Smartphone, Apple } from 'lucide-react';
-
+import { Download, Loader2, AlertCircle, Shield, Lock, CheckCircle2, Monitor, RefreshCw, ExternalLink, Smartphone, Apple, Tag, FileText, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 
@@ -109,16 +108,33 @@ export default function DownloadPage() {
   const [activePlatform, setActivePlatform] = useState('windows');
   const justPaid = new URLSearchParams(window.location.search).get('payment') === 'success';
 
-  const DIRECT_DOWNLOAD_URL = 'https://github.com/stepperandy/VoxVPN-Setup-1.5/releases/download/v1.5/VoxVPN-Setup-v1.5.exe';
+  const [desktopRelease, setDesktopRelease] = useState(null);
+  const [desktopLoading, setDesktopLoading] = useState(true);
 
-  const handleDownload = (platformId) => {
+  // Load latest Windows desktop release from latestVersion function
+  useEffect(() => {
+    base44.functions.invoke('latestVersion', { platform: 'Windows' })
+      .then(res => setDesktopRelease(res.data || null))
+      .catch(() => setDesktopRelease({
+        version: '2.0.0',
+        download_url: 'https://voxvpn.net/downloads/VoxVPN-Latest.exe',
+        description: 'VoxVPN Desktop V2.0 for Windows',
+        released_at: new Date().toISOString(),
+      }))
+      .finally(() => setDesktopLoading(false));
+  }, []);
+
+  const handleDesktopDownload = () => {
+    const url = desktopRelease?.download_url || 'https://voxvpn.net/downloads/VoxVPN-Latest.exe';
     const a = document.createElement('a');
-    a.href = DIRECT_DOWNLOAD_URL;
-    a.download = 'VoxVPN-Setup-v1.5.exe';
+    a.href = url;
+    a.download = 'VoxVPN-Latest.exe';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
   };
+
+  const handleDownload = () => handleDesktopDownload();
 
   useEffect(() => {
     base44.auth.me()
@@ -258,7 +274,92 @@ export default function DownloadPage() {
               </motion.div>
             )}
 
-            {/* Active — show download with platform tabs */}
+            {/* ── VoxVPN Desktop V2.0 — Primary Download ── */}
+            {canDownload(subscription) && (
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+                <div className="rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-[#0d1420] to-[#060c1a] p-8"
+                  style={{ boxShadow: '0 0 60px rgba(0,212,255,0.08)' }}>
+
+                  {/* Badge row */}
+                  <div className="flex flex-wrap items-center gap-2 mb-5">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-[#00d4ff] text-xs font-bold">
+                      <Star size={10} /> Official Installer
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-400 text-xs font-mono">
+                      <Tag size={10} />
+                      {desktopLoading ? '…' : `v${desktopRelease?.version || '2.0.0'}`}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">
+                      <CheckCircle2 size={10} /> Latest
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                    {/* Icon */}
+                    <div className="w-20 h-20 rounded-2xl flex items-center justify-center flex-shrink-0"
+                      style={{ background: 'linear-gradient(135deg, rgba(0,212,255,0.2), rgba(0,212,255,0.05))', border: '1px solid rgba(0,212,255,0.3)' }}>
+                      <Monitor size={38} className="text-[#00d4ff]" />
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1">
+                      <h2 className="text-2xl font-black text-white mb-1">VoxVPN Desktop for Windows</h2>
+                      <p className="text-slate-400 text-sm mb-3">
+                        {desktopRelease?.description || 'One-click VPN client. Military-grade encryption. No config files needed.'}
+                      </p>
+                      <div className="flex flex-wrap gap-3 text-xs text-slate-500">
+                        <span className="flex items-center gap-1"><Shield size={11} className="text-emerald-400" /> AES-256</span>
+                        <span>·</span>
+                        <span>Windows 10 / 11 · 64-bit</span>
+                        <span>·</span>
+                        {desktopRelease?.released_at && (
+                          <span>Released {new Date(desktopRelease.released_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Download Button */}
+                    <button
+                      onClick={handleDesktopDownload}
+                      disabled={desktopLoading}
+                      className="flex items-center gap-3 px-8 py-4 rounded-xl font-black text-base text-black transition-all shadow-2xl disabled:opacity-50 flex-shrink-0 w-full sm:w-auto justify-center"
+                      style={{ background: 'linear-gradient(135deg, #00d4ff, #00b8e6)', boxShadow: '0 8px 30px rgba(0,212,255,0.35)' }}
+                    >
+                      {desktopLoading ? <Loader2 size={20} className="animate-spin" /> : <Download size={20} />}
+                      Download .exe
+                    </button>
+                  </div>
+
+                  {/* Release Notes */}
+                  <div className="mt-6 pt-5 border-t border-white/5">
+                    <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold mb-3">
+                      <FileText size={12} /> RELEASE NOTES — V2.0.0
+                    </div>
+                    <ul className="space-y-1.5 text-slate-400 text-xs">
+                      {[
+                        'Unified login with voxvpn.net — same credentials everywhere',
+                        'OS-encrypted token storage (Windows DPAPI / macOS Keychain)',
+                        'Auto-update notifications on launch',
+                        'Heartbeat subscription enforcement — expired plans auto-disconnect',
+                        'Session lifecycle fully synced with VoxVPN backend',
+                        'Removed dependency on local proxy server (V1.5 deprecated)',
+                      ].map((note, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <CheckCircle2 size={11} className="text-emerald-400 flex-shrink-0 mt-0.5" />
+                          {note}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <p className="text-slate-700 text-xs mt-4 text-center">
+                    Distributed exclusively via voxvpn.net · Hosted at /downloads/VoxVPN-Latest.exe
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Active — show platform tabs for mobile/config downloads */}
             {canDownload(subscription) && (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
 

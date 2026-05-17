@@ -27,7 +27,10 @@ export default function Dashboard() {
   // Check for updates on mount
   useEffect(() => {
     vpn?.checkUpdate?.().then(res => {
-      if (res?.hasUpdate) setUpdateInfo(res);
+      if (res?.hasUpdate) setUpdateInfo({
+        ...res,
+        downloadUrl: res.downloadUrl || 'https://voxvpn.net/downloads/VoxVPN-Latest.exe',
+      });
     }).catch(() => {});
   }, []);
 

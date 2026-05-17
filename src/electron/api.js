@@ -67,7 +67,10 @@ export const api = {
   forgotPassword: (email) =>
     request('forgotPassword', { email }),
 
-  // Version check
+  // Version check — hosted at voxvpn.net/downloads/
   latestVersion: () =>
     request('latestVersion', { platform: 'Windows' }),
+
+  // Direct installer URL (fallback if latestVersion has no download_url)
+  INSTALLER_URL: 'https://voxvpn.net/downloads/VoxVPN-Latest.exe',
 };

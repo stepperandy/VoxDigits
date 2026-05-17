@@ -49,10 +49,11 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({
       success: true,
       platform: latest.platform,
-      version: latest.version || '1.0.0',
+      version: latest.version || '2.0.0',
       name: latest.name,
       description: latest.description,
-      download_url: latest.file_url,
+      download_url: latest.file_url || `https://voxvpn.net/downloads/VoxVPN-Latest.exe`,
+      mandatory: latest.notes?.includes('mandatory') || false,
       is_free: latest.is_free,
       price: latest.price,
       payment_link: latest.payment_link || null,
