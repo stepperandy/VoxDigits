@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
     if (action === 'fetch_vultr_instances') {
       // Get all instances from Vultr
       const instances = await vultrFetch('/instances?per_page=500');
-      return Response.json({ success: true, instances: instances.instances || [] });
+      return Response.json({ success: true, servers: instances.instances || [] });
     }
 
     if (action === 'provision_server') {

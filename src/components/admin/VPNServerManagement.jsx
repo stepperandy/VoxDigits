@@ -13,7 +13,7 @@ const emptyForm = {
   status: 'online',
 };
 
-function ServerForm({ initial, onSave, onCancel, saving, vultrRegions }) {
+function ServerForm({ initial, onSave, onCancel, saving }) {
   const [form, setForm] = useState(initial || emptyForm);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -122,7 +122,7 @@ export default function VPNServerManagement() {
     }
   };
 
-  const handleSyncVultr = async () => {
+  const handleSyncServers = async () => {
     setSyncing(true);
     try {
       await base44.functions.invoke('vultrServerManagement', {
@@ -164,12 +164,12 @@ export default function VPNServerManagement() {
         <h2 className="text-white font-semibold">VPN Servers</h2>
         <div className="flex gap-2">
           <button
-            onClick={handleSyncVultr}
+            onClick={handleSyncServers}
             disabled={syncing}
             className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-500/50 text-black text-sm font-bold rounded-xl transition-all flex-shrink-0"
           >
             {syncing ? <Loader2 size={15} className="animate-spin" /> : <Zap size={15} />}
-            Sync Vultr
+            Sync Servers
           </button>
           <button
             onClick={() => { setEditing(null); setShowForm(true); }}
@@ -188,7 +188,6 @@ export default function VPNServerManagement() {
             onSave={handleSave}
             onCancel={() => { setShowForm(false); setEditing(null); }}
             saving={saving}
-            vultrRegions={vultrRegions}
           />
         )}
       </AnimatePresence>

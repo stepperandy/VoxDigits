@@ -125,7 +125,7 @@ export default function ServersView() {
       {loading ? (
         <div className="flex items-center justify-center py-32 gap-2 text-slate-400">
           <Loader2 size={20} className="animate-spin text-cyan-400" />
-          <span className="text-sm">Fetching live server data...</span>
+          <span className="text-sm">Fetching VoxVPN server data...</span>
         </div>
       ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">

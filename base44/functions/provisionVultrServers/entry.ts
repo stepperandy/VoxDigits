@@ -20,7 +20,7 @@ Deno.serve(async (req) => {
 
     if (serversToProvision.length === 0) {
       return Response.json({ 
-        message: 'No servers to provision (all have Vultr instance IDs)',
+        message: 'No servers to provision (all servers are already configured)',
         total: servers.length,
         provisioned: 0
       });
@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
     }
 
     return Response.json({
-      message: 'Vultr provisioning completed',
+      message: 'VoxVPN server provisioning completed',
       total_to_provision: serversToProvision.length,
       results: results,
       provisioned_count: results.filter(r => r.status === 'provisioned').length,
