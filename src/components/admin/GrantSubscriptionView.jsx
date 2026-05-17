@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Gift, Loader2, Search, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Gift, Loader2, Search, CheckCircle2, AlertCircle, Wrench } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const PLANS = ['Basic', 'Standard', 'Premium', 'Advanced', 'Enterprise'];
@@ -139,6 +139,108 @@ export default function GrantSubscriptionView() {
           </button>
         </form>
       </div>
+
+      {/* Recover Paid User — for users who paid but weren't provisioned */}
+      <div className="rounded-2xl border border-amber-500/20 bg-[#0d1120] p-6">
+        <div className="flex items-center gap-2 mb-1">
+          <Wrench size={18} className="text-amber-400" />
+          <h3 className="text-white font-bold text-base">Recover Paid User</h3>
+        </div>
+        <p className="text-slate-400 text-xs mb-4">Use this for users who paid (Stripe/Hubtel) but didn't receive their setup email or subscription. This will provision their subscription AND resend the setup email.</p>
+        <RecoverPaidUser />
+      </div>
     </div>
+  );
+}
+
+function RecoverPaidUser() {
+  const [email, setEmail] = useState('');
+  const [plan, setPlan] = useState('Standard');
+  const [billingCycle, setBillingCycle] = useState('monthly');
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState(null);
+
+  const PLANS = ['Basic', 'Standard', 'Premium', 'Advanced', 'Enterprise'];
+
+  const handleRecover = async (e) => {
+    e.preventDefault();
+    if (!email) return;
+    setLoading(true);
+    setMsg(null);
+    try {
+      const res = await base44.functions.invoke('recoverPaidUser', {
+        email: email.trim(),
+        plan,
+        billing_cycle: billingCycle,
+      });
+      setMsg({ type: 'success', text: res.data?.message || `✓ Recovered ${email} — setup email sent.` });
+      setEmail('');
+    } catch (err) {
+      setMsg({ type: 'error', text: 'Error: ' + err.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleRecover} className="space-y-4">
+      <div>
+        <label className="text-slate-400 text-xs uppercase tracking-wider block mb-1.5">User Email</label>
+        <div className="relative">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+          <input
+            type="email"
+            placeholder="e.g. andreamenuku@gmail.com"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+            className="w-full pl-9 pr-4 py-3 rounded-xl bg-[#060910] border border-white/10 text-white placeholder-slate-600 text-sm focus:outline-none focus:border-amber-500/50 transition-colors"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="text-slate-400 text-xs uppercase tracking-wider block mb-1.5">Plan They Paid For</label>
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+          {PLANS.map(p => (
+            <button key={p} type="button" onClick={() => setPlan(p)}
+              className={`py-2 rounded-xl text-xs font-bold transition-all border ${
+                plan === p ? 'bg-amber-500/15 border-amber-500/40 text-amber-400' : 'bg-[#060910] border-white/10 text-slate-500 hover:text-white'
+              }`}>
+              {p}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex gap-3">
+        {['monthly', 'yearly'].map(c => (
+          <button key={c} type="button" onClick={() => setBillingCycle(c)}
+            className={`flex-1 py-2 rounded-xl text-xs font-bold capitalize transition-all border ${
+              billingCycle === c ? 'bg-amber-500/15 border-amber-500/40 text-amber-400' : 'bg-[#060910] border-white/10 text-slate-500 hover:text-white'
+            }`}>
+            {c}
+          </button>
+        ))}
+      </div>
+
+      <AnimatePresence>
+        {msg && (
+          <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium ${
+              msg.type === 'success' ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border border-rose-500/20 text-rose-400'
+            }`}>
+            {msg.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+            {msg.text}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <button type="submit" disabled={loading || !email}
+        className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-black font-black text-sm transition-all flex items-center justify-center gap-2">
+        {loading ? <Loader2 size={16} className="animate-spin" /> : <Wrench size={16} />}
+        Recover & Resend Setup Email
+      </button>
+    </form>
   );
 }

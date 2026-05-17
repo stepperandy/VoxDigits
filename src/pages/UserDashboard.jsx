@@ -9,7 +9,7 @@ import {
   CreditCard, HeadphonesIcon, Clock, XCircle, Calendar, LogOut, User
 } from 'lucide-react';
 
-const INSTALLER_URL = 'https://github.com/stepperandy/VoxVPN-Setup-1.5/releases/download/v1.5/VoxVPN-Setup-v1.5.exe';
+const INSTALLER_URL = 'https://github.com/stepperandy/VoxVPN-Setup-2.0/releases/download/v2.0/VoxVPN-Setup-v2.0.exe';
 
 const STATUS_CONFIG = {
   active:    { label: 'Active',    color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30', dot: 'bg-emerald-400' },
@@ -186,16 +186,16 @@ export default function UserDashboard() {
 
           {/* Download button */}
           {hasAccess ? (
-            <a href={downloadUrl} download="VoxVPN-Setup-v1.5.exe"
+            <a href={downloadUrl} download="VoxVPN-Setup-v2.0.exe"
               className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-black text-base transition-all"
               style={{ background: 'linear-gradient(135deg, #00d4ff, #0080ff)', boxShadow: '0 6px 24px rgba(0,212,255,0.25)' }}>
               <Download size={20} />
-              Download VoxVPN
+              Download VoxVPN v2.0
             </a>
           ) : (
             <div className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-slate-600 text-base border border-white/5 bg-white/2 cursor-not-allowed select-none">
               <Download size={20} />
-              Download VoxVPN
+              Download VoxVPN v2.0
             </div>
           )}
 
@@ -214,6 +214,16 @@ export default function UserDashboard() {
               <RefreshCw size={16} /> Choose a Plan
             </Link>
           )}
+        </motion.div>
+
+        {/* Upgrade Plan button — always visible */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
+          className="mb-5">
+          <Link to="/pricing"
+            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-bold text-sm transition-all border border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+            style={{ background: 'rgba(251,191,36,0.05)' }}>
+            <RefreshCw size={15} /> Upgrade / Change Plan
+          </Link>
         </motion.div>
 
         {/* Secondary actions */}
