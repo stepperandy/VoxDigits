@@ -2,8 +2,8 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 /**
  * latestVersion — returns the latest desktop app version info.
- * The active Download record with platform matching the request is returned.
- * Electron app compares its current version and prompts for update if behind.
+ * V2.0.0 is the current production release (replaces V1.5).
+ * Download is served via GitHub Releases.
  */
 
 const CORS = {
@@ -11,6 +11,17 @@ const CORS = {
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Content-Type': 'application/json',
+};
+
+const V2_RELEASE = {
+  version: '2.0.0',
+  name: 'VoxVPN Desktop V2.0',
+  description: 'VoxVPN Desktop V2.0 — Direct Base44 authentication, OS-encrypted token storage, heartbeat enforcement.',
+  download_url: 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe',
+  released_at: '2026-05-17T00:00:00.000Z',
+  platform: 'Windows',
+  is_free: false,
+  mandatory: true,
 };
 
 Deno.serve(async (req) => {
@@ -28,37 +39,36 @@ Deno.serve(async (req) => {
     }
     platform = platform || 'Windows';
 
-    // Fetch latest active download for this platform
+    // Try to find an active Download record override first
     const downloads = await base44.asServiceRole.entities.Download.filter({
       platform,
       is_active: true,
     });
 
-    if (!downloads || downloads.length === 0) {
+    if (downloads && downloads.length > 0) {
+      const latest = downloads.sort((a, b) =>
+        new Date(b.updated_date) - new Date(a.updated_date)
+      )[0];
+
       return new Response(JSON.stringify({
-        success: false,
-        message: `No release found for platform: ${platform}`,
-      }), { status: 404, headers: CORS });
+        success: true,
+        platform: latest.platform,
+        version: latest.version || V2_RELEASE.version,
+        name: latest.name,
+        description: latest.description,
+        download_url: latest.file_url || V2_RELEASE.download_url,
+        mandatory: latest.notes?.includes('mandatory') || V2_RELEASE.mandatory,
+        is_free: latest.is_free,
+        price: latest.price,
+        payment_link: latest.payment_link || null,
+        released_at: latest.updated_date,
+      }), { status: 200, headers: CORS });
     }
 
-    // Pick the most recently updated entry as "latest"
-    const latest = downloads.sort((a, b) =>
-      new Date(b.updated_date) - new Date(a.updated_date)
-    )[0];
-
+    // Fallback: return hardcoded V2.0 release
     return new Response(JSON.stringify({
       success: true,
-      platform: latest.platform,
-      version: latest.version || '2.0.0',
-      name: latest.name,
-      description: latest.description,
-      download_url: latest.file_url || `https://voxvpn.net/downloads/VoxVPN-Latest.exe`,
-      sha256: latest.sha256 || null,
-      mandatory: latest.notes?.includes('mandatory') || false,
-      is_free: latest.is_free,
-      price: latest.price,
-      payment_link: latest.payment_link || null,
-      released_at: latest.updated_date,
+      ...V2_RELEASE,
     }), { status: 200, headers: CORS });
 
   } catch (error) {

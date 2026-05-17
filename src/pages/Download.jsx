@@ -117,15 +117,15 @@ export default function DownloadPage() {
       .then(res => setDesktopRelease(res.data || null))
       .catch(() => setDesktopRelease({
         version: '2.0.0',
-        download_url: 'https://voxvpn.net/downloads/VoxVPN-Latest.exe',
+        download_url: 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe',
         description: 'VoxVPN Desktop V2.0 for Windows',
-        released_at: new Date().toISOString(),
+        released_at: '2026-05-17T00:00:00.000Z',
       }))
       .finally(() => setDesktopLoading(false));
   }, []);
 
   const handleDesktopDownload = () => {
-    const url = desktopRelease?.download_url || 'https://voxvpn.net/downloads/VoxVPN-Latest.exe';
+    const url = desktopRelease?.download_url || 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe';
     const a = document.createElement('a');
     a.href = url;
     a.download = 'VoxVPN-Latest.exe';

@@ -72,5 +72,5 @@ export const api = {
     request('latestVersion', { platform: 'Windows' }),
 
   // Direct installer URL (fallback if latestVersion has no download_url)
-  INSTALLER_URL: 'https://voxvpn.net/downloads/VoxVPN-Latest.exe',
+  INSTALLER_URL: 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe',
 };

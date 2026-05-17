@@ -29,7 +29,7 @@ export default function Dashboard() {
     vpn?.checkUpdate?.().then(res => {
       if (res?.hasUpdate) setUpdateInfo({
         ...res,
-        downloadUrl: res.downloadUrl || 'https://voxvpn.net/downloads/VoxVPN-Latest.exe',
+        downloadUrl: res.downloadUrl || 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe',
       });
     }).catch(() => {});
   }, []);
