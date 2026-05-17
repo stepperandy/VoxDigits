@@ -208,11 +208,11 @@ export default function UserDashboard() {
               {hasAccess ? 'Manage Billing' : 'Renew Subscription'}
             </button>
           ) : (
-            <a href="/#pricing" onClick={(e) => { e.preventDefault(); window.location.assign('/#pricing'); }}
+            <Link to="/pricing"
               className="flex items-center justify-center gap-2 py-4 rounded-xl border font-bold text-sm transition-all"
               style={{ borderColor: 'rgba(0,212,255,0.3)', color: '#00d4ff', background: 'rgba(0,212,255,0.05)' }}>
               <RefreshCw size={16} /> Choose a Plan
-            </a>
+            </Link>
           )}
         </motion.div>
 
