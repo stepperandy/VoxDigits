@@ -48,6 +48,8 @@ export default function ServersView() {
     }
   };
 
+
+
   useEffect(() => { fetchServers(); }, []);
 
   const online = servers.filter(s => s.status === 'active' && s.power === 'running').length;

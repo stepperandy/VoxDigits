@@ -85,7 +85,7 @@ export default function VPNServerManagement() {
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState(false);
-  const [vultrRegions, setVultrRegions] = useState([]);
+  const [voxRegions, setVoxRegions] = useState([]);
 
   const load = () => {
     setLoading(true);
