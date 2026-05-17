@@ -213,6 +213,7 @@ export default function UsersView() {
                   <th className="px-5 py-3.5 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Role</th>
                   <th className="px-5 py-3.5 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-widest hidden lg:table-cell">Joined</th>
                   <th className="px-5 py-3.5 text-right text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Actions</th>
+                  <th className="px-5 py-3.5 text-center text-[10px] font-semibold text-emerald-500 uppercase tracking-widest">Grant</th>
                 </tr>
               </thead>
               <tbody>
@@ -260,29 +261,31 @@ export default function UsersView() {
                           <Mail size={14} />
                         </button>
                         {u.role !== 'admin' && (
-                         <>
-                           <button
-                             onClick={() => handlePromoteAdmin(u.id, u.full_name)}
-                             title="Promote to admin"
-                             className="p-1.5 rounded-lg hover:bg-white/5 text-slate-600 hover:text-violet-400 transition-colors"
-                           >
-                             <Shield size={14} />
-                           </button>
-                           <button
-                             onClick={() => { setGrantModal({ email: u.email, name: u.full_name }); setGrantMsg(''); }}
-                             title="Grant subscription"
-                             className="p-1.5 rounded-lg hover:bg-white/5 text-slate-600 hover:text-emerald-400 transition-colors"
-                           >
-                             <Gift size={14} />
-                           </button>
-                         </>
+                          <button
+                            onClick={() => handlePromoteAdmin(u.id, u.full_name)}
+                            title="Promote to admin"
+                            className="p-1.5 rounded-lg hover:bg-white/5 text-slate-600 hover:text-violet-400 transition-colors"
+                          >
+                            <Shield size={14} />
+                          </button>
                         )}
-                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-4 text-center">
+                      {u.role !== 'admin' && (
+                        <button
+                          onClick={() => { setGrantModal({ email: u.email, name: u.full_name }); setGrantMsg(''); }}
+                          title="Grant subscription"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 text-xs font-semibold transition-all"
+                        >
+                          <Gift size={12} /> Grant
+                        </button>
+                      )}
                     </td>
                   </motion.tr>
                 ))}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={6} className="px-5 py-16 text-center text-slate-600 text-sm">No users found.</td></tr>
+                  <tr><td colSpan={7} className="px-5 py-16 text-center text-slate-600 text-sm">No users found.</td></tr>
                 )}
               </tbody>
             </table>
