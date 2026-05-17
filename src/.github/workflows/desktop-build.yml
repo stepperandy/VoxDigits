@@ -1,87 +1,88 @@
-name: Desktop App Build & Release
+name: VoxVPN Desktop V2.0 — Build & Release
 
 on:
   push:
     branches: [main, develop]
     tags: ['v*']
   pull_request:
-    branches: [main, develop]
+    branches: [main]
 
 jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         include:
-          - os: ubuntu-latest
-            artifact: VoxVPN-linux
           - os: windows-latest
-            artifact: VoxVPN-windows-setup.exe
+            build_cmd: npm run build:win
+            artifact_name: VoxVPN-2.0-windows-setup
+            artifact_path: installer/windows/output
           - os: macos-latest
-            artifact: VoxVPN-macos.dmg
+            build_cmd: npm run build:mac
+            artifact_name: VoxVPN-2.0-macos
+            artifact_path: installer/windows/output
+          - os: ubuntu-latest
+            build_cmd: npm run build:linux
+            artifact_name: VoxVPN-2.0-linux
+            artifact_path: installer/windows/output
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build React app
-        run: npm run build
+      - name: Build Vite + Electron
+        run: ${{ matrix.build_cmd }}
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          BASE44_APP_ID: 69c84f61d5543b54fe26e1e5
+          WIN_SIGNING_CERT:      ${{ secrets.WIN_SIGNING_CERT }}
+          WIN_SIGNING_PASSWORD:  ${{ secrets.WIN_SIGNING_PASSWORD }}
+          APPLE_ID:              ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD:        ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID:         ${{ secrets.APPLE_TEAM_ID }}
 
-      - name: Build Electron (Windows)
-        if: runner.os == 'Windows'
-        run: npm run electron:build:win
-        env:
-          WIN_SIGNING_CERT: ${{ secrets.WIN_SIGNING_CERT }}
-          WIN_SIGNING_PASSWORD: ${{ secrets.WIN_SIGNING_PASSWORD }}
-
-      - name: Build Electron (macOS)
-        if: runner.os == 'macOS'
-        run: npm run electron:build:mac
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-
-      - name: Build Electron (Linux)
-        if: runner.os == 'Linux'
-        run: npm run electron:build:linux
-
-      - name: Upload artifacts
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact }}
-          path: dist/
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_path }}
 
-      - name: Create Release
+      - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          files: dist/*
+          name: VoxVPN ${{ github.ref_name }}
+          body: |
+            ## VoxVPN Desktop ${{ github.ref_name }}
+
+            ### What's new in V2.0
+            - Unified authentication with voxvpn.net (Base44 backend)
+            - OS-encrypted token storage (Windows DPAPI / macOS Keychain)
+            - Auto-update notifications via `latestVersion` endpoint
+            - Heartbeat subscription enforcement
+            - Session lifecycle (start / end / heartbeat) fully wired to live backend
+            - V1.5 local Express proxy server removed
+          files: ${{ matrix.artifact_path }}/**/*
           draft: false
-          prerelease: contains(github.ref, 'beta') || contains(github.ref, 'rc')
+          prerelease: ${{ contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Post to Slack
+      - name: Notify Slack on failure
         if: failure()
-        uses: slackapi/slack-github-action@v1
+        uses: slackapi/slack-github-action@v2
         with:
           payload: |
             {
-              "text": "Desktop build failed for ${{ matrix.os }}",
-              "channel": "#voxvpn-builds"
+              "text": "❌ VoxVPN V2.0 desktop build failed on *${{ matrix.os }}* — <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
