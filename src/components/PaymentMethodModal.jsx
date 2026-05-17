@@ -12,6 +12,7 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
     try {
       if (selectedMethod === 'admin-bypass') {
         await onProceed('admin-bypass');
+        setLoading(false);
         return;
       }
       if (selectedMethod === 'hubtel') {

@@ -271,7 +271,23 @@ export default function Pricing() {
             plan={selectedPlan}
             isBilledYearly={false}
             isAdmin={user?.role === 'admin'}
-            onProceed={() => setModalOpen(false)}
+            onProceed={async (method) => {
+              if (method === 'admin-bypass') {
+                const plan = selectedPlan;
+                setModalOpen(false);
+                // Find the matching duration plan for months
+                const durationPlan = PLANS.find(p => p.stripePlanName === plan.name);
+                await base44.functions.invoke('grantSubscription', {
+                  target_email: user.email,
+                  plan: plan.name,
+                  billing_cycle: 'monthly',
+                  months: durationPlan?.months || 1,
+                });
+                alert('Subscription granted successfully!');
+              } else {
+                setModalOpen(false);
+              }
+            }}
             currency={currency}
             countryCode={countryCode}
           />
