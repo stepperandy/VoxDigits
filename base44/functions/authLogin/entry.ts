@@ -13,16 +13,19 @@ const PLAN_TIERS = {
   'Enterprise': 5,
 };
 
-Deno.serve(async (req) => {
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Content-Type': 'application/json',
-  };
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Content-Type': 'application/json',
+};
 
+const APP_ID = Deno.env.get('BASE44_APP_ID');
+const BASE44_API = 'https://base44.app/api';
+
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: corsHeaders });
+    return new Response(null, { status: 204, headers: CORS });
   }
 
   try {
@@ -34,68 +37,94 @@ Deno.serve(async (req) => {
         success: false,
         message: 'Email and password are required.',
         subscriptionActive: false,
-      }), { status: 400, headers: corsHeaders });
+      }), { status: 400, headers: CORS });
     }
 
-    // Step 1: Authenticate with Base44
-    const base44 = createClientFromRequest(req);
-    let token;
+    // ── Step 1: Authenticate directly against Base44 REST auth API ─────────
+    // This works server-side (no browser/localStorage needed)
+    let token = null;
+    let authUser = null;
+
+    console.log('[authLogin] calling login API for:', email, 'appId:', APP_ID);
+    let loginRes;
     try {
-      const result = await base44.auth.loginWithEmailPassword(email, password);
-      token = result?.token || result?.access_token || null;
-    } catch {
+      loginRes = await fetch(`${BASE44_API}/apps/${APP_ID}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-App-Id': APP_ID,
+        },
+        body: JSON.stringify({ email, password }),
+      });
+    } catch (fetchErr) {
+      console.error('[authLogin] fetch error:', fetchErr.message);
+      throw new Error('Auth API unreachable: ' + fetchErr.message);
+    }
+
+    console.log('[authLogin] login API status:', loginRes.status);
+
+    if (!loginRes.ok) {
+      const errBody = await loginRes.text().catch(() => '');
+      console.log('[authLogin] login failed body:', errBody.slice(0, 200));
       return new Response(JSON.stringify({
         success: false,
         message: 'Invalid email or password.',
         subscriptionActive: false,
-      }), { status: 401, headers: corsHeaders });
+      }), { status: 401, headers: CORS });
     }
+
+    const loginData = await loginRes.json();
+    token = loginData?.access_token || loginData?.token || null;
+    authUser = loginData?.user || null;
 
     if (!token) {
       return new Response(JSON.stringify({
         success: false,
-        message: 'Authentication failed.',
+        message: 'Authentication failed — no token returned.',
         subscriptionActive: false,
-      }), { status: 401, headers: corsHeaders });
+      }), { status: 401, headers: CORS });
     }
 
-    // Step 2: Load user profile
+    // ── Step 2: Load full user profile using the obtained token ────────────
     const authedClient = createClientFromRequest(
       new Request(req.url, {
         headers: { ...Object.fromEntries(req.headers), Authorization: `Bearer ${token}` },
       })
     );
-    const user = await authedClient.auth.me();
 
-    // Step 3: Check subscription
+    const user = authUser || await authedClient.auth.me();
+
+    // ── Step 3: Check subscription ─────────────────────────────────────────
     const subs = await authedClient.entities.VPNSubscription.filter({ user_email: user.email });
     const activeSub = subs.find(s => ['active', 'trial'].includes(s.status)) || null;
     const subscriptionActive = !!activeSub;
 
-    // Step 4: Device fingerprint enforcement (only if subscription active and device_id provided)
+    // ── Step 4: Device fingerprint enforcement ─────────────────────────────
     let deviceRecord = null;
     let deviceLimitExceeded = false;
 
     if (subscriptionActive && device_id) {
       const maxDevices = activeSub.max_devices || 1;
-      const existingDevices = await authedClient.entities.LinkedDevice.filter({
+
+      // Fetch ALL devices for this subscription (active + inactive) to find known device
+      const allDevices = await authedClient.entities.LinkedDevice.filter({
         subscription_id: activeSub.id,
-        status: 'active',
       });
 
-      // Check if this device is already registered
-      const knownDevice = existingDevices.find(d => d.device_id === device_id);
+      const knownDevice = allDevices.find(d => d.device_id === device_id);
+      const activeDevices = allDevices.filter(d => d.status === 'active' && d.device_id);
 
       if (knownDevice) {
-        // Update last_connected
+        // Returning device — mark active and update timestamp
         await authedClient.entities.LinkedDevice.update(knownDevice.id, {
+          status: 'active',
           last_connected: new Date().toISOString(),
         });
-        deviceRecord = knownDevice;
-      } else if (existingDevices.length >= maxDevices) {
+        deviceRecord = { ...knownDevice, status: 'active' };
+      } else if (activeDevices.length >= maxDevices) {
         deviceLimitExceeded = true;
       } else {
-        // Register new device
+        // New device — register it
         deviceRecord = await authedClient.entities.LinkedDevice.create({
           subscription_id: activeSub.id,
           device_name: device_name || 'Desktop App',
@@ -113,8 +142,10 @@ Deno.serve(async (req) => {
         message: `Device limit reached. Your plan allows ${activeSub.max_devices} device(s). Please revoke another device to continue.`,
         subscriptionActive: true,
         deviceLimitExceeded: true,
-      }), { status: 403, headers: corsHeaders });
+      }), { status: 403, headers: CORS });
     }
+
+    console.log(`[authLogin] success: user=${user.email} sub=${subscriptionActive} device=${device_id || 'none'}`);
 
     return new Response(JSON.stringify({
       success: true,
@@ -141,13 +172,14 @@ Deno.serve(async (req) => {
           device_type: deviceRecord.device_type,
         }
       }),
-    }), { status: 200, headers: corsHeaders });
+    }), { status: 200, headers: CORS });
 
   } catch (error) {
+    console.error('[authLogin] error:', error.message);
     return new Response(JSON.stringify({
       success: false,
       message: 'Server error: ' + error.message,
       subscriptionActive: false,
-    }), { status: 500, headers: corsHeaders });
+    }), { status: 500, headers: CORS });
   }
 });
