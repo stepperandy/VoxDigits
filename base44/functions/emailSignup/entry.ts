@@ -38,14 +38,17 @@ Deno.serve(async (req) => {
       throw err;
     }
 
-    // Update the user's full_name via service role after registration
+    // Update the user's full_name and mark as verified via service role
     try {
       const users = await base44.asServiceRole.entities.User.filter({ email });
       if (users.length > 0) {
-        await base44.asServiceRole.entities.User.update(users[0].id, { full_name });
+        await base44.asServiceRole.entities.User.update(users[0].id, {
+          full_name,
+          is_verified: true,
+        });
       }
     } catch {
-      // Non-fatal — full_name update is best-effort
+      // Non-fatal — full_name/verification update is best-effort
     }
 
     // Create a VPN subscription record (expired until they pay)
