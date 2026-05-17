@@ -53,6 +53,7 @@ Deno.serve(async (req) => {
       name: latest.name,
       description: latest.description,
       download_url: latest.file_url || `https://voxvpn.net/downloads/VoxVPN-Latest.exe`,
+      sha256: latest.sha256 || null,
       mandatory: latest.notes?.includes('mandatory') || false,
       is_free: latest.is_free,
       price: latest.price,
