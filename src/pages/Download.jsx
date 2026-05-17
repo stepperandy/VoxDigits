@@ -353,7 +353,7 @@ export default function DownloadPage() {
                   </div>
 
                   <p className="text-slate-700 text-xs mt-4 text-center">
-                    Distributed exclusively via voxvpn.net · Hosted at /downloads/VoxVPN-Latest.exe
+                    Distributed exclusively via voxvpn.net · GitHub Releases · v2.0.0
                   </p>
                 </div>
               </motion.div>
