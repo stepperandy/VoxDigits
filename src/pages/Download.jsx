@@ -125,8 +125,14 @@ export default function DownloadPage() {
   }, []);
 
   const handleDesktopDownload = () => {
-    const url = desktopRelease?.download_url || 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe';
-    window.open(url, '_blank');
+    const url = desktopRelease?.download_url || 'https://github.com/stepperandy/VoxVPN-Setup-2.0/releases/download/v2.0/VoxVPN-Setup-v2.0.exe';
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   const handleDownload = () => handleDesktopDownload();
