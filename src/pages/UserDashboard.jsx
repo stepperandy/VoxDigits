@@ -217,12 +217,13 @@ export default function UserDashboard() {
 
           {/* Download button */}
           {hasAccess ? (
-            <a href={downloadUrl} download="VoxVPN-Setup-v2.0.exe"
-              className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-black text-base transition-all"
+            <button
+              onClick={() => { window.top.location.href = downloadUrl; }}
+              className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-black text-base transition-all w-full"
               style={{ background: 'linear-gradient(135deg, #00d4ff, #0080ff)', boxShadow: '0 6px 24px rgba(0,212,255,0.25)' }}>
               <Download size={20} />
               Download VoxVPN v2.0
-            </a>
+            </button>
           ) : (
             <div className="flex items-center justify-center gap-3 py-4 rounded-xl font-black text-slate-600 text-base border border-white/5 bg-white/2 cursor-not-allowed select-none">
               <Download size={20} />
