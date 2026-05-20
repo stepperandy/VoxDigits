@@ -197,6 +197,19 @@ Deno.serve(async (req) => {
       }), { status: 403, headers: CORS });
     }
 
+    // Block login if subscription renewal_date has passed — mark it expired
+    if (activeSub.renewal_date && new Date(activeSub.renewal_date) < new Date()) {
+      console.log('[authLogin] subscription expired for:', userEmail, 'renewal_date:', activeSub.renewal_date);
+      await base44.asServiceRole.entities.VPNSubscription.update(activeSub.id, { status: 'expired' });
+      return new Response(JSON.stringify({
+        success: false,
+        message: `Your subscription expired on ${new Date(activeSub.renewal_date).toLocaleDateString()}. Please renew at voxvpn.net to continue.`,
+        subscriptionActive: false,
+        expired: true,
+        renewal_date: activeSub.renewal_date,
+      }), { status: 403, headers: CORS });
+    }
+
     // Ensure max_devices is always a positive integer (guard against null/0)
     if (!activeSub.max_devices || activeSub.max_devices < 1) {
       await base44.asServiceRole.entities.VPNSubscription.update(activeSub.id, { max_devices: 3 });
