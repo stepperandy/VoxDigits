@@ -42,13 +42,19 @@ Deno.serve(async (req) => {
     }
   } catch (_) {}
 
-  // Redirect directly to the file — browser downloads it seamlessly
-  return new Response(null, {
-    status: 302,
+  // Stream the file directly so the browser downloads it without visiting GitHub
+  const fileRes = await fetch(downloadUrl, { redirect: 'follow' });
+  if (!fileRes.ok) {
+    return Response.json({ error: 'File not available' }, { status: 502 });
+  }
+
+  return new Response(fileRes.body, {
+    status: 200,
     headers: {
       ...corsHeaders,
-      'Location': downloadUrl,
+      'Content-Type': 'application/octet-stream',
       'Content-Disposition': 'attachment; filename="VoxVPN-Setup.exe"',
+      'Content-Length': fileRes.headers.get('content-length') || '',
     },
   });
 });
