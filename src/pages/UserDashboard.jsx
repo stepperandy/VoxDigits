@@ -15,7 +15,13 @@ async function triggerDownload() {
   const latest = downloads?.sort((a, b) => new Date(b.created_date) - new Date(a.created_date))?.[0];
   const fileUrl = latest?.file_url;
   if (!fileUrl) { alert('No installer available. Please contact support.'); return; }
-  window.location.href = fileUrl;
+  const a = document.createElement('a');
+  a.href = fileUrl;
+  a.setAttribute('download', '');
+  a.setAttribute('rel', 'noopener noreferrer');
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => document.body.removeChild(a), 200);
 }
 
 const STATUS_CONFIG = {
