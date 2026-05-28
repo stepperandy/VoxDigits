@@ -86,11 +86,19 @@ function DownloadForm({ initial, onSave, onCancel, saving }) {
             className="w-full px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50" />
         </div>
         <div className="sm:col-span-2">
-          <label className="text-slate-500 text-xs uppercase tracking-wider mb-1.5 block">{form.type === 'setup' ? 'Setup Portal URL' : 'Download URL'}</label>
+          <label className="text-slate-500 text-xs uppercase tracking-wider mb-1.5 block">{form.type === 'setup' ? 'Setup Portal URL' : 'Download File'}</label>
+          <div className="flex gap-2 mb-2">
+            <input ref={fileRef} type="file" className="hidden" onChange={handleFileUpload} />
+            <button type="button" onClick={() => fileRef.current.click()} disabled={uploading}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 text-sm font-semibold hover:bg-cyan-500/20 transition-all disabled:opacity-50">
+              {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+              {uploading ? 'Uploading...' : 'Upload File'}
+            </button>
+            {uploadDone && <span className="flex items-center gap-1 text-emerald-400 text-xs"><CheckCircle2 size={13} /> Uploaded!</span>}
+          </div>
           <input value={form.file_url} onChange={e => set('file_url', e.target.value)}
-            placeholder={form.type === 'setup' ? 'https://app.example.com/setup?token=ABC123' : 'https://drive.google.com/uc?export=download&id=FILE_ID'}
+            placeholder="Or paste a direct URL..."
             className="w-full px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50" />
-          <p className="text-amber-400/70 text-xs mt-1.5">⚠️ .exe files cannot be uploaded directly. Host your installer on Google Drive, Dropbox, or OneDrive and paste the direct download link above.</p>
         </div>
         <div className="sm:col-span-2">
           <label className="text-slate-500 text-xs uppercase tracking-wider mb-1.5 block">Payment Link (Stripe / PayPal)</label>
