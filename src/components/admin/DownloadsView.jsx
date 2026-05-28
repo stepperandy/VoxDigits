@@ -222,36 +222,6 @@ export default function DownloadsView() {
         ))}
       </div>
 
-      {/* Installer Quick Download */}
-      <div className="rounded-2xl border border-cyan-500/20 bg-[#0a1020] p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center flex-shrink-0">
-            <Monitor size={18} className="text-cyan-400" />
-          </div>
-          <div>
-            <p className="text-white font-semibold text-sm">VoxVPN Setup v2.0</p>
-            <p className="text-slate-500 text-xs">Windows · Direct Download</p>
-          </div>
-        </div>
-        <button
-          onClick={async () => {
-            const res = await fetch('/api/functions/downloadInstaller');
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'VoxVPN-Setup-v2.0.exe';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-          }}
-          className="flex items-center gap-2 px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-sm rounded-xl transition-all flex-shrink-0"
-        >
-          <Download size={15} /> Download Installer
-        </button>
-      </div>
-
       {/* Top controls */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
         <div className="flex gap-2 flex-wrap">
