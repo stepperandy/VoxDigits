@@ -15,13 +15,7 @@ async function triggerDownload() {
   const latest = downloads?.sort((a, b) => new Date(b.created_date) - new Date(a.created_date))?.[0];
   const fileUrl = latest?.file_url;
   if (!fileUrl) { alert('No installer available. Please contact support.'); return; }
-  const a = document.createElement('a');
-  a.href = fileUrl;
-  a.download = fileUrl.split('/').pop() || 'VoxVPN-Setup-v2.0.exe';
-  a.target = '_blank';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  window.location.href = fileUrl;
 }
 
 const STATUS_CONFIG = {
