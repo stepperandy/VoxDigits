@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
   } catch (_) {}
 
   if (!downloadUrl) {
-    downloadUrl = 'https://drive.usercontent.google.com/download?id=1gZ6XN6mOfxhjZVWvLZ3I_u5el_cv_-Y1&export=download&confirm=t';
+    downloadUrl = 'https://www.dropbox.com/scl/fi/d3b7mbdy73fylkycygww7/VoxVPN-Setup-v2.0.exe?rlkey=muhp0hccpfwxpxznr1ugctoyh&st=87wbw5sm&dl=1';
     fileName = 'VoxVPN-Setup-v2.0.exe';
   }
 
