@@ -20,12 +20,25 @@ Deno.serve(async (req) => {
     if (latest?.file_url) downloadUrl = latest.file_url;
   } catch (_) {}
 
-  // Redirect directly to the download URL — avoids server-side proxy issues with GitHub CDN
-  return new Response(null, {
-    status: 302,
+  // Fetch with browser-like headers so GitHub/CDN serves the file
+  const fileRes = await fetch(downloadUrl, {
+    redirect: 'follow',
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept': 'application/octet-stream,*/*',
+    },
+  });
+
+  if (!fileRes.ok) {
+    return Response.json({ error: 'File not available', status: fileRes.status }, { status: 502 });
+  }
+
+  return new Response(fileRes.body, {
+    status: 200,
     headers: {
       ...corsHeaders,
-      'Location': downloadUrl,
+      'Content-Type': 'application/octet-stream',
+      'Content-Disposition': 'attachment; filename="VoxVPN-Setup-v2.0.exe"',
     },
   });
 });
