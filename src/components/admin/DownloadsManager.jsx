@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Trash2, Plus, Loader2 } from 'lucide-react';
+import { Trash2, Plus, Loader2, Upload, CheckCircle2 } from 'lucide-react';
 
 export default function DownloadsManager() {
   const [downloads, setDownloads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -113,13 +114,39 @@ export default function DownloadsManager() {
               onChange={(e) => setFormData({ ...formData, version: e.target.value })}
               className="w-full px-3 py-2 bg-[#0a0f1f] border border-white/10 rounded text-white placeholder-slate-500"
             />
-            <input
-              type="text"
-              placeholder="File URL"
-              value={formData.file_url}
-              onChange={(e) => setFormData({ ...formData, file_url: e.target.value })}
-              className="w-full px-3 py-2 bg-[#0a0f1f] border border-white/10 rounded text-white placeholder-slate-500"
-            />
+            {/* File Upload */}
+            <div className="space-y-2">
+              <label className="block text-slate-400 text-xs uppercase tracking-wider">File Upload</label>
+              <div className="flex items-center gap-3">
+                <label className={`flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer transition-all text-sm font-semibold ${
+                  uploading ? 'border-cyan-500/30 text-cyan-400 opacity-60 cursor-wait' : 'border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10'
+                }`}>
+                  {uploading ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
+                  {uploading ? 'Uploading…' : 'Upload File'}
+                  <input type="file" className="hidden" disabled={uploading} onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setUploading(true);
+                    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                    setFormData(prev => ({ ...prev, file_url }));
+                    setUploading(false);
+                  }} />
+                </label>
+                {formData.file_url && (
+                  <span className="flex items-center gap-1.5 text-emerald-400 text-xs font-semibold">
+                    <CheckCircle2 size={14} /> Uploaded
+                  </span>
+                )}
+              </div>
+              {/* Also allow pasting a URL manually */}
+              <input
+                type="text"
+                placeholder="Or paste a direct URL"
+                value={formData.file_url}
+                onChange={(e) => setFormData({ ...formData, file_url: e.target.value })}
+                className="w-full px-3 py-2 bg-[#0a0f1f] border border-white/10 rounded text-white placeholder-slate-500 text-sm"
+              />
+            </div>
             <div className="flex gap-4">
               <label className="flex items-center gap-2 text-white">
                 <input
