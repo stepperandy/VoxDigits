@@ -23,15 +23,14 @@ Deno.serve(async (req) => {
   } catch (_) {}
 
   if (!downloadUrl) {
-    return new Response(JSON.stringify({ error: 'No installer available. Please contact support.' }), {
-      status: 404,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    downloadUrl = 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe';
+    fileName = 'VoxVPN-Setup-v2.0.exe';
   }
 
   // Proxy/stream the file so the browser never navigates to GitHub
   const upstream = await fetch(downloadUrl, {
     headers: { 'User-Agent': 'VoxVPN-Downloader/1.0' },
+    redirect: 'follow',
   });
 
   if (!upstream.ok) {
