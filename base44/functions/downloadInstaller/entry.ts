@@ -27,26 +27,6 @@ Deno.serve(async (req) => {
     fileName = 'VoxVPN-Setup-v2.0.exe';
   }
 
-  // Proxy/stream the file so the browser never navigates to GitHub
-  const upstream = await fetch(downloadUrl, {
-    headers: { 'User-Agent': 'VoxVPN-Downloader/1.0' },
-    redirect: 'follow',
-  });
-
-  if (!upstream.ok) {
-    return new Response(JSON.stringify({ error: 'File not available' }), {
-      status: 502,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
-
-  return new Response(upstream.body, {
-    status: 200,
-    headers: {
-      ...corsHeaders,
-      'Content-Type': 'application/octet-stream',
-      'Content-Disposition': `attachment; filename="${fileName}"`,
-      'Content-Length': upstream.headers.get('Content-Length') || '',
-    },
-  });
+  // Redirect browser directly to the file — CDN serves it natively
+  return Response.redirect(downloadUrl, 302);
 });
