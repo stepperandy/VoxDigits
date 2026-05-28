@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from './AuthContext';
 import { Loader2, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 
-const LOCAL_API = 'http://localhost:5000';
+const API_URL = 'https://voxvpn.net/api/functions/authLogin';
 
 // Generate a stable device_id stored in localStorage
 function getDeviceId() {
@@ -48,7 +48,7 @@ export default function Login() {
       const device_id   = getDeviceId();
       const device_name = getDeviceName();
 
-      const res = await fetch(`${LOCAL_API}/login`, {
+      const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, device_id, device_name, device_type: 'windows' }),
