@@ -10,7 +10,7 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Get download URL from DB
+  // Get download URL from DB, fallback to default
   let downloadUrl = 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe';
 
   try {
@@ -20,19 +20,12 @@ Deno.serve(async (req) => {
     if (latest?.file_url) downloadUrl = latest.file_url;
   } catch (_) {}
 
-  // Stream the file directly so the browser downloads it without visiting GitHub
-  const fileRes = await fetch(downloadUrl, { redirect: 'follow' });
-  if (!fileRes.ok) {
-    return Response.json({ error: 'File not available' }, { status: 502 });
-  }
-
-  return new Response(fileRes.body, {
-    status: 200,
+  // Redirect directly to the download URL — avoids server-side proxy issues with GitHub CDN
+  return new Response(null, {
+    status: 302,
     headers: {
       ...corsHeaders,
-      'Content-Type': 'application/octet-stream',
-      'Content-Disposition': 'attachment; filename="VoxVPN-Setup.exe"',
-      'Content-Length': fileRes.headers.get('content-length') || '',
+      'Location': downloadUrl,
     },
   });
 });
