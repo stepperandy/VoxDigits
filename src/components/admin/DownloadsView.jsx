@@ -312,27 +312,10 @@ export default function DownloadsView() {
                     </a>
                   )}
                   {d.file_url && (
-                    <button onClick={async () => {
-                      let url = d.file_url;
-                      if (!url.startsWith('http')) {
-                        const res = await base44.integrations.Core.CreateFileSignedUrl({ file_uri: url });
-                        url = res.signed_url;
-                      }
-                      // Stream as blob so GitHub/external URLs don't open in browser
-                      const resp = await fetch(url);
-                      if (!resp.ok) { alert('File not found. Please upload a valid file for this download.'); return; }
-                      const blob = await resp.blob();
-                      const blobUrl = URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = blobUrl;
-                      a.download = d.name + (d.platform === 'Windows' ? '.exe' : d.platform === 'macOS' ? '.dmg' : '.bin');
-                      document.body.appendChild(a);
-                      a.click();
-                      setTimeout(() => { URL.revokeObjectURL(blobUrl); document.body.removeChild(a); }, 1000);
-                    }}
+                    <a href={d.file_url} target="_blank" rel="noopener noreferrer"
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold hover:bg-cyan-500/20 transition-all">
                       <Download size={12} /> DOWNLOAD
-                    </button>
+                    </a>
                   )}
                 </div>
 
