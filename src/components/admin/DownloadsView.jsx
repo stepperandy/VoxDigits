@@ -229,8 +229,8 @@ export default function DownloadsView() {
             <Monitor size={18} className="text-cyan-400" />
           </div>
           <div>
-            <p className="text-white font-semibold text-sm">VoxVPN Desktop Installer</p>
-            <p className="text-slate-500 text-xs">Windows · v2.0.0 · Streamed via proxy (no GitHub redirect)</p>
+            <p className="text-white font-semibold text-sm">VoxVPN Setup v2.0</p>
+            <p className="text-slate-500 text-xs">Windows · Direct Download</p>
           </div>
         </div>
         <a
