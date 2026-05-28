@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
   } catch (_) {}
 
   if (!downloadUrl) {
-    downloadUrl = 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe';
+    downloadUrl = 'https://drive.usercontent.google.com/download?id=1gZ6XN6mOfxhjZVWvLZ3I_u5el_cv_-Y1&export=download&confirm=t';
     fileName = 'VoxVPN-Setup-v2.0.exe';
   }
 
