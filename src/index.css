@@ -103,6 +103,21 @@
   }
 }
 
+/* Light theme overrides — applied via .theme-light on <html> */
+.theme-light body {
+  background-color: #f0f4f8 !important;
+  color: #0f172a !important;
+}
+.theme-light .bg-\[\#080c18\], .theme-light .bg-\[\#060c1a\], .theme-light .bg-\[\#060910\] { background-color: #ffffff !important; }
+.theme-light .bg-\[\#0d1120\], .theme-light .bg-\[\#0a1020\] { background-color: #e8edf5 !important; }
+.theme-light .text-white { color: #0f172a !important; }
+.theme-light .text-slate-400 { color: #475569 !important; }
+.theme-light .text-slate-500 { color: #64748b !important; }
+.theme-light .text-slate-600 { color: #94a3b8 !important; }
+.theme-light .border-white\/5 { border-color: rgba(0,0,0,0.08) !important; }
+.theme-light .border-white\/10 { border-color: rgba(0,0,0,0.12) !important; }
+.theme-light nav.bg-\[\#080c18\]\/95, .theme-light header { background-color: rgba(255,255,255,0.95) !important; border-bottom-color: rgba(0,0,0,0.1) !important; }
+
 @layer components {
   /* Safe area utilities for notch/safe area insets */
   .safe-area-bottom {

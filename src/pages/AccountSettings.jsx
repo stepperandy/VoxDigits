@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useTheme } from '@/lib/ThemeProvider';
 import { base44 } from '@/api/base44Client';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Loader2, Save, Trash2, Smartphone, Monitor, Wifi, User,
   ArrowLeft, Check, CreditCard, ExternalLink, Shield, Bell,
-  AlertCircle, Settings
+  AlertCircle, Settings, Sun, Moon
 } from 'lucide-react';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
@@ -18,9 +19,11 @@ const TABS = [
   { id: 'subscription', label: 'Subscription', icon: Shield },
   { id: 'devices', label: 'Devices', icon: Smartphone },
   { id: 'notifications', label: 'Notifications', icon: Bell },
+  { id: 'appearance', label: 'Appearance', icon: Sun },
 ];
 
 export default function AccountSettings() {
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
   const [user, setUser] = useState(null);
@@ -330,6 +333,51 @@ export default function AccountSettings() {
                   {saving ? <Loader2 size={15} className="animate-spin" /> : saved ? <Check size={15} /> : <Save size={15} />}
                   {saved ? 'Saved!' : 'Save Preferences'}
                 </button>
+              </motion.div>
+            )}
+
+            {/* Appearance Tab */}
+            {activeTab === 'appearance' && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                className="rounded-2xl border border-white/5 bg-[#0d1120] p-6 space-y-5">
+                <h2 className="text-white font-bold text-lg">Appearance</h2>
+                <p className="text-slate-400 text-sm">Choose a display theme. Your preference is saved automatically.</p>
+
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Dark theme */}
+                  <button onClick={() => theme !== 'dark' && toggleTheme()}
+                    className={`flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all ${
+                      theme === 'dark'
+                        ? 'border-cyan-400 bg-cyan-500/10'
+                        : 'border-white/10 bg-[#0a1020] hover:border-white/20'
+                    }`}>
+                    <div className="w-12 h-12 rounded-xl bg-[#080c18] border border-white/10 flex items-center justify-center">
+                      <Moon size={22} className="text-cyan-400" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-white font-bold text-sm">Dark</p>
+                      <p className="text-slate-500 text-xs mt-0.5">Easy on the eyes</p>
+                    </div>
+                    {theme === 'dark' && <Check size={14} className="text-cyan-400" />}
+                  </button>
+
+                  {/* Light theme */}
+                  <button onClick={() => theme !== 'light' && toggleTheme()}
+                    className={`flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all ${
+                      theme === 'light'
+                        ? 'border-cyan-400 bg-cyan-500/10'
+                        : 'border-white/10 bg-[#0a1020] hover:border-white/20'
+                    }`}>
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-300 flex items-center justify-center">
+                      <Sun size={22} className="text-amber-500" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-white font-bold text-sm">Light</p>
+                      <p className="text-slate-500 text-xs mt-0.5">High-contrast &amp; readable</p>
+                    </div>
+                    {theme === 'light' && <Check size={14} className="text-cyan-400" />}
+                  </button>
+                </div>
               </motion.div>
             )}
 
