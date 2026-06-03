@@ -261,10 +261,11 @@ export default function DownloadPage() {
             )}
 
             {/* ── VoxVPN Desktop V2.0 — Primary Download ── */}
-            {canDownload(subscription) && (
-              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-                <div className="rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-[#0d1420] to-[#060c1a] p-8"
-                  style={{ boxShadow: '0 0 60px rgba(0,212,255,0.08)' }}>
+             {canDownload(subscription) && (
+               <>
+                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+                   <div className="rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-[#0d1420] to-[#060c1a] p-8"
+                     style={{ boxShadow: '0 0 60px rgba(0,212,255,0.08)' }}>
 
                   {/* Badge row */}
                   <div className="flex flex-wrap items-center gap-2 mb-5">
@@ -342,11 +343,59 @@ export default function DownloadPage() {
                     Download v2.0.0 directly · No external links required
                   </p>
                 </div>
-              </motion.div>
-            )}
+                </motion.div>
 
-            {/* Active — show platform tabs for mobile/config downloads */}
-            {canDownload(subscription) && (
+                 {/* ── VoxVPN Android APK — Premium Download ── */}
+                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-8">
+                   <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-[#0d1420] to-[#060c1a] p-8"
+                     style={{ boxShadow: '0 0 60px rgba(52,168,83,0.08)' }}>
+
+                     <div className="flex flex-wrap items-center gap-2 mb-5">
+                       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+                         <Star size={10} /> Premium Android
+                       </span>
+                       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-400 text-xs font-mono">
+                         <Tag size={10} /> Android 8.0+
+                       </span>
+                     </div>
+
+                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                       <div className="w-20 h-20 rounded-2xl flex items-center justify-center flex-shrink-0"
+                         style={{ background: 'linear-gradient(135deg, rgba(52,168,83,0.2), rgba(52,168,83,0.05))', border: '1px solid rgba(52,168,83,0.3)' }}>
+                         <Smartphone size={38} style={{ color: '#34A853' }} />
+                       </div>
+
+                       <div className="flex-1">
+                         <h2 className="text-2xl font-black text-white mb-1">VoxVPN for Android (APK)</h2>
+                         <p className="text-slate-400 text-sm mb-3">
+                           Premium native app with faster performance and seamless VPN integration.
+                         </p>
+                         <div className="flex flex-wrap gap-3 text-xs text-slate-500">
+                           <span className="flex items-center gap-1"><Shield size={11} className="text-emerald-400" /> AES-256</span>
+                           <span>·</span>
+                           <span>Android 8.0+</span>
+                           <span>·</span>
+                           <span>Direct APK Install</span>
+                         </div>
+                       </div>
+
+                       <a
+                         href="http:///apps/voxvpn.apk"
+                         download="voxvpn.apk"
+                         className="flex items-center gap-3 px-8 py-4 rounded-xl font-black text-base text-black transition-all shadow-2xl flex-shrink-0 w-full sm:w-auto justify-center"
+                         style={{ background: 'linear-gradient(135deg, #34A853, #2d8659)', boxShadow: '0 8px 30px rgba(52,168,83,0.35)' }}
+                       >
+                         <Download size={20} />
+                         Download .APK
+                       </a>
+                     </div>
+                   </div>
+                 </motion.div>
+                </>
+                )}
+
+                {/* Active — show platform tabs for mobile/config downloads */}
+                {canDownload(subscription) && (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
 
                 {/* Platform Tabs */}
