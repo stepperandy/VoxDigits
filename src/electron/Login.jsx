@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useAuth } from './AuthContext';
-import { Loader2, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import { Loader2, Eye, EyeOff, AlertTriangle, Shield, ExternalLink, CreditCard } from 'lucide-react';
 
 const API_URL = 'https://voxvpn.net/api/functions/authLogin';
 
-// Generate a stable device_id stored in localStorage
 function getDeviceId() {
   let id = localStorage.getItem('voxvpn_device_id');
   if (!id) {
@@ -37,12 +36,14 @@ export default function Login() {
   const [showPw, setShowPw]     = useState(false);
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState('');
+  const [errorType, setErrorType] = useState(''); // 'expired' | 'device_limit' | 'no_sub' | 'invalid'
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) { setError('Please fill in all fields.'); return; }
     setLoading(true);
     setError('');
+    setErrorType('');
 
     try {
       const device_id   = getDeviceId();
@@ -57,16 +58,15 @@ export default function Login() {
       const data = await res.json();
 
       if (!res.ok || !data.token) {
-        throw new Error(data.error || 'Invalid email or password.');
-      }
-
-      if (data.subscriptionActive === false) {
-        throw new Error('No active subscription. Please renew at voxvpn.net.');
+        if (data.expired) setErrorType('expired');
+        else if (data.deviceLimitExceeded) setErrorType('device_limit');
+        else if (data.subscriptionActive === false && res.status === 403) setErrorType('no_sub');
+        else setErrorType('invalid');
+        throw new Error(data.message || data.error || 'Invalid email or password.');
       }
 
       localStorage.setItem('voxvpn_device_name', device_name);
 
-      // Persist token securely via main process (OS-encrypted)
       if (window.electronVPN?.saveToken) {
         await window.electronVPN.saveToken(data.token);
       } else {
@@ -78,8 +78,8 @@ export default function Login() {
         token: data.token,
         device_id,
         device_name,
-        name: data.name || email.split('@')[0],
-        plan: data.subscription?.plan || data.plan || null,
+        name: data.user?.name || email.split('@')[0],
+        plan: data.subscription?.plan || null,
         hasAccess: true,
       });
 
@@ -91,24 +91,59 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080c18] flex items-center justify-center px-4" style={gridBg}>
+    <div className="min-h-screen bg-[#060c1a] flex items-center justify-center px-4" style={gridBg}>
       <div className="w-full max-w-sm">
 
+        {/* Logo */}
         <div className="flex flex-col items-center mb-8">
           <img
             src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
             alt="VoxVPN"
             className="h-16 w-auto mb-3"
           />
-          <p className="text-slate-500 text-sm">Sign in to your VoxVPN account</p>
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
+            style={{ background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.2)', color: '#00d4ff' }}>
+            <Shield size={11} /> Same login as voxvpn.net
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-white/8 bg-[#0d1120] p-6 shadow-2xl shadow-black/50">
-          <h2 className="text-white font-black text-xl mb-6">Welcome back</h2>
+        {/* Card */}
+        <div className="rounded-2xl p-6 shadow-2xl shadow-black/50"
+          style={{ background: 'linear-gradient(135deg,#0d1420,#060c1a)', border: '1px solid rgba(0,212,255,0.15)', boxShadow: '0 0 40px rgba(0,212,255,0.06)' }}>
 
+          <h2 className="text-white font-black text-xl mb-1">Welcome back</h2>
+          <p className="text-slate-500 text-xs mb-6">Sign in with your voxvpn.net account to connect</p>
+
+          {/* Error messages */}
           {error && (
-            <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-rose-500/20 bg-rose-500/5 text-rose-400 text-sm mb-4">
-              <AlertTriangle size={14} className="flex-shrink-0" /> {error}
+            <div className="rounded-xl border p-3 mb-4 text-sm"
+              style={{
+                borderColor: errorType === 'expired' ? 'rgba(251,191,36,0.3)' : errorType === 'device_limit' ? 'rgba(139,92,246,0.3)' : 'rgba(239,68,68,0.25)',
+                background: errorType === 'expired' ? 'rgba(251,191,36,0.05)' : errorType === 'device_limit' ? 'rgba(139,92,246,0.05)' : 'rgba(239,68,68,0.05)',
+              }}>
+              <div className="flex items-start gap-2">
+                <AlertTriangle size={14} className="flex-shrink-0 mt-0.5"
+                  style={{ color: errorType === 'expired' ? '#fbbf24' : errorType === 'device_limit' ? '#a78bfa' : '#f87171' }} />
+                <div>
+                  <p style={{ color: errorType === 'expired' ? '#fbbf24' : errorType === 'device_limit' ? '#a78bfa' : '#f87171' }}>
+                    {error}
+                  </p>
+                  {(errorType === 'expired' || errorType === 'no_sub') && (
+                    <a href="https://voxvpn.net/pricing" target="_blank" rel="noopener noreferrer"
+                      className="mt-1.5 inline-flex items-center gap-1 text-xs font-bold underline"
+                      style={{ color: '#00d4ff' }}>
+                      <CreditCard size={10} /> Renew at voxvpn.net <ExternalLink size={9} />
+                    </a>
+                  )}
+                  {errorType === 'device_limit' && (
+                    <a href="https://voxvpn.net/account-settings" target="_blank" rel="noopener noreferrer"
+                      className="mt-1.5 inline-flex items-center gap-1 text-xs font-bold underline"
+                      style={{ color: '#a78bfa' }}>
+                      Manage devices at voxvpn.net <ExternalLink size={9} />
+                    </a>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
@@ -120,7 +155,10 @@ export default function Login() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full px-4 py-3 rounded-xl border border-white/8 bg-[#080c18] text-white placeholder-slate-600 text-sm focus:outline-none focus:border-cyan-500/50 transition-colors"
+                className="w-full px-4 py-3 rounded-xl text-white placeholder-slate-600 text-sm focus:outline-none transition-colors"
+                style={{ background: '#060c1a', border: '1px solid rgba(255,255,255,0.08)' }}
+                onFocus={e => e.target.style.borderColor = 'rgba(0,212,255,0.4)'}
+                onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
               />
             </div>
             <div>
@@ -131,7 +169,10 @@ export default function Login() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 pr-11 rounded-xl border border-white/8 bg-[#080c18] text-white placeholder-slate-600 text-sm focus:outline-none focus:border-cyan-500/50 transition-colors"
+                  className="w-full px-4 py-3 pr-11 rounded-xl text-white placeholder-slate-600 text-sm focus:outline-none transition-colors"
+                  style={{ background: '#060c1a', border: '1px solid rgba(255,255,255,0.08)' }}
+                  onFocus={e => e.target.style.borderColor = 'rgba(0,212,255,0.4)'}
+                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
                 />
                 <button type="button" onClick={() => setShowPw(v => !v)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
@@ -143,37 +184,30 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-black text-sm transition-all shadow-lg shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+              className="w-full py-3.5 rounded-xl text-black font-black text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+              style={{ background: loading ? 'rgba(0,212,255,0.7)' : 'linear-gradient(135deg,#00d4ff,#00b8e6)', boxShadow: '0 8px 24px rgba(0,212,255,0.3)' }}
             >
-              {loading ? <><Loader2 size={16} className="animate-spin" /> Signing in…</> : 'Sign In'}
+              {loading ? <><Loader2 size={16} className="animate-spin" /> Signing in…</> : 'Sign In to VoxVPN'}
             </button>
           </form>
 
-          <p className="text-center text-slate-500 text-sm mt-5">
-            No account?{' '}
-            <a
-              href="https://voxvpn.net/#pricing"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-cyan-400 hover:text-cyan-300 font-bold transition-colors"
-            >
-              Get a plan
-            </a>
-          </p>
-
-          <p className="text-center text-slate-600 text-xs mt-3">
-            <a
-              href="https://voxvpn.net/auth-login"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-slate-400 transition-colors"
-            >
+          {/* Footer links */}
+          <div className="mt-5 pt-4 border-t border-white/5 space-y-2 text-center">
+            <p className="text-slate-500 text-sm">
+              No account?{' '}
+              <a href="https://voxvpn.net/pricing" target="_blank" rel="noopener noreferrer"
+                className="font-bold transition-colors" style={{ color: '#00d4ff' }}>
+                Get a plan at voxvpn.net
+              </a>
+            </p>
+            <a href="https://voxvpn.net/auth-login" target="_blank" rel="noopener noreferrer"
+              className="block text-slate-600 text-xs hover:text-slate-400 transition-colors">
               Forgot password?
             </a>
-          </p>
+          </div>
         </div>
 
-        <p className="text-center text-slate-700 text-xs mt-6">VoxVPN · Military-grade privacy</p>
+        <p className="text-center text-slate-700 text-xs mt-5">VoxVPN · Military-grade privacy</p>
       </div>
     </div>
   );
