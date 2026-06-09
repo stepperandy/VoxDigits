@@ -159,7 +159,7 @@ export default function DashboardView() {
             <div className="space-y-2 max-h-72 overflow-y-auto pr-1 custom-scroll">
               {servers.map((s) => {
                 const online = s.status === 'active' && s.power === 'running';
-                const name = regionNames[s.location] || s.location.toUpperCase();
+                const name = regionNames[s.location] || (s.location || '').toUpperCase();
                 return (
                   <div key={s.id} className="flex items-center justify-between py-2.5 px-3 rounded-xl bg-white/2 hover:bg-white/4 transition-colors">
                     <div className="flex items-center gap-3">
