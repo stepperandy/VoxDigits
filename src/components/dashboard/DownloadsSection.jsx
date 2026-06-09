@@ -6,9 +6,18 @@ import { motion } from 'framer-motion';
 async function triggerDownload(platform) {
   const res = await base44.functions.invoke('secureDownload', { platform });
   const url = res.data?.url;
+  const filename = res.data?.filename || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
   if (!url) throw new Error('No download URL returned');
-  // Open in new tab — bypasses React router and works for external/direct URLs
-  window.open(url, '_blank');
+  // Fetch as blob so browser saves with correct .exe/.apk filename
+  const blob = await fetch(url).then(r => r.blob());
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
 }
 
 export default function DownloadsSection() {

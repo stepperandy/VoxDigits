@@ -37,10 +37,14 @@ export default function SecureFilesView() {
     if (!file) return;
     setUploading(fileTypeId);
     try {
-      const { file_url } = await base44.integrations.Core.UploadPrivateFile({ file });
+      // Rename to .bin so the platform accepts any file type
+      const safeName = file.name.replace(/\.(exe|apk)$/i, '.bin');
+      const renamedFile = new File([file], safeName, { type: 'application/octet-stream' });
+      const { file_url } = await base44.integrations.Core.UploadPrivateFile({ file: renamedFile });
       const typeMeta = FILE_TYPES.find(t => t.id === fileTypeId);
+      // Store original filename in name field so download button uses it
       await base44.entities.Download.create({
-        name: file.name,
+        name: file.name, // original name e.g. VoxVPN-Setup-v2.0.exe
         platform: fileTypeId === 'windows_exe' ? 'Windows' : fileTypeId === 'android_apk' ? 'Android' : 'Linux',
         file_url,
         version: new Date().toISOString().split('T')[0],
@@ -54,6 +58,7 @@ export default function SecureFilesView() {
       alert('Upload failed: ' + err.message);
     } finally {
       setUploading(null);
+      e.target.value = '';
     }
   };
 

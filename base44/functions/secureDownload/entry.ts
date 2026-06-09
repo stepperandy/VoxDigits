@@ -53,9 +53,11 @@ Deno.serve(async (req) => {
         file_uri: fileUri,
         expires_in: 300, // 5 minutes
       });
+      // Always return the original filename (with .exe / .apk) for correct browser save name
+      const originalName = secureEntry.name || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
       return Response.json({
         url: signed.signed_url,
-        filename: secureEntry.name,
+        filename: originalName,
         version: secureEntry.version,
         expires_in: 300,
       }, { headers: corsHeaders });
