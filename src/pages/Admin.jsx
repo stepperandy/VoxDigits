@@ -18,6 +18,7 @@ import ProvidersView from '@/components/admin/ProvidersView';
 import DownloadLinkManager from '@/components/admin/DownloadLinkManager';
 import SubscriberStats from '@/components/admin/SubscriberStats';
 import GrantSubscriptionView from '@/components/admin/GrantSubscriptionView';
+import SecureFilesView from '@/components/admin/SecureFilesView';
 
 export default function Admin() {
   const [activePage, setActivePage] = useState('dashboard');
@@ -50,6 +51,7 @@ export default function Admin() {
         </div>
       );
       case 'grant-subscription': return <GrantSubscriptionView />;
+      case 'secure-files': return <SecureFilesView />;
       default: return <DashboardView />;
     }
   };

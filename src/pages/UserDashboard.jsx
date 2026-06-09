@@ -11,13 +11,20 @@ import {
   Smartphone, Monitor, Zap
 } from 'lucide-react';
 
-function triggerDownload() {
-  const a = document.createElement('a');
-  a.href = '/api/functions/downloadInstaller';
-  a.download = 'VoxVPN-Setup.exe';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+async function triggerDownload(platform = 'Windows') {
+  try {
+    const res = await base44.functions.invoke('secureDownload', { platform });
+    const url = res.data?.url;
+    if (!url) { alert('Download not available. Please contact support.'); return; }
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = res.data?.filename || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch {
+    alert('Download failed. Please try again or contact support.');
+  }
 }
 
 const STATUS_CONFIG = {
@@ -283,10 +290,9 @@ export default function UserDashboard() {
               </button>
 
               {/* Android APK */}
-              <a
-                href="https://voxvpn.net/downloads/voxvpn.apk"
-                download="voxvpn.apk"
-                className="flex items-center gap-4 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 transition-all group text-left">
+              <button
+                onClick={() => triggerDownload('Android')}
+                className="flex items-center gap-4 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 transition-all group text-left w-full">
                 <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
                   <Smartphone size={18} className="text-emerald-400" />
                 </div>
@@ -295,7 +301,7 @@ export default function UserDashboard() {
                   <p className="text-slate-500 text-xs">Android 8.0+ · .apk</p>
                 </div>
                 <Download size={14} className="text-emerald-400 group-hover:scale-110 transition-transform flex-shrink-0" />
-              </a>
+              </button>
             </div>
             <p className="text-slate-700 text-xs text-center mt-3">All downloads are verified and signed</p>
           </motion.div>

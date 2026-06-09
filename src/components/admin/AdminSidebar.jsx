@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Server, LogOut, Menu, X, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2, Handshake, Globe, Gift } from 'lucide-react';
+import { LayoutDashboard, Users, Server, LogOut, Menu, X, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2, Handshake, Globe, Gift, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
@@ -16,6 +16,7 @@ const navItems = [
   { icon: Globe, label: 'Providers', id: 'providers', desc: 'Hybrid VPN provider APIs' },
   { icon: Users, label: 'Subscribers', id: 'subscribers', desc: 'Stats & download link' },
   { icon: Gift, label: 'Grant Subscription', id: 'grant-subscription', desc: 'Manually activate plans' },
+  { icon: ShieldCheck, label: 'Secure Files', id: 'secure-files', desc: 'Host installer files privately' },
 ];
 
 export default function AdminSidebar({ activePage, onNavigate, onLogout }) {
