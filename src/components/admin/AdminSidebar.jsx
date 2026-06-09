@@ -51,7 +51,7 @@ export default function AdminSidebar({ activePage, onNavigate, onLogout }) {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 space-y-0.5">
+        <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activePage === item.id;

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Upload, Trash2, Download, Loader2, ShieldCheck, Copy, CheckCircle2, FileText, Smartphone, Monitor, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
