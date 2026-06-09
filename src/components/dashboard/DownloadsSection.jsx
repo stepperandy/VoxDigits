@@ -4,12 +4,11 @@ import { Download, Monitor, Smartphone, Loader2, Key, Copy, CheckCircle2, Shield
 import { motion } from 'framer-motion';
 
 async function triggerDownload(platform) {
-  const res = await base44.functions.invoke('secureDownload', { platform });
-  const url = res.data?.url;
-  const filename = res.data?.filename || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
-  if (!url) throw new Error('No download URL returned');
-  // Fetch as blob so browser saves with correct .exe/.apk filename
-  const blob = await fetch(url).then(r => r.blob());
+  const filename = platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe';
+  // Call the backend which streams the file with correct Content-Disposition header
+  const res = await base44.functions.invoke('secureDownload', { platform }, { responseType: 'blob' });
+  const blob = res.data;
+  if (!blob || blob.size === 0) throw new Error('Empty file received');
   const blobUrl = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = blobUrl;

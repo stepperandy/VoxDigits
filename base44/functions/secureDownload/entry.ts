@@ -47,20 +47,28 @@ Deno.serve(async (req) => {
 
     const fileUri = secureEntry.file_url;
 
-    // If it's a private URI (not http), generate a signed URL
+    const originalName = secureEntry.name || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
+
+    // If it's a private URI (not http), fetch and stream with correct .exe/.apk filename
     if (!fileUri.startsWith('http')) {
       const signed = await base44.asServiceRole.integrations.Core.CreateFileSignedUrl({
         file_uri: fileUri,
-        expires_in: 300, // 5 minutes
-      });
-      // Always return the original filename (with .exe / .apk) for correct browser save name
-      const originalName = secureEntry.name || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
-      return Response.json({
-        url: signed.signed_url,
-        filename: originalName,
-        version: secureEntry.version,
         expires_in: 300,
-      }, { headers: corsHeaders });
+      });
+      // Fetch the file from the signed URL and stream it back with correct Content-Disposition
+      const fileResponse = await fetch(signed.signed_url);
+      if (!fileResponse.ok) {
+        return Response.json({ error: 'File fetch failed' }, { status: 502, headers: corsHeaders });
+      }
+      return new Response(fileResponse.body, {
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/octet-stream',
+          'Content-Disposition': `attachment; filename="${originalName}"`,
+          'Content-Length': fileResponse.headers.get('Content-Length') || '',
+        },
+      });
     }
 
     // External URL — return it directly

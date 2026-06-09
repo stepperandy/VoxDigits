@@ -116,10 +116,17 @@ export default function DownloadPage() {
   const handleDesktopDownload = async () => {
     setDownloading(true);
     try {
-      const res = await base44.functions.invoke('secureDownload', { platform: 'Windows' });
-      const url = res.data?.url;
-      if (!url) { alert('Installer not available. Please contact support.'); return; }
-      window.open(url, '_blank');
+      const res = await base44.functions.invoke('secureDownload', { platform: 'Windows' }, { responseType: 'blob' });
+      const blob = res.data;
+      if (!blob || blob.size === 0) throw new Error('Empty file');
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = 'VoxVPN-Setup.exe';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
     } catch (err) {
       alert('Download failed: ' + (err.message || 'Please try again.'));
     } finally {
@@ -387,12 +394,23 @@ export default function DownloadPage() {
                        </div>
 
                        <button
-                         onClick={async () => {
-                           const res = await base44.functions.invoke('secureDownload', { platform: 'Android' });
-                           const url = res.data?.url;
-                           if (!url) { alert('APK not available yet.'); return; }
-                           window.open(url, '_blank');
-                         }}
+                          onClick={async () => {
+                            try {
+                              const res = await base44.functions.invoke('secureDownload', { platform: 'Android' }, { responseType: 'blob' });
+                              const blob = res.data;
+                              if (!blob || blob.size === 0) { alert('APK not available yet.'); return; }
+                              const blobUrl = URL.createObjectURL(blob);
+                              const a = document.createElement('a');
+                              a.href = blobUrl;
+                              a.download = 'VoxVPN.apk';
+                              document.body.appendChild(a);
+                              a.click();
+                              document.body.removeChild(a);
+                              setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+                            } catch (err) {
+                              alert('Download failed: ' + (err.message || 'Please try again.'));
+                            }
+                          }}
                          className="flex items-center gap-3 px-8 py-4 rounded-xl font-black text-base text-black transition-all shadow-2xl flex-shrink-0 w-full sm:w-auto justify-center"
                          style={{ background: 'linear-gradient(135deg, #34A853, #2d8659)', boxShadow: '0 8px 30px rgba(52,168,83,0.35)' }}
                        >
