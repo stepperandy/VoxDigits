@@ -183,10 +183,22 @@ export default function SecureFilesView() {
                             {copiedId === f.id ? <CheckCircle2 size={12} /> : <Copy size={12} />}
                             {copiedId === f.id ? 'Copied!' : 'Copy'}
                           </button>
-                          <a href={signed} target="_blank" rel="noopener noreferrer"
+                          <button
+                            onClick={async () => {
+                              const blobRes = await fetch(signed);
+                              const blob = await blobRes.blob();
+                              const blobUrl = URL.createObjectURL(blob);
+                              const a = document.createElement('a');
+                              a.href = blobUrl;
+                              a.download = f.name; // original .exe/.apk name
+                              document.body.appendChild(a);
+                              a.click();
+                              document.body.removeChild(a);
+                              setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+                            }}
                             className="flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs hover:bg-emerald-500/20 transition-all">
                             <Download size={12} /> Test
-                          </a>
+                          </button>
                         </div>
                       )}
                     </div>
