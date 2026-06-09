@@ -116,13 +116,16 @@ export default function DownloadPage() {
   const handleDesktopDownload = async () => {
     setDownloading(true);
     try {
-      const res = await base44.functions.invoke('secureDownload', { platform: 'Windows' }, { responseType: 'blob' });
-      const blob = res.data;
-      if (!blob || blob.size === 0) throw new Error('Empty file');
+      const res = await base44.functions.invoke('secureDownload', { platform: 'Windows' });
+      const { url, filename } = res.data;
+      if (!url) throw new Error('No download URL');
+      const blobRes = await fetch(url);
+      if (!blobRes.ok) throw new Error('Fetch failed: ' + blobRes.status);
+      const blob = await blobRes.blob();
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = blobUrl;
-      a.download = 'VoxVPN-Setup.exe';
+      a.download = filename || 'VoxVPN-Setup.exe';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -396,13 +399,15 @@ export default function DownloadPage() {
                        <button
                           onClick={async () => {
                             try {
-                              const res = await base44.functions.invoke('secureDownload', { platform: 'Android' }, { responseType: 'blob' });
-                              const blob = res.data;
-                              if (!blob || blob.size === 0) { alert('APK not available yet.'); return; }
+                              const res = await base44.functions.invoke('secureDownload', { platform: 'Android' });
+                              const { url, filename } = res.data;
+                              if (!url) { alert('APK not available yet.'); return; }
+                              const blobRes = await fetch(url);
+                              const blob = await blobRes.blob();
                               const blobUrl = URL.createObjectURL(blob);
                               const a = document.createElement('a');
                               a.href = blobUrl;
-                              a.download = 'VoxVPN.apk';
+                              a.download = filename || 'VoxVPN.apk';
                               document.body.appendChild(a);
                               a.click();
                               document.body.removeChild(a);
