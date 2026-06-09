@@ -113,19 +113,20 @@ export default function DownloadPage() {
 
   const [downloading, setDownloading] = useState(false);
 
-  const handleDesktopDownload = async () => {
+  const handleDownload = async (platform = 'Windows') => {
     setDownloading(true);
     try {
-      const res = await base44.functions.invoke('secureDownload', { platform: 'Windows' });
+      const res = await base44.functions.invoke('secureDownload', { platform });
       const { url, filename } = res.data;
       if (!url) throw new Error('No download URL');
+      // Fetch as blob to trigger instant download without navigation
       const blobRes = await fetch(url);
       if (!blobRes.ok) throw new Error('Fetch failed: ' + blobRes.status);
       const blob = await blobRes.blob();
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = blobUrl;
-      a.download = filename || 'VoxVPN-Setup.exe';
+      a.download = filename || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -136,8 +137,6 @@ export default function DownloadPage() {
       setDownloading(false);
     }
   };
-
-  const handleDownload = () => handleDesktopDownload();
 
   useEffect(() => {
     base44.auth.me()
@@ -324,7 +323,7 @@ export default function DownloadPage() {
 
                     {/* Download Button */}
                     <button
-                      onClick={handleDesktopDownload}
+                      onClick={() => handleDownload('Windows')}
                       disabled={downloading}
                       className="flex items-center gap-3 px-8 py-4 rounded-xl font-black text-base text-black transition-all shadow-2xl disabled:opacity-50 flex-shrink-0 w-full sm:w-auto justify-center"
                       style={{ background: 'linear-gradient(135deg, #00d4ff, #00b8e6)', boxShadow: '0 8px 30px rgba(0,212,255,0.35)' }}
@@ -397,30 +396,12 @@ export default function DownloadPage() {
                        </div>
 
                        <button
-                          onClick={async () => {
-                            try {
-                              const res = await base44.functions.invoke('secureDownload', { platform: 'Android' });
-                              const { url, filename } = res.data;
-                              if (!url) { alert('APK not available yet.'); return; }
-                              const blobRes = await fetch(url);
-                              const blob = await blobRes.blob();
-                              const blobUrl = URL.createObjectURL(blob);
-                              const a = document.createElement('a');
-                              a.href = blobUrl;
-                              a.download = filename || 'VoxVPN.apk';
-                              document.body.appendChild(a);
-                              a.click();
-                              document.body.removeChild(a);
-                              setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
-                            } catch (err) {
-                              alert('Download failed: ' + (err.message || 'Please try again.'));
-                            }
-                          }}
+                         onClick={() => handleDownload('Android')}
                          className="flex items-center gap-3 px-8 py-4 rounded-xl font-black text-base text-black transition-all shadow-2xl flex-shrink-0 w-full sm:w-auto justify-center"
                          style={{ background: 'linear-gradient(135deg, #34A853, #2d8659)', boxShadow: '0 8px 30px rgba(52,168,83,0.35)' }}
                        >
-                         <Download size={20} />
-                         Download .APK
+                         {downloading ? <Loader2 size={20} className="animate-spin" /> : <Download size={20} />}
+                         {downloading ? 'Preparing...' : 'Download .APK'}
                        </button>
                      </div>
                    </div>

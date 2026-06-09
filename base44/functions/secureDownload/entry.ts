@@ -63,10 +63,10 @@ Deno.serve(async (req) => {
       }, { headers: corsHeaders });
     }
 
-    // External URL — return it directly
+    // External URL (GitHub, etc.) — return it directly with proper filename
     return Response.json({
       url: fileUri,
-      filename: secureEntry.name,
+      filename: originalName,
       version: secureEntry.version,
     }, { headers: corsHeaders });
 
