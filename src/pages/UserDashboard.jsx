@@ -284,7 +284,7 @@ export default function UserDashboard() {
 
               {/* Android APK */}
               <a
-                href="http:///apps/voxvpn.apk"
+                href="https://voxvpn.net/downloads/voxvpn.apk"
                 download="voxvpn.apk"
                 className="flex items-center gap-4 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 transition-all group text-left">
                 <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">

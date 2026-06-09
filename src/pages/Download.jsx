@@ -380,7 +380,7 @@ export default function DownloadPage() {
                        </div>
 
                        <a
-                         href="http:///apps/voxvpn.apk"
+                         href="https://voxvpn.net/downloads/voxvpn.apk"
                          download="voxvpn.apk"
                          className="flex items-center gap-3 px-8 py-4 rounded-xl font-black text-base text-black transition-all shadow-2xl flex-shrink-0 w-full sm:w-auto justify-center"
                          style={{ background: 'linear-gradient(135deg, #34A853, #2d8659)', boxShadow: '0 8px 30px rgba(52,168,83,0.35)' }}
