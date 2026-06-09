@@ -65,14 +65,14 @@ export default function UserProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#080c18] flex items-center justify-center">
+      <div className="min-h-screen bg-[#060c1a] flex items-center justify-center">
         <Loader2 size={32} className="text-cyan-400 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#080c18]">
+    <div className="min-h-screen bg-[#060c1a]">
       <Navbar />
       <div className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto space-y-6">
 
@@ -88,7 +88,7 @@ export default function UserProfile() {
 
         {/* Profile Card */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-white/5 bg-[#0d1120] p-6">
+          className="rounded-2xl border border-white/5 bg-[#0d1420] p-6">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
               <User size={24} className="text-cyan-400" />
@@ -106,7 +106,7 @@ export default function UserProfile() {
                 type="text"
                 value={user?.full_name || ''}
                 disabled
-                className="w-full px-4 py-3 rounded-xl bg-[#0a1020] border border-white/5 text-slate-500 text-sm cursor-not-allowed"
+                className="w-full px-4 py-3 rounded-xl bg-[#060c1a] border border-white/5 text-slate-500 text-sm cursor-not-allowed"
               />
               <p className="text-slate-600 text-xs mt-1">Name is managed by your login provider.</p>
             </div>
@@ -118,7 +118,7 @@ export default function UserProfile() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-xl bg-[#0a1020] border border-white/10 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-[#060c1a] border border-white/10 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 transition-colors"
               />
             </div>
 
@@ -135,7 +135,7 @@ export default function UserProfile() {
 
         {/* Linked Devices */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="rounded-2xl border border-white/5 bg-[#0d1120] p-6">
+          className="rounded-2xl border border-white/5 bg-[#0d1420] p-6">
           <h2 className="text-white font-bold text-lg mb-1">
             Connected Devices
             {subscription && <span className="text-slate-500 font-normal text-sm ml-2">({devices.length}/{subscription.max_devices})</span>}
@@ -153,7 +153,7 @@ export default function UserProfile() {
                 const Icon = deviceIcons[device.device_type] || Smartphone;
                 return (
                   <div key={device.id}
-                    className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-[#0a1020]">
+                    className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-[#060c1a]">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center">
                         <Icon size={18} className="text-cyan-400" />
@@ -181,7 +181,7 @@ export default function UserProfile() {
         {/* Subscription summary */}
         {subscription && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="rounded-2xl border border-cyan-500/10 bg-[#0d1120] p-6">
+            className="rounded-2xl border border-cyan-500/10 bg-[#0d1420] p-6">
             <h2 className="text-white font-bold text-lg mb-4">Subscription</h2>
             <div className="grid grid-cols-2 gap-3">
               {[
@@ -190,7 +190,7 @@ export default function UserProfile() {
                 { label: 'Billing', value: subscription.billing_cycle === 'yearly' ? 'Yearly' : 'Monthly' },
                 { label: 'Renews', value: subscription.renewal_date ? new Date(subscription.renewal_date).toLocaleDateString() : 'N/A' },
               ].map(item => (
-                <div key={item.label} className="bg-[#0a1020] rounded-xl p-3 border border-white/5">
+                <div key={item.label} className="bg-[#060c1a] rounded-xl p-3 border border-white/5">
                   <p className="text-slate-600 text-xs uppercase tracking-wider mb-1">{item.label}</p>
                   <p className="text-white font-bold text-sm">{item.value}</p>
                 </div>

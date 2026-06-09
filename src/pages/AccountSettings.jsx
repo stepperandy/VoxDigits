@@ -108,14 +108,14 @@ export default function AccountSettings() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#080c18] flex items-center justify-center">
+      <div className="min-h-screen bg-[#060c1a] flex items-center justify-center">
         <Loader2 size={32} className="text-cyan-400 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#080c18]">
+    <div className="min-h-screen bg-[#060c1a]">
       <Navbar />
       <div className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
 
@@ -159,7 +159,7 @@ export default function AccountSettings() {
             {/* Profile Tab */}
             {activeTab === 'profile' && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl border border-white/5 bg-[#0d1120] p-6 space-y-5">
+                className="rounded-2xl border border-white/5 bg-[#0d1420] p-6 space-y-5">
                 <h2 className="text-white font-bold text-lg">Profile Information</h2>
 
                 <div className="flex items-center gap-4 pb-5 border-b border-white/5">
@@ -177,13 +177,13 @@ export default function AccountSettings() {
                   <div>
                     <label className="text-slate-400 text-xs uppercase tracking-wider mb-1.5 block">Full Name</label>
                     <input type="text" value={user?.full_name || ''} disabled
-                      className="w-full px-4 py-3 rounded-xl bg-[#0a1020] border border-white/5 text-slate-500 text-sm cursor-not-allowed" />
+                      className="w-full px-4 py-3 rounded-xl bg-[#060c1a] border border-white/5 text-slate-500 text-sm cursor-not-allowed" />
                     <p className="text-slate-600 text-xs mt-1">Managed by your login provider.</p>
                   </div>
                   <div>
                     <label className="text-slate-400 text-xs uppercase tracking-wider mb-1.5 block">Contact Email</label>
                     <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
-                      className="w-full px-4 py-3 rounded-xl bg-[#0a1020] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50 transition-colors" />
+                      className="w-full px-4 py-3 rounded-xl bg-[#060c1a] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50 transition-colors" />
                   </div>
                   <button type="submit" disabled={saving || email === user?.email}
                     className="flex items-center gap-2 px-5 py-2.5 bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold rounded-xl text-sm transition-all">
@@ -212,7 +212,7 @@ export default function AccountSettings() {
                     </a>
                   </div>
                 ) : (
-                  <div className="rounded-2xl border border-cyan-500/20 bg-[#0d1120] p-6 space-y-5">
+                  <div className="rounded-2xl border border-cyan-500/20 bg-[#0d1420] p-6 space-y-5">
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <p className="text-slate-500 text-xs uppercase tracking-widest mb-1">Current Plan</p>
@@ -233,7 +233,7 @@ export default function AccountSettings() {
                         { label: 'Billing', value: subscription.billing_cycle === 'yearly' ? 'Yearly' : 'Monthly' },
                         { label: 'Price', value: `$${subscription.price}` },
                       ].map(item => (
-                        <div key={item.label} className="bg-[#0a1020] rounded-xl p-3 border border-white/5">
+                        <div key={item.label} className="bg-[#060c1a] rounded-xl p-3 border border-white/5">
                           <p className="text-slate-600 text-xs uppercase tracking-wider mb-1">{item.label}</p>
                           <p className="text-white font-bold text-sm">{item.value}</p>
                         </div>
@@ -259,7 +259,7 @@ export default function AccountSettings() {
             {/* Devices Tab */}
             {activeTab === 'devices' && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl border border-white/5 bg-[#0d1120] p-6">
+                className="rounded-2xl border border-white/5 bg-[#0d1420] p-6">
                 <div className="flex items-center justify-between mb-5">
                   <div>
                     <h2 className="text-white font-bold text-lg">Connected Devices</h2>
@@ -282,7 +282,7 @@ export default function AccountSettings() {
                     {devices.map((device) => {
                       const Icon = deviceIcons[device.device_type] || Smartphone;
                       return (
-                        <div key={device.id} className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-[#0a1020] group">
+                        <div key={device.id} className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-[#060c1a] group">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center">
                               <Icon size={17} className="text-cyan-400" />
@@ -307,7 +307,7 @@ export default function AccountSettings() {
             {/* Notifications Tab */}
             {activeTab === 'notifications' && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl border border-white/5 bg-[#0d1120] p-6 space-y-5">
+                className="rounded-2xl border border-white/5 bg-[#0d1420] p-6 space-y-5">
                 <h2 className="text-white font-bold text-lg">Notification Preferences</h2>
 
                 <div className="space-y-3">
@@ -315,7 +315,7 @@ export default function AccountSettings() {
                     { key: 'email', label: 'Email Notifications', desc: 'Receive subscription confirmations and updates via email.', value: notifEmail, set: setNotifEmail },
                     { key: 'renewal', label: 'Renewal Reminders', desc: 'Get reminded 3 days before your subscription renews.', value: notifRenewal, set: setNotifRenewal },
                   ].map(item => (
-                    <div key={item.key} className="flex items-start justify-between gap-4 p-4 rounded-xl border border-white/5 bg-[#0a1020]">
+                    <div key={item.key} className="flex items-start justify-between gap-4 p-4 rounded-xl border border-white/5 bg-[#060c1a]">
                       <div>
                         <p className="text-white font-semibold text-sm">{item.label}</p>
                         <p className="text-slate-500 text-xs mt-0.5">{item.desc}</p>
@@ -339,7 +339,7 @@ export default function AccountSettings() {
             {/* Appearance Tab */}
             {activeTab === 'appearance' && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl border border-white/5 bg-[#0d1120] p-6 space-y-5">
+                className="rounded-2xl border border-white/5 bg-[#0d1420] p-6 space-y-5">
                 <h2 className="text-white font-bold text-lg">Appearance</h2>
                 <p className="text-slate-400 text-sm">Choose a display theme. Your preference is saved automatically.</p>
 
@@ -349,7 +349,7 @@ export default function AccountSettings() {
                     className={`flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all ${
                       theme === 'dark'
                         ? 'border-cyan-400 bg-cyan-500/10'
-                        : 'border-white/10 bg-[#0a1020] hover:border-white/20'
+                        : 'border-white/10 bg-[#060c1a] hover:border-white/20'
                     }`}>
                     <div className="w-12 h-12 rounded-xl bg-[#080c18] border border-white/10 flex items-center justify-center">
                       <Moon size={22} className="text-cyan-400" />
@@ -366,7 +366,7 @@ export default function AccountSettings() {
                     className={`flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all ${
                       theme === 'light'
                         ? 'border-cyan-400 bg-cyan-500/10'
-                        : 'border-white/10 bg-[#0a1020] hover:border-white/20'
+                        : 'border-white/10 bg-[#060c1a] hover:border-white/20'
                     }`}>
                     <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-300 flex items-center justify-center">
                       <Sun size={22} className="text-amber-500" />
