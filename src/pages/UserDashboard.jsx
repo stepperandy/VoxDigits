@@ -290,7 +290,27 @@ export default function UserDashboard() {
         </motion.div>
 
         {/* Installer Downloads — active subscribers only */}
-        {hasAccess && <DownloadsSection />}
+        {hasAccess ? (
+          <DownloadsSection />
+        ) : (
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            className="rounded-2xl border border-white/5 bg-[#0d1420] p-6 mb-5 text-center">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <Download size={22} className="text-slate-600" />
+            </div>
+            <h3 className="text-white font-bold text-sm mb-1">Downloads Locked</h3>
+            <p className="text-slate-500 text-xs mb-4 leading-relaxed">
+              Download access is only available after a confirmed payment.<br />
+              Complete your subscription to unlock VoxVPN installers.
+            </p>
+            <Link to="/pricing"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-black text-sm transition-all"
+              style={{ background: '#00d4ff' }}>
+              <Zap size={14} /> Activate Subscription
+            </Link>
+          </motion.div>
+        )}
 
         {/* Credentials info — always visible to logged-in users */}
         {user && (
