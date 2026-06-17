@@ -34,9 +34,10 @@ async function triggerDownload(platform) {
   document.body.removeChild(a);
 }
 
-const INSTALLERS = [
+const ALL_INSTALLERS = [
   {
     platform: 'Windows',
+    osKeys: ['win'],
     label: 'Windows',
     subtitle: 'Windows 10 / 11 · 64-bit',
     ext: '.exe',
@@ -50,6 +51,7 @@ const INSTALLERS = [
   },
   {
     platform: 'Android',
+    osKeys: ['android'],
     label: 'Android',
     subtitle: 'Android 8.0+ · All devices',
     ext: '.apk',
@@ -64,19 +66,64 @@ const INSTALLERS = [
     directFilename: 'VoxVPN-v1.0-APK.apk',
     directVersion: '1.0',
   },
+  {
+    platform: 'iOS',
+    osKeys: ['iphone', 'ipad', 'ios'],
+    label: 'iOS',
+    subtitle: 'iPhone & iPad · iOS 14+',
+    ext: '.ipa',
+    icon: Smartphone,
+    color: '#a78bfa',
+    borderColor: 'rgba(167,139,250,0.25)',
+    bgColor: 'rgba(167,139,250,0.06)',
+    hoverBg: 'rgba(167,139,250,0.12)',
+    iconBg: 'rgba(167,139,250,0.12)',
+    iconBorder: 'rgba(167,139,250,0.3)',
+    comingSoon: true,
+  },
+  {
+    platform: 'macOS',
+    osKeys: ['mac'],
+    label: 'macOS',
+    subtitle: 'macOS 12+ · Apple Silicon & Intel',
+    ext: '.dmg',
+    icon: Monitor,
+    color: '#94a3b8',
+    borderColor: 'rgba(148,163,184,0.25)',
+    bgColor: 'rgba(148,163,184,0.06)',
+    hoverBg: 'rgba(148,163,184,0.12)',
+    iconBg: 'rgba(148,163,184,0.12)',
+    iconBorder: 'rgba(148,163,184,0.3)',
+    comingSoon: true,
+  },
 ];
 
+function detectPlatform() {
+  const ua = navigator.userAgent.toLowerCase();
+  if (/android/.test(ua)) return 'Android';
+  if (/iphone|ipad|ipod/.test(ua)) return 'iOS';
+  if (/macintosh|mac os x/.test(ua) && !/iphone|ipad/.test(ua)) return 'macOS';
+  if (/win/.test(ua)) return 'Windows';
+  return null; // unknown / desktop fallback
+}
+
 export default function DownloadsSection() {
-  const [dlState, setDlState] = useState({ Windows: 'idle', Android: 'idle' });
-  const [meta, setMeta] = useState({ Windows: null, Android: null });
+  const detectedPlatform = detectPlatform();
+  // Show only the detected platform's installer; fall back to all if unknown
+  const INSTALLERS = detectedPlatform
+    ? ALL_INSTALLERS.filter(i => i.platform === detectedPlatform)
+    : ALL_INSTALLERS.filter(i => !i.comingSoon);
+
+  const [dlState, setDlState] = useState({});
+  const [meta, setMeta] = useState({});
   const [tokenData, setTokenData] = useState(null);
   const [tokenLoading, setTokenLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Pre-fetch metadata (version + size) for Windows only (Android uses direct URL)
+  // Pre-fetch metadata (version + size) — skip direct-URL and coming-soon installers
   useEffect(() => {
-    INSTALLERS.forEach(({ platform, directUrl }) => {
-      if (directUrl) return; // skip backend call for direct-URL installers
+    INSTALLERS.forEach(({ platform, directUrl, comingSoon }) => {
+      if (directUrl || comingSoon) return;
       fetchInstallerMeta(platform)
         .then(m => setMeta(prev => ({ ...prev, [platform]: m })))
         .catch(() => {});
@@ -155,11 +202,36 @@ export default function DownloadsSection() {
       </div>
 
       <div className="p-6 space-y-4">
+        {/* Platform notice */}
+        {detectedPlatform && (
+          <p className="text-slate-500 text-xs text-center">
+            Showing installer for your device: <span className="text-white font-semibold">{detectedPlatform}</span>
+          </p>
+        )}
+
         {/* Installer buttons */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {INSTALLERS.map(({ platform, label, subtitle, ext, icon: Icon, color, borderColor, bgColor, hoverBg, iconBg, iconBorder, directVersion }) => {
+          {INSTALLERS.map(({ platform, label, subtitle, ext, icon: Icon, color, borderColor, bgColor, hoverBg, iconBg, iconBorder, directVersion, comingSoon }) => {
             const m = meta[platform];
-            const state = dlState[platform];
+            const state = dlState[platform] || 'idle';
+
+            if (comingSoon) {
+              return (
+                <div key={platform}
+                  className="flex items-center gap-4 p-4 rounded-2xl opacity-50 cursor-not-allowed"
+                  style={{ border: `1px solid ${borderColor}`, background: bgColor }}>
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: iconBg, border: `1px solid ${iconBorder}` }}>
+                    <Icon size={22} style={{ color }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white font-black text-sm">{label} <span className="font-mono text-[10px] opacity-50">{ext}</span></p>
+                    <p className="text-slate-500 text-xs mt-0.5">{subtitle}</p>
+                    <span className="inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.35)' }}>Coming Soon</span>
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <button
                 key={platform}
