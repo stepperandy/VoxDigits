@@ -22,12 +22,24 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const platform = body.platform || 'Windows'; // 'Windows' or 'Android'
 
-    // For non-admins, verify active subscription
+    // For non-admins, verify active subscription with expiry timer
     if (user.role !== 'admin') {
       const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: user.email });
       const active = subs?.find(s => ['active', 'trial'].includes(s.status));
+
       if (!active) {
-        return Response.json({ error: 'No active subscription' }, { status: 403, headers: corsHeaders });
+        return Response.json({ error: 'No active subscription. Please purchase a VoxVPN plan to download.' }, { status: 403, headers: corsHeaders });
+      }
+
+      // Enforce subscription timer — block if renewal_date has passed
+      if (active.renewal_date && new Date(active.renewal_date) < new Date()) {
+        // Mark it expired
+        await base44.asServiceRole.entities.VPNSubscription.update(active.id, { status: 'expired' });
+        return Response.json({
+          error: `Your subscription expired on ${new Date(active.renewal_date).toLocaleDateString()}. Please renew to continue downloading.`,
+          expired: true,
+          renewal_date: active.renewal_date,
+        }, { status: 403, headers: corsHeaders });
       }
     }
 

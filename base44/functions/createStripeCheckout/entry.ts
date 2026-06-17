@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
         billing: isBilledYearly ? 'yearly' : 'monthly',
         email: userEmail || '',
       },
-      success_url: `${origin}/payment-success`,
+      success_url: `${origin}/dashboard?payment=success&plan=${encodeURIComponent(plan)}`,
       cancel_url: `${origin}/payment-failed`,
     };
 

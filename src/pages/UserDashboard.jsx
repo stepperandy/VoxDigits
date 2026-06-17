@@ -253,6 +253,34 @@ export default function UserDashboard() {
         {/* Installer Downloads — active subscribers only */}
         {hasAccess && <DownloadsSection />}
 
+        {/* Credentials info — always visible to logged-in users */}
+        {user && (
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
+            className="rounded-2xl border border-violet-500/20 bg-[#0d1420] p-5 mb-5">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)' }}>
+                <Shield size={14} className="text-violet-400" />
+              </div>
+              <h3 className="text-white font-bold text-sm">Your Login Credentials</h3>
+              <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full font-bold text-violet-300" style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.2)' }}>All Platforms</span>
+            </div>
+            <p className="text-slate-400 text-xs mb-3 leading-relaxed">
+              Use the same credentials to log in on <span className="text-white font-semibold">Windows, Android, iOS</span> and all other VoxVPN apps.
+            </p>
+            <div className="space-y-2">
+              <div className="flex items-center gap-3 px-3 py-2 rounded-lg" style={{ background: '#060c1a', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <span className="text-slate-500 text-xs w-12 flex-shrink-0">Email</span>
+                <span className="text-white text-xs font-mono font-semibold">{user.email}</span>
+              </div>
+              <div className="flex items-center gap-3 px-3 py-2 rounded-lg" style={{ background: '#060c1a', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <span className="text-slate-500 text-xs w-12 flex-shrink-0">Password</span>
+                <span className="text-slate-400 text-xs">Your VoxVPN account password</span>
+              </div>
+            </div>
+            <p className="text-slate-600 text-[10px] mt-2">Forgot your password? <a href="/vpn-login" className="text-violet-400 hover:text-violet-300">Reset it here →</a></p>
+          </motion.div>
+        )}
+
         {/* Secondary actions */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
           className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
