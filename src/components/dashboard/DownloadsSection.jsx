@@ -73,9 +73,10 @@ export default function DownloadsSection() {
   const [tokenLoading, setTokenLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Pre-fetch metadata (version + size) for both installers on mount
+  // Pre-fetch metadata (version + size) for Windows only (Android uses direct URL)
   useEffect(() => {
-    INSTALLERS.forEach(({ platform }) => {
+    INSTALLERS.forEach(({ platform, directUrl }) => {
+      if (directUrl) return; // skip backend call for direct-URL installers
       fetchInstallerMeta(platform)
         .then(m => setMeta(prev => ({ ...prev, [platform]: m })))
         .catch(() => {});
