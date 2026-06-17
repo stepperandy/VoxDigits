@@ -113,16 +113,24 @@ export default function DownloadPage() {
 
   const [downloading, setDownloading] = useState(false);
 
+  const ANDROID_APK_URL = 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.apk';
+
   const handleDownload = async (platform = 'Windows') => {
     setDownloading(true);
     try {
-      const res = await base44.functions.invoke('secureDownload', { platform });
-      const { url, filename } = res.data;
-      if (!url) throw new Error('No download URL');
-      // Fetch as blob to trigger instant download without navigation
+      let url, filename;
+      if (platform === 'Android') {
+        url = ANDROID_APK_URL;
+        filename = 'VoxVPN-v1.0.apk';
+      } else {
+        const res = await base44.functions.invoke('secureDownload', { platform });
+        url = res.data?.url;
+        filename = res.data?.filename || 'VoxVPN-Setup.exe';
+        if (!url) throw new Error('No download URL');
+      }
       const a = document.createElement('a');
       a.href = url;
-      a.download = filename || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
+      a.download = filename;
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
       document.body.appendChild(a);
