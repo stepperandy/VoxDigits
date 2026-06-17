@@ -22,19 +22,24 @@ Deno.serve(async (req) => {
       renewalDate.setMonth(renewalDate.getMonth() + 1);
     }
 
+    const existing = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: email });
+    const existingSub = existing?.[0] || null;
+
+    // If user had a pending_payment trial, activate it (5-day trial starts now on first payment)
+    const isFirstPaymentOnTrial = existingSub?.status === 'pending_payment' && existingSub?.plan === 'Free Trial';
+    const trialRenewalDate = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
+
     const subData = {
       plan,
-      status: 'active',
-      billing_cycle: billingCycle,
-      renewal_date: renewalDate.toISOString(),
+      status: isFirstPaymentOnTrial ? 'trial' : 'active',
+      billing_cycle: isFirstPaymentOnTrial ? 'trial' : billingCycle,
+      renewal_date: isFirstPaymentOnTrial ? trialRenewalDate.toISOString() : renewalDate.toISOString(),
       max_devices: PLAN_DEVICES[plan] || 1,
-      start_date: new Date().toISOString(),
+      start_date: existingSub?.start_date || new Date().toISOString(),
     };
 
-    const existing = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: email });
-
-    if (existing.length > 0) {
-      await base44.asServiceRole.entities.VPNSubscription.update(existing[0].id, subData);
+    if (existingSub) {
+      await base44.asServiceRole.entities.VPNSubscription.update(existingSub.id, subData);
     } else {
       await base44.asServiceRole.entities.VPNSubscription.create({ user_email: email, ...subData });
     }

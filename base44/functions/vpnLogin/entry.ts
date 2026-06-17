@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
-    const { email, password } = body;
+    const { email, password, device_id } = body;
 
     if (!email || !password) {
       return new Response(JSON.stringify({
@@ -131,12 +131,20 @@ Deno.serve(async (req) => {
     // Step 2: Check active subscription
     const userEmail = authUser?.email || email;
     const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
-    const activeSub = subs?.find(s => ['active', 'trial'].includes(s.status)) || null;
+    const activeSub = subs?.find(s => ['active', 'trial'].includes(s.status)) || subs?.[0] || null;
 
     if (!activeSub) {
       return new Response(JSON.stringify({
         success: false,
-        message: 'No active subscription found. Please purchase a VoxVPN plan at voxvpn.net.',
+        message: 'No subscription found. Please sign up at voxvpn.net.',
+      }), { status: 403, headers: CORS });
+    }
+
+    // Block pending_payment — trial window exists but user must pay first
+    if (activeSub.status === 'pending_payment') {
+      return new Response(JSON.stringify({
+        success: false,
+        message: 'Your 5-day trial is reserved. Please subscribe or make a payment at voxvpn.net to activate VPN access.',
       }), { status: 403, headers: CORS });
     }
 
@@ -147,6 +155,27 @@ Deno.serve(async (req) => {
         success: false,
         message: `Subscription expired on ${new Date(activeSub.renewal_date).toLocaleDateString()}. Please renew at voxvpn.net.`,
       }), { status: 403, headers: CORS });
+    }
+
+    // Step 4: Device lock — prevent same device from being used across multiple accounts
+    if (device_id) {
+      const deviceTag = `device:${device_id}`;
+      // Check if this device_id is already linked to a DIFFERENT user's subscription
+      const allSubs = await base44.asServiceRole.entities.VPNSubscription.filter({ notes: deviceTag });
+      const conflict = allSubs.find(s => s.user_email !== userEmail && s.id !== activeSub.id);
+      if (conflict) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: 'This device is already linked to another VoxVPN account. Each device can only be used with one subscription.',
+        }), { status: 403, headers: CORS });
+      }
+      // Tag this device on the active subscription if not already tagged
+      if (!activeSub.notes || !activeSub.notes.includes(deviceTag)) {
+        const existingNotes = activeSub.notes ? activeSub.notes + '\n' : '';
+        await base44.asServiceRole.entities.VPNSubscription.update(activeSub.id, {
+          notes: existingNotes + deviceTag,
+        });
+      }
     }
 
     const expiresAt = activeSub.renewal_date

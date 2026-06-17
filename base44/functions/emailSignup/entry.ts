@@ -51,16 +51,17 @@ Deno.serve(async (req) => {
       // Non-fatal — full_name/verification update is best-effort
     }
 
-    // Create a VPN subscription record (7-day free trial on signup, activated on payment)
+    // Create a VPN subscription record (5-day trial window, but access requires payment first)
     await base44.asServiceRole.entities.VPNSubscription.create({
       user_email: email,
       plan: 'Free Trial',
-      status: 'trial',
+      status: 'pending_payment',
       billing_cycle: 'trial',
       start_date: new Date().toISOString(),
-      renewal_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      renewal_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
       max_devices: 1,
       price: 0,
+      notes: 'Trial window: 5 days after first payment activates this account.',
     });
 
     // Send welcome email

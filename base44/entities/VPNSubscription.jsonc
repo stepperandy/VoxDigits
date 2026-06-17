@@ -26,12 +26,13 @@
       "enum": [
         "active",
         "trial",
+        "pending_payment",
         "expired",
         "cancelled",
         "paused"
       ],
-      "default": "active",
-      "description": "Current subscription status"
+      "default": "pending_payment",
+      "description": "Current subscription status. pending_payment = signed up but not yet paid."
     },
     "billing_cycle": {
       "type": "string",
@@ -71,7 +72,7 @@
     },
     "notes": {
       "type": "string",
-      "description": "Admin internal notes"
+      "description": "Admin internal notes and device lock tags (device:DEVICE_ID)"
     }
   },
   "required": [
