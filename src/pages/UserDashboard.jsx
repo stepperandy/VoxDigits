@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -31,6 +31,69 @@ function StatusBadge({ status }) {
       <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot} ${status === 'active' || status === 'trial' ? 'animate-pulse' : ''}`} />
       {cfg.label}
     </span>
+  );
+}
+
+function SubscriptionCountdown({ renewalDate, billingCycle }) {
+  const calcTime = () => {
+    const diff = Math.max(0, new Date(renewalDate) - Date.now());
+    const totalSecs = Math.floor(diff / 1000);
+    const days = Math.floor(totalSecs / 86400);
+    const hours = Math.floor((totalSecs % 86400) / 3600);
+    const mins = Math.floor((totalSecs % 3600) / 60);
+    const secs = totalSecs % 60;
+    return { days, hours, mins, secs, totalSecs };
+  };
+
+  const [time, setTime] = useState(calcTime);
+  const intervalRef = useRef(null);
+
+  useEffect(() => {
+    intervalRef.current = setInterval(() => setTime(calcTime()), 1000);
+    return () => clearInterval(intervalRef.current);
+  }, [renewalDate]);
+
+  const totalDays = billingCycle === 'yearly' ? 365 : 30;
+  const pct = Math.max(0, Math.min(100, (time.days / totalDays) * 100));
+  const urgent = time.days <= 7;
+  const color = urgent ? '#f59e0b' : '#00d4ff';
+  const barBg = urgent ? 'linear-gradient(90deg,#f59e0b,#ef4444)' : 'linear-gradient(90deg,#00d4ff,#0080ff)';
+
+  const pad = (n) => String(n).padStart(2, '0');
+
+  return (
+    <div className="mb-4 p-4 rounded-xl bg-[#0a1020] border border-white/5">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-slate-500 text-xs flex items-center gap-1.5">
+          <Clock size={11} /> Time remaining
+        </span>
+        {urgent && time.totalSecs > 0 && (
+          <span className="text-amber-400 text-[10px] font-semibold flex items-center gap-1">
+            <AlertCircle size={10} /> Renew soon
+          </span>
+        )}
+      </div>
+
+      {/* Countdown blocks */}
+      <div className="grid grid-cols-4 gap-2 mb-3">
+        {[
+          { label: 'Days', value: time.days },
+          { label: 'Hours', value: pad(time.hours) },
+          { label: 'Mins', value: pad(time.mins) },
+          { label: 'Secs', value: pad(time.secs) },
+        ].map(({ label, value }) => (
+          <div key={label} className="flex flex-col items-center py-2 px-1 rounded-lg" style={{ background: '#060c1a', border: `1px solid ${urgent ? 'rgba(245,158,11,0.2)' : 'rgba(0,212,255,0.1)'}` }}>
+            <span className="font-black text-xl leading-none tabular-nums" style={{ color }}>{value}</span>
+            <span className="text-slate-600 text-[10px] mt-1 uppercase tracking-wider">{label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Progress bar */}
+      <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+        <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${pct}%`, background: barBg }} />
+      </div>
+    </div>
   );
 }
 
@@ -183,34 +246,10 @@ export default function UserDashboard() {
             </div>
           </div>
 
-          {/* Days remaining progress bar */}
-          {subscription?.renewal_date && hasAccess && (() => {
-            const daysLeft = Math.ceil((new Date(subscription.renewal_date) - Date.now()) / (1000 * 60 * 60 * 24));
-            const totalDays = subscription.billing_cycle === 'yearly' ? 365 : 30;
-            const pct = Math.max(0, Math.min(100, (daysLeft / totalDays) * 100));
-            const urgent = daysLeft <= 7;
-            return (
-              <div className="mb-4 p-3 rounded-xl bg-[#0a1020] border border-white/5">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-slate-500 text-xs flex items-center gap-1.5">
-                    <Clock size={11} /> Time remaining
-                  </span>
-                  <span className={`text-xs font-bold ${urgent ? 'text-amber-400' : 'text-white'}`}>
-                    {daysLeft > 0 ? `${daysLeft} day${daysLeft !== 1 ? 's' : ''} left` : 'Expired'}
-                  </span>
-                </div>
-                <div className="h-2 rounded-full bg-white/5 overflow-hidden">
-                  <div className="h-full rounded-full transition-all duration-700"
-                    style={{ width: `${pct}%`, background: urgent ? 'linear-gradient(90deg,#f59e0b,#ef4444)' : 'linear-gradient(90deg,#00d4ff,#0080ff)' }} />
-                </div>
-                {urgent && daysLeft > 0 && (
-                  <p className="text-amber-400 text-xs font-semibold mt-2 flex items-center gap-1">
-                    <AlertCircle size={10} /> Renew soon to avoid service interruption.
-                  </p>
-                )}
-              </div>
-            );
-          })()}
+          {/* Countdown timer */}
+          {subscription?.renewal_date && hasAccess && (
+            <SubscriptionCountdown renewalDate={subscription.renewal_date} billingCycle={subscription.billing_cycle} />
+          )}
 
           {/* Expired notice */}
           {!hasAccess && subscription && (
