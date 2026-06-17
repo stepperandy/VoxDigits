@@ -60,6 +60,9 @@ const INSTALLERS = [
     hoverBg: 'rgba(52,168,83,0.12)',
     iconBg: 'rgba(52,168,83,0.12)',
     iconBorder: 'rgba(52,168,83,0.3)',
+    directUrl: '/downloads/VoxVPN-v1.0-APK.apk',
+    directFilename: 'VoxVPN-v1.0-APK.apk',
+    directVersion: '1.0',
   },
 ];
 
@@ -82,7 +85,20 @@ export default function DownloadsSection() {
   const handleDownload = async (platform) => {
     setDlState(s => ({ ...s, [platform]: 'loading' }));
     try {
-      await triggerDownload(platform);
+      const installer = INSTALLERS.find(i => i.platform === platform);
+      // Android: direct URL, no backend needed
+      if (installer?.directUrl) {
+        const a = document.createElement('a');
+        a.href = installer.directUrl;
+        a.download = installer.directFilename;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        await triggerDownload(platform);
+      }
       setDlState(s => ({ ...s, [platform]: 'done' }));
       setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);
     } catch (err) {
@@ -140,7 +156,7 @@ export default function DownloadsSection() {
       <div className="p-6 space-y-4">
         {/* Installer buttons */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {INSTALLERS.map(({ platform, label, subtitle, ext, icon: Icon, color, borderColor, bgColor, hoverBg, iconBg, iconBorder }) => {
+          {INSTALLERS.map(({ platform, label, subtitle, ext, icon: Icon, color, borderColor, bgColor, hoverBg, iconBg, iconBorder, directVersion }) => {
             const m = meta[platform];
             const state = dlState[platform];
             return (
@@ -165,15 +181,9 @@ export default function DownloadsSection() {
 
                   {/* Version + size badges */}
                   <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                    {m?.version ? (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
-                        <Tag size={8} /> v{m.version}
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
-                        <Tag size={8} /> v2.0.0
-                      </span>
-                    )}
+                    <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
+                      <Tag size={8} /> v{m?.version || directVersion || '2.0.0'}
+                    </span>
                     {m?.fileSize && (
                       <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
                         <HardDrive size={8} /> {m.fileSize}
