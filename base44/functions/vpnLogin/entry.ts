@@ -8,10 +8,10 @@ const CORS = {
 };
 
 const APP_ID = Deno.env.get('BASE44_APP_ID');
-const BASE44_API = 'https://api.base44.com/api';
+const APP_BASE_URL = `https://app--${APP_ID}.base44.app`;
 
 async function tryPasswordLogin(email, password) {
-  const res = await fetch(`${BASE44_API}/apps/${APP_ID}/auth/login`, {
+  const res = await fetch(`${APP_BASE_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
 
         const userId = users[0].id;
 
-        await fetch(`${BASE44_API}/apps/${APP_ID}/auth/resend-otp`, {
+        await fetch(`${APP_BASE_URL}/api/auth/resend-otp`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
@@ -86,14 +86,14 @@ Deno.serve(async (req) => {
 
         const serviceToken = getServiceToken(req);
         if (serviceToken) {
-          const userRes = await fetch(`${BASE44_API}/apps/${APP_ID}/entities/User/${userId}`, {
+          const userRes = await fetch(`${APP_BASE_URL}/api/entities/User/${userId}`, {
             headers: { 'Authorization': `Bearer ${serviceToken}`, 'X-App-Id': APP_ID },
           });
           if (userRes.ok) {
             const userData = await userRes.json();
             const otpCode = userData.otp_code || null;
             if (otpCode) {
-              await fetch(`${BASE44_API}/apps/${APP_ID}/auth/verify-otp`, {
+              await fetch(`${APP_BASE_URL}/api/auth/verify-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, otp_code: otpCode }),
