@@ -165,23 +165,36 @@ Deno.serve(async (req) => {
       }), { status: 403, headers: CORS });
     }
 
-    // Step 4: Device lock — prevent same device from being used across multiple accounts
+    // Step 4: Device lock — one subscription = one device
     if (device_id) {
       const deviceTag = `device:${device_id}`;
-      // Check if this device_id is already linked to a DIFFERENT user's subscription
-      const allSubs = await base44.asServiceRole.entities.VPNSubscription.filter({ notes: deviceTag });
-      const conflict = allSubs.find(s => s.user_email !== userEmail && s.id !== activeSub.id);
-      if (conflict) {
+      const notes = activeSub.notes || '';
+
+      // Extract the locked device from subscription notes (first `device:` entry)
+      const lockedMatch = notes.match(/device:([^\s\n]+)/);
+      const lockedDevice = lockedMatch ? lockedMatch[1] : null;
+
+      if (lockedDevice && lockedDevice !== device_id) {
+        // A different device is already locked to this subscription — block it
         return new Response(JSON.stringify({
           success: false,
-          message: 'This device is already linked to another VoxVPN account. Each device can only be used with one subscription.',
+          message: 'This subscription is already active on another device. Each subscription allows only one device. Contact support to transfer your license.',
         }), { status: 403, headers: CORS });
       }
-      // Tag this device on the active subscription if not already tagged
-      if (!activeSub.notes || !activeSub.notes.includes(deviceTag)) {
-        const existingNotes = activeSub.notes ? activeSub.notes + '\n' : '';
+
+      // Also block if this device_id is tagged on a DIFFERENT user's subscription
+      if (!lockedDevice) {
+        const allSubs = await base44.asServiceRole.entities.VPNSubscription.filter({});
+        const conflict = allSubs.find(s => s.id !== activeSub.id && (s.notes || '').includes(deviceTag));
+        if (conflict) {
+          return new Response(JSON.stringify({
+            success: false,
+            message: 'This device is already linked to another VoxVPN account.',
+          }), { status: 403, headers: CORS });
+        }
+        // First login — lock this device to the subscription
         await base44.asServiceRole.entities.VPNSubscription.update(activeSub.id, {
-          notes: existingNotes + deviceTag,
+          notes: (notes ? notes + '\n' : '') + deviceTag,
         });
       }
     }
