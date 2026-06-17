@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Download, Monitor, Smartphone, Loader2, Key, Copy, CheckCircle2, Shield, RefreshCw, Tag, HardDrive } from 'lucide-react';
+import { Download, Monitor, Smartphone, Loader2, Key, Copy, CheckCircle2, Shield, RefreshCw, Tag, HardDrive, XCircle, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 async function fetchInstallerMeta(platform) {
   const res = await base44.functions.invoke('secureDownload', { platform });
+  if (res.data?.expired) {
+    const err = new Error(res.data.error || 'Subscription expired.');
+    err.expired = true;
+    throw err;
+  }
   const { url, filename, version } = res.data;
   if (!url) throw new Error('No download URL');
   // Try to get file size via HEAD request
@@ -119,6 +125,7 @@ export default function DownloadsSection() {
   const [tokenData, setTokenData] = useState(null);
   const [tokenLoading, setTokenLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [expiredError, setExpiredError] = useState(null);
 
   // Pre-fetch metadata (version + size) — skip direct-URL and coming-soon installers
   useEffect(() => {
@@ -132,6 +139,7 @@ export default function DownloadsSection() {
 
   const handleDownload = async (platform) => {
     setDlState(s => ({ ...s, [platform]: 'loading' }));
+    setExpiredError(null);
     try {
       const installer = INSTALLERS.find(i => i.platform === platform);
       // Android: direct URL, no backend needed
@@ -151,7 +159,11 @@ export default function DownloadsSection() {
       setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);
     } catch (err) {
       setDlState(s => ({ ...s, [platform]: 'idle' }));
-      alert('Download failed: ' + (err.message || 'Please try again.'));
+      if (err.expired) {
+        setExpiredError(err.message);
+      } else {
+        alert('Download failed: ' + (err.message || 'Please try again.'));
+      }
     }
   };
 
@@ -202,6 +214,22 @@ export default function DownloadsSection() {
       </div>
 
       <div className="p-6 space-y-4">
+        {/* Expired subscription block */}
+        {expiredError && (
+          <div className="rounded-xl p-4 flex items-start gap-3" style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.25)' }}>
+            <XCircle size={18} className="text-rose-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <p className="text-rose-400 font-bold text-sm mb-1">Subscription Expired</p>
+              <p className="text-slate-400 text-xs leading-relaxed mb-3">{expiredError}</p>
+              <Link to="/pricing"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-black text-xs font-bold transition-all"
+                style={{ background: '#00d4ff' }}>
+                <Zap size={12} /> Renew Plan
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Platform notice */}
         {detectedPlatform && (
           <p className="text-slate-500 text-xs text-center">
