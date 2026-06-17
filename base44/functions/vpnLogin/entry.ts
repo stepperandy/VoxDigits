@@ -131,13 +131,21 @@ Deno.serve(async (req) => {
     // Step 2: Check active subscription
     const userEmail = authUser?.email || email;
     const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
-    const activeSub = subs?.find(s => ['active', 'trial'].includes(s.status)) || subs?.[0] || null;
+    let activeSub = subs?.find(s => ['active', 'trial'].includes(s.status)) || subs?.[0] || null;
 
+    // Auto-create a pending_payment record for users who signed up via social/Google (no subscription yet)
     if (!activeSub) {
-      return new Response(JSON.stringify({
-        success: false,
-        message: 'No subscription found. Please sign up at voxvpn.net.',
-      }), { status: 403, headers: CORS });
+      activeSub = await base44.asServiceRole.entities.VPNSubscription.create({
+        user_email: userEmail,
+        plan: 'Free Trial',
+        status: 'pending_payment',
+        billing_cycle: 'trial',
+        start_date: new Date().toISOString(),
+        renewal_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+        max_devices: 1,
+        price: 0,
+        notes: 'Auto-created on first login attempt.',
+      });
     }
 
     // Block pending_payment — trial window exists but user must pay first
