@@ -3,6 +3,10 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 const PLAN_TIERS = {
   'Free Trial': 1,
   'Basic': 1,
+  '1 Month': 2,
+  '3 Months': 2,
+  '6 Months': 3,
+  '1 Year': 4,
   'Standard': 2,
   'Pro Monthly': 3,
   'Pro Annual': 3,
@@ -184,34 +188,42 @@ Deno.serve(async (req) => {
     const userEmail = authUser?.email || email;
     console.log('[authLogin] looking up subscription for:', userEmail);
 
+    // Look up the platform user to check role
+    const platformUsers = await base44.asServiceRole.entities.User.filter({ email: userEmail });
+    const isAdmin = platformUsers?.[0]?.role === 'admin';
+    console.log('[authLogin] isAdmin:', isAdmin);
+
     let subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
     let activeSub = subs.find(s => ['active', 'trial'].includes(s.status)) || null;
 
-    // Block login if no active/trial subscription exists
-    if (!activeSub) {
-      console.log('[authLogin] no active subscription found for:', userEmail);
-      return new Response(JSON.stringify({
-        success: false,
-        message: 'No active subscription found. Please purchase a VoxVPN plan at voxvpn.net to access the app.',
-        subscriptionActive: false,
-      }), { status: 403, headers: CORS });
-    }
+    // Admins bypass subscription checks entirely
+    if (!isAdmin) {
+      // Block login if no active/trial subscription exists
+      if (!activeSub) {
+        console.log('[authLogin] no active subscription found for:', userEmail);
+        return new Response(JSON.stringify({
+          success: false,
+          message: 'No active subscription found. Please purchase a VoxVPN plan at voxvpn.net to access the app.',
+          subscriptionActive: false,
+        }), { status: 403, headers: CORS });
+      }
 
-    // Block login if subscription renewal_date has passed — mark it expired
-    if (activeSub.renewal_date && new Date(activeSub.renewal_date) < new Date()) {
-      console.log('[authLogin] subscription expired for:', userEmail, 'renewal_date:', activeSub.renewal_date);
-      await base44.asServiceRole.entities.VPNSubscription.update(activeSub.id, { status: 'expired' });
-      return new Response(JSON.stringify({
-        success: false,
-        message: `Your subscription expired on ${new Date(activeSub.renewal_date).toLocaleDateString()}. Please renew at voxvpn.net to continue.`,
-        subscriptionActive: false,
-        expired: true,
-        renewal_date: activeSub.renewal_date,
-      }), { status: 403, headers: CORS });
+      // Block login if subscription renewal_date has passed — mark it expired
+      if (activeSub.renewal_date && new Date(activeSub.renewal_date) < new Date()) {
+        console.log('[authLogin] subscription expired for:', userEmail, 'renewal_date:', activeSub.renewal_date);
+        await base44.asServiceRole.entities.VPNSubscription.update(activeSub.id, { status: 'expired' });
+        return new Response(JSON.stringify({
+          success: false,
+          message: `Your subscription expired on ${new Date(activeSub.renewal_date).toLocaleDateString()}. Please renew at voxvpn.net to continue.`,
+          subscriptionActive: false,
+          expired: true,
+          renewal_date: activeSub.renewal_date,
+        }), { status: 403, headers: CORS });
+      }
     }
 
     // Ensure max_devices is always a positive integer (guard against null/0)
-    if (!activeSub.max_devices || activeSub.max_devices < 1) {
+    if (activeSub && (!activeSub.max_devices || activeSub.max_devices < 1)) {
       await base44.asServiceRole.entities.VPNSubscription.update(activeSub.id, { max_devices: 3 });
       activeSub = { ...activeSub, max_devices: 3 };
     }
@@ -222,8 +234,8 @@ Deno.serve(async (req) => {
     let deviceRecord = null;
     let deviceLimitExceeded = false;
 
-    if (device_id) {
-      const maxDevices = activeSub.max_devices;
+    if (device_id && !isAdmin) {
+      const maxDevices = activeSub?.max_devices || 3;
       const allDevices = await base44.asServiceRole.entities.LinkedDevice.filter({ subscription_id: activeSub.id });
 
       const knownDevice = allDevices.find(d => d.device_id === device_id);
