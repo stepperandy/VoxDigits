@@ -133,7 +133,7 @@ export default function Footer() {
           <div className="flex-shrink-0 max-w-[200px]">
             <Link to="/">
               <img
-                src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png"
+                src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/13431de73_VoxICON.png"
                 alt="VoxVPN"
                 className="h-16 w-auto mb-4 hover:opacity-80 transition-opacity cursor-pointer"
               />
