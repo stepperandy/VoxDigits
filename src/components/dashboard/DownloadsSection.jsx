@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import { appParams } from '@/lib/app-params';
 import { Download, Monitor, Smartphone, Loader2, Key, Copy, CheckCircle2, Shield, RefreshCw, Tag, HardDrive, XCircle, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -18,10 +19,18 @@ async function fetchInstallerMeta(platform) {
 
 async function triggerDownload(platform) {
   const { url, filename } = await fetchInstallerMeta(platform);
-  // Fetch as blob so the browser saves the file instead of navigating
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('Download failed: ' + response.status);
-  const blob = await response.blob();
+  const { appId, token, appBaseUrl } = appParams;
+  const baseUrl = appBaseUrl || `https://app--${appId}.base44.app`;
+  const proxyRes = await fetch(`${baseUrl}/api/functions/proxyDownload`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ url, filename }),
+  });
+  if (!proxyRes.ok) throw new Error('Download failed: ' + proxyRes.status);
+  const blob = await proxyRes.blob();
   const blobUrl = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = blobUrl;
