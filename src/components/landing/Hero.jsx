@@ -144,13 +144,28 @@ export default function Hero() {
         />
       ))}
 
+      {/* Logo blink above headline */}
+      <motion.div
+        className="relative z-10 flex items-center justify-center"
+        style={{ marginTop: '20px', marginBottom: '16px' }}
+        animate={{ opacity: [1, 0.15, 1, 0.15, 1] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1 }}
+      >
+        <img
+          src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/13431de73_VoxICON.png"
+          alt="VoxVPN"
+          className="w-24 h-24"
+          style={{ filter: 'drop-shadow(0 0 20px rgba(0,212,255,0.8))' }}
+        />
+      </motion.div>
+
       {/* Premium Shield — centered */}
       <motion.div
         initial={{ opacity: 0, y: -30, scale: 0.85 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
         className="relative z-10 flex items-center justify-center"
-        style={{ marginTop: '20px', marginBottom: '-10px' }}
+        style={{ marginTop: '0px', marginBottom: '-10px' }}
       >
         {/* Outer glow aura */}
         <div className="absolute" style={{
