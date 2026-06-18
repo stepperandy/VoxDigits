@@ -66,7 +66,7 @@ export default function AuthLogin() {
     setLoading(true);
     setError('');
     try {
-      await base44.auth.loginWithEmailPassword(email, password);
+      await base44.auth.loginViaEmailPassword(email, password);
       const params = new URLSearchParams(window.location.search);
       window.location.href = params.get('next') || '/dashboard';
     } catch (err) {
