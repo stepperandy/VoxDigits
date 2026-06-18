@@ -27,30 +27,17 @@ async function trackDownload(platform, status, errorMessage = null) {
 }
 
 async function triggerDownload(platform) {
-  const { appId, token, appBaseUrl } = appParams;
-  const baseUrl = appBaseUrl || `https://app--${appId}.base44.app`;
-  const proxyRes = await fetch(`${baseUrl}/api/functions/proxyDownload`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ platform }),
-  });
-  if (!proxyRes.ok) {
-    const err = await proxyRes.json().catch(() => ({}));
-    if (err.expired) { const e = new Error(err.error); e.expired = true; throw e; }
-    throw new Error(err.error || 'Download failed: ' + proxyRes.status);
+  // Use secureDownload to get the file URL (validates subscription), then open directly
+  const res = await base44.functions.invoke('secureDownload', { platform });
+  if (res.data?.expired) {
+    const err = new Error(res.data.error || 'Subscription expired.');
+    err.expired = true;
+    throw err;
   }
-  const blob = await proxyRes.blob();
-  const blobUrl = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = blobUrl;
-  a.download = platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+  if (res.data?.error) throw new Error(res.data.error);
+  const { url } = res.data;
+  if (!url) throw new Error('No download URL returned.');
+  window.open(url, '_blank');
 }
 
 const ALL_INSTALLERS = [

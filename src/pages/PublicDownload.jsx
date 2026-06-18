@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Download, Monitor, Smartphone, Loader2, CheckCircle2, Shield, Lock, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { appParams } from '@/lib/app-params';
 
 const PLATFORMS = [
   {
@@ -38,29 +37,16 @@ async function trackDownload(platform, status, source = 'public_page', error_mes
 }
 
 async function doDownload(platform) {
-  const { appId, token, appBaseUrl } = appParams;
-  const baseUrl = appBaseUrl || `https://app--${appId}.base44.app`;
-  const res = await fetch(`${baseUrl}/api/functions/proxyDownload`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ platform }),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw Object.assign(new Error(err.error || 'Download failed'), { expired: err.expired });
+  const res = await base44.functions.invoke('secureDownload', { platform });
+  if (res.data?.expired) {
+    const err = new Error(res.data.error || 'Subscription expired.');
+    err.expired = true;
+    throw err;
   }
-  const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  if (res.data?.error) throw new Error(res.data.error);
+  const { url } = res.data;
+  if (!url) throw new Error('No download URL returned.');
+  window.open(url, '_blank');
 }
 
 export default function PublicDownload() {

@@ -62,19 +62,12 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Public/external URL — fetch and stream (follows redirects)
-    const fileRes = await fetch(fileUri, {
-      headers: { 'User-Agent': 'Mozilla/5.0' },
-      redirect: 'follow',
-    });
-    if (!fileRes.ok) throw new Error(`File fetch failed: ${fileRes.status} — check the file URL in Admin > Downloads`);
-    const contentType = fileRes.headers.get('content-type') || 'application/octet-stream';
-    return new Response(fileRes.body, {
-      status: 200,
+    // Public/external URL — redirect the browser directly (avoids streaming large binaries)
+    return new Response(null, {
+      status: 302,
       headers: {
         ...corsHeaders,
-        'Content-Type': contentType,
-        'Content-Disposition': `attachment; filename="${filename}"`,
+        'Location': fileUri,
       },
     });
 
