@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Shield, Wifi, Lock, Zap, Globe, Server, Key, Cpu, AlertTriangle } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
-
 function getDeviceId() {
   let id = localStorage.getItem('voxvpn_device_id');
   if (!id) {
@@ -36,23 +34,28 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const res = await base44.functions.invoke('authLogin', {
-        email,
-        password,
-        device_id: getDeviceId(),
-        device_name: 'VoxVPN Android',
-        device_type: 'android',
+      const baseUrl = import.meta.env.VITE_BASE44_APP_BASE_URL || window.location.origin;
+      const res = await fetch(`${baseUrl}/functions/authLogin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          device_id: getDeviceId(),
+          device_name: 'VoxVPN Android',
+          device_type: 'android',
+        }),
       });
-      const data = res.data;
+      const data = await res.json();
       if (!data?.success || !data?.token) {
-        setError(data?.message || 'Invalid credentials.');
+        setError(data?.message || 'Invalid email or password.');
         return;
       }
       localStorage.setItem('vpn_token', data.token);
       localStorage.setItem('vpn_email', email);
       navigate('/app/servers');
     } catch (err) {
-      setError(err?.response?.data?.message || 'Connection failed. Try again.');
+      setError('Connection failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -66,10 +69,15 @@ export default function Login() {
     setLoading(true);
     setError('');
     try {
-      await base44.auth.resetPasswordRequest(email);
+      const baseUrl = import.meta.env.VITE_BASE44_APP_BASE_URL || window.location.origin;
+      await fetch(`${baseUrl}/api/auth/reset-password-request`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
       alert('Password reset email sent! Check your inbox.');
     } catch (err) {
-      setError(err.message || 'Failed to send reset email.');
+      setError('Failed to send reset email. Please try again.');
     } finally {
       setLoading(false);
     }
