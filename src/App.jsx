@@ -69,6 +69,7 @@ const AppSplash = lazy(() => import('./pages/mobile-app/Splash.jsx'));
 const AppLogin = lazy(() => import('./pages/mobile-app/Login.jsx'));
 const AppServerList = lazy(() => import('./pages/mobile-app/ServerList.jsx'));
 
+const AppSignup = lazy(() => import('./pages/mobile-app/Signup.jsx'));
 const AppSubscription = lazy(() => import('./pages/mobile-app/Subscription.jsx'));
 const AppSettings = lazy(() => import('./pages/mobile-app/Settings.jsx'));
 const VpnServers = lazy(() => import('./pages/VpnServers.jsx'));
@@ -177,6 +178,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/vpn-dashboard" element={<PageTransition><VpnDashboard /></PageTransition>} />
           <Route path="/app" element={<AppSplash />} />
           <Route path="/app/login" element={<AppLogin />} />
+          <Route path="/app/signup" element={<AppSignup />} />
           <Route path="/app/servers" element={<AppServerList />} />
 
           <Route path="/app/subscription" element={<AppSubscription />} />
