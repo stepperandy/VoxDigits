@@ -20,11 +20,11 @@ const CORS = {
 };
 
 const APP_ID = Deno.env.get('BASE44_APP_ID');
-const BASE44_API = 'https://base44.app/api';
+const BASE44_API = `https://app--${APP_ID}.base44.app/api`;
 
 // Direct password login against the Base44 REST API
 async function tryPasswordLogin(email, password) {
-  const res = await fetch(`${BASE44_API}/apps/${APP_ID}/auth/login`, {
+  const res = await fetch(`${BASE44_API}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
@@ -108,7 +108,7 @@ Deno.serve(async (req) => {
         const userId = users[0].id;
 
         // 2. Trigger resend-otp so a fresh OTP is generated and stored
-        const resendRes = await fetch(`${BASE44_API}/apps/${APP_ID}/auth/resend-otp`, {
+        const resendRes = await fetch(`${BASE44_API}/auth/resend-otp`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
@@ -123,7 +123,7 @@ Deno.serve(async (req) => {
 
         if (serviceToken) {
           // Read the raw user record with service token — includes sensitive fields
-          const userRes = await fetch(`${BASE44_API}/apps/${APP_ID}/entities/User/${userId}`, {
+          const userRes = await fetch(`${BASE44_API}/entities/User/${userId}`, {
             headers: {
               'Authorization': `Bearer ${serviceToken}`,
               'X-App-Id': APP_ID,
@@ -140,7 +140,7 @@ Deno.serve(async (req) => {
 
         // 4. If we have the OTP, verify the email
         if (otpCode) {
-          const verifyRes = await fetch(`${BASE44_API}/apps/${APP_ID}/auth/verify-otp`, {
+          const verifyRes = await fetch(`${BASE44_API}/auth/verify-otp`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, otp_code: otpCode }),
