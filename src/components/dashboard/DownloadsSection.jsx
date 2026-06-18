@@ -35,14 +35,9 @@ async function triggerDownload(platform) {
   }
   if (res.data?.error) throw new Error(res.data.error);
   // Backend returns a direct CDN URL — open it so the browser downloads natively
-  const { url, filename } = res.data;
+  const { url } = res.data;
   if (!url) throw new Error('No download URL returned.');
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 const ALL_INSTALLERS = [
