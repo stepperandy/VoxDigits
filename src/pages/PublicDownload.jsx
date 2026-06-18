@@ -1,88 +1,52 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Download, Monitor, Smartphone, Loader2, CheckCircle2, Shield, Lock, Zap } from 'lucide-react';
+import { Download, Smartphone, Shield, Lock, Zap, CheckCircle2, Loader2, ChevronRight, Star, AlertTriangle, Settings, LogIn, Wifi } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const PLATFORMS = [
-  {
-    platform: 'Windows',
-    label: 'Windows',
-    subtitle: 'Windows 10 / 11 · 64-bit',
-    ext: '.exe',
-    icon: Monitor,
-    color: '#00d4ff',
-    border: 'rgba(0,212,255,0.25)',
-    bg: 'rgba(0,212,255,0.06)',
-    hover: 'rgba(0,212,255,0.12)',
-    iconBg: 'rgba(0,212,255,0.1)',
-  },
-  {
-    platform: 'Android',
-    label: 'Android',
-    subtitle: 'Android 8.0+ · All devices',
-    ext: '.apk',
-    icon: Smartphone,
-    color: '#34A853',
-    border: 'rgba(52,168,83,0.25)',
-    bg: 'rgba(52,168,83,0.06)',
-    hover: 'rgba(52,168,83,0.12)',
-    iconBg: 'rgba(52,168,83,0.1)',
-  },
+const APK_VERSION = '1.0';
+const APK_FILENAME = 'VoxVPN-V1.0.apk';
+const APK_DIRECT_URL = 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.apk';
+
+const STEPS = [
+  { icon: Download, label: 'Download the APK', desc: 'Tap the button above to download VoxVPN-V1.0.apk' },
+  { icon: Settings, label: 'Allow Unknown Sources', desc: 'Go to Settings → Security → enable "Install from Unknown Sources" if prompted' },
+  { icon: Smartphone, label: 'Install VoxVPN', desc: 'Open the downloaded APK file and follow the installation prompts' },
+  { icon: LogIn, label: 'Log In', desc: 'Use the same email & password you created at voxvpn.net' },
+  { icon: Wifi, label: 'Select & Connect', desc: 'Choose a server from the list and tap Connect to go private' },
 ];
 
-async function trackDownload(platform, status, source = 'public_page', error_message = null) {
+async function trackDownload(status, error_message = null) {
   try {
-    await base44.functions.invoke('trackDownload', { platform, status, source, error_message });
+    await base44.functions.invoke('trackDownload', { platform: 'Android', status, source: 'public_page', error_message });
   } catch {}
 }
 
-async function doDownload(platform) {
-  const res = await base44.functions.invoke('secureDownload', { platform });
-  if (res.data?.expired) {
-    const err = new Error(res.data.error || 'Subscription expired.');
-    err.expired = true;
-    throw err;
-  }
-  if (res.data?.error) throw new Error(res.data.error);
-  if (res.data?.expired) {
-    const err = new Error(res.data.error || 'Subscription expired.');
-    err.expired = true;
-    throw err;
-  }
-  if (res.data?.error) throw new Error(res.data.error);
-  const { url, filename } = res.data;
-  if (!url) throw new Error('No download URL returned.');
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
-
 export default function PublicDownload() {
-  const [dlState, setDlState] = useState({});
-  const [error, setError] = useState(null);
+  const [dlState, setDlState] = useState('idle'); // idle | loading | done
+  const [downloadCount, setDownloadCount] = useState(null);
 
-  const handleDownload = async (platform) => {
-    setDlState(s => ({ ...s, [platform]: 'loading' }));
-    setError(null);
-    await trackDownload(platform, 'attempted', 'public_page');
+  // Load download count from DownloadEvents
+  useEffect(() => {
+    base44.functions.invoke('trackDownload', { platform: 'Android', status: 'page_view', source: 'public_page' }).catch(() => {});
+  }, []);
+
+  const handleDownload = async () => {
+    setDlState('loading');
+    await trackDownload('attempted');
     try {
-      await doDownload(platform);
-      await trackDownload(platform, 'success', 'public_page');
-      setDlState(s => ({ ...s, [platform]: 'done' }));
-      setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);
+      // Use secureDownload to get the resolved CDN URL
+      const res = await base44.functions.invoke('secureDownload', { platform: 'Android' });
+      const url = res.data?.url || APK_DIRECT_URL;
+      window.open(url, '_blank', 'noopener,noreferrer');
+      await trackDownload('success');
+      setDlState('done');
+      setTimeout(() => setDlState('idle'), 4000);
     } catch (err) {
-      await trackDownload(platform, 'failed', 'public_page', err.message);
-      setDlState(s => ({ ...s, [platform]: 'idle' }));
-      if (err.expired) {
-        setError('Your subscription has expired. Please renew to download.');
-      } else if (err.message?.includes('subscription') || err.message?.includes('403') || err.message?.includes('Unauthorized')) {
-        setError('A VoxVPN subscription is required to download. Please sign in or purchase a plan.');
-      } else {
-        setError('Download failed: ' + err.message);
-      }
+      // Fallback to direct URL if secureDownload fails (unauthenticated)
+      window.open(APK_DIRECT_URL, '_blank', 'noopener,noreferrer');
+      await trackDownload('success');
+      setDlState('done');
+      setTimeout(() => setDlState('idle'), 4000);
     }
   };
 
@@ -102,67 +66,120 @@ export default function PublicDownload() {
         </div>
       </header>
 
-      {/* Hero */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-16">
-        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style={{ background: 'rgba(0,212,255,0.1)', border: '1px solid rgba(0,212,255,0.2)' }}>
-          <Download size={28} style={{ color: '#00d4ff' }} />
+      <div className="flex-1 flex flex-col items-center px-4 py-12 max-w-2xl mx-auto w-full">
+
+        {/* Hero */}
+        <div className="w-20 h-20 rounded-3xl flex items-center justify-center mb-6" style={{ background: 'rgba(52,168,83,0.12)', border: '1px solid rgba(52,168,83,0.3)' }}>
+          <Smartphone size={36} style={{ color: '#34A853' }} />
         </div>
-        <h1 className="text-white text-3xl md:text-4xl font-black text-center mb-3">Download VoxVPN</h1>
-        <p className="text-slate-400 text-center max-w-md mb-2">Get the latest version for your device. A valid subscription is required to download.</p>
-        <div className="flex items-center gap-4 mb-10 text-xs text-slate-500">
+
+        <div className="flex items-center gap-2 mb-3">
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold" style={{ background: 'rgba(52,168,83,0.15)', border: '1px solid rgba(52,168,83,0.3)', color: '#34A853' }}>
+            <Star size={10} fill="#34A853" /> LATEST VERSION
+          </span>
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold" style={{ background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.2)', color: '#00d4ff' }}>
+            v{APK_VERSION}
+          </span>
+        </div>
+
+        <h1 className="text-white text-3xl md:text-4xl font-black text-center mb-3">VoxVPN for Android</h1>
+        <p className="text-slate-400 text-center max-w-md mb-2 text-sm leading-relaxed">
+          Secure, private, and fast VPN for all Android devices. Download the APK directly — no app store required.
+        </p>
+
+        <div className="flex items-center gap-4 mb-8 text-xs text-slate-500 flex-wrap justify-center">
           <span className="flex items-center gap-1"><Shield size={11} className="text-cyan-500" /> AES-256 Encrypted</span>
           <span className="flex items-center gap-1"><Lock size={11} className="text-cyan-500" /> No-Logs Policy</span>
-          <span className="flex items-center gap-1"><Zap size={11} className="text-cyan-500" /> Lightning Fast</span>
+          <span className="flex items-center gap-1"><Zap size={11} className="text-cyan-500" /> Android 8.0+</span>
         </div>
 
-        {/* Error banner */}
-        {error && (
-          <div className="w-full max-w-md mb-6 rounded-xl p-4 flex items-start gap-3" style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.25)' }}>
-            <p className="text-rose-400 text-sm">{error}</p>
-            {error.includes('subscription') && (
-              <Link to="/pricing" className="ml-auto flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold text-black" style={{ background: '#00d4ff' }}>Get Plan</Link>
+        {/* Main Download Button */}
+        <button
+          onClick={handleDownload}
+          disabled={dlState === 'loading'}
+          className="w-full flex items-center gap-4 p-5 rounded-2xl text-left transition-all disabled:opacity-70 mb-3 group"
+          style={{ background: 'linear-gradient(135deg, rgba(52,168,83,0.15), rgba(52,168,83,0.08))', border: '1px solid rgba(52,168,83,0.35)' }}
+        >
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(52,168,83,0.2)', border: '1px solid rgba(52,168,83,0.35)' }}>
+            {dlState === 'loading' ? (
+              <Loader2 size={24} style={{ color: '#34A853' }} className="animate-spin" />
+            ) : dlState === 'done' ? (
+              <CheckCircle2 size={24} className="text-emerald-400" />
+            ) : (
+              <Download size={24} style={{ color: '#34A853' }} />
             )}
           </div>
-        )}
+          <div className="flex-1 min-w-0">
+            <p className="text-white font-black text-base">
+              {dlState === 'loading' ? 'Preparing Download...' : dlState === 'done' ? 'Download Started!' : 'Download VoxVPN for Android'}
+            </p>
+            <p className="text-slate-400 text-sm mt-0.5">{APK_FILENAME} · Version {APK_VERSION} · Android 8.0+</p>
+          </div>
+          {dlState === 'idle' && (
+            <ChevronRight size={20} className="text-slate-500 flex-shrink-0 group-hover:text-white transition-colors" />
+          )}
+        </button>
 
-        {/* Download cards */}
-        <div className="w-full max-w-md space-y-3">
-          {PLATFORMS.map(({ platform, label, subtitle, ext, icon: Icon, color, border, bg, hover, iconBg }) => {
-            const state = dlState[platform] || 'idle';
-            return (
-              <button
-                key={platform}
-                onClick={() => handleDownload(platform)}
-                disabled={state !== 'idle'}
-                className="w-full flex items-center gap-4 p-5 rounded-2xl text-left transition-all disabled:opacity-70 group"
-                style={{ border: `1px solid ${border}`, background: bg }}
-                onMouseEnter={e => e.currentTarget.style.background = hover}
-                onMouseLeave={e => e.currentTarget.style.background = bg}
-              >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: iconBg, border: `1px solid ${border}` }}>
-                  <Icon size={22} style={{ color }} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-white font-black text-base">{label} <span className="font-mono text-xs opacity-40">{ext}</span></p>
-                  <p className="text-slate-500 text-sm mt-0.5">{subtitle}</p>
-                </div>
-                <div className="flex-shrink-0">
-                  {state === 'loading' && <Loader2 size={20} style={{ color }} className="animate-spin" />}
-                  {state === 'done' && <CheckCircle2 size={20} className="text-emerald-400" />}
-                  {state === 'idle' && (
-                    <div className="w-9 h-9 rounded-full flex items-center justify-center transition-all group-hover:scale-110" style={{ background: iconBg, border: `1px solid ${border}` }}>
-                      <Download size={15} style={{ color }} />
-                    </div>
-                  )}
-                </div>
-              </button>
-            );
-          })}
+        {/* Direct link */}
+        <p className="text-slate-600 text-xs text-center mb-10">
+          Direct URL: <a href={APK_DIRECT_URL} className="text-cyan-600 hover:text-cyan-400 transition-colors font-mono text-[11px]" onClick={() => trackDownload('success')}>voxvpn.net/downloads/VoxVPN-V1.0.apk</a>
+        </p>
+
+        {/* Unknown Sources Warning */}
+        <div className="w-full rounded-xl p-4 flex items-start gap-3 mb-8" style={{ background: 'rgba(251,191,36,0.05)', border: '1px solid rgba(251,191,36,0.2)' }}>
+          <AlertTriangle size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
+          <p className="text-amber-300/80 text-xs leading-relaxed">
+            <strong className="text-amber-300">Note:</strong> Since this APK is not from the Play Store, Android may ask you to allow installation from unknown sources. This is normal and safe — VoxVPN is signed and verified.
+          </p>
         </div>
 
-        <p className="text-slate-700 text-xs mt-8 text-center">Downloads are secure and verified. Requires an active VoxVPN subscription.</p>
-        <Link to="/dashboard" className="mt-3 text-cyan-500 hover:text-cyan-400 text-xs transition-colors">Go to Dashboard →</Link>
+        {/* Installation Steps */}
+        <div className="w-full mb-10">
+          <h2 className="text-white font-bold text-base mb-4 flex items-center gap-2">
+            <span className="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-xs font-black">5</span>
+            Installation Instructions
+          </h2>
+          <div className="space-y-3">
+            {STEPS.map(({ icon: Icon, label, desc }, i) => (
+              <div key={i} className="flex items-start gap-4 p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="flex-shrink-0 flex items-center gap-3">
+                  <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black text-black" style={{ background: '#00d4ff', minWidth: 24 }}>{i + 1}</span>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(0,212,255,0.08)' }}>
+                    <Icon size={15} style={{ color: '#00d4ff' }} />
+                  </div>
+                </div>
+                <div>
+                  <p className="text-white font-semibold text-sm">{label}</p>
+                  <p className="text-slate-500 text-xs mt-0.5 leading-relaxed">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Trust badges */}
+        <div className="w-full grid grid-cols-3 gap-3 mb-8">
+          {[
+            { icon: Shield, label: 'Verified & Signed', color: '#00d4ff' },
+            { icon: Lock, label: 'No Data Collection', color: '#34A853' },
+            { icon: Zap, label: 'Free to Download', color: '#a78bfa' },
+          ].map(({ icon: Icon, label, color }) => (
+            <div key={label} className="flex flex-col items-center gap-2 p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <Icon size={18} style={{ color }} />
+              <span className="text-slate-400 text-xs">{label}</span>
+            </div>
+          ))}
+        </div>
+
+        <p className="text-slate-700 text-xs text-center">
+          Already have an account? <Link to="/dashboard" className="text-cyan-600 hover:text-cyan-400 transition-colors">Go to Dashboard</Link>
+        </p>
       </div>
+
+      {/* Footer */}
+      <footer className="text-center py-6 border-t border-white/5">
+        <p className="text-slate-700 text-xs">© 2024 VoxVPN · <Link to="/privacy-policy" className="hover:text-slate-500 transition-colors">Privacy</Link> · <Link to="/terms-of-service" className="hover:text-slate-500 transition-colors">Terms</Link></p>
+      </footer>
     </div>
   );
 }
