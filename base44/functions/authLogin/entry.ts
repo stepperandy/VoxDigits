@@ -23,8 +23,8 @@ const CORS = {
   'Content-Type': 'application/json',
 };
 
-const APP_ID = Deno.env.get('BASE44_APP_ID');
-const BASE44_API = `https://app--${APP_ID}.base44.app/api`;
+const APP_URL = Deno.env.get('APP_URL') || 'https://voxvpn.net';
+const BASE44_API = `${APP_URL}/api`;
 
 // Direct password login against the Base44 REST API
 async function tryPasswordLogin(email, password) {

@@ -7,8 +7,7 @@ const CORS = {
   'Content-Type': 'application/json',
 };
 
-const APP_ID = Deno.env.get('BASE44_APP_ID');
-const APP_BASE_URL = `https://app--${APP_ID}.base44.app`;
+const APP_BASE_URL = Deno.env.get('APP_URL') || 'https://voxvpn.net';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
