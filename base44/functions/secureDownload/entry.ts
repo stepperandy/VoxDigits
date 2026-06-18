@@ -52,17 +52,44 @@ Deno.serve(async (req) => {
     const filename = entry.name || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
     const version = entry.version || '2.0.0';
 
-    // If it's a private storage URI, generate a signed URL
+    // Private storage URI — generate signed URL and stream
     if (!fileUri.startsWith('http')) {
       const signed = await base44.asServiceRole.integrations.Core.CreateFileSignedUrl({
         file_uri: fileUri,
         expires_in: 300,
       });
-      return Response.json({ url: signed.signed_url, filename, version }, { headers: corsHeaders });
+      const fileRes = await fetch(signed.signed_url);
+      if (!fileRes.ok) throw new Error(`Storage fetch failed: ${fileRes.status}`);
+      const ext = platform === 'Android' ? 'apk' : 'exe';
+      const dlFilename = filename.endsWith(`.${ext}`) ? filename : `${filename}.${ext}`;
+      return new Response(fileRes.body, {
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/octet-stream',
+          'Content-Disposition': `attachment; filename="${dlFilename}"`,
+        },
+      });
     }
 
-    // External URL — return it directly (browser will follow redirects natively)
-    return Response.json({ url: fileUri, filename, version }, { headers: corsHeaders });
+    // External/GitHub URL — proxy the binary so browser downloads it directly
+    const fileRes = await fetch(fileUri, {
+      headers: { 'User-Agent': 'VoxVPN-Download-Proxy/1.0' },
+      redirect: 'follow',
+    });
+    if (!fileRes.ok) throw new Error(`Failed to fetch installer: ${fileRes.status}`);
+
+    const ext = platform === 'Android' ? 'apk' : 'exe';
+    const dlFilename = filename.endsWith(`.${ext}`) ? filename : `${filename}.${ext}`;
+
+    return new Response(fileRes.body, {
+      status: 200,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/octet-stream',
+        'Content-Disposition': `attachment; filename="${dlFilename}"`,
+      },
+    });
 
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500, headers: corsHeaders });
