@@ -1,0 +1,63 @@
+{
+  "name": "DownloadEvent",
+  "type": "object",
+  "properties": {
+    "platform": {
+      "type": "string",
+      "enum": [
+        "Windows",
+        "Android",
+        "iOS",
+        "macOS"
+      ],
+      "description": "Platform being downloaded"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "attempted",
+        "success",
+        "failed"
+      ],
+      "description": "Outcome of the download attempt"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user (if authenticated)"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "dashboard",
+        "public_page"
+      ],
+      "description": "Where the download was initiated from"
+    },
+    "error_message": {
+      "type": "string",
+      "description": "Error message if failed"
+    }
+  },
+  "required": [
+    "platform",
+    "status"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

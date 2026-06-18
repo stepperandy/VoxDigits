@@ -17,6 +17,15 @@ async function fetchInstallerMeta(platform) {
   return { url, filename, version };
 }
 
+async function trackDownload(platform, status, errorMessage = null) {
+  try {
+    await base44.functions.invoke('trackDownload', {
+      platform, status, source: 'dashboard',
+      ...(errorMessage && { error_message: errorMessage }),
+    });
+  } catch {}
+}
+
 async function triggerDownload(platform) {
   const { appId, token, appBaseUrl } = appParams;
   const baseUrl = appBaseUrl || `https://app--${appId}.base44.app`;
@@ -142,11 +151,14 @@ export default function DownloadsSection() {
   const handleDownload = async (platform) => {
     setDlState(s => ({ ...s, [platform]: 'loading' }));
     setExpiredError(null);
+    await trackDownload(platform, 'attempted');
     try {
       await triggerDownload(platform);
+      await trackDownload(platform, 'success');
       setDlState(s => ({ ...s, [platform]: 'done' }));
       setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);
     } catch (err) {
+      await trackDownload(platform, 'failed', err.message);
       setDlState(s => ({ ...s, [platform]: 'idle' }));
       if (err.expired) {
         setExpiredError(err.message);
