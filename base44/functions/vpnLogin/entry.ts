@@ -10,29 +10,6 @@ const CORS = {
 const APP_ID = Deno.env.get('BASE44_APP_ID');
 const APP_BASE_URL = `https://app--${APP_ID}.base44.app`;
 
-async function tryPasswordLogin(email, password) {
-  const res = await fetch(`${APP_BASE_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
-  const text = await res.text();
-  let data = null;
-  try { data = JSON.parse(text); } catch {}
-  console.log('[vpnLogin] auth attempt status:', res.status, text.slice(0, 300));
-  return { ok: res.ok, status: res.status, data, text };
-}
-
-function getServiceToken(req) {
-  return (
-    req.headers.get('x-service-token') ||
-    req.headers.get('base44-service-token') ||
-    req.headers.get('x-base44-service-token') ||
-    Deno.env.get('BASE44_SERVICE_TOKEN') ||
-    null
-  );
-}
-
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
 
@@ -48,92 +25,52 @@ Deno.serve(async (req) => {
       }), { status: 400, headers: CORS });
     }
 
-    // Step 1: Try password login
-    let attempt = await tryPasswordLogin(email, password);
-    let token = null;
-    let authUser = null;
+    console.log(`[vpnLogin] Login attempt for: ${email}`);
 
-    if (attempt.ok) {
-      token = attempt.data?.access_token || attempt.data?.token || null;
-      authUser = attempt.data?.user || null;
+    // Step 1: Authenticate against Base44 auth endpoint
+    const authRes = await fetch(`${APP_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
-    } else {
-      const errLower = attempt.text.toLowerCase();
-      const isWrongPassword = errLower.includes('invalid email or password') || errLower.includes('invalid credentials');
-      const isUnverified = errLower.includes('verif') || errLower.includes('confirm');
+    const authText = await authRes.text();
+    let authData = null;
+    try { authData = JSON.parse(authText); } catch {}
 
-      if (isWrongPassword) {
-        return new Response(JSON.stringify({
-          success: false,
-          message: 'Invalid email or password.',
-        }), { status: 401, headers: CORS });
-      }
+    console.log(`[vpnLogin] Auth status: ${authRes.status}, body: ${authText.slice(0, 300)}`);
 
-      // Handle unverified email — auto-verify using service token OTP method
-      if (isUnverified) {
-        const users = await base44.asServiceRole.entities.User.filter({ email });
-        if (!users || users.length === 0) {
-          return new Response(JSON.stringify({ success: false, message: 'Invalid email or password.' }), { status: 401, headers: CORS });
-        }
-
-        const userId = users[0].id;
-
-        await fetch(`${APP_BASE_URL}/api/auth/resend-otp`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
-        });
-
-        const serviceToken = getServiceToken(req);
-        if (serviceToken) {
-          const userRes = await fetch(`${APP_BASE_URL}/api/entities/User/${userId}`, {
-            headers: { 'Authorization': `Bearer ${serviceToken}`, 'X-App-Id': APP_ID },
-          });
-          if (userRes.ok) {
-            const userData = await userRes.json();
-            const otpCode = userData.otp_code || null;
-            if (otpCode) {
-              await fetch(`${APP_BASE_URL}/api/auth/verify-otp`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, otp_code: otpCode }),
-              });
-            }
-          }
-        }
-
-        attempt = await tryPasswordLogin(email, password);
-        if (!attempt.ok) {
-          return new Response(JSON.stringify({
-            success: false,
-            message: 'Login failed. Please verify your email first.',
-          }), { status: 401, headers: CORS });
-        }
-
-        token = attempt.data?.access_token || attempt.data?.token || null;
-        authUser = attempt.data?.user || users[0];
-
-      } else {
-        return new Response(JSON.stringify({
-          success: false,
-          message: attempt.data?.message || attempt.data?.detail || 'Login failed.',
-        }), { status: 401, headers: CORS });
-      }
-    }
-
-    if (!token) {
+    if (!authRes.ok) {
+      // Return the actual error message from the auth system so we can debug
+      const authMsg = authData?.message || authData?.detail || authText.slice(0, 200);
+      console.log(`[vpnLogin] Auth failed for ${email}: ${authMsg}`);
       return new Response(JSON.stringify({
         success: false,
-        message: 'Authentication failed. Please try again.',
+        message: authMsg || 'Invalid email or password.',
+        debug_status: authRes.status,
+      }), { status: 401, headers: CORS });
+    }
+
+    const token = authData?.access_token || authData?.token || null;
+    if (!token) {
+      console.log(`[vpnLogin] Auth OK but no token in response: ${authText.slice(0, 300)}`);
+      return new Response(JSON.stringify({
+        success: false,
+        message: 'Authentication succeeded but no token returned. Please contact support.',
       }), { status: 500, headers: CORS });
     }
 
-    // Step 2: Check active subscription
+    const authUser = authData?.user || null;
     const userEmail = authUser?.email || email;
+    console.log(`[vpnLogin] Auth success for ${userEmail}, token obtained`);
+
+    // Step 2: Check subscription
     const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
     let activeSub = subs?.find(s => ['active', 'trial'].includes(s.status)) || subs?.[0] || null;
 
-    // Auto-create a pending_payment record for users who signed up via social/Google (no subscription yet)
+    console.log(`[vpnLogin] Found ${subs?.length || 0} subscriptions for ${userEmail}`);
+
+    // Auto-create pending record if none exists
     if (!activeSub) {
       activeSub = await base44.asServiceRole.entities.VPNSubscription.create({
         user_email: userEmail,
@@ -148,15 +85,17 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Block pending_payment — trial window exists but user must pay first
+    console.log(`[vpnLogin] Subscription status: ${activeSub.status}, plan: ${activeSub.plan}`);
+
+    // Block pending_payment
     if (activeSub.status === 'pending_payment') {
       return new Response(JSON.stringify({
         success: false,
-        message: 'Your 5-day trial is reserved. Please subscribe or make a payment at voxvpn.net to activate VPN access.',
+        message: 'Your trial is reserved. Please subscribe at voxvpn.net to activate VPN access.',
       }), { status: 403, headers: CORS });
     }
 
-    // Step 3: Check expiry
+    // Check expiry
     if (activeSub.renewal_date && new Date(activeSub.renewal_date) < new Date()) {
       await base44.asServiceRole.entities.VPNSubscription.update(activeSub.id, { status: 'expired' });
       return new Response(JSON.stringify({
@@ -165,24 +104,20 @@ Deno.serve(async (req) => {
       }), { status: 403, headers: CORS });
     }
 
-    // Step 4: Device lock — one subscription = one device
+    // Device lock
     if (device_id) {
       const deviceTag = `device:${device_id}`;
       const notes = activeSub.notes || '';
-
-      // Extract the locked device from subscription notes (first `device:` entry)
       const lockedMatch = notes.match(/device:([^\s\n]+)/);
       const lockedDevice = lockedMatch ? lockedMatch[1] : null;
 
       if (lockedDevice && lockedDevice !== device_id) {
-        // A different device is already locked to this subscription — block it
         return new Response(JSON.stringify({
           success: false,
-          message: 'This subscription is already active on another device. Each subscription allows only one device. Contact support to transfer your license.',
+          message: 'This subscription is already active on another device. Contact support to transfer your license.',
         }), { status: 403, headers: CORS });
       }
 
-      // Also block if this device_id is tagged on a DIFFERENT user's subscription
       if (!lockedDevice) {
         const allSubs = await base44.asServiceRole.entities.VPNSubscription.filter({});
         const conflict = allSubs.find(s => s.id !== activeSub.id && (s.notes || '').includes(deviceTag));
@@ -192,7 +127,6 @@ Deno.serve(async (req) => {
             message: 'This device is already linked to another VoxVPN account.',
           }), { status: 403, headers: CORS });
         }
-        // First login — lock this device to the subscription
         await base44.asServiceRole.entities.VPNSubscription.update(activeSub.id, {
           notes: (notes ? notes + '\n' : '') + deviceTag,
         });
@@ -202,6 +136,8 @@ Deno.serve(async (req) => {
     const expiresAt = activeSub.renewal_date
       ? new Date(activeSub.renewal_date).toISOString().split('T')[0]
       : null;
+
+    console.log(`[vpnLogin] Success for ${userEmail} — plan: ${activeSub.plan}, expires: ${expiresAt}`);
 
     return new Response(JSON.stringify({
       success: true,
@@ -213,7 +149,7 @@ Deno.serve(async (req) => {
     }), { status: 200, headers: CORS });
 
   } catch (error) {
-    console.error('[vpnLogin] error:', error.message);
+    console.error('[vpnLogin] Unexpected error:', error.message, error.stack);
     return new Response(JSON.stringify({
       success: false,
       message: 'Server error: ' + error.message,
