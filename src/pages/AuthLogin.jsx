@@ -66,10 +66,11 @@ export default function AuthLogin() {
     setLoading(true);
     setError('');
     try {
-      console.log('Email login:', { email, password });
-      alert('Email login coming soon! Use social login for now.');
+      await base44.auth.login(email, password);
+      const params = new URLSearchParams(window.location.search);
+      window.location.href = params.get('next') || '/dashboard';
     } catch (err) {
-      setError(err.message || 'Login failed');
+      setError(err.message || 'Invalid email or password.');
     } finally {
       setLoading(false);
     }
@@ -259,9 +260,9 @@ export default function AuthLogin() {
           {/* Footer links */}
           <div className="mt-5 space-y-2 text-center text-sm">
             <div>
-              <a href="#" className="text-cyan-400/80 hover:text-cyan-300 text-xs transition-colors">
+              <Link to="/vpn-login" className="text-cyan-400/80 hover:text-cyan-300 text-xs transition-colors">
                 Forgot password?
-              </a>
+              </Link>
             </div>
             <div className="text-slate-500 text-xs">
               No account?{' '}
