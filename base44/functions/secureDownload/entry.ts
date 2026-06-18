@@ -72,24 +72,20 @@ Deno.serve(async (req) => {
       });
     }
 
-    // External/GitHub URL — proxy the binary so browser downloads it directly
-    const fileRes = await fetch(fileUri, {
+    // External/GitHub URL — follow redirects to get the final CDN URL, return it to client
+    // (Streaming 60MB+ through serverless corrupts the binary due to timeouts)
+    const headRes = await fetch(fileUri, {
+      method: 'HEAD',
       headers: { 'User-Agent': 'VoxVPN-Download-Proxy/1.0' },
       redirect: 'follow',
     });
-    if (!fileRes.ok) throw new Error(`Failed to fetch installer: ${fileRes.status}`);
+    const finalUrl = headRes.url || fileUri;
 
-    const ext = platform === 'Android' ? 'apk' : 'exe';
-    const dlFilename = filename.endsWith(`.${ext}`) ? filename : `${filename}.${ext}`;
-
-    return new Response(fileRes.body, {
-      status: 200,
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'application/octet-stream',
-        'Content-Disposition': `attachment; filename="${dlFilename}"`,
-      },
-    });
+    return Response.json({
+      url: finalUrl,
+      filename,
+      version,
+    }, { headers: corsHeaders });
 
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500, headers: corsHeaders });

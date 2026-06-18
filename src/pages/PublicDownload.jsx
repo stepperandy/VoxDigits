@@ -50,16 +50,14 @@ async function doDownload(platform) {
     throw err;
   }
   if (res.data?.error) throw new Error(res.data.error);
-  const blob = res.data instanceof Blob ? res.data : new Blob([JSON.stringify(res.data)]);
-  const filename = platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe';
-  const blobUrl = URL.createObjectURL(blob);
+  const { url, filename } = res.data;
+  if (!url) throw new Error('No download URL returned.');
   const a = document.createElement('a');
-  a.href = blobUrl;
-  a.download = filename;
+  a.href = url;
+  a.download = filename || (platform === 'Android' ? 'VoxVPN.apk' : 'VoxVPN-Setup.exe');
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
 }
 
 export default function PublicDownload() {
