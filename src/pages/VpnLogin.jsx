@@ -19,7 +19,7 @@ const PARTICLES = [
 
 export default function VpnLogin() {
   useEffect(() => {
-    base44.auth.redirectToLogin('/dashboard');
+    window.location.replace('/auth-login');
   }, []);
 
   return (

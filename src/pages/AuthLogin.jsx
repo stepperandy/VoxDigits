@@ -61,6 +61,24 @@ export default function AuthLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError('Enter your email address above, then click Forgot password.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      await base44.auth.resetPasswordRequest(email);
+      setError(''); 
+      alert('Password reset email sent! Check your inbox.');
+    } catch (err) {
+      setError(err.message || 'Failed to send reset email.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -260,9 +278,9 @@ export default function AuthLogin() {
           {/* Footer links */}
           <div className="mt-5 space-y-2 text-center text-sm">
             <div>
-              <Link to="/vpn-login" className="text-cyan-400/80 hover:text-cyan-300 text-xs transition-colors">
+              <button type="button" onClick={handleForgotPassword} className="text-cyan-400/80 hover:text-cyan-300 text-xs transition-colors">
                 Forgot password?
-              </Link>
+              </button>
             </div>
             <div className="text-slate-500 text-xs">
               No account?{' '}
