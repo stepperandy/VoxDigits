@@ -7,8 +7,6 @@ const CORS = {
   'Content-Type': 'application/json',
 };
 
-const APP_BASE_URL = Deno.env.get('APP_URL') || 'https://voxvpn.net';
-
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
 
@@ -26,40 +24,29 @@ Deno.serve(async (req) => {
 
     console.log(`[vpnLogin] Login attempt for: ${email}`);
 
-    // Step 1: Authenticate against Base44 auth endpoint
-    const authRes = await fetch(`${APP_BASE_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const authText = await authRes.text();
-    let authData = null;
-    try { authData = JSON.parse(authText); } catch {}
-
-    console.log(`[vpnLogin] Auth status: ${authRes.status}, body: ${authText.slice(0, 300)}`);
-
-    if (!authRes.ok) {
-      // Return the actual error message from the auth system so we can debug
-      const authMsg = authData?.message || authData?.detail || authText.slice(0, 200);
-      console.log(`[vpnLogin] Auth failed for ${email}: ${authMsg}`);
+    // Step 1: Authenticate via Base44 SDK (uses the correct internal auth endpoint)
+    let token = null;
+    let authUser = null;
+    try {
+      const authResult = await base44.auth.loginViaEmailPassword(email, password);
+      token = authResult.access_token || null;
+      authUser = authResult.user || null;
+      console.log(`[vpnLogin] Auth success for ${email}`);
+    } catch (authErr) {
+      console.log(`[vpnLogin] Auth failed for ${email}: ${authErr.message}`);
       return new Response(JSON.stringify({
         success: false,
-        message: authMsg || 'Invalid email or password.',
-        debug_status: authRes.status,
+        message: 'Invalid email or password.',
       }), { status: 401, headers: CORS });
     }
 
-    const token = authData?.access_token || authData?.token || null;
     if (!token) {
-      console.log(`[vpnLogin] Auth OK but no token in response: ${authText.slice(0, 300)}`);
       return new Response(JSON.stringify({
         success: false,
         message: 'Authentication succeeded but no token returned. Please contact support.',
       }), { status: 500, headers: CORS });
     }
 
-    const authUser = authData?.user || null;
     const userEmail = authUser?.email || email;
     console.log(`[vpnLogin] Auth success for ${userEmail}, token obtained`);
 

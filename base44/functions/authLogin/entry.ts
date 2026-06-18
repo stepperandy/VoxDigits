@@ -23,32 +23,7 @@ const CORS = {
   'Content-Type': 'application/json',
 };
 
-const APP_URL = Deno.env.get('APP_URL') || 'https://voxvpn.net';
-const BASE44_API = `${APP_URL}/api`;
-
-// Direct password login against the Base44 REST API
-async function tryPasswordLogin(email, password) {
-  const res = await fetch(`${BASE44_API}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
-  const text = await res.text();
-  let data = null;
-  try { data = JSON.parse(text); } catch {}
-  return { ok: res.ok, status: res.status, text, data };
-}
-
-// Extract the service token from the incoming request (Base44 injects it)
-function getServiceToken(req) {
-  return (
-    req.headers.get('x-service-token') ||
-    req.headers.get('base44-service-token') ||
-    req.headers.get('x-base44-service-token') ||
-    Deno.env.get('BASE44_SERVICE_TOKEN') ||
-    null
-  );
-}
+// No raw fetch needed — SDK handles auth internally
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -69,112 +44,25 @@ Deno.serve(async (req) => {
 
     const base44 = createClientFromRequest(req);
 
-    // ── Step 1: Try direct password login ──────────────────────────────────
+    // ── Step 1: Authenticate via Base44 SDK ──────────────────────────────
     console.log('[authLogin] authenticating:', email);
-    let attempt = await tryPasswordLogin(email, password);
-    console.log('[authLogin] attempt1 status:', attempt.status, attempt.text.slice(0, 200));
 
     let token = null;
     let authUser = null;
 
-    if (attempt.ok) {
-      token = attempt.data?.access_token || attempt.data?.token || null;
-      authUser = attempt.data?.user || null;
-      console.log('[authLogin] direct login OK');
-
-    } else {
-      const errLower = attempt.text.toLowerCase();
-      const isWrongPassword = errLower.includes('invalid email or password') || errLower.includes('invalid credentials');
-      const isUnverified = errLower.includes('verif') || errLower.includes('confirm');
-
-      console.log('[authLogin] isWrongPassword:', isWrongPassword, 'isUnverified:', isUnverified);
-
-      if (isWrongPassword) {
-        return new Response(JSON.stringify({
-          success: false, message: 'Invalid email or password.', subscriptionActive: false,
-        }), { status: 401, headers: CORS });
-      }
-
-      if (isUnverified) {
-        // Password is correct but email not verified.
-        // Strategy: resend-otp to get a fresh OTP, read it via direct REST API with service token, verify it, retry login.
-
-        // 1. Look up user to get their ID
-        const users = await base44.asServiceRole.entities.User.filter({ email });
-        console.log('[authLogin] found users:', users.length);
-
-        if (!users || users.length === 0) {
-          return new Response(JSON.stringify({
-            success: false, message: 'Invalid email or password.', subscriptionActive: false,
-          }), { status: 401, headers: CORS });
-        }
-
-        const userId = users[0].id;
-
-        // 2. Trigger resend-otp so a fresh OTP is generated and stored
-        const resendRes = await fetch(`${BASE44_API}/auth/resend-otp`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
-        });
-        console.log('[authLogin] resend-otp status:', resendRes.status);
-
-        // 3. Read the fresh OTP from the User entity using service role REST call directly
-        const serviceToken = getServiceToken(req);
-        console.log('[authLogin] service token available:', !!serviceToken);
-
-        let otpCode = null;
-
-        if (serviceToken) {
-          // Read the raw user record with service token — includes sensitive fields
-          const userRes = await fetch(`${BASE44_API}/entities/User/${userId}`, {
-            headers: {
-              'Authorization': `Bearer ${serviceToken}`,
-              'X-App-Id': APP_ID,
-            },
-          });
-          console.log('[authLogin] user fetch status:', userRes.status);
-
-          if (userRes.ok) {
-            const userData = await userRes.json();
-            otpCode = userData.otp_code || null;
-            console.log('[authLogin] otp_code from REST:', !!otpCode);
-          }
-        }
-
-        // 4. If we have the OTP, verify the email
-        if (otpCode) {
-          const verifyRes = await fetch(`${BASE44_API}/auth/verify-otp`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, otp_code: otpCode }),
-          });
-          const verifyText = await verifyRes.text();
-          console.log('[authLogin] verify-otp status:', verifyRes.status, verifyText.slice(0, 150));
-        } else {
-          console.log('[authLogin] no OTP available, cannot auto-verify');
-        }
-
-        // 5. Retry login (works if verify succeeded OR if already verified by previous attempt)
-        attempt = await tryPasswordLogin(email, password);
-        console.log('[authLogin] attempt2 status:', attempt.status, attempt.text.slice(0, 200));
-
-        if (!attempt.ok) {
-          return new Response(JSON.stringify({
-            success: false, message: 'Login failed. Please verify your email before logging in.', subscriptionActive: false,
-          }), { status: 401, headers: CORS });
-        }
-
-        token = attempt.data?.access_token || attempt.data?.token || null;
-        authUser = attempt.data?.user || users[0];
-        console.log('[authLogin] retry login OK, token:', !!token);
-
-      } else {
-        // Unknown error from Base44
-        return new Response(JSON.stringify({
-          success: false, message: 'Login failed: ' + (attempt.data?.message || attempt.data?.detail || 'Unknown error'), subscriptionActive: false,
-        }), { status: 401, headers: CORS });
-      }
+    try {
+      const authResult = await base44.auth.loginViaEmailPassword(email, password);
+      token = authResult.access_token || null;
+      authUser = authResult.user || null;
+      console.log('[authLogin] SDK login OK, token:', !!token);
+    } catch (authErr) {
+      const msg = authErr.message || '';
+      console.log('[authLogin] SDK login failed:', msg);
+      return new Response(JSON.stringify({
+        success: false,
+        message: 'Invalid email or password.',
+        subscriptionActive: false,
+      }), { status: 401, headers: CORS });
     }
 
     if (!token) {
