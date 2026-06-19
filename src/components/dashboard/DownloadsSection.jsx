@@ -180,39 +180,26 @@ export default function DownloadsSection({ isAdmin = false }) {
     setExpiredError(null);
     await trackDownload(platform, 'attempted');
     try {
-      // For Android: direct GitHub redirect to ensure uncorrupted APK download
+      // Direct URLs for all platforms — same approach that works for Android
       const DIRECT_URLS = {
         'Android': 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.1.apk',
         'Android-Mirror': 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v1.0.1.apk?alt=media&token=58a0f442-d7e1-4c5c-a0ee-42360097e516',
+        'Windows': 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-Setup.exe',
+      };
+      const downloadFilenames = {
+        'Android': 'VoxVPNGIT.apk',
+        'Android-Mirror': 'VoxVPNFIRE.apk',
+        'Windows': 'VoxVPN-Setup.exe',
       };
       if (DIRECT_URLS[platform]) {
         const a = document.createElement('a');
         a.href = DIRECT_URLS[platform];
-        a.download = platform === 'Android-Mirror' ? 'VoxVPNFIRE.apk' : 'VoxVPNGIT.apk';
+        a.download = downloadFilenames[platform] || platform;
         a.click();
-        await trackDownload('Android', 'success');
+        await trackDownload(platform, 'success');
         setDlState(s => ({ ...s, [platform]: 'done' }));
         setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);
         return;
-      } else {
-        // For desktop platforms: fetch with auth then trigger download
-        const token = localStorage.getItem('base44_access_token');
-        const dlRes = await fetch('/functions/secureDownload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-          body: JSON.stringify({ platform }),
-        });
-        if (!dlRes.ok) {
-          const err = await dlRes.json().catch(() => ({}));
-          throw new Error(err.error || 'Download failed');
-        }
-        const blob = await dlRes.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `VoxVPN-Setup.exe`;
-        a.click();
-        URL.revokeObjectURL(url);
       }
       
       await trackDownload(platform, 'success');
