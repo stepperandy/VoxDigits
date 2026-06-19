@@ -63,36 +63,47 @@ Deno.serve(async (req) => {
       const msg = authErr.message || '';
       console.log('[authLogin] SDK login failed:', msg);
       
-      // Fallback: Check if user has an ACTIVE VPNSubscription but no Base44 account (legacy website signup)
+      // Fallback: Check if user has an ACTIVE VPNSubscription (legacy user or admin without Base44 password)
       const existingSubs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: email });
       const activeSub = existingSubs?.find(s => ['active', 'trial'].includes(s.status));
       
       if (activeSub) {
-        // User has active subscription but no Base44 account - create one via email signup
-        console.log('[authLogin] Found active legacy subscription, creating Base44 account for:', email);
+        // User has active subscription - create Base44 account if needed, or just generate token
+        console.log('[authLogin] Found active subscription for:', email);
         try {
-          // Use emailSignup function to create the account properly
+          // Try to create account via emailSignup (will fail if user exists, which is ok)
           const signupRes = await base44.functions.invoke('emailSignup', { full_name: email.split('@')[0], email, password });
           if (signupRes.data?.success) {
             const authResult = await base44.auth.loginViaEmailPassword(email, password);
             token = authResult.access_token || null;
             authUser = authResult.user || null;
-            console.log('[authLogin] Created Base44 account via emailSignup and logged in, token:', !!token);
+            console.log('[authLogin] Created and logged in, token:', !!token);
+          } else if (signupRes.data?.error?.includes('already exists')) {
+            // User exists but password doesn't match - for subscription holders, generate token anyway
+            const platformUsers = await base44.asServiceRole.entities.User.filter({ email });
+            if (platformUsers?.length > 0) {
+              // User exists in Base44 - use service role to generate a token
+              token = await base44.auth.createToken({ user_id: platformUsers[0].id });
+              authUser = platformUsers[0];
+              console.log('[authLogin] Generated service token for existing user, token:', !!token);
+            } else {
+              throw new Error('User not found');
+            }
           } else {
             throw new Error(signupRes.data?.error || 'Signup failed');
           }
         } catch (createErr) {
-          console.log('[authLogin] Failed to create fallback account:', createErr.message);
-          // If account creation fails, check if account already exists and just log them in
-          try {
-            const authResult = await base44.auth.loginViaEmailPassword(email, password);
-            token = authResult.access_token || null;
-            authUser = authResult.user || null;
-            console.log('[authLogin] Logged in to existing account, token:', !!token);
-          } catch (loginErr) {
+          console.log('[authLogin] Fallback account creation failed:', createErr.message);
+          // Last resort: check if user exists and has active subscription, generate token
+          const platformUsers = await base44.asServiceRole.entities.User.filter({ email });
+          if (platformUsers?.length > 0 && activeSub) {
+            token = await base44.auth.createToken({ user_id: platformUsers[0].id });
+            authUser = platformUsers[0];
+            console.log('[authLogin] Generated service token for subscription holder, token:', !!token);
+          } else {
             return new Response(JSON.stringify({
               success: false,
-              message: 'Invalid email or password. If you have an active subscription but cannot log in, contact support.',
+              message: 'Invalid email or password. If you have an active subscription, contact support.',
               subscriptionActive: false,
             }), { status: 401, headers: CORS });
           }
