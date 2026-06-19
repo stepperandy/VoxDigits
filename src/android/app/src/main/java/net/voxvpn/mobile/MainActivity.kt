@@ -33,6 +33,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Colour palette
@@ -285,6 +289,7 @@ fun LoginScreen(onLogin: (String) -> Unit) {
     var showPw by remember { mutableStateOf(false) }
     var loading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
 
     val pulse = rememberInfiniteTransition(label = "logoPulse")
     val orbScale by pulse.animateFloat(
@@ -420,9 +425,39 @@ fun LoginScreen(onLogin: (String) -> Unit) {
                             }
                             loading = true
                             error = ""
-                            // In production: call your auth API here.
-                            // For now we accept any non-empty credentials.
-                            onLogin(email)
+                            
+                            scope.launch {
+                                try {
+                                    val apiUrl = "https://app--69c84f61d5543b54fe26e1e5.base44.app/functions/authLogin"
+                                    val jsonBody = """{"email":"$email","password":"$password","device_id":"android-${System.currentTimeMillis()}","device_name":"Android App","device_type":"android"}"""
+                                    
+                                    val url = URL(apiUrl)
+                                    val connection = url.openConnection() as HttpURLConnection
+                                    connection.requestMethod = "POST"
+                                    connection.setRequestProperty("Content-Type", "application/json")
+                                    connection.doOutput = true
+                                    connection.outputStream.write(jsonBody.toByteArray())
+                                    
+                                    val responseCode = connection.responseCode
+                                    val responseBody = connection.inputStream.bufferedReader().readText()
+                                    
+                                    if (responseCode == 200) {
+                                        val jsonResponse = JSONObject(responseBody)
+                                        if (jsonResponse.optBoolean("success")) {
+                                            onLogin(email)
+                                        } else {
+                                            error = jsonResponse.optString("message", "Login failed")
+                                            loading = false
+                                        }
+                                    } else {
+                                        error = "Server error: $responseCode"
+                                        loading = false
+                                    }
+                                } catch (e: Exception) {
+                                    error = "Connection failed: ${e.message}"
+                                    loading = false
+                                }
+                            }
                         }
                     )
 

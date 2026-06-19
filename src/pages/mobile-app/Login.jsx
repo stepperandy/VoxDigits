@@ -24,8 +24,13 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const baseUrl = import.meta.env.VITE_BASE44_APP_BASE_URL || window.location.origin;
-      const res = await fetch(`${baseUrl}/functions/authLogin`, {
+      // Use api.base44.com for consistent auth across all platforms
+      const baseUrl = 'https://api.base44.com';
+      const appUrl = window.location.origin;
+      console.log('[Login] Attempting login for:', email);
+      console.log('[Login] Base URL:', baseUrl);
+      
+      const res = await fetch(`${appUrl}/functions/authLogin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -36,17 +41,23 @@ export default function Login() {
           device_type: 'android',
         }),
       });
+      
+      console.log('[Login] Response status:', res.status);
       const data = await res.json();
+      console.log('[Login] Response data:', data);
+      
       if (!data?.success || !data?.token) {
         setError(data?.message || 'Invalid email or password.');
+        setLoading(false);
         return;
       }
       localStorage.setItem('vpn_token', data.token);
       localStorage.setItem('vpn_email', email);
+      console.log('[Login] Success, navigating to servers');
       navigate('/app/servers');
     } catch (err) {
-      setError('Connection failed. Please try again.');
-    } finally {
+      console.error('[Login] Error:', err);
+      setError('Connection failed: ' + (err.message || 'Please try again.'));
       setLoading(false);
     }
   };
