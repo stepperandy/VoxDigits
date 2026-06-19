@@ -24,40 +24,22 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      // Use api.base44.com for consistent auth across all platforms
-      const baseUrl = 'https://api.base44.com';
-      const appUrl = window.location.origin;
-      console.log('[Login] Attempting login for:', email);
-      console.log('[Login] Base URL:', baseUrl);
-      
-      const res = await fetch(`${appUrl}/functions/authLogin`, {
+      const res = await fetch('/functions/authLogin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          password,
-          device_id: getDeviceId(),
-          device_name: 'VoxVPN Android',
-          device_type: 'android',
-        }),
+        body: JSON.stringify({ email, password }),
       });
-      
-      console.log('[Login] Response status:', res.status);
       const data = await res.json();
-      console.log('[Login] Response data:', data);
-      
-      if (!data?.success || !data?.token) {
-        setError(data?.message || 'Invalid email or password.');
-        setLoading(false);
-        return;
+      if (data?.success === true) {
+        if (data.token) localStorage.setItem('vpn_token', data.token);
+        if (data.subscription) localStorage.setItem('subscription', JSON.stringify(data.subscription));
+        navigate('/app/servers');
+      } else {
+        setError(data?.message || 'Login failed');
       }
-      localStorage.setItem('vpn_token', data.token);
-      localStorage.setItem('vpn_email', email);
-      console.log('[Login] Success, navigating to servers');
-      navigate('/app/servers');
     } catch (err) {
-      console.error('[Login] Error:', err);
-      setError('Connection failed: ' + (err.message || 'Please try again.'));
+      setError('Network error. Please try again.');
+    } finally {
       setLoading(false);
     }
   };
