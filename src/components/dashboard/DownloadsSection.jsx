@@ -195,8 +195,24 @@ export default function DownloadsSection({ isAdmin = false }) {
         setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);
         return;
       } else {
-        // For other platforms: use backend proxy
-        window.open(`/functions/secureDownload?platform=${platform}`, '_blank');
+        // For desktop platforms: fetch with auth then trigger download
+        const token = localStorage.getItem('base44_access_token');
+        const dlRes = await fetch('/functions/secureDownload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ platform }),
+        });
+        if (!dlRes.ok) {
+          const err = await dlRes.json().catch(() => ({}));
+          throw new Error(err.error || 'Download failed');
+        }
+        const blob = await dlRes.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `VoxVPN-Setup.exe`;
+        a.click();
+        URL.revokeObjectURL(url);
       }
       
       await trackDownload(platform, 'success');

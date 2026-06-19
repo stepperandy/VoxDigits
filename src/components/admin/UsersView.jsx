@@ -16,11 +16,20 @@ export default function UsersView() {
   const [deleteId, setDeleteId] = useState(null);
   const [selected, setSelected] = useState([]);
 
-  const loadUsers = () => {
+  const loadUsers = async () => {
     setLoading(true);
-    base44.functions.invoke('getUsersData', {})
-      .then(res => setUsers(res.data?.users || []))
-      .finally(() => setLoading(false));
+    try {
+      const token = localStorage.getItem('base44_access_token');
+      const res = await fetch('/functions/getUsersData', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setUsers(data?.users || []);
+    } catch {
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { loadUsers(); }, []);
