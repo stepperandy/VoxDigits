@@ -19,12 +19,8 @@ export default function UsersView() {
   const loadUsers = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('base44_access_token');
-      const res = await fetch('/functions/getUsersData', {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setUsers(data?.users || []);
+      const res = await base44.functions.invoke('getUsersData', {});
+      setUsers(res.data?.users || []);
     } catch {
       setUsers([]);
     } finally {
