@@ -163,10 +163,15 @@ export default function DownloadsSection() {
     setExpiredError(null);
     await trackDownload(platform, 'attempted');
     try {
-      // Direct window.open for binary streaming from backend
-      const token = localStorage.getItem('base44_access_token');
-      const appUrl = window.location.origin;
-      window.open(`${appUrl}/functions/secureDownload?platform=${platform}`, '_blank');
+      // For Android: direct GitHub redirect to ensure uncorrupted APK download
+      if (platform === 'Android') {
+        window.location.href = 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-V1.0.apk';
+      } else {
+        // For other platforms: use backend proxy
+        const token = localStorage.getItem('base44_access_token');
+        const appUrl = window.location.origin;
+        window.open(`${appUrl}/functions/secureDownload?platform=${platform}`, '_blank');
+      }
       
       await trackDownload(platform, 'success');
       setDlState(s => ({ ...s, [platform]: 'done' }));
