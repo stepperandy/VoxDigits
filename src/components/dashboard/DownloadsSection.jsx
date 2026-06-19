@@ -82,6 +82,7 @@ const ALL_INSTALLERS = [
     platform: 'Android',
     osKeys: ['android'],
     label: 'Android',
+    filename: 'VoxVPNGIT.apk',
     subtitle: 'Android 8.0+ · All devices',
     ext: '.apk',
     icon: Smartphone,
@@ -96,6 +97,7 @@ const ALL_INSTALLERS = [
     platform: 'Android-Mirror',
     osKeys: ['android'],
     label: 'Android (Mirror)',
+    filename: 'VoxVPNFIRE.apk',
     subtitle: 'Android 8.0+ · Firebase CDN',
     ext: '.apk',
     icon: Smartphone,
@@ -284,7 +286,7 @@ export default function DownloadsSection({ isAdmin = false }) {
 
         {/* Installer buttons */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {INSTALLERS.map(({ platform, label, subtitle, ext, icon: Icon, color, borderColor, bgColor, hoverBg, iconBg, iconBorder, directVersion, comingSoon }) => {
+          {INSTALLERS.map(({ platform, label, filename, subtitle, ext, icon: Icon, color, borderColor, bgColor, hoverBg, iconBg, iconBorder, directVersion, comingSoon }) => {
             const m = meta[platform];
             const state = dlState[platform] || 'idle';
 
@@ -323,6 +325,7 @@ export default function DownloadsSection({ isAdmin = false }) {
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <p className="text-white font-black text-sm">{label} <span className="font-mono text-[10px] opacity-50">{ext}</span></p>
+                  {filename && <p className="text-[10px] font-mono font-semibold mt-0.5" style={{ color }}>{filename}</p>}
                   <p className="text-slate-500 text-xs mt-0.5">{subtitle}</p>
 
                   {/* Version + size badges */}
