@@ -150,9 +150,7 @@ function detectPlatform() {
 export default function DownloadsSection() {
   const detectedPlatform = detectPlatform();
   // Show only the detected platform's installer; fall back to all if unknown
-  const INSTALLERS = detectedPlatform
-    ? ALL_INSTALLERS.filter(i => i.osKeys.includes(detectedPlatform.toLowerCase()) && !i.comingSoon)
-    : ALL_INSTALLERS.filter(i => !i.comingSoon);
+  const INSTALLERS = ALL_INSTALLERS.filter(i => !i.comingSoon);
 
   const [dlState, setDlState] = useState({});
   const [meta, setMeta] = useState({});
