@@ -147,10 +147,13 @@ function detectPlatform() {
   return null; // unknown / desktop fallback
 }
 
-export default function DownloadsSection() {
+export default function DownloadsSection({ isAdmin = false }) {
   const detectedPlatform = detectPlatform();
-  // Show only the detected platform's installer; fall back to all if unknown
-  const INSTALLERS = ALL_INSTALLERS.filter(i => !i.comingSoon);
+  const INSTALLERS = isAdmin
+    ? ALL_INSTALLERS.filter(i => !i.comingSoon)
+    : detectedPlatform
+      ? ALL_INSTALLERS.filter(i => i.osKeys.includes(detectedPlatform.toLowerCase()) && !i.comingSoon)
+      : ALL_INSTALLERS.filter(i => !i.comingSoon);
 
   const [dlState, setDlState] = useState({});
   const [meta, setMeta] = useState({});
