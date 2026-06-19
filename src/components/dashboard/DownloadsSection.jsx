@@ -66,7 +66,7 @@ async function triggerDownload(platform) {
 const ALL_INSTALLERS = [
   {
     platform: 'Windows',
-    osKeys: ['win'],
+    osKeys: ['windows'],
     label: 'Windows',
     subtitle: 'Windows 10 / 11 · 64-bit',
     ext: '.exe',
