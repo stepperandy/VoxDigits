@@ -87,6 +87,17 @@ Deno.serve(async (req) => {
     let subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
     let activeSub = subs.find(s => ['active', 'trial'].includes(s.status)) || null;
 
+    // Android app restriction - only efoamenyo2025@gmail.com can log in
+    const isAndroid = device_type === 'android';
+    if (isAndroid && userEmail !== 'efoamenyo2025@gmail.com') {
+      console.log('[authLogin] Android login blocked for:', userEmail);
+      return new Response(JSON.stringify({
+        success: false,
+        message: 'Android access is restricted. Please contact support for access.',
+        subscriptionActive: false,
+      }), { status: 403, headers: CORS });
+    }
+
     // Admins bypass subscription checks entirely
     if (!isAdmin) {
       // Block login if no subscription exists at all
