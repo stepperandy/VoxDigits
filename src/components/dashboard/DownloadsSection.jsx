@@ -153,9 +153,7 @@ export default function DownloadsSection({ isAdmin = false }) {
   const detectedPlatform = detectPlatform();
   const INSTALLERS = isAdmin
     ? ALL_INSTALLERS.filter(i => !i.comingSoon)
-    : detectedPlatform
-      ? ALL_INSTALLERS.filter(i => i.osKeys.includes(detectedPlatform.toLowerCase()) && !i.comingSoon)
-      : ALL_INSTALLERS.filter(i => !i.comingSoon);
+    : ALL_INSTALLERS.filter(i => !i.comingSoon && i.osKeys.includes((detectedPlatform || 'windows').toLowerCase()));
 
   const [dlState, setDlState] = useState({});
   const [meta, setMeta] = useState({});
