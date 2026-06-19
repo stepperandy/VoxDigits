@@ -58,15 +58,25 @@ export default function PublicDownload() {
           <span className="flex items-center gap-1"><Zap size={11} className="text-cyan-500" /> Android 8.0+</span>
         </div>
 
-        {/* Download Button */}
-        <button
-          onClick={() => { window.location.href = APK_DIRECT_URL; }}
-          className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl text-black font-black text-base mb-6 transition-all hover:opacity-90 active:scale-95"
-          style={{ background: 'linear-gradient(135deg, #34A853, #2d8f47)', boxShadow: '0 0 30px rgba(52,168,83,0.3)' }}
-        >
-          <Download size={20} />
-          Download VoxVPN {APK_VERSION} · APK
-        </button>
+        {/* Download Buttons */}
+        <div className="w-full flex flex-col gap-3 mb-6">
+          <button
+            onClick={() => { window.location.href = APK_DIRECT_URL; }}
+            className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl text-black font-black text-base transition-all hover:opacity-90 active:scale-95"
+            style={{ background: 'linear-gradient(135deg, #34A853, #2d8f47)', boxShadow: '0 0 30px rgba(52,168,83,0.3)' }}
+          >
+            <Download size={20} />
+            Download v{APK_VERSION} · GitHub Release
+          </button>
+          <button
+            onClick={() => { window.location.href = 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v1.0.1.apk?alt=media'; }}
+            className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl text-white font-black text-base transition-all hover:opacity-90 active:scale-95"
+            style={{ background: 'linear-gradient(135deg, #FF6F00, #e65c00)', boxShadow: '0 0 30px rgba(255,111,0,0.25)' }}
+          >
+            <Download size={20} />
+            Download v{APK_VERSION} · Mirror (Firebase)
+          </button>
+        </div>
 
         {/* Unknown Sources Warning */}
         <div className="w-full rounded-xl p-4 flex items-start gap-3 mb-8" style={{ background: 'rgba(251,191,36,0.05)', border: '1px solid rgba(251,191,36,0.2)' }}>
