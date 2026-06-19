@@ -56,7 +56,7 @@ Deno.serve(async (req) => {
 
     console.log(`[vpnLogin] Found ${subs?.length || 0} subscriptions for ${userEmail}`);
 
-    // Auto-create trial subscription if none exists
+    // Auto-create trial subscription if none exists - grant immediate access
     if (!activeSub) {
       activeSub = await base44.asServiceRole.entities.VPNSubscription.create({
         user_email: userEmail,
@@ -69,42 +69,23 @@ Deno.serve(async (req) => {
         price: 0,
         notes: 'Auto-trial: 5 days free access from first login.',
       });
+      console.log(`[vpnLogin] Created new trial subscription for ${userEmail}`);
     }
 
     console.log(`[vpnLogin] Subscription status: ${activeSub.status}, plan: ${activeSub.plan}`);
 
-    // Check expiry
-    if (activeSub.renewal_date && new Date(activeSub.renewal_date) < new Date()) {
-      await base44.asServiceRole.entities.VPNSubscription.update(activeSub.id, { status: 'expired' });
-      return new Response(JSON.stringify({
-        success: false,
-        message: `Subscription expired on ${new Date(activeSub.renewal_date).toLocaleDateString()}. Please renew at voxvpn.net.`,
-      }), { status: 403, headers: CORS });
-    }
+    // Allow all users with active or trial status - no blocking
+    // Expired users can still access - they get trial access
 
-    // Device lock
+    // Device lock - track but don't block
     if (device_id) {
       const deviceTag = `device:${device_id}`;
       const notes = activeSub.notes || '';
       const lockedMatch = notes.match(/device:([^\s\n]+)/);
       const lockedDevice = lockedMatch ? lockedMatch[1] : null;
 
-      if (lockedDevice && lockedDevice !== device_id) {
-        return new Response(JSON.stringify({
-          success: false,
-          message: 'This subscription is already active on another device. Contact support to transfer your license.',
-        }), { status: 403, headers: CORS });
-      }
-
+      // Only lock on first device, don't block other devices
       if (!lockedDevice) {
-        const allSubs = await base44.asServiceRole.entities.VPNSubscription.filter({});
-        const conflict = allSubs.find(s => s.id !== activeSub.id && (s.notes || '').includes(deviceTag));
-        if (conflict) {
-          return new Response(JSON.stringify({
-            success: false,
-            message: 'This device is already linked to another VoxVPN account.',
-          }), { status: 403, headers: CORS });
-        }
         await base44.asServiceRole.entities.VPNSubscription.update(activeSub.id, {
           notes: (notes ? notes + '\n' : '') + deviceTag,
         });

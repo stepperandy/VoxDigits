@@ -111,27 +111,20 @@ Deno.serve(async (req) => {
         }), { status: 403, headers: CORS });
       }
 
-      // Block login if no active/trial subscription exists
+      // Auto-create trial if no subscription exists - grant immediate access
       if (!activeSub) {
-        console.log('[authLogin] no active subscription found for:', userEmail);
-        return new Response(JSON.stringify({
-          success: false,
-          message: 'No active subscription found. Please purchase a VoxVPN plan at voxvpn.net to access the app.',
-          subscriptionActive: false,
-        }), { status: 403, headers: CORS });
-      }
-
-      // Block login if subscription renewal_date has passed — mark it expired
-      if (activeSub.renewal_date && new Date(activeSub.renewal_date) < new Date()) {
-        console.log('[authLogin] subscription expired for:', userEmail, 'renewal_date:', activeSub.renewal_date);
-        await base44.asServiceRole.entities.VPNSubscription.update(activeSub.id, { status: 'expired' });
-        return new Response(JSON.stringify({
-          success: false,
-          message: `Your subscription expired on ${new Date(activeSub.renewal_date).toLocaleDateString()}. Please renew at voxvpn.net to continue.`,
-          subscriptionActive: false,
-          expired: true,
-          renewal_date: activeSub.renewal_date,
-        }), { status: 403, headers: CORS });
+        activeSub = await base44.asServiceRole.entities.VPNSubscription.create({
+          user_email: userEmail,
+          plan: 'Free Trial',
+          status: 'trial',
+          billing_cycle: 'trial',
+          start_date: new Date().toISOString(),
+          renewal_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+          max_devices: 1,
+          price: 0,
+          notes: 'Auto-trial: 5 days free access from login.',
+        });
+        console.log('[authLogin] Created trial subscription for:', userEmail);
       }
     }
 
