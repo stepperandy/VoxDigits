@@ -3,9 +3,9 @@ import { base44 } from '@/api/base44Client';
 import { Download, Smartphone, Shield, Lock, Zap, CheckCircle2, Loader2, ChevronRight, Star, AlertTriangle, Settings, LogIn, Wifi } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const APK_VERSION = '1.0';
-const APK_FILENAME = 'VoxVPN-V1.0.apk';
-const APK_DIRECT_URL = 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.apk';
+const APK_VERSION = '1.0-debug';
+const APK_FILENAME = 'VoxVPN-debug.apk';
+const APK_DIRECT_URL = 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/main-ui-ovpn2-debug.apk';
 
 const STEPS = [
   { icon: Download, label: 'Download the APK', desc: 'Tap the button above to download VoxVPN-V1.0.apk' },
@@ -143,7 +143,7 @@ export default function PublicDownload() {
 
         {/* Direct link */}
         <p className="text-slate-600 text-xs text-center mb-10">
-          Direct URL: <a href={APK_DIRECT_URL} className="text-cyan-600 hover:text-cyan-400 transition-colors font-mono text-[11px]" onClick={() => trackDownload('success')}>voxvpn.net/downloads/VoxVPN-V1.0.apk</a>
+          Direct URL: <a href={APK_DIRECT_URL} className="text-cyan-600 hover:text-cyan-400 transition-colors font-mono text-[11px]" onClick={() => trackDownload('success')}>voxvpn.net/downloads/VoxVPN-debug.apk</a>
         </p>
 
         {/* Unknown Sources Warning */}
