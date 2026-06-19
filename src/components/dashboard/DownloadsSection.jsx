@@ -110,7 +110,7 @@ const ALL_INSTALLERS = [
   },
   {
     platform: 'iOS',
-    osKeys: ['iphone', 'ipad', 'ios'],
+    osKeys: ['ios'],
     label: 'iOS',
     subtitle: 'iPhone & iPad · iOS 14+',
     ext: '.ipa',
@@ -125,7 +125,7 @@ const ALL_INSTALLERS = [
   },
   {
     platform: 'macOS',
-    osKeys: ['mac'],
+    osKeys: ['macos'],
     label: 'macOS',
     subtitle: 'macOS 12+ · Apple Silicon & Intel',
     ext: '.dmg',
@@ -142,14 +142,13 @@ const ALL_INSTALLERS = [
 
 function detectPlatform() {
   const ua = navigator.userAgent.toLowerCase();
-  // Check mobile/Android first — most specific
   if (/android/.test(ua)) return 'Android';
   if (/iphone|ipad|ipod/.test(ua)) return 'iOS';
-  // Only return desktop platforms if clearly not a mobile device
   if (/macintosh|mac os x/.test(ua) && !/iphone|ipad|mobile/.test(ua)) return 'macOS';
-  if (/windows nt/.test(ua) && !/iemobile|windows phone/.test(ua)) return 'Windows';
-  // Unknown — treat as mobile/Android to avoid showing Windows installer on phones
-  return 'Android';
+  if (/windows/.test(ua) && !/iemobile|windows phone/.test(ua)) return 'Windows';
+  // Mobile-like UA with no match — assume Android; otherwise Windows
+  if (/mobile|touch|tablet/.test(ua)) return 'Android';
+  return 'Windows';
 }
 
 export default function DownloadsSection({ isAdmin = false }) {
@@ -157,7 +156,7 @@ export default function DownloadsSection({ isAdmin = false }) {
   // Admins see all; users see only the single installer matching their OS (exact platform match)
   const INSTALLERS = isAdmin
     ? ALL_INSTALLERS.filter(i => !i.comingSoon)
-    : ALL_INSTALLERS.filter(i => !i.comingSoon && i.platform === detectedPlatform);
+    : ALL_INSTALLERS.filter(i => !i.comingSoon && i.osKeys.includes(detectedPlatform.toLowerCase()));
 
   const [dlState, setDlState] = useState({});
   const [meta, setMeta] = useState({});
