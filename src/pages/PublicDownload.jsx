@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
-import { Download, Smartphone, Shield, Lock, Zap, CheckCircle2, Loader2, ChevronRight, Star, AlertTriangle, Settings, LogIn, Wifi } from 'lucide-react';
+import { Download, Smartphone, Shield, Lock, Zap, Star, AlertTriangle, Settings, LogIn, Wifi } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const APK_VERSION = '1.0-debug';
-const APK_FILENAME = 'VoxVPN-debug.apk';
-const APK_DIRECT_URL = 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/main-ui-ovpn2-debug.apk';
+const APK_VERSION = '2.0.0';
+const APK_FILENAME = 'VoxVPN-v2.0.0.apk';
+const APK_DIRECT_URL = null; // New release pending — URL will be updated on launch
 
 const STEPS = [
   { icon: Download, label: 'Download the APK', desc: 'Tap the button above to download VoxVPN-V1.0.apk' },
@@ -15,61 +13,7 @@ const STEPS = [
   { icon: Wifi, label: 'Select & Connect', desc: 'Choose a server from the list and tap Connect to go private' },
 ];
 
-async function trackDownload(status, error_message = null) {
-  try {
-    await base44.functions.invoke('trackDownload', { platform: 'Android', status, source: 'public_page', error_message });
-  } catch {}
-}
-
 export default function PublicDownload() {
-  const [dlState, setDlState] = useState('idle'); // idle | loading | done
-  const [downloadCount, setDownloadCount] = useState(null);
-
-  // Load download count from DownloadEvents
-  useEffect(() => {
-    base44.functions.invoke('trackDownload', { platform: 'Android', status: 'page_view', source: 'public_page' }).catch(() => {});
-  }, []);
-
-  const handleDownload = async () => {
-    setDlState('loading');
-    await trackDownload('attempted');
-    try {
-      // Try authenticated download first (streams file directly, no GitHub page)
-      const token = localStorage.getItem('base44_access_token');
-      const appUrl = window.location.origin;
-      const res = await fetch(`${appUrl}/functions/secureDownload`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ platform: 'Android' }),
-      });
-      if (res.ok) {
-        const blob = await res.blob();
-        const blobUrl = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = 'VoxVPN.apk';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(blobUrl);
-      } else {
-        // Fallback to direct URL for unauthenticated users
-        window.open(APK_DIRECT_URL, '_blank', 'noopener,noreferrer');
-      }
-      await trackDownload('success');
-      setDlState('done');
-      setTimeout(() => setDlState('idle'), 4000);
-    } catch (err) {
-      // Fallback to direct URL on error
-      window.open(APK_DIRECT_URL, '_blank', 'noopener,noreferrer');
-      await trackDownload('success');
-      setDlState('done');
-      setTimeout(() => setDlState('idle'), 4000);
-    }
-  };
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#060c1a' }}>
@@ -114,37 +58,19 @@ export default function PublicDownload() {
           <span className="flex items-center gap-1"><Zap size={11} className="text-cyan-500" /> Android 8.0+</span>
         </div>
 
-        {/* Main Download Button */}
-        <button
-          onClick={handleDownload}
-          disabled={dlState === 'loading'}
-          className="w-full flex items-center gap-4 p-5 rounded-2xl text-left transition-all disabled:opacity-70 mb-3 group"
-          style={{ background: 'linear-gradient(135deg, rgba(52,168,83,0.15), rgba(52,168,83,0.08))', border: '1px solid rgba(52,168,83,0.35)' }}
-        >
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(52,168,83,0.2)', border: '1px solid rgba(52,168,83,0.35)' }}>
-            {dlState === 'loading' ? (
-              <Loader2 size={24} style={{ color: '#34A853' }} className="animate-spin" />
-            ) : dlState === 'done' ? (
-              <CheckCircle2 size={24} className="text-emerald-400" />
-            ) : (
-              <Download size={24} style={{ color: '#34A853' }} />
-            )}
+        {/* Coming Soon Notice */}
+        <div className="w-full flex flex-col items-center gap-3 p-6 rounded-2xl mb-6" style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.25)' }}>
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)' }}>
+            <Smartphone size={28} style={{ color: '#f59e0b' }} />
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-white font-black text-base">
-              {dlState === 'loading' ? 'Preparing Download...' : dlState === 'done' ? 'Download Started!' : 'Download VoxVPN for Android'}
-            </p>
-            <p className="text-slate-400 text-sm mt-0.5">{APK_FILENAME} · Version {APK_VERSION} · Android 8.0+</p>
-          </div>
-          {dlState === 'idle' && (
-            <ChevronRight size={20} className="text-slate-500 flex-shrink-0 group-hover:text-white transition-colors" />
-          )}
-        </button>
-
-        {/* Direct link */}
-        <p className="text-slate-600 text-xs text-center mb-10">
-          Direct URL: <a href={APK_DIRECT_URL} className="text-cyan-600 hover:text-cyan-400 transition-colors font-mono text-[11px]" onClick={() => trackDownload('success')}>voxvpn.net/downloads/VoxVPN-debug.apk</a>
-        </p>
+          <p className="text-amber-300 font-black text-lg text-center">New Release Coming Soon</p>
+          <p className="text-slate-400 text-sm text-center leading-relaxed max-w-sm">
+            We're preparing a brand-new signed release of VoxVPN for Android (v{APK_VERSION}). The download will be available here shortly.
+          </p>
+          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold" style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b' }}>
+            🚀 v{APK_VERSION} · Production Release · Android 8.0+
+          </span>
+        </div>
 
         {/* Unknown Sources Warning */}
         <div className="w-full rounded-xl p-4 flex items-start gap-3 mb-8" style={{ background: 'rgba(251,191,36,0.05)', border: '1px solid rgba(251,191,36,0.2)' }}>

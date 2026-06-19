@@ -91,7 +91,7 @@ const ALL_INSTALLERS = [
     hoverBg: 'rgba(52,168,83,0.12)',
     iconBg: 'rgba(52,168,83,0.12)',
     iconBorder: 'rgba(52,168,83,0.3)',
-
+    comingSoon: true,
   },
   {
     platform: 'iOS',
@@ -278,7 +278,7 @@ export default function DownloadsSection() {
                   <div className="flex-1 min-w-0">
                     <p className="text-white font-black text-sm">{label} <span className="font-mono text-[10px] opacity-50">{ext}</span></p>
                     <p className="text-slate-500 text-xs mt-0.5">{subtitle}</p>
-                    <span className="inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.35)' }}>Coming Soon</span>
+                    <span className="inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,165,0,0.1)', color: '#f59e0b' }}>New Release Coming Soon</span>
                   </div>
                 </div>
               );
