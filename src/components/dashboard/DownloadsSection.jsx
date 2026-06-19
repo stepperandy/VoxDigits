@@ -195,9 +195,7 @@ export default function DownloadsSection({ isAdmin = false }) {
         return;
       } else {
         // For other platforms: use backend proxy
-        const token = localStorage.getItem('base44_access_token');
-        const appUrl = window.location.origin;
-        window.open(`${appUrl}/functions/secureDownload?platform=${platform}`, '_blank');
+        window.open(`/functions/secureDownload?platform=${platform}`, '_blank');
       }
       
       await trackDownload(platform, 'success');
