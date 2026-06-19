@@ -178,15 +178,15 @@ export default function DownloadsSection({ isAdmin = false }) {
     await trackDownload(platform, 'attempted');
     try {
       // For Android: direct GitHub redirect to ensure uncorrupted APK download
-      if (platform === 'Android') {
-        window.location.href = 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.1.apk';
-        await trackDownload(platform, 'success');
-        setDlState(s => ({ ...s, [platform]: 'done' }));
-        setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);
-        return;
-      }
-      if (platform === 'Android-Mirror') {
-        window.location.href = 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v1.0.1.apk?alt=media&token=58a0f442-d7e1-4c5c-a0ee-42360097e516';
+      const DIRECT_URLS = {
+        'Android': 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.1.apk',
+        'Android-Mirror': 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v1.0.1.apk?alt=media&token=58a0f442-d7e1-4c5c-a0ee-42360097e516',
+      };
+      if (DIRECT_URLS[platform]) {
+        const a = document.createElement('a');
+        a.href = DIRECT_URLS[platform];
+        a.download = platform === 'Android-Mirror' ? 'VoxVPNFIRE.apk' : 'VoxVPNGIT.apk';
+        a.click();
         await trackDownload('Android', 'success');
         setDlState(s => ({ ...s, [platform]: 'done' }));
         setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);

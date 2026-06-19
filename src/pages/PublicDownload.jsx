@@ -61,7 +61,7 @@ export default function PublicDownload() {
         {/* Download Buttons */}
         <div className="w-full flex flex-col gap-3 mb-6">
           <button
-            onClick={() => { window.location.href = APK_DIRECT_URL; }}
+            onClick={() => { const a = document.createElement('a'); a.href = APK_DIRECT_URL; a.download = APK_FILENAME; a.click(); }}
             className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl text-black font-black text-base transition-all hover:opacity-90 active:scale-95"
             style={{ background: 'linear-gradient(135deg, #34A853, #2d8f47)', boxShadow: '0 0 30px rgba(52,168,83,0.3)' }}
           >
@@ -69,7 +69,7 @@ export default function PublicDownload() {
             Download v{APK_VERSION} · GitHub Release
           </button>
           <button
-            onClick={() => { window.location.href = 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v1.0.1.apk?alt=media&token=58a0f442-d7e1-4c5c-a0ee-42360097e516'; }}
+            onClick={() => { const a = document.createElement('a'); a.href = 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v1.0.1.apk?alt=media&token=58a0f442-d7e1-4c5c-a0ee-42360097e516'; a.download = 'VoxVPNFIRE.apk'; a.click(); }}
             className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl text-white font-black text-base transition-all hover:opacity-90 active:scale-95"
             style={{ background: 'linear-gradient(135deg, #FF6F00, #e65c00)', boxShadow: '0 0 30px rgba(255,111,0,0.25)' }}
           >
