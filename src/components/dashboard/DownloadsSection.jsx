@@ -93,6 +93,20 @@ const ALL_INSTALLERS = [
     iconBorder: 'rgba(52,168,83,0.3)',
   },
   {
+    platform: 'Android-Mirror',
+    osKeys: ['android'],
+    label: 'Android (Mirror)',
+    subtitle: 'Android 8.0+ · Firebase CDN',
+    ext: '.apk',
+    icon: Smartphone,
+    color: '#FF6F00',
+    borderColor: 'rgba(255,111,0,0.25)',
+    bgColor: 'rgba(255,111,0,0.06)',
+    hoverBg: 'rgba(255,111,0,0.12)',
+    iconBg: 'rgba(255,111,0,0.12)',
+    iconBorder: 'rgba(255,111,0,0.3)',
+  },
+  {
     platform: 'iOS',
     osKeys: ['iphone', 'ipad', 'ios'],
     label: 'iOS',
@@ -137,7 +151,7 @@ export default function DownloadsSection() {
   const detectedPlatform = detectPlatform();
   // Show only the detected platform's installer; fall back to all if unknown
   const INSTALLERS = detectedPlatform
-    ? ALL_INSTALLERS.filter(i => i.platform === detectedPlatform)
+    ? ALL_INSTALLERS.filter(i => i.osKeys.includes(detectedPlatform.toLowerCase()) && !i.comingSoon)
     : ALL_INSTALLERS.filter(i => !i.comingSoon);
 
   const [dlState, setDlState] = useState({});
@@ -166,6 +180,13 @@ export default function DownloadsSection() {
       if (platform === 'Android') {
         window.location.href = 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.1.apk';
         await trackDownload(platform, 'success');
+        setDlState(s => ({ ...s, [platform]: 'done' }));
+        setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);
+        return;
+      }
+      if (platform === 'Android-Mirror') {
+        window.location.href = 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v1.0.1.apk?alt=media';
+        await trackDownload('Android', 'success');
         setDlState(s => ({ ...s, [platform]: 'done' }));
         setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);
         return;
