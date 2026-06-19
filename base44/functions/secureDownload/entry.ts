@@ -76,10 +76,19 @@ Deno.serve(async (req) => {
     // GitHub releases require GET to follow the redirect chain to the CDN
     const fileRes = await fetch(fileUri, {
       method: 'GET',
-      headers: { 'User-Agent': 'VoxVPN-Download-Proxy/1.0' },
+      headers: { 
+        'User-Agent': 'VoxVPN-Download-Proxy/1.0',
+        'Accept': 'application/octet-stream',
+      },
       redirect: 'follow',
     });
     if (!fileRes.ok) throw new Error(`GitHub fetch failed: ${fileRes.status}`);
+    
+    // Verify we got binary content, not HTML
+    const contentType = fileRes.headers.get('content-type');
+    if (contentType && contentType.includes('text/html')) {
+      throw new Error('GitHub returned HTML instead of APK file. Check the release URL.');
+    }
 
     const ext = platform === 'Android' ? 'apk' : 'exe';
     const dlFilename = filename.endsWith(`.${ext}`) ? filename : `${filename}.${ext}`;
