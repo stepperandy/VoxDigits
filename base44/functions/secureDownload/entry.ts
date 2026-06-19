@@ -92,13 +92,14 @@ Deno.serve(async (req) => {
 
     const ext = platform === 'Android' ? 'apk' : 'exe';
     const dlFilename = filename.endsWith(`.${ext}`) ? filename : `${filename}.${ext}`;
+    const downloadContentType = platform === 'Android' ? 'application/vnd.android.package-archive' : 'application/octet-stream';
 
     // Stream the binary directly with download headers
     return new Response(fileRes.body, {
       status: 200,
       headers: {
         ...corsHeaders,
-        'Content-Type': 'application/octet-stream',
+        'Content-Type': downloadContentType,
         'Content-Disposition': `attachment; filename="${dlFilename}"`,
       },
     });
