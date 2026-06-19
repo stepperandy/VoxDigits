@@ -59,15 +59,14 @@ export default function PublicDownload() {
         </div>
 
         {/* Download Button */}
-        <a
-          href={APK_DIRECT_URL}
-          download={APK_FILENAME}
+        <button
+          onClick={() => { window.location.href = APK_DIRECT_URL; }}
           className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl text-black font-black text-base mb-6 transition-all hover:opacity-90 active:scale-95"
           style={{ background: 'linear-gradient(135deg, #34A853, #2d8f47)', boxShadow: '0 0 30px rgba(52,168,83,0.3)' }}
         >
           <Download size={20} />
           Download VoxVPN {APK_VERSION} · APK
-        </a>
+        </button>
 
         {/* Unknown Sources Warning */}
         <div className="w-full rounded-xl p-4 flex items-start gap-3 mb-8" style={{ background: 'rgba(251,191,36,0.05)', border: '1px solid rgba(251,191,36,0.2)' }}>
