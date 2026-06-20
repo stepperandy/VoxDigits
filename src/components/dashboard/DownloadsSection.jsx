@@ -1,112 +1,22 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Download, Monitor, Smartphone, Loader2, Key, Copy, CheckCircle2, Shield, RefreshCw, Tag, XCircle, Zap, LogIn } from 'lucide-react';
+import { Download, Monitor, Smartphone, Loader2, Key, Copy, CheckCircle2, Shield, RefreshCw, Tag, XCircle, Zap, LogIn, Terminal, Wifi, Router } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
-async function trackDownload(platform, status, errorMessage = null) {
-  try {
-    await base44.functions.invoke('trackDownload', {
-      platform, status, source: 'dashboard',
-      ...(errorMessage && { error_message: errorMessage }),
-    });
-  } catch {}
-}
-
-// Fallback direct download URLs — overridden dynamically from the Download entity
-const FALLBACK_URLS = {
-  'Windows': 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe',
-  'Android': 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-v2.0.apk',
-  'Android-Mirror': 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v2.0.apk?alt=media',
-};
-const DOWNLOAD_FILENAMES = {
-  'Windows': 'VoxVPN-Setup.exe',
-  'Android': 'VoxVPNGIT.apk',
-  'Android-Mirror': 'VoxVPNFIRE.apk',
-};
-// Platform keys to match Download entity platform field
-const PLATFORM_ENTITY_KEY = {
-  'Windows': 'Windows',
-  'Android': 'Android',
-  'Android-Mirror': 'Android',
+const platformIcons = {
+  Windows: Monitor, macOS: Monitor, Linux: Terminal,
+  iOS: Smartphone, Android: Smartphone, Router: Router,
 };
 
-const ALL_INSTALLERS = [
-  {
-    platform: 'Windows',
-    osKeys: ['windows'],
-    label: 'Windows',
-    subtitle: 'Windows 10 / 11 · 64-bit',
-    ext: '.exe',
-    icon: Monitor,
-    color: '#00d4ff',
-    borderColor: 'rgba(0,212,255,0.25)',
-    bgColor: 'rgba(0,212,255,0.06)',
-    hoverBg: 'rgba(0,212,255,0.12)',
-    iconBg: 'rgba(0,212,255,0.12)',
-    iconBorder: 'rgba(0,212,255,0.3)',
-  },
-  {
-    platform: 'Android',
-    osKeys: ['android'],
-    label: 'Android',
-    filename: 'VoxVPNGIT.apk',
-    subtitle: 'Android 8.0+ · All devices',
-    ext: '.apk',
-    icon: Smartphone,
-    color: '#34A853',
-    borderColor: 'rgba(52,168,83,0.25)',
-    bgColor: 'rgba(52,168,83,0.06)',
-    hoverBg: 'rgba(52,168,83,0.12)',
-    iconBg: 'rgba(52,168,83,0.12)',
-    iconBorder: 'rgba(52,168,83,0.3)',
-  },
-  {
-    platform: 'Android-Mirror',
-    osKeys: ['android'],
-    label: 'Android (Mirror)',
-    filename: 'VoxVPNFIRE.apk',
-    subtitle: 'Android 8.0+ · Firebase CDN',
-    ext: '.apk',
-    icon: Smartphone,
-    color: '#FF6F00',
-    borderColor: 'rgba(255,111,0,0.25)',
-    bgColor: 'rgba(255,111,0,0.06)',
-    hoverBg: 'rgba(255,111,0,0.12)',
-    iconBg: 'rgba(255,111,0,0.12)',
-    iconBorder: 'rgba(255,111,0,0.3)',
-  },
-  {
-    platform: 'iOS',
-    osKeys: ['ios'],
-    label: 'iOS',
-    subtitle: 'iPhone & iPad · iOS 14+',
-    ext: '.ipa',
-    icon: Smartphone,
-    color: '#a78bfa',
-    borderColor: 'rgba(167,139,250,0.25)',
-    bgColor: 'rgba(167,139,250,0.06)',
-    hoverBg: 'rgba(167,139,250,0.12)',
-    iconBg: 'rgba(167,139,250,0.12)',
-    iconBorder: 'rgba(167,139,250,0.3)',
-    comingSoon: true,
-  },
-  {
-    platform: 'macOS',
-    osKeys: ['macos'],
-    label: 'macOS',
-    subtitle: 'macOS 12+ · Apple Silicon & Intel',
-    ext: '.dmg',
-    icon: Monitor,
-    color: '#94a3b8',
-    borderColor: 'rgba(148,163,184,0.25)',
-    bgColor: 'rgba(148,163,184,0.06)',
-    hoverBg: 'rgba(148,163,184,0.12)',
-    iconBg: 'rgba(148,163,184,0.12)',
-    iconBorder: 'rgba(148,163,184,0.3)',
-    comingSoon: true,
-  },
-];
+const platformColors = {
+  Windows: { color: '#00d4ff', borderColor: 'rgba(0,212,255,0.25)', bgColor: 'rgba(0,212,255,0.06)', hoverBg: 'rgba(0,212,255,0.12)', iconBg: 'rgba(0,212,255,0.12)', iconBorder: 'rgba(0,212,255,0.3)' },
+  Android: { color: '#34A853', borderColor: 'rgba(52,168,83,0.25)', bgColor: 'rgba(52,168,83,0.06)', hoverBg: 'rgba(52,168,83,0.12)', iconBg: 'rgba(52,168,83,0.12)', iconBorder: 'rgba(52,168,83,0.3)' },
+  iOS: { color: '#a78bfa', borderColor: 'rgba(167,139,250,0.25)', bgColor: 'rgba(167,139,250,0.06)', hoverBg: 'rgba(167,139,250,0.12)', iconBg: 'rgba(167,139,250,0.12)', iconBorder: 'rgba(167,139,250,0.3)' },
+  macOS: { color: '#94a3b8', borderColor: 'rgba(148,163,184,0.25)', bgColor: 'rgba(148,163,184,0.06)', hoverBg: 'rgba(148,163,184,0.12)', iconBg: 'rgba(148,163,184,0.12)', iconBorder: 'rgba(148,163,184,0.3)' },
+  Linux: { color: '#f97316', borderColor: 'rgba(249,115,22,0.25)', bgColor: 'rgba(249,115,22,0.06)', hoverBg: 'rgba(249,115,22,0.12)', iconBg: 'rgba(249,115,22,0.12)', iconBorder: 'rgba(249,115,22,0.3)' },
+  Router: { color: '#8b5cf6', borderColor: 'rgba(139,92,246,0.25)', bgColor: 'rgba(139,92,246,0.06)', hoverBg: 'rgba(139,92,246,0.12)', iconBg: 'rgba(139,92,246,0.12)', iconBorder: 'rgba(139,92,246,0.3)' },
+};
 
 function detectPlatform() {
   const ua = navigator.userAgent.toLowerCase();
@@ -114,62 +24,44 @@ function detectPlatform() {
   if (/iphone|ipad|ipod/.test(ua)) return 'iOS';
   if (/macintosh|mac os x/.test(ua) && !/iphone|ipad|mobile/.test(ua)) return 'macOS';
   if (/windows/.test(ua) && !/iemobile|windows phone/.test(ua)) return 'Windows';
-  // Mobile-like UA with no match — assume Android; otherwise Windows
+  if (/linux/.test(ua)) return 'Linux';
   if (/mobile|touch|tablet/.test(ua)) return 'Android';
   return 'Windows';
 }
 
 export default function DownloadsSection({ isAdmin = false }) {
   const detectedPlatform = detectPlatform();
-  // Admins see all active installers; users see their platform's installer
-  const INSTALLERS = isAdmin
-    ? ALL_INSTALLERS.filter(i => !i.comingSoon)
-    : ALL_INSTALLERS.filter(i => {
-        if (i.comingSoon) return false;
-        // Match platform by osKeys or by direct platform name match
-        const platformMatch = i.platform.toLowerCase() === detectedPlatform.toLowerCase();
-        const osKeyMatch = i.osKeys && i.osKeys.includes(detectedPlatform.toLowerCase());
-        return platformMatch || osKeyMatch;
-      });
-
+  const [downloads, setDownloads] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [dlState, setDlState] = useState({});
   const [tokenData, setTokenData] = useState(null);
   const [tokenLoading, setTokenLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [expiredError, setExpiredError] = useState(null);
-  const [versions, setVersions] = useState({});
-  const [entityUrls, setEntityUrls] = useState({});
 
   useEffect(() => {
-    base44.entities.Download.filter({ is_active: true }).then(records => {
-      const vMap = {};
-      const uMap = {};
-      records.forEach(r => {
-        if (r.platform && r.version) vMap[r.platform] = r.version;
-        if (r.platform && r.file_url) uMap[r.platform] = r.file_url;
-      });
-      setVersions(vMap);
-      setEntityUrls(uMap);
-    }).catch(() => {});
-  }, []);
+    setLoading(true);
+    base44.entities.Download.filter({ is_active: true })
+      .then(records => {
+        const filtered = isAdmin ? records : records.filter(d => d.platform === detectedPlatform);
+        setDownloads(filtered);
+      })
+      .catch(() => setDownloads([]))
+      .finally(() => setLoading(false));
+  }, [isAdmin, detectedPlatform]);
 
-  const handleDownload = async (platform) => {
-    setDlState(s => ({ ...s, [platform]: 'loading' }));
+  const handleDownload = async (download) => {
+    const key = download.id;
+    setDlState(s => ({ ...s, [key]: 'loading' }));
     setExpiredError(null);
-    trackDownload(platform, 'attempted');
     try {
-      // Prefer URL from admin-configured Download entity, fall back to hardcoded
-      const entityKey = PLATFORM_ENTITY_KEY[platform];
-      const url = entityUrls[entityKey] || FALLBACK_URLS[platform];
-      if (!url) throw new Error('No download URL for ' + platform);
-      // Use window.open to let the browser handle the redirect chain natively
+      const url = download.file_url;
+      if (!url) throw new Error('No download URL available');
       window.open(url, '_blank', 'noopener,noreferrer');
-      trackDownload(platform, 'success');
-      setDlState(s => ({ ...s, [platform]: 'done' }));
-      setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);
+      setDlState(s => ({ ...s, [key]: 'done' }));
+      setTimeout(() => setDlState(s => ({ ...s, [key]: 'idle' })), 3000);
     } catch (err) {
-      trackDownload(platform, 'failed', err.message);
-      setDlState(s => ({ ...s, [platform]: 'idle' }));
+      setDlState(s => ({ ...s, [key]: 'idle' }));
       alert('Download failed: ' + (err.message || 'Please try again.'));
     }
   };
@@ -221,7 +113,6 @@ export default function DownloadsSection({ isAdmin = false }) {
       </div>
 
       <div className="p-6 space-y-4">
-        {/* Expired subscription block */}
         {expiredError && (
           <div className="rounded-xl p-4 flex items-start gap-3" style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.25)' }}>
             <XCircle size={18} className="text-rose-400 flex-shrink-0 mt-0.5" />
@@ -237,82 +128,71 @@ export default function DownloadsSection({ isAdmin = false }) {
           </div>
         )}
 
-        {/* Platform notice */}
-        {detectedPlatform && (
+        {!isAdmin && (
           <p className="text-slate-500 text-xs text-center">
             Showing installer for your device: <span className="text-white font-semibold">{detectedPlatform}</span>
           </p>
         )}
 
-        {/* Installer buttons */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {INSTALLERS.map(({ platform, label, filename, subtitle, ext, icon: Icon, color, borderColor, bgColor, hoverBg, iconBg, iconBorder, comingSoon }) => {
-            const state = dlState[platform] || 'idle';
+        {loading ? (
+          <div className="flex items-center justify-center py-12 gap-2 text-slate-400">
+            <Loader2 size={18} className="animate-spin text-cyan-400" />
+            <span className="text-sm">Loading downloads...</span>
+          </div>
+        ) : downloads.length === 0 ? (
+          <div className="rounded-2xl border border-white/5 bg-[#0d1120] py-12 text-center">
+            <Download size={32} className="text-slate-700 mx-auto mb-3" />
+            <p className="text-slate-500 text-sm">No downloads available for your platform.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {downloads.map((d) => {
+              const Icon = platformIcons[d.platform] || Download;
+              const colors = platformColors[d.platform] || platformColors.Windows;
+              const state = dlState[d.id] || 'idle';
+              const ext = d.file_url?.split('.').pop()?.toUpperCase() || 'FILE';
 
-            if (comingSoon) {
               return (
-                <div key={platform}
-                  className="flex items-center gap-4 p-4 rounded-2xl opacity-50 cursor-not-allowed"
-                  style={{ border: `1px solid ${borderColor}`, background: bgColor }}>
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: iconBg, border: `1px solid ${iconBorder}` }}>
-                    <Icon size={22} style={{ color }} />
+                <button
+                  key={d.id}
+                  onClick={() => handleDownload(d)}
+                  disabled={state !== 'idle'}
+                  className="flex items-center gap-4 p-4 rounded-2xl text-left transition-all disabled:opacity-70 group"
+                  style={{ border: `1px solid ${colors.borderColor}`, background: colors.bgColor }}
+                  onMouseEnter={e => e.currentTarget.style.background = colors.hoverBg}
+                  onMouseLeave={e => e.currentTarget.style.background = colors.bgColor}
+                >
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: colors.iconBg, border: `1px solid ${colors.iconBorder}` }}>
+                    <Icon size={22} style={{ color: colors.color }} />
                   </div>
+
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-black text-sm">{label} <span className="font-mono text-[10px] opacity-50">{ext}</span></p>
-                    <p className="text-slate-500 text-xs mt-0.5">{subtitle}</p>
-                    <span className="inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,165,0,0.1)', color: '#f59e0b' }}>New Release Coming Soon</span>
-                  </div>
-                </div>
-              );
-            }
-
-            return (
-              <button
-                key={platform}
-                onClick={() => handleDownload(platform)}
-                disabled={state !== 'idle'}
-                className="flex items-center gap-4 p-4 rounded-2xl text-left transition-all disabled:opacity-70 group"
-                style={{ border: `1px solid ${borderColor}`, background: bgColor }}
-                onMouseEnter={e => e.currentTarget.style.background = hoverBg}
-                onMouseLeave={e => e.currentTarget.style.background = bgColor}
-              >
-                {/* Icon */}
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: iconBg, border: `1px solid ${iconBorder}` }}>
-                  <Icon size={22} style={{ color }} />
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-white font-black text-sm">{label} <span className="font-mono text-[10px] opacity-50">{ext}</span></p>
-                  {filename && <p className="text-[10px] font-mono font-semibold mt-0.5" style={{ color }}>{filename}</p>}
-                  <p className="text-slate-500 text-xs mt-0.5">{subtitle}</p>
-
-                  {/* Version badge — pulled from admin Download entity */}
-                  {(versions[PLATFORM_ENTITY_KEY[platform]] || versions[platform]) && (
-                    <div className="flex items-center gap-2 mt-1.5">
-                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
-                        <Tag size={8} /> v{versions[PLATFORM_ENTITY_KEY[platform]] || versions[platform]}
+                    <p className="text-white font-black text-sm">{d.name}</p>
+                    {d.version && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded mt-1" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
+                        <Tag size={8} /> v{d.version}
                       </span>
-                    </div>
-                  )}
-                </div>
+                    )}
+                    <p className="text-slate-500 text-xs mt-1">{d.platform} · {ext}</p>
+                    {d.description && <p className="text-slate-600 text-[10px] mt-1 truncate">{d.description}</p>}
+                  </div>
 
-                {/* State icon */}
-                <div className="flex-shrink-0">
-                  {state === 'loading' && <Loader2 size={18} style={{ color }} className="animate-spin" />}
-                  {state === 'done' && <CheckCircle2 size={18} className="text-emerald-400" />}
-                  {state === 'idle' && (
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all group-hover:scale-110" style={{ background: iconBg, border: `1px solid ${iconBorder}` }}>
-                      <Download size={14} style={{ color }} />
-                    </div>
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
+                  <div className="flex-shrink-0">
+                    {state === 'loading' && <Loader2 size={18} style={{ color: colors.color }} className="animate-spin" />}
+                    {state === 'done' && <CheckCircle2 size={18} className="text-emerald-400" />}
+                    {state === 'idle' && (
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all group-hover:scale-110" style={{ background: colors.iconBg, border: `1px solid ${colors.iconBorder}` }}>
+                        <Download size={14} style={{ color: colors.color }} />
+                      </div>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
-        {/* Account Linking — Android & Desktop */}
+        {/* Account Linking */}
         <div className="rounded-xl p-4" style={{ border: '1px solid rgba(139,92,246,0.2)', background: 'rgba(139,92,246,0.05)' }}>
           <div className="flex items-start gap-3">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.2)' }}>
@@ -324,8 +204,8 @@ export default function DownloadsSection({ isAdmin = false }) {
               </p>
               <p className="text-slate-400 text-xs leading-relaxed">
                 {detectedPlatform === 'Android' 
-                  ? 'After installing the APK, open VoxVPN and sign in with your email and password — the same credentials you use on the dashboard.'
-                  : 'After installing, open the app and enter this one-time token to automatically sign in — no password needed.'
+                  ? 'After installing the APK, open VoxVPN and sign in with your email and password.'
+                  : 'After installing, open the app and enter this one-time token to automatically sign in.'
                 }
               </p>
 
