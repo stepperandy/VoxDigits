@@ -121,10 +121,16 @@ function detectPlatform() {
 
 export default function DownloadsSection({ isAdmin = false }) {
   const detectedPlatform = detectPlatform();
-  // Admins see all active installers; users see ONLY their platform's installer(s)
+  // Admins see all active installers; users see their platform's installer
   const INSTALLERS = isAdmin
     ? ALL_INSTALLERS.filter(i => !i.comingSoon)
-    : ALL_INSTALLERS.filter(i => !i.comingSoon && i.osKeys[0] === detectedPlatform.toLowerCase());
+    : ALL_INSTALLERS.filter(i => {
+        if (i.comingSoon) return false;
+        // Match platform by osKeys or by direct platform name match
+        const platformMatch = i.platform.toLowerCase() === detectedPlatform.toLowerCase();
+        const osKeyMatch = i.osKeys && i.osKeys.includes(detectedPlatform.toLowerCase());
+        return platformMatch || osKeyMatch;
+      });
 
   const [dlState, setDlState] = useState({});
   const [tokenData, setTokenData] = useState(null);
