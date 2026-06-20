@@ -148,14 +148,8 @@ export default function DownloadsSection({ isAdmin = false }) {
     try {
       const url = DIRECT_URLS[platform];
       if (!url) throw new Error('No download URL for ' + platform);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = DOWNLOAD_FILENAMES[platform] || platform;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      // Use window.open to let the browser handle the redirect chain natively
+      window.open(url, '_blank', 'noopener,noreferrer');
       trackDownload(platform, 'success');
       setDlState(s => ({ ...s, [platform]: 'done' }));
       setTimeout(() => setDlState(s => ({ ...s, [platform]: 'idle' })), 3000);
