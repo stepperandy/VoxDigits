@@ -1,9 +1,9 @@
 import { Download, Smartphone, Shield, Lock, Zap, Star, AlertTriangle, Settings, LogIn, Wifi } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const APK_VERSION = '1.0.1';
-const APK_FILENAME = 'VoxVPN-v1.0.1.apk';
-const APK_DIRECT_URL = 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.1.apk';
+const APK_VERSION = '1.1.0';
+const APK_FILENAME = 'VoxVPN-v1.1.0.apk';
+const APK_DIRECT_URL = ''; // TODO: update with new release URL
 
 const STEPS = [
   { icon: Download, label: 'Download the APK', desc: 'Tap the button above to download VoxVPN-V1.0.apk' },
