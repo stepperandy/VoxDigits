@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const APK_VERSION = '1.1.0';
 const APK_FILENAME = 'VoxVPN-v1.1.0.apk';
-const APK_DIRECT_URL = ''; // TODO: update with new release URL
+const APK_DIRECT_URL = 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-1.0.apk?alt=media&token=3551942a-cf70-4d17-898b-5dd27b9c0be0';
 
 const STEPS = [
   { icon: Download, label: 'Download the APK', desc: 'Tap the button above to download VoxVPN-V1.0.apk' },
