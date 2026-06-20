@@ -58,14 +58,13 @@ export default function Login() {
     setLoading(true);
     setError('');
     try {
-      const baseUrl = import.meta.env.VITE_BASE44_APP_BASE_URL || window.location.origin;
-      await fetch(`${baseUrl}/api/auth/reset-password-request`, {
+      await fetch(`${window.location.origin}/api/auth/reset-password-request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
       alert('Password reset email sent! Check your inbox.');
-    } catch (err) {
+    } catch {
       setError('Failed to send reset email. Please try again.');
     } finally {
       setLoading(false);
@@ -75,7 +74,6 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#f0f4f8' }}>
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
-        {/* Logo */}
         <div className="text-center mb-6">
           <img
             src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/13431de73_VoxICON.png"
