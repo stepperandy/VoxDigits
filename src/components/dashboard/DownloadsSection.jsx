@@ -16,8 +16,8 @@ async function trackDownload(platform, status, errorMessage = null) {
 // Fallback direct download URLs — overridden dynamically from the Download entity
 const FALLBACK_URLS = {
   'Windows': 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe',
-  'Android': 'https://github.com/stepperandy/voxvpn/releases/download/V1.0/VoxVPN-v1.0.1.apk',
-  'Android-Mirror': 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v1.0.1.apk?alt=media&token=58a0f442-d7e1-4c5c-a0ee-42360097e516',
+  'Android': 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-v2.0.apk',
+  'Android-Mirror': 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v2.0.apk?alt=media',
 };
 const DOWNLOAD_FILENAMES = {
   'Windows': 'VoxVPN-Setup.exe',
