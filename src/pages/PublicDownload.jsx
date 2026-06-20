@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 
 const APK_VERSION = '1.1.0';
 const APK_FILENAME = 'VoxVPN-v1.1.0.apk';
-const APK_DIRECT_URL = 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-1.0.apk?alt=media&token=3551942a-cf70-4d17-898b-5dd27b9c0be0';
+
+const APK_DIRECT_URL = 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v1.1.0.apk?alt=media&token=c8bf8b26-d182-4fd4-bda0-fba767790f82';
 
 const STEPS = [
   { icon: Download, label: 'Download the APK', desc: 'Tap the button above to download VoxVPN-V1.0.apk' },
@@ -69,7 +70,7 @@ export default function PublicDownload() {
             Download v{APK_VERSION} · GitHub Release
           </button>
           <button
-            onClick={() => { const a = document.createElement('a'); a.href = 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v1.0.1.apk?alt=media&token=58a0f442-d7e1-4c5c-a0ee-42360097e516'; a.download = 'VoxVPNFIRE.apk'; a.click(); }}
+            onClick={() => { const a = document.createElement('a'); a.href = 'https://firebasestorage.googleapis.com/v0/b/voxvpn-1-apk.firebasestorage.app/o/VoxVPN-v1.1.0.apk?alt=media&token=c8bf8b26-d182-4fd4-bda0-fba767790f82'; a.download = 'VoxVPN-v1.1.0.apk'; a.click(); }}
             className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl text-white font-black text-base transition-all hover:opacity-90 active:scale-95"
             style={{ background: 'linear-gradient(135deg, #FF6F00, #e65c00)', boxShadow: '0 0 30px rgba(255,111,0,0.25)' }}
           >
