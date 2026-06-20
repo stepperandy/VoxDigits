@@ -150,7 +150,8 @@ export default function DownloadsSection({ isAdmin = false }) {
               const Icon = platformIcons[d.platform] || Download;
               const colors = platformColors[d.platform] || platformColors.Windows;
               const state = dlState[d.id] || 'idle';
-              const ext = d.file_url?.split('.').pop()?.toUpperCase() || 'FILE';
+              const rawExt = d.file_url?.split('?')[0]?.split('.').pop()?.toUpperCase();
+              const ext = rawExt && rawExt.length <= 5 ? rawExt : (d.platform === 'Android' ? 'APK' : d.platform === 'Windows' ? 'EXE' : 'FILE');
 
               return (
                 <button
