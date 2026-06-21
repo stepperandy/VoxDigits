@@ -4,7 +4,7 @@ const PLAN_PRICES = {
   'Basic':      { monthly: 3.99,  sixmonths: 13.99, yearly: 29.88 },
   'Standard':   { monthly: 6.99,  sixmonths: 13.99, yearly: 53.88 },
   'Premium':    { monthly: 9.99,  sixmonths: 13.99, yearly: 77.88 },
-  'Advanced':   { monthly: 14.99, sixmonths: 13.99, yearly: 119.88 },
+  'Advanced':   { monthly: 14.99, sixmonths: 13.99, yearly: 24.99 },
   'Enterprise': { monthly: 29.99, sixmonths: 13.99, yearly: 239.88 },
 };
 
