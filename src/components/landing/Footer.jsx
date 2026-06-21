@@ -173,33 +173,35 @@ export default function Footer() {
         {/* Payment logos + App store badges */}
         <div className="border-t border-white/5 pt-8 flex flex-col items-center gap-6">
           {/* Payment method icons */}
-          <div className="flex items-center gap-2 flex-wrap justify-center">
+          <div className="flex items-center gap-3 flex-wrap justify-center">
             {/* Visa */}
-            <div className="h-9 w-14 bg-[#1434CB] rounded-md flex items-center justify-center">
-              <span className="text-white font-black text-sm italic tracking-tight">VISA</span>
+            <div className="h-10 w-16 bg-[#1434CB] rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-black text-base italic tracking-tight">VISA</span>
             </div>
             {/* Mastercard */}
-            <div className="h-9 w-14 bg-[#252525] rounded-md flex items-center justify-center gap-0">
-              <div className="w-5 h-5 rounded-full bg-[#EB001B] opacity-90" />
-              <div className="w-5 h-5 rounded-full bg-[#F79E1B] opacity-90 -ml-2.5" />
+            <div className="h-10 w-16 bg-[#1a1a1a] rounded-xl flex items-center justify-center shadow-lg">
+              <div className="relative flex items-center">
+                <div className="w-6 h-6 rounded-full bg-[#EB001B]" />
+                <div className="w-6 h-6 rounded-full bg-[#F79E1B] -ml-3 opacity-90" />
+              </div>
             </div>
             {/* Amex */}
-            <div className="h-9 w-14 bg-[#2E77BC] rounded-md flex items-center justify-center">
-              <span className="text-white font-black text-[10px] tracking-widest">AMEX</span>
+            <div className="h-10 w-16 bg-[#2E77BC] rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-black text-[11px] tracking-widest">AMEX</span>
             </div>
             {/* Discover */}
-            <div className="h-9 w-14 bg-white rounded-md flex items-center justify-center">
-              <span className="text-[#F76F20] font-black text-[9px] tracking-tight">DISCOVER</span>
+            <div className="h-10 w-16 bg-[#231F20] rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-[#F76F20] font-black text-[8px] tracking-tight">DISCOVER</span>
             </div>
             {/* Apple Pay */}
-            <div className="h-9 w-14 bg-black rounded-md flex items-center justify-center gap-0.5">
+            <div className="h-10 w-16 bg-[#1a1a1a] rounded-xl flex items-center justify-center gap-1 shadow-lg">
               <svg viewBox="0 0 24 24" className="w-4 h-4 fill-white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-              <span className="text-white text-[9px] font-semibold">Pay</span>
+              <span className="text-white text-[10px] font-semibold">Pay</span>
             </div>
             {/* Google Pay */}
-            <div className="h-9 w-14 bg-white rounded-md flex items-center justify-center gap-0.5">
-              <span className="font-bold text-[11px]"><span className="text-[#4285F4]">G</span><span className="text-[#EA4335]">o</span><span className="text-[#FBBC05]">o</span><span className="text-[#4285F4]">g</span><span className="text-[#34A853]">l</span><span className="text-[#EA4335]">e</span></span>
-              <span className="text-[#5F6368] font-bold text-[9px] ml-0.5">Pay</span>
+            <div className="h-10 w-16 bg-white rounded-xl flex items-center justify-center gap-0.5 shadow-lg">
+              <span className="font-bold text-base leading-none"><span className="text-[#4285F4]">G</span></span>
+              <span className="text-[#5F6368] font-semibold text-[10px] ml-0.5">Pay</span>
             </div>
           </div>
 
