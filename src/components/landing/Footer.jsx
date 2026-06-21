@@ -174,12 +174,38 @@ export default function Footer() {
         <div className="border-t border-white/5 pt-8 flex flex-col items-center gap-6">
           {/* Payment method icons */}
           <div className="flex items-center gap-3 flex-wrap justify-center">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="Visa" className="h-10 w-auto object-contain bg-[#1434CB] rounded-xl px-3 py-2 shadow-lg" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard" className="h-10 w-auto object-contain bg-[#1a1a1a] rounded-xl px-2 py-1.5 shadow-lg" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_%282018%29.svg/1200px-American_Express_logo_%282018%29.svg.png" alt="Amex" className="h-10 w-auto object-contain bg-[#2E77BC] rounded-xl px-2 py-1.5 shadow-lg" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Discover_Card_logo.svg/1280px-Discover_Card_logo.svg.png" alt="Discover" className="h-10 w-auto object-contain bg-[#231F20] rounded-xl px-3 py-2 shadow-lg" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Apple_Pay_logo.svg/2560px-Apple_Pay_logo.svg.png" alt="Apple Pay" className="h-10 w-auto object-contain bg-[#1a1a1a] rounded-xl px-3 py-2 shadow-lg" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/2560px-Google_Pay_Logo.svg.png" alt="Google Pay" className="h-10 w-auto object-contain bg-white rounded-xl px-2 py-1.5 shadow-lg" />
+            {/* Visa */}
+            <div className="h-12 w-[72px] bg-[#1434CB] rounded-2xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-black text-xl italic tracking-tight" style={{fontFamily:'sans-serif'}}>VISA</span>
+            </div>
+            {/* Mastercard */}
+            <div className="h-12 w-[72px] bg-[#1a1a1a] rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="relative flex items-center">
+                <div className="w-7 h-7 rounded-full bg-[#EB001B]" />
+                <div className="w-7 h-7 rounded-full bg-[#F79E1B] -ml-3.5" style={{opacity:0.95}} />
+              </div>
+            </div>
+            {/* Amex */}
+            <div className="h-12 w-[72px] bg-[#2E77BC] rounded-2xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-black text-sm tracking-widest">AMEX</span>
+            </div>
+            {/* Discover */}
+            <div className="h-12 w-[72px] bg-[#231F20] rounded-2xl flex items-center justify-center overflow-hidden shadow-lg">
+              <div className="flex flex-col items-center">
+                <span className="text-white font-black text-[9px] tracking-widest leading-none">DISCOVER</span>
+                <div className="w-8 h-1.5 rounded-full mt-0.5" style={{background:'linear-gradient(90deg,#F76F20,#FFB347)'}} />
+              </div>
+            </div>
+            {/* Apple Pay */}
+            <div className="h-12 w-[72px] bg-[#1a1a1a] rounded-2xl flex items-center justify-center gap-1 shadow-lg">
+              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white flex-shrink-0"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              <span className="text-white text-xs font-semibold">Pay</span>
+            </div>
+            {/* Google Pay */}
+            <div className="h-12 w-[72px] bg-white rounded-2xl flex items-center justify-center shadow-lg px-2">
+              <span className="font-bold text-lg leading-none"><span className="text-[#4285F4]">G</span></span>
+              <span className="text-[#5F6368] font-semibold text-xs ml-0.5">Pay</span>
+            </div>
           </div>
 
           {/* App store badges */}
