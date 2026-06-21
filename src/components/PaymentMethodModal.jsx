@@ -3,7 +3,7 @@ import { CreditCard, X, Smartphone } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 // v2
 
-export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, isAdmin, isBilledYearly, currency, countryCode }) {
+export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, isAdmin, isBilledYearly, isSixMonths, currency, countryCode }) {
   const [selectedMethod, setSelectedMethod] = useState('stripe');
   const [loading, setLoading] = useState(false);
 
@@ -19,6 +19,7 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
         const res = await base44.functions.invoke('createHubtelCheckout', {
           plan: plan?.name,
           isBilledYearly: !!isBilledYearly,
+          isSixMonths: !!isSixMonths,
         });
         if (res.data?.url) {
           window.location.href = res.data.url;
@@ -31,6 +32,7 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: plan?.name,
         isBilledYearly: !!isBilledYearly,
+        isSixMonths: !!isSixMonths,
         paymentMethod: selectedMethod,
         currencyCode: currency?.code || 'USD',
         countryCode: countryCode || 'US',

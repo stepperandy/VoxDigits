@@ -269,7 +269,8 @@ export default function Pricing() {
             isOpen={modalOpen}
             onClose={() => setModalOpen(false)}
             plan={selectedPlan}
-            isBilledYearly={false}
+            isBilledYearly={selectedPlan?.stripePlanName === 'Advanced' || selectedPlan?.stripePlanName === 'Enterprise'}
+            isSixMonths={selectedPlan?.stripePlanName === 'Premium'}
             isAdmin={user?.role === 'admin'}
             onProceed={async (method) => {
               if (method === 'admin-bypass') {
