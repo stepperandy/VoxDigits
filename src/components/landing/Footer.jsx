@@ -1,4 +1,5 @@
 import { Mail, Phone } from 'lucide-react';
+import SocialIcons from '@/components/landing/SocialIcons';
 import { Link, useNavigate } from 'react-router-dom';
 
 const footerSections = [
@@ -211,11 +212,7 @@ export default function Footer() {
             {/* Social media */}
             <div className="flex flex-col items-center lg:items-end gap-2">
               <span className="text-slate-600 text-[10px] font-bold uppercase tracking-widest">Follow Us</span>
-              <img
-                src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/7358382f8_image.png"
-                alt="Follow us on Facebook, X, Pinterest, Instagram, and YouTube"
-                className="h-20 w-auto object-contain"
-              />
+              <SocialIcons />
             </div>
           </div>
         </div>
