@@ -1,11 +1,11 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const PLAN_PRICES = {
-  'Basic': { monthly: 2.59, yearly: 29.88 },
-  'Standard': { monthly: 6.99, yearly: 53.88 },
-  'Premium': { monthly: 9.99, yearly: 77.88 },
-  'Advanced': { monthly: 14.99, yearly: 119.88 },
-  'Enterprise': { monthly: 29.99, yearly: 239.88 },
+  'Basic': { monthly: 2.59, sixmonths: 13.99, yearly: 29.88 },
+  'Standard': { monthly: 6.99, sixmonths: 13.99, yearly: 53.88 },
+  'Premium': { monthly: 9.99, sixmonths: 13.99, yearly: 77.88 },
+  'Advanced': { monthly: 14.99, sixmonths: 13.99, yearly: 119.88 },
+  'Enterprise': { monthly: 29.99, sixmonths: 13.99, yearly: 239.88 },
 };
 
 const CURRENCY_RATES = {
@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
-    const { plan, isBilledYearly, paymentMethod, currencyCode, countryCode } = body;
+    const { plan, isBilledYearly, isSixMonths, paymentMethod, currencyCode, countryCode } = body;
 
     if (!plan || !PLAN_PRICES[plan]) {
       return Response.json({ error: 'Invalid plan' }, { status: 400 });
@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
     const client = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY'));
 
     const planPrice = PLAN_PRICES[plan];
-    let usdAmount = isBilledYearly ? planPrice.yearly : planPrice.monthly;
+    let usdAmount = isBilledYearly ? planPrice.yearly : isSixMonths ? planPrice.sixmonths : planPrice.monthly;
     
     // Use provided currency or default to USD
     let currency = (currencyCode || 'USD').toLowerCase();
@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
             currency: currency,
             product_data: {
               name: `VoxVPN ${plan} Plan`,
-              description: isBilledYearly ? 'Yearly' : 'Monthly',
+              description: isBilledYearly ? 'Yearly' : isSixMonths ? '6 Months' : 'Monthly',
             },
             unit_amount: amount,
           },
@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
       },
       metadata: {
         plan: plan,
-        billing: isBilledYearly ? 'yearly' : 'monthly',
+        billing: isBilledYearly ? 'yearly' : isSixMonths ? 'sixmonths' : 'monthly',
         email: userEmail || '',
       },
       success_url: `${origin}/dashboard?payment=success&plan=${encodeURIComponent(plan)}`,

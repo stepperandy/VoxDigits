@@ -1,11 +1,11 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const PLAN_PRICES = {
-  'Basic':      { monthly: 3.99,  yearly: 29.88 },
-  'Standard':   { monthly: 6.99,  yearly: 53.88 },
-  'Premium':    { monthly: 9.99,  yearly: 77.88 },
-  'Advanced':   { monthly: 14.99, yearly: 119.88 },
-  'Enterprise': { monthly: 29.99, yearly: 239.88 },
+  'Basic':      { monthly: 3.99,  sixmonths: 13.99, yearly: 29.88 },
+  'Standard':   { monthly: 6.99,  sixmonths: 13.99, yearly: 53.88 },
+  'Premium':    { monthly: 9.99,  sixmonths: 13.99, yearly: 77.88 },
+  'Advanced':   { monthly: 14.99, sixmonths: 13.99, yearly: 119.88 },
+  'Enterprise': { monthly: 29.99, sixmonths: 13.99, yearly: 239.88 },
 };
 
 // GHS conversion rate (approximate)
@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
-    const { plan, isBilledYearly } = body;
+    const { plan, isBilledYearly, isSixMonths } = body;
 
     if (!plan || !PLAN_PRICES[plan]) {
       return Response.json({ error: 'Invalid plan name' }, { status: 400 });
@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
     }
 
     const planPrice = PLAN_PRICES[plan];
-    const amountUSD = isBilledYearly ? planPrice.yearly : planPrice.monthly;
+    const amountUSD = isBilledYearly ? planPrice.yearly : isSixMonths ? planPrice.sixmonths : planPrice.monthly;
     const amountGHS = parseFloat((amountUSD * USD_TO_GHS).toFixed(2));
 
     const clientId = Deno.env.get('HUBTEL_CLIENT_ID');
@@ -38,12 +38,12 @@ Deno.serve(async (req) => {
 
     const credentials = btoa(`${clientId}:${clientSecret}`);
 
-    const billingCycle = isBilledYearly ? 'yearly' : 'monthly';
+    const billingCycle = isBilledYearly ? 'yearly' : isSixMonths ? 'sixmonths' : 'monthly';
     const clientRef = `voxvpn-${plan.toLowerCase()}-${billingCycle}-${Date.now()}`;
 
     const payload = {
       totalAmount: amountGHS,
-      description: `VoxVPN ${plan} Plan — ${isBilledYearly ? 'Yearly' : 'Monthly'}`,
+      description: `VoxVPN ${plan} Plan — ${isBilledYearly ? 'Yearly' : isSixMonths ? '6 Months' : 'Monthly'}`,
       callbackUrl: `${origin}/dashboard?payment=success&plan=${encodeURIComponent(plan)}`,
       returnUrl: `${origin}/dashboard?payment=success&plan=${encodeURIComponent(plan)}`,
       cancellationUrl: `${origin}/payment-failed`,
