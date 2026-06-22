@@ -42,6 +42,19 @@ export default function AuthLogin() {
     setLoading(true);
     setError('');
     try {
+      // Step 1: Verify credentials and registration via backend function
+      // This enforces the database pre-check — only registered users get through
+      const res = await fetch('/functions/authLogin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!data?.success) {
+        setError(data?.message || 'Invalid email or password.');
+        return;
+      }
+      // Step 2: SDK login to establish the web session token
       await base44.auth.loginViaEmailPassword(email, password);
       const params = new URLSearchParams(window.location.search);
       window.location.href = params.get('next') || '/dashboard';
