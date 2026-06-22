@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { base44 } from '@/api/base44Client';
 
 export default function Splash() {
   const navigate = useNavigate();
@@ -16,9 +17,29 @@ export default function Splash() {
       setProgress(p => Math.min(p + 2.2, 100));
     }, 40);
 
-    timerRef.current = setTimeout(() => {
+    timerRef.current = setTimeout(async () => {
       const token = localStorage.getItem('vpn_token');
-      navigate(token ? '/app/servers' : '/app/login');
+      const email = localStorage.getItem('vpn_email');
+      if (!token || !email) {
+        navigate('/app/login');
+        return;
+      }
+      // Validate the cached token against the backend — never trust localStorage blindly
+      try {
+        const response = await base44.functions.invoke('verifySession', { token, email });
+        const data = response?.data || response;
+        if (data?.valid && data?.subscriptionActive) {
+          navigate('/app/servers');
+        } else {
+          localStorage.removeItem('vpn_token');
+          localStorage.removeItem('vpn_email');
+          navigate('/app/login');
+        }
+      } catch {
+        localStorage.removeItem('vpn_token');
+        localStorage.removeItem('vpn_email');
+        navigate('/app/login');
+      }
     }, 2600);
 
     return () => {

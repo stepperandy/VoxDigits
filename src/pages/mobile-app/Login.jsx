@@ -34,6 +34,8 @@ export default function Login() {
       });
       const data = response?.data || response;
       if (data?.success === true) {
+        // Set up the SDK auth state so verifySession (base44.auth.me()) works on next launch
+        await base44.auth.loginViaEmailPassword(email, password);
         if (data.token) localStorage.setItem('vpn_token', data.token);
         if (data.subscription) localStorage.setItem('subscription', JSON.stringify(data.subscription));
         localStorage.setItem('vpn_email', email);
