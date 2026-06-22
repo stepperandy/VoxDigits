@@ -50,7 +50,13 @@ Deno.serve(async (req) => {
     const amount = Math.round(convertedAmount * 100);
     const origin = req.headers.get('origin') || Deno.env.get('APP_URL') || 'https://voxvpn.net';
 
-    const paymentMethods = ['card', 'alipay', 'wechat_pay'];
+    // WeChat Pay ONLY supports CNY — including it with other currencies causes Stripe to
+    // reject the entire session (which also blocks Alipay and card). Only add wechat_pay
+    // when the currency is CNY.
+    const isCNY = currency === 'cny';
+    const paymentMethods = isCNY
+      ? ['card', 'alipay', 'wechat_pay']
+      : ['card', 'alipay'];
     
     const sessionParams = {
       mode: 'payment',
@@ -68,9 +74,11 @@ Deno.serve(async (req) => {
           quantity: 1,
         },
       ],
-      payment_method_options: {
-        wechat_pay: { client: 'web' },
-      },
+      ...(isCNY && {
+        payment_method_options: {
+          wechat_pay: { client: 'web' },
+        },
+      }),
       metadata: {
         plan: plan,
         billing: isBilledYearly ? 'yearly' : isSixMonths ? 'sixmonths' : 'monthly',
@@ -89,7 +97,7 @@ Deno.serve(async (req) => {
 
     return Response.json({ sessionId: session.id, url: session.url });
   } catch (error) {
-    console.error('Stripe error:', error);
-    return Response.json({ error: 'Checkout failed' }, { status: 500 });
+    console.error('Stripe error:', error.message, error.type, error.code);
+    return Response.json({ error: error.message || 'Checkout failed' }, { status: 500 });
   }
 });
