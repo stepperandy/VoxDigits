@@ -76,6 +76,7 @@ const FeaturesMobile = lazy(() => import('./pages/FeaturesMobile.jsx'));
 const PricingMobile = lazy(() => import('./pages/PricingMobile.jsx'));
 const AccountMobile = lazy(() => import('./pages/AccountMobile.jsx'));
 const DeleteAccount = lazy(() => import('./pages/DeleteAccount.jsx'));
+const DeleteAccountGooglePlay = lazy(() => import('./pages/DeleteAccountGooglePlay.jsx'));
 const PaymentSuccess = lazy(() => import('./pages/PaymentSuccess.jsx'));
 const ReviewDemo = lazy(() => import('./pages/ReviewDemo.jsx'));
 const OsSetupGuide = lazy(() => import('./pages/OsSetupGuide.jsx'));
@@ -187,6 +188,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/pricing-mobile" element={<PageTransition><PricingMobile /></PageTransition>} />
           <Route path="/account-mobile" element={<PageTransition><AccountMobile /></PageTransition>} />
           <Route path="/delete-account" element={<PageTransition><DeleteAccount /></PageTransition>} />
+          <Route path="/delete" element={<PageTransition><DeleteAccountGooglePlay /></PageTransition>} />
           <Route path="/payment-success" element={<PageTransition><PaymentSuccess /></PageTransition>} />
           <Route path="/payment-failed" element={<PageTransition><PaymentFailed /></PageTransition>} />
           <Route path="/review" element={<ReviewDemo />} />
