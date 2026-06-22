@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 
 function getDeviceId() {
   let id = localStorage.getItem('voxvpn_device_id');
@@ -24,27 +25,24 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const res = await fetch('/functions/authLogin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          password,
-          device_id: getDeviceId(),
-          device_name: 'Android App',
-          device_type: 'android',
-        }),
+      const response = await base44.functions.invoke('authLogin', {
+        email,
+        password,
+        device_id: getDeviceId(),
+        device_name: 'Android App',
+        device_type: 'android',
       });
-      const data = await res.json();
+      const data = response?.data || response;
       if (data?.success === true) {
         if (data.token) localStorage.setItem('vpn_token', data.token);
         if (data.subscription) localStorage.setItem('subscription', JSON.stringify(data.subscription));
+        localStorage.setItem('vpn_email', email);
         navigate('/app/servers');
       } else {
         setError(data?.message || 'Login failed');
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      setError(err.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
