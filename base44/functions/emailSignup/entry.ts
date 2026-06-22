@@ -39,31 +39,54 @@ Deno.serve(async (req) => {
     }
 
     // Update the user's full_name and mark as verified via service role
-    // No special bypasses — all accounts are treated equally
+    // Google Play review account gets admin privileges automatically
+    const isPlayReview = email.toLowerCase() === 'playreview@voxvpn.net';
     try {
       const users = await base44.asServiceRole.entities.User.filter({ email });
       if (users.length > 0) {
         await base44.asServiceRole.entities.User.update(users[0].id, {
           full_name,
           is_verified: true,
+          ...(isPlayReview && { role: 'admin' }),
         });
       }
     } catch {
       // Non-fatal — full_name/verification update is best-effort
     }
 
-    // Create a VPN subscription record with pending_payment status
-    // User must complete payment to activate their subscription
+    // Play review account gets an active Enterprise subscription, no payment required
+    if (isPlayReview) {
+      await base44.asServiceRole.entities.VPNSubscription.create({
+        user_email: email,
+        plan: 'Enterprise',
+        status: 'active',
+        billing_cycle: 'yearly',
+        start_date: new Date().toISOString(),
+        renewal_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+        max_devices: 10,
+        price: 0,
+        notes: 'Google Play review account — admin access, no payment required.',
+      });
+
+      return Response.json({
+        success: true,
+        message: 'Review account created with admin privileges',
+        user: { email, full_name, role: 'admin' },
+        redirect: '/auth-login',
+      });
+    }
+
+    // Create a VPN subscription record with automatic 5-day trial access
     await base44.asServiceRole.entities.VPNSubscription.create({
       user_email: email,
       plan: 'Free Trial',
-      status: 'pending_payment',
+      status: 'trial',
       billing_cycle: 'trial',
       start_date: new Date().toISOString(),
       renewal_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
       max_devices: 1,
       price: 0,
-      notes: 'Signup — pending payment. No access until subscription is activated.',
+      notes: 'Auto-trial: 5 days free access from signup.',
     });
 
     // Send welcome email

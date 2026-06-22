@@ -100,15 +100,39 @@ Deno.serve(async (req) => {
     let subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
     let activeSub = subs.find(s => ['active', 'trial'].includes(s.status)) || null;
 
-    // All users (including admins) must have an active or trial subscription
-    // No bypasses — strict database checks for every account
-    if (!subs || subs.length === 0) {
-      console.log('[authLogin] no subscription found for:', userEmail);
-      return new Response(JSON.stringify({
-        success: false,
-        message: 'No subscription found. Please sign up for a VoxVPN plan to access the dashboard.',
-        subscriptionActive: false,
-      }), { status: 403, headers: CORS });
+    // Admins bypass subscription checks entirely
+    if (!isAdmin) {
+      // Block login if no subscription exists at all
+      if (!subs || subs.length === 0) {
+        console.log('[authLogin] no subscription found for:', userEmail);
+        return new Response(JSON.stringify({
+          success: false,
+          message: 'No subscription found. Please sign up for a VoxVPN plan to access the dashboard.',
+          subscriptionActive: false,
+        }), { status: 403, headers: CORS });
+      }
+
+      // Block login if subscription is pending_payment (user registered but hasn't paid)
+      const pendingSub = subs.find(s => s.status === 'pending_payment');
+      if (pendingSub && !activeSub) {
+        console.log('[authLogin] subscription pending_payment for:', userEmail);
+        return new Response(JSON.stringify({
+          success: false,
+          message: 'Payment required. Please complete your subscription purchase to access the dashboard.',
+          subscriptionActive: false,
+          pendingPayment: true,
+        }), { status: 403, headers: CORS });
+      }
+
+      // Block login if no active/trial subscription exists — no auto-creation on login
+      if (!activeSub) {
+        console.log('[authLogin] no active subscription for:', userEmail);
+        return new Response(JSON.stringify({
+          success: false,
+          message: 'Your subscription has expired. Please renew to access the dashboard.',
+          subscriptionActive: false,
+        }), { status: 403, headers: CORS });
+      }
     }
 
     // Block login if subscription is pending_payment (user registered but hasn't paid)
