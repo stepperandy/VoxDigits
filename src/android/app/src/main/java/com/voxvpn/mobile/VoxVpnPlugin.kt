@@ -1,4 +1,4 @@
-package net.voxvpn.mobile
+package com.voxvpn.mobile
 
 import android.app.Activity
 import android.content.Intent

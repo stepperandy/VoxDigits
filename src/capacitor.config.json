@@ -1,5 +1,5 @@
 {
-  "appId": "net.voxvpn.mobile",
+  "appId": "com.voxvpn.mobile",
   "appName": "VoxVPN",
   "webDir": "dist",
   "server": {
