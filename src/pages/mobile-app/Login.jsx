@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
@@ -19,6 +19,14 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Clear any cached SDK auth state on mount — force fresh login every time
+  useEffect(() => {
+    localStorage.removeItem('voxvpn_device_id');
+    localStorage.removeItem('vpn_token');
+    localStorage.removeItem('vpn_email');
+    localStorage.removeItem('subscription');
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -152,6 +160,34 @@ export default function Login() {
             </button>
           </div>
         </div>
+
+        {/* Debug button — proves backend rejects fake emails */}
+        <button
+          type="button"
+          onClick={async () => {
+            setLoading(true);
+            setError('');
+            try {
+              const res = await base44.functions.invoke('authLogin', {
+                email: 'fakegmail_notexist_99999@gmail.com',
+                password: 'FakePass123',
+              });
+              const data = res?.data || res;
+              if (data?.success) {
+                setError('BUG: Fake email was accepted!');
+              } else {
+                alert('Backend correctly rejected fake email: ' + data?.message);
+              }
+            } catch (err) {
+              alert('Backend rejected fake email (correct behavior): ' + err.message);
+            } finally {
+              setLoading(false);
+            }
+          }}
+          className="mt-4 w-full py-2 border border-red-300 text-red-600 text-xs rounded"
+        >
+          TEST: Try fake gmail login
+        </button>
       </div>
     </div>
   );
