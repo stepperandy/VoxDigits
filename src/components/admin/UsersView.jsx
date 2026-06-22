@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Loader2, Search, Shield, UserPlus, RefreshCw, Mail, Crown, User, Gift } from 'lucide-react';
+import { Loader2, Search, Shield, UserPlus, RefreshCw, Mail, Crown, User, Gift, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { format } from 'date-fns';
@@ -71,6 +71,31 @@ export default function UsersView() {
 
   const toggleAll = () => {
     setSelected(selected.length === filtered.length ? [] : filtered.map(u => u.id));
+  };
+
+  const handleDeleteUser = async (id, email) => {
+    if (!window.confirm(`Delete user ${email}? This action cannot be undone.`)) return;
+    try {
+      await base44.entities.User.delete(id);
+      setUsers(users.filter(u => u.id !== id));
+      setSelected(s => s.filter(x => x !== id));
+    } catch (err) {
+      alert('Failed to delete user: ' + err.message);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selected.length === 0) return;
+    if (!window.confirm(`Delete ${selected.length} selected users? This action cannot be undone.`)) return;
+    const usersToDelete = users.filter(u => selected.includes(u.id));
+    try {
+      await Promise.all(usersToDelete.map(u => base44.entities.User.delete(u.id)));
+      setUsers(users.filter(u => !selected.includes(u.id)));
+      setSelected([]);
+      alert(`Successfully deleted ${selected.length} user(s)`);
+    } catch (err) {
+      alert('Failed to delete some users: ' + err.message);
+    }
   };
 
   const [grantModal, setGrantModal] = useState(null); // { email, name }
@@ -195,7 +220,13 @@ export default function UsersView() {
       {selected.length > 0 && (
         <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-cyan-500/5 border border-cyan-500/20">
           <span className="text-cyan-400 text-sm font-medium">{selected.length} selected</span>
-          <button onClick={() => setSelected([])} className="text-slate-500 hover:text-white text-xs ml-auto">Clear</button>
+          <button
+            onClick={handleBulkDelete}
+            className="ml-auto px-3 py-1.5 rounded-lg bg-rose-500/20 border border-rose-500/30 text-rose-400 hover:bg-rose-500/30 text-xs font-semibold transition-all flex items-center gap-1.5"
+          >
+            <Trash2 size={12} /> Delete Selected
+          </button>
+          <button onClick={() => setSelected([])} className="text-slate-500 hover:text-white text-xs">Clear</button>
         </div>
       )}
 
@@ -276,6 +307,13 @@ export default function UsersView() {
                             <Shield size={14} />
                           </button>
                         )}
+                        <button
+                          onClick={() => handleDeleteUser(u.id, u.email)}
+                          title="Delete user"
+                          className="p-1.5 rounded-lg hover:bg-white/5 text-slate-600 hover:text-rose-400 transition-colors"
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     </td>
                     <td className="px-5 py-4 text-center">
