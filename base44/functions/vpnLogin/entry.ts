@@ -24,7 +24,18 @@ Deno.serve(async (req) => {
 
     console.log(`[vpnLogin] Login attempt for: ${email}`);
 
-    // Step 1: Authenticate via Base44 SDK (uses the correct internal auth endpoint)
+    // Step 1: PRE-CHECK — verify user is registered in the database BEFORE authenticating
+    // This prevents auto-creation of users by base44.auth.loginViaEmailPassword
+    const registeredUsers = await base44.asServiceRole.entities.User.filter({ email });
+    if (!registeredUsers || registeredUsers.length === 0) {
+      console.log(`[vpnLogin] REJECTED — user not registered: ${email}`);
+      return new Response(JSON.stringify({
+        success: false,
+        message: 'No account found with this email. Please sign up first.',
+      }), { status: 401, headers: CORS });
+    }
+
+    // Step 2: Authenticate via Base44 SDK (user is confirmed to exist)
     let token = null;
     let authUser = null;
     try {
@@ -49,16 +60,6 @@ Deno.serve(async (req) => {
 
     const userEmail = authUser?.email || email;
     console.log(`[vpnLogin] Auth success for ${userEmail}, token obtained`);
-
-    // Step 2: PRE-CHECK — verify user is registered in the database
-    const registeredUsers = await base44.asServiceRole.entities.User.filter({ email: userEmail });
-    if (!registeredUsers || registeredUsers.length === 0) {
-      console.log(`[vpnLogin] REJECTED — user not registered: ${userEmail}`);
-      return new Response(JSON.stringify({
-        success: false,
-        message: 'No account found with this email. Please sign up first.',
-      }), { status: 401, headers: CORS });
-    }
 
     // Step 3: Check subscription — only registered users with an existing
     // active/trial subscription may log in. No auto-creation on login.
