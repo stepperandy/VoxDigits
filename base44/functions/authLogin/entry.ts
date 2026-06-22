@@ -23,8 +23,6 @@ const CORS = {
   'Content-Type': 'application/json',
 };
 
-// No raw fetch needed — SDK handles auth internally
-
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: CORS });
@@ -34,35 +32,27 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const { email, password, device_id, device_name, device_type } = body;
 
-    // Log the raw received data for debugging
-    console.log('[authLogin] RAW REQUEST:', JSON.stringify({ email, password_length: password?.length, device_id, device_type }));
-
     if (!email || !password) {
-      console.log('[authLogin] MISSING CREDENTIALS:', { has_email: !!email, has_password: !!password });
       return new Response(JSON.stringify({
         success: false,
         message: 'Email and password are required.',
-        subscriptionActive: false,
       }), { status: 400, headers: CORS });
     }
 
     const base44 = createClientFromRequest(req);
 
-    // ── Step 0: PRE-CHECK — verify user is registered before attempting login ─
-    // This is a security gate: only users who exist in the User database may log in.
+    // ── Step 1: Verify the user exists in the registered User database ──
+    // No auto-creation — if the email isn't in the User table, reject immediately.
     const registeredUsers = await base44.asServiceRole.entities.User.filter({ email });
     if (!registeredUsers || registeredUsers.length === 0) {
-      console.log('[authLogin] REJECTED — user not registered:', email);
       return new Response(JSON.stringify({
         success: false,
-        message: 'No account found with this email. Please sign up first.',
-        subscriptionActive: false,
+        message: 'Invalid email or password',
       }), { status: 401, headers: CORS });
     }
 
-    // ── Step 1: Authenticate via Base44 SDK ──────────────────────────────
-    console.log('[authLogin] authenticating:', email);
-
+    // ── Step 2: Verify password via Base44 SDK ──
+    // loginViaEmailPassword throws on wrong credentials — no auto-creation.
     let token = null;
     let authUser = null;
 
@@ -70,115 +60,52 @@ Deno.serve(async (req) => {
       const authResult = await base44.auth.loginViaEmailPassword(email, password);
       token = authResult.access_token || null;
       authUser = authResult.user || null;
-      console.log('[authLogin] SDK login OK, token:', !!token);
-    } catch (authErr) {
-      console.log('[authLogin] SDK login failed:', authErr.message || '');
+    } catch (_) {
       return new Response(JSON.stringify({
         success: false,
-        message: 'Invalid password. If you forgot your password, tap "Forgot password" to reset it.',
-        subscriptionActive: false,
-        userExists: true,
+        message: 'Invalid email or password',
       }), { status: 401, headers: CORS });
     }
 
     if (!token) {
       return new Response(JSON.stringify({
-        success: false, message: 'Could not obtain session token. Please try again.', subscriptionActive: false,
-      }), { status: 500, headers: CORS });
+        success: false,
+        message: 'Invalid email or password',
+      }), { status: 401, headers: CORS });
     }
 
-    // ── Step 2: Load or auto-create subscription ──────────────────────────
-    // Use the exact email returned by the auth response (canonical case)
     const userEmail = authUser?.email || email;
-    console.log('[authLogin] looking up subscription for:', userEmail);
 
-    // Look up the platform user to check role
-    const platformUsers = await base44.asServiceRole.entities.User.filter({ email: userEmail });
-    const isAdmin = platformUsers?.[0]?.role === 'admin';
-    console.log('[authLogin] isAdmin:', isAdmin);
+    // ── Step 3: Verify the user has an ACTIVE VoxVPN subscription ──
+    // Applies to ALL users — no admin bypass, no exceptions.
+    const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
+    const activeSub = subs && subs.length > 0
+      ? subs.find(s => s.status === 'active' || s.status === 'trial')
+      : null;
 
-    let subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
-    let activeSub = subs.find(s => ['active', 'trial'].includes(s.status)) || null;
-
-    // Admins bypass subscription checks entirely
-    if (!isAdmin) {
-      // Block login if no subscription exists at all
-      if (!subs || subs.length === 0) {
-        console.log('[authLogin] no subscription found for:', userEmail);
-        return new Response(JSON.stringify({
-          success: false,
-          message: 'No subscription found. Please sign up for a VoxVPN plan to access the dashboard.',
-          subscriptionActive: false,
-        }), { status: 403, headers: CORS });
-      }
-
-      // Block login if subscription is pending_payment (user registered but hasn't paid)
-      const pendingSub = subs.find(s => s.status === 'pending_payment');
-      if (pendingSub && !activeSub) {
-        console.log('[authLogin] subscription pending_payment for:', userEmail);
-        return new Response(JSON.stringify({
-          success: false,
-          message: 'Payment required. Please complete your subscription purchase to access the dashboard.',
-          subscriptionActive: false,
-          pendingPayment: true,
-        }), { status: 403, headers: CORS });
-      }
-
-      // Block login if no active/trial subscription exists — no auto-creation on login
-      if (!activeSub) {
-        console.log('[authLogin] no active subscription for:', userEmail);
-        return new Response(JSON.stringify({
-          success: false,
-          message: 'Your subscription has expired. Please renew to access the dashboard.',
-          subscriptionActive: false,
-        }), { status: 403, headers: CORS });
-      }
-    }
-
-    // Block login if subscription is pending_payment (user registered but hasn't paid)
-    const pendingSub = subs.find(s => s.status === 'pending_payment');
-    if (pendingSub && !activeSub) {
-      console.log('[authLogin] subscription pending_payment for:', userEmail);
-      return new Response(JSON.stringify({
-        success: false,
-        message: 'Payment required. Please complete your subscription purchase to access the dashboard.',
-        subscriptionActive: false,
-        pendingPayment: true,
-      }), { status: 403, headers: CORS });
-    }
-
-    // Block login if no active/trial subscription exists — no auto-creation on login
     if (!activeSub) {
-      console.log('[authLogin] no active subscription for:', userEmail);
       return new Response(JSON.stringify({
         success: false,
-        message: 'Your subscription has expired. Please renew to access the dashboard.',
-        subscriptionActive: false,
+        message: 'No active subscription found',
       }), { status: 403, headers: CORS });
     }
 
-    // Ensure max_devices is always a positive integer (guard against null/0)
-    if (activeSub && (!activeSub.max_devices || activeSub.max_devices < 1)) {
-      await base44.asServiceRole.entities.VPNSubscription.update(activeSub.id, { max_devices: 3 });
-      activeSub = { ...activeSub, max_devices: 3 };
-    }
-
-    const subscriptionActive = true;
-
-    // ── Step 3: Device fingerprint enforcement ─────────────────────────────
+    // ── Step 4: Device fingerprint enforcement ──
     let deviceRecord = null;
     let deviceLimitExceeded = false;
 
-    if (device_id && !isAdmin) {
-      const maxDevices = activeSub?.max_devices || 3;
-      const allDevices = await base44.asServiceRole.entities.LinkedDevice.filter({ subscription_id: activeSub.id });
+    if (device_id) {
+      const maxDevices = activeSub.max_devices && activeSub.max_devices >= 1
+        ? activeSub.max_devices
+        : 3;
+      const allDevices = await base44.asServiceRole.entities.LinkedDevice.filter({
+        subscription_id: activeSub.id,
+      });
 
       const knownDevice = allDevices.find(d => d.device_id === device_id);
-      // Only count devices with a device_id set (registered via app) as "active"
       const registeredDevices = allDevices.filter(d => d.device_id && d.device_id.trim() !== '');
 
       if (knownDevice) {
-        // Always allow known devices — just refresh last_connected
         await base44.asServiceRole.entities.LinkedDevice.update(knownDevice.id, {
           status: 'active',
           last_connected: new Date().toISOString(),
@@ -189,8 +116,8 @@ Deno.serve(async (req) => {
       } else {
         deviceRecord = await base44.asServiceRole.entities.LinkedDevice.create({
           subscription_id: activeSub.id,
-          device_name: device_name || 'Desktop App',
-          device_type: device_type || 'windows',
+          device_name: device_name || 'Mobile App',
+          device_type: device_type || 'android',
           device_id,
           status: 'active',
           last_connected: new Date().toISOString(),
@@ -201,44 +128,36 @@ Deno.serve(async (req) => {
     if (deviceLimitExceeded) {
       return new Response(JSON.stringify({
         success: false,
-        message: `Device limit reached. Your plan allows ${activeSub.max_devices} device(s). Please revoke another device from the dashboard.`,
-        subscriptionActive: true,
-        deviceLimitExceeded: true,
+        message: `Device limit reached. Your plan allows ${activeSub.max_devices || 3} device(s). Please revoke another device from the dashboard.`,
       }), { status: 403, headers: CORS });
     }
 
-    console.log(`[authLogin] SUCCESS user=${userEmail} sub=${subscriptionActive}`);
-
+    // ── Success: registered user, verified password, active subscription ──
     return new Response(JSON.stringify({
       success: true,
-      message: subscriptionActive ? 'Login successful.' : 'Login successful, but no active subscription.',
-      user: { email: userEmail, name: authUser?.full_name || null },
-      subscriptionActive,
       token,
-      ...(activeSub && {
-        subscription: {
-          plan: activeSub.plan,
-          status: activeSub.status,
-          renewal_date: activeSub.renewal_date,
-          max_devices: activeSub.max_devices,
-          plan_tier: PLAN_TIERS[activeSub.plan] || 1,
-        }
-      }),
+      user: { email: userEmail, name: authUser?.full_name || null },
+      subscription: {
+        plan: activeSub.plan,
+        status: activeSub.status,
+        renewal_date: activeSub.renewal_date,
+        max_devices: activeSub.max_devices || 3,
+        plan_tier: PLAN_TIERS[activeSub.plan] || 1,
+      },
       ...(deviceRecord && {
         device: {
           id: deviceRecord.id,
           device_name: deviceRecord.device_name,
           device_type: deviceRecord.device_type,
-        }
+        },
       }),
     }), { status: 200, headers: CORS });
 
   } catch (error) {
-    console.error('[authLogin] error:', error.message, error.stack?.slice(0, 300));
+    console.error('[authLogin] error:', error.message);
     return new Response(JSON.stringify({
       success: false,
       message: 'Server error: ' + error.message,
-      subscriptionActive: false,
     }), { status: 500, headers: CORS });
   }
 });
