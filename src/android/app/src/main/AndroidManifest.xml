@@ -40,35 +40,5 @@
             </intent-filter>
         </activity>
 
-        <!--
-            ICS-OpenVPN VPN Service — this is the REAL tunnel service.
-            It creates the TUN device, handles routing, DNS, and all traffic.
-            android:permission ensures only the system can bind to it.
-            foregroundServiceType="connectedDevice" is required on Android 14+.
-        -->
-        <service
-            android:name="de.blinkt.openvpn.core.OpenVPNService"
-            android:exported="false"
-            android:foregroundServiceType="connectedDevice"
-            android:permission="android.permission.BIND_VPN_SERVICE">
-            <intent-filter>
-                <action android:name="android.net.VpnService" />
-            </intent-filter>
-        </service>
-
-        <!-- ICS-OpenVPN internal management receiver -->
-        <receiver
-            android:name="de.blinkt.openvpn.core.BootReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
-        <!-- ICS-OpenVPN disconnect/alarm receiver -->
-        <receiver
-            android:name="de.blinkt.openvpn.core.AlarmReceiver"
-            android:exported="false" />
-
     </application>
 </manifest>

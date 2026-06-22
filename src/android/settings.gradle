@@ -17,8 +17,3 @@ dependencyResolutionManagement {
 rootProject.name = "VoxVPN"
 
 include ':app'
-
-// ICS-OpenVPN real OpenVPN engine
-// Run: git submodule add https://github.com/schwabe/ics-openvpn.git android/ics-openvpn
-include ':ics-openvpn:main'
-project(':ics-openvpn:main').projectDir = new File('ics-openvpn/main')

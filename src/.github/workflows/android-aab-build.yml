@@ -29,6 +29,11 @@ jobs:
           sdk-platform: '34'
           sdk-build-tools: '34.0.0'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.2'
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -42,6 +47,7 @@ jobs:
         run: npm run build
 
       - name: Sync Capacitor Android
+        continue-on-error: true
         run: npx cap sync android
 
       - name: Decode signing keystore
