@@ -76,18 +76,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create a VPN subscription record with automatic 5-day trial access
-    await base44.asServiceRole.entities.VPNSubscription.create({
-      user_email: email,
-      plan: 'Free Trial',
-      status: 'trial',
-      billing_cycle: 'trial',
-      start_date: new Date().toISOString(),
-      renewal_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-      max_devices: 1,
-      price: 0,
-      notes: 'Auto-trial: 5 days free access from signup.',
-    });
+    // No auto-trial subscription — users must purchase a plan before they can log in.
+    // authLogin enforces an active/trial subscription check, so without a subscription
+    // record, new signups are blocked from accessing the app until they pay.
 
     // Send welcome email
     await base44.asServiceRole.integrations.Core.SendEmail({
