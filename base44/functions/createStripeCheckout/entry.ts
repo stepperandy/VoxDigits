@@ -50,17 +50,13 @@ Deno.serve(async (req) => {
     const amount = Math.round(convertedAmount * 100);
     const origin = req.headers.get('origin') || Deno.env.get('APP_URL') || 'https://voxvpn.net';
 
-    // WeChat Pay ONLY supports CNY — including it with other currencies causes Stripe to
-    // reject the entire session (which also blocks Alipay and card). Only add wechat_pay
-    // when the currency is CNY.
-    const isCNY = currency === 'cny';
-    const paymentMethods = isCNY
-      ? ['card', 'alipay', 'wechat_pay']
-      : ['card', 'alipay'];
-    
+    // Do NOT force payment_method_types — if any listed method isn't enabled in the
+    // Stripe Dashboard, Stripe rejects the ENTIRE session (breaking card, Alipay, and
+    // WeChat Pay all at once). Instead, let Stripe show whatever is enabled in the
+    // Dashboard for the given currency. Enable Alipay + WeChat Pay in:
+    // Stripe Dashboard → Settings → Payment methods
     const sessionParams = {
       mode: 'payment',
-      payment_method_types: paymentMethods,
       line_items: [
         {
           price_data: {
@@ -74,11 +70,6 @@ Deno.serve(async (req) => {
           quantity: 1,
         },
       ],
-      ...(isCNY && {
-        payment_method_options: {
-          wechat_pay: { client: 'web' },
-        },
-      }),
       metadata: {
         plan: plan,
         billing: isBilledYearly ? 'yearly' : isSixMonths ? 'sixmonths' : 'monthly',

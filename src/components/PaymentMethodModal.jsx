@@ -59,7 +59,9 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
         setLoading(false);
       }
     } catch (error) {
-      window.location.href = '/payment-failed';
+      const errMsg = error?.response?.data?.error || error?.message || 'Unable to start checkout. Please try again.';
+      alert('Payment error: ' + errMsg);
+      setLoading(false);
     }
   };
 
