@@ -5,6 +5,7 @@ import MobileSelectSheet from '@/mobile/MobileSelectSheet';
 import { Check } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PaymentMethodModal from '@/components/PaymentMethodModal';
+import { useCurrencyDetection } from '@/hooks/useCurrencyDetection';
 
 const MONTHLY_PLANS = [
   {
@@ -56,8 +57,10 @@ const YEARLY_PLANS = [
 
 const HUBTEL_BASE_LINK = 'https://paylink.hubtel.com/voxvpn';
 
-function PlanCard({ plan, onCheckout, isLoading, yearly }) {
+function PlanCard({ plan, onCheckout, isLoading, yearly, currency }) {
   const cedisPrice = (plan.price * 12.5).toFixed(2);
+  const convertedPrice = (plan.price * currency.rate).toFixed(currency.rate >= 100 ? 0 : 2);
+  const convertedYearly = plan.yearlyTotal ? (plan.yearlyTotal * currency.rate).toFixed(currency.rate >= 100 ? 0 : 2) : null;
   return (
     <div
       className={`relative p-4 rounded-xl border transition-all ${
@@ -74,9 +77,9 @@ function PlanCard({ plan, onCheckout, isLoading, yearly }) {
       )}
       <h3 className="text-white font-bold text-lg">{plan.name}</h3>
       <div className="text-2xl font-black text-white mt-1">
-        ${plan.price}<span className="text-xs text-slate-400">/mo</span>
+        {currency.symbol}{convertedPrice}<span className="text-xs text-slate-400">/mo</span>
       </div>
-      <p className="text-slate-500 text-xs mb-1">{yearly ? `Billed $${plan.yearlyTotal}/year` : plan.billingLabel}</p>
+      <p className="text-slate-500 text-xs mb-1">{yearly ? `Billed ${currency.symbol}${convertedYearly}/year` : plan.billingLabel}</p>
 
       {/* Stripe button */}
       <button
@@ -123,6 +126,7 @@ export default function PricingMobile() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [selectedPriceId, setSelectedPriceId] = useState(null);
+  const { currency, countryCode } = useCurrencyDetection();
 
   useEffect(() => {
     // Capture referral code
@@ -177,6 +181,8 @@ export default function PricingMobile() {
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: selectedPlan.name,
         isBilledYearly: yearly,
+        currencyCode: currency.code,
+        countryCode,
       });
       setModalOpen(false);
       setLoadingPlan(null);
@@ -229,6 +235,7 @@ export default function PricingMobile() {
                 onCheckout={handleCheckout}
                 isLoading={loadingPlan === plan.name}
                 yearly={yearly}
+                currency={currency}
               />
             ))}
           </div>
@@ -241,6 +248,8 @@ export default function PricingMobile() {
             isAdmin={isAdmin}
             isBilledYearly={yearly}
             onProceed={handlePaymentProceed}
+            currency={currency}
+            countryCode={countryCode}
           />
         </div>
       </PullToRefresh>

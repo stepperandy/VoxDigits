@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
+import { useCurrencyDetection } from '@/hooks/useCurrencyDetection';
 import {
   RefreshCw, Shield, Check, Loader2, CreditCard, Zap, AlertCircle, CheckCircle2
 } from 'lucide-react';
@@ -21,6 +22,7 @@ const PLANS = [
   },
   {
     name: 'Pro Monthly',
+    price: 9.99,
     priceLabel: '$9.99',
     period: '/month',
     features: ['Windows installer download', 'All 20+ server locations', 'Unlimited bandwidth', 'Kill Switch & DNS protection', 'Up to 5 devices', 'Priority support'],
@@ -32,6 +34,8 @@ const PLANS = [
   },
   {
     name: 'Pro Annual',
+    price: 6.49,
+    yearlyTotal: 77.88,
     priceLabel: '$6.49',
     period: '/month',
     subLabel: 'Billed $77.88/year',
@@ -62,6 +66,7 @@ export default function RenewSubscription() {
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(null);
   const [success, setSuccess] = useState(false);
+  const { currency, countryCode } = useCurrencyDetection();
 
   useEffect(() => {
     const init = async () => {
@@ -92,6 +97,8 @@ export default function RenewSubscription() {
       const res = await base44.functions.invoke('createStripeCheckout', {
         plan: plan.stripePlan,
         isBilledYearly: !!plan.yearly,
+        currencyCode: currency.code,
+        countryCode,
       });
       if (res.data?.url) window.location.href = res.data.url;
       else alert('Error: ' + (res.data?.error || 'Unknown error'));
@@ -168,10 +175,14 @@ export default function RenewSubscription() {
               <div className="mb-4">
                 <h3 className="text-white font-black text-base mb-3">{plan.name}</h3>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-black text-white">{plan.priceLabel}</span>
+                  <span className="text-3xl font-black text-white">
+                    {plan.isFree ? 'Free' : plan.isBusiness ? 'Custom' : `${currency.symbol}${(plan.price * currency.rate).toFixed(currency.rate >= 100 ? 0 : 2)}`}
+                  </span>
                   <span className="text-slate-500 text-xs">{plan.period}</span>
                 </div>
-                {plan.subLabel && <p className="text-slate-500 text-xs mt-0.5">{plan.subLabel}</p>}
+                {plan.subLabel && <p className="text-slate-500 text-xs mt-0.5">
+                  {plan.isFree || plan.isBusiness ? plan.subLabel : `Billed ${currency.symbol}${(plan.yearlyTotal * currency.rate).toFixed(currency.rate >= 100 ? 0 : 2)}/year`}
+                </p>}
               </div>
 
               <ul className="space-y-2 mb-6 flex-1">

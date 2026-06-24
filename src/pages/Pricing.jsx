@@ -178,6 +178,16 @@ const FALLBACK_RATES = {
   'BRL': 4.97, 'AUD': 1.50, 'EUR': 0.92,
 };
 
+// Detect China via timezone/locale — fallback when geo APIs are blocked in China
+function detectChinaFallback() {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    const locale = navigator.language || navigator.languages?.[0] || '';
+    return tz === 'Asia/Shanghai' || tz === 'Asia/Urumqi' ||
+           locale.toLowerCase().startsWith('zh') || locale.toLowerCase().includes('cn');
+  } catch { return false; }
+}
+
 function makeCurrency(currencyCode, rate) {
   return {
     code: currencyCode,
@@ -216,7 +226,7 @@ export default function Pricing() {
       fetch('https://ipapi.co/json/').then(r => r.json()).catch(() => ({})),
       fetchLiveRates(),
     ]).then(([geoData, liveRates]) => {
-      const code = geoData.country_code || 'US';
+      const code = geoData.country_code || (detectChinaFallback() ? 'CN' : 'US');
       setCountryCode(code);
       const currencyCode = COUNTRY_CURRENCY[code] || 'USD';
       const rate = liveRates
@@ -265,7 +275,7 @@ export default function Pricing() {
                     fetch('https://ipapi.co/json/').then(r => r.json()),
                     fetchLiveRates(),
                   ]);
-                  const code = geoRes.country_code || 'US';
+                  const code = geoRes.country_code || (detectChinaFallback() ? 'CN' : 'US');
                   setCountryCode(code);
                   const currencyCode = COUNTRY_CURRENCY[code] || 'USD';
                   const rate = liveRates
