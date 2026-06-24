@@ -75,6 +75,14 @@ Deno.serve(async (req) => {
         billing: isBilledYearly ? 'yearly' : isSixMonths ? 'sixmonths' : 'monthly',
         email: userEmail || '',
       },
+      // WeChat Pay requires client='web' for browser checkout. This option is only
+      // applied if WeChat Pay is enabled in the Stripe Dashboard — safe to include
+      // even if it isn't, Stripe ignores options for unavailable methods.
+      ...(currency === 'cny' && {
+        payment_method_options: {
+          wechat_pay: { client: 'web' },
+        },
+      }),
       success_url: `${origin}/dashboard?payment=success&plan=${encodeURIComponent(plan)}`,
       cancel_url: `${origin}/payment-failed`,
     };
