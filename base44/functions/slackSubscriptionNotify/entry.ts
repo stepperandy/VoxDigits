@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 Deno.serve(async (req) => {
   try {
@@ -6,29 +6,30 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
 
     const event = body.event;
-    const entityId = event?.entity_id;
     const eventType = event?.type; // 'create' or 'update'
-
-    // Fetch the subscription record
     const sub = body.data;
     const oldData = body.old_data;
 
     if (!sub) {
-      return Response.json({ ok: false, reason: 'No data' });
+      return Response.json({ ok: false, reason: 'No subscription data' });
     }
 
-    // Determine what happened
+    // ── Determine the notification message ──
     let messageText = null;
 
     if (eventType === 'create') {
-      messageText = `🎉 *New Subscription!*\n• User: ${sub.user_email}\n• Plan: ${sub.plan}\n• Billing: ${sub.billing_cycle}\n• Price: $${sub.price}`;
+      // New plan signup
+      const priceLabel = sub.price != null ? `$${sub.price}` : 'N/A';
+      messageText = `🎉 *New Subscription Signup!*\n• Email: ${sub.user_email}\n• Plan: ${sub.plan}\n• Billing: ${sub.billing_cycle || 'N/A'}\n• Price: ${priceLabel}`;
     } else if (eventType === 'update') {
-      const wasActive = oldData?.status === 'active';
-      const isCancelled = sub.status === 'cancelled' || sub.status === 'expired';
-      if (wasActive && isCancelled) {
-        messageText = `❌ *Subscription Cancelled*\n• User: ${sub.user_email}\n• Plan: ${sub.plan}\n• Status: ${sub.status}`;
-      } else if (sub.status === 'active' && oldData?.status !== 'active') {
-        messageText = `✅ *Subscription Activated*\n• User: ${sub.user_email}\n• Plan: ${sub.plan}`;
+      // Renewal: status returns to active from a non-active state, OR renewal_date is pushed forward
+      const becameActive = sub.status === 'active' && oldData?.status !== 'active';
+      const renewalExtended = sub.renewal_date && oldData?.renewal_date &&
+        new Date(sub.renewal_date) > new Date(oldData.renewal_date);
+
+      if (becameActive || renewalExtended) {
+        const priceLabel = sub.price != null ? `$${sub.price}` : 'N/A';
+        messageText = `🔄 *Subscription Renewed!*\n• Email: ${sub.user_email}\n• Plan: ${sub.plan}\n• New Renewal: ${sub.renewal_date ? new Date(sub.renewal_date).toLocaleDateString() : 'N/A'}\n• Price: ${priceLabel}`;
       }
     }
 
@@ -36,16 +37,15 @@ Deno.serve(async (req) => {
       return Response.json({ ok: true, reason: 'No relevant change' });
     }
 
-    // Get Slack access token
+    // ── Post to Slack ──
     const { accessToken } = await base44.asServiceRole.connectors.getConnection('slack');
 
-    // Post to #general (or first available channel)
-    // Find a suitable channel
-    const channelsRes = await fetch('https://slack.com/api/conversations.list?limit=20&exclude_archived=true&types=public_channel', {
+    // Find #general or the first available public channel
+    const channelsRes = await fetch('https://slack.com/api/conversations.list?limit=50&exclude_archived=true&types=public_channel', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     const channelsData = await channelsRes.json();
-    const channel = channelsData.channels?.find(c => c.name === 'general') || channelsData.channels?.[0];
+    const channel = channelsData.channels?.find((c: any) => c.name === 'general') || channelsData.channels?.[0];
 
     if (!channel) {
       return Response.json({ ok: false, reason: 'No Slack channel found' });
@@ -56,10 +56,9 @@ Deno.serve(async (req) => {
       headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ channel: channel.id, text: messageText }),
     });
-
     const postData = await postRes.json();
-    return Response.json({ ok: postData.ok, channel: channel.name });
 
+    return Response.json({ ok: postData.ok, channel: channel.name });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
