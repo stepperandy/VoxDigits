@@ -116,6 +116,7 @@ const PaymentFailed = lazy(() => import('./pages/PaymentFailed.jsx'));
 const PublicDownload = lazy(() => import('./pages/PublicDownload.jsx'));
 const PlayReview = lazy(() => import('./pages/PlayReview.jsx'));
 const AntivirusSignup = lazy(() => import('./pages/AntivirusSignup.jsx'));
+const IOSSetup = lazy(() => import('./pages/IOSSetup.jsx'));
 
 const PageTransition = ({ children }) => (
   <motion.div
@@ -232,6 +233,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/get" element={<PublicDownload />} />
           <Route path="/play-review" element={<PageTransition><PlayReview /></PageTransition>} />
           <Route path="/antivirus-signup" element={<PageTransition><AntivirusSignup /></PageTransition>} />
+          <Route path="/ios-setup" element={<PageTransition><IOSSetup /></PageTransition>} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Suspense>

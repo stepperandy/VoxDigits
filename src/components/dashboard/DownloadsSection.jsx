@@ -136,12 +136,17 @@ export default function DownloadsSection({ isAdmin = false }) {
         )}
 
         {detectedPlatform === 'iOS' && !isAdmin ? (
-          <div className="rounded-2xl border border-violet-500/20 bg-violet-500/5 py-12 text-center">
+          <div className="rounded-2xl border border-violet-500/20 bg-violet-500/5 py-10 text-center px-6">
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.25)' }}>
               <Smartphone size={28} style={{ color: '#a78bfa' }} />
             </div>
-            <p className="text-violet-300 font-black text-lg mb-1">iOS — Coming Soon</p>
-            <p className="text-slate-500 text-sm">VoxVPN for iPhone & iPad is currently in development.<br />Check back soon!</p>
+            <p className="text-violet-300 font-black text-lg mb-1">VoxVPN for iOS</p>
+            <p className="text-slate-500 text-sm mb-4">Get step-by-step instructions to install the VPN<br />profile on your iPhone or iPad.</p>
+            <Link to="/ios-setup"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02]"
+              style={{ background: 'linear-gradient(135deg, #a78bfa, #7c3aed)' }}>
+              <Smartphone size={14} /> iOS Setup Guide
+            </Link>
           </div>
         ) : loading ? (
           <div className="flex items-center justify-center py-12 gap-2 text-slate-400">
