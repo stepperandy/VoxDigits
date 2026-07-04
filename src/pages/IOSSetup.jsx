@@ -7,22 +7,30 @@ import Footer from '@/components/landing/Footer';
 import {
   ArrowLeft, Smartphone, Download, Shield, Lock, UserCheck,
   Settings, Wifi, CheckCircle2, Loader2, ExternalLink, Apple,
-  ChevronRight, KeyRound, Fingerprint, AppWindow
+  ChevronRight, KeyRound, Fingerprint, AppWindow, Bell, Clock,
+  PackageCheck, FileCheck2, Rocket
 } from 'lucide-react';
+
+const RELEASE_STAGES = [
+  { icon: PackageCheck, label: 'Development', status: 'done', date: 'Completed' },
+  { icon: FileCheck2, label: 'App Store Submission', status: 'done', date: 'Submitted' },
+  { icon: Clock, label: 'Apple Review', status: 'active', date: 'In Progress' },
+  { icon: Rocket, label: 'Public Release', status: 'pending', date: 'Coming Soon' },
+];
 
 const STEPS = [
   {
     icon: Download,
     title: 'Download VoxVPN',
     subtitle: 'From the App Store',
-    description: 'Open the App Store on your iPhone or iPad and search for "VoxVPN", or tap the button below to go straight to the listing.',
+    description: 'Once the app is approved, open the App Store on your iPhone or iPad and search for "VoxVPN", or use the download button that will appear on this page.',
     accent: '#a78bfa',
   },
   {
     icon: AppWindow,
     title: 'Install & Open',
     subtitle: 'Launch the app',
-    description: 'Tap Get to install, then open VoxVPN from your home screen. The app icon features the VoxVPN shield logo.',
+    description: 'Tap Get in the App Store to install, then open VoxVPN from your home screen. The app icon features the VoxVPN shield logo.',
     accent: '#8b5cf6',
   },
   {
@@ -86,7 +94,7 @@ export default function IOSSetup() {
         </Link>
 
         {/* Hero */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0"
               style={{ background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.3)', boxShadow: '0 0 30px rgba(167,139,250,0.15)' }}>
@@ -97,25 +105,94 @@ export default function IOSSetup() {
               <p className="text-slate-400 text-sm mt-0.5">Install & configure the VPN profile on your iPhone or iPad</p>
             </div>
           </div>
+        </motion.div>
 
-          {/* App Store button */}
-          <div className="flex flex-wrap items-center gap-3 mt-5">
-            <a
-              href="https://apps.apple.com/app/voxvpn"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl text-white font-bold text-sm transition-all hover:scale-[1.02]"
-              style={{ background: 'linear-gradient(135deg, #a78bfa, #7c3aed)', boxShadow: '0 8px 30px rgba(124,58,237,0.3)' }}
-            >
-              <Apple size={20} />
-              <div className="text-left leading-tight">
-                <div className="text-[10px] font-medium opacity-80">Download on the</div>
-                <div className="text-base font-black">App Store</div>
+        {/* Installer release status */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.03 }}
+          className="rounded-2xl border border-violet-500/25 p-6 mb-8 relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, rgba(167,139,250,0.08), rgba(124,58,237,0.04))' }}>
+          {/* Glow */}
+          <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full pointer-events-none"
+            style={{ background: 'radial-gradient(circle, rgba(167,139,250,0.15), transparent 70%)' }} />
+
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider"
+                style={{ background: 'rgba(167,139,250,0.2)', border: '1px solid rgba(167,139,250,0.35)', color: '#c4b5fd' }}>
+                <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" /> Coming Soon
+              </span>
+            </div>
+            <h2 className="text-white font-black text-xl mb-1">iOS Installer — In Apple Review</h2>
+            <p className="text-slate-400 text-xs leading-relaxed mb-5">
+              The VoxVPN iOS app has been submitted to the Apple App Store and is currently undergoing Apple's review process.
+              Once approved, you'll be able to download it directly from the App Store and follow the setup guide below.
+            </p>
+
+            {/* Release progress tracker */}
+            <div className="grid grid-cols-4 gap-2 mb-5">
+              {RELEASE_STAGES.map((stage, idx) => {
+                const StageIcon = stage.icon;
+                const statusConfig = {
+                  done: { color: '#34d399', bg: 'rgba(52,211,153,0.1)', border: 'rgba(52,211,153,0.3)', label: 'Done' },
+                  active: { color: '#a78bfa', bg: 'rgba(167,139,250,0.12)', border: 'rgba(167,139,250,0.35)', label: stage.date },
+                  pending: { color: '#64748b', bg: 'rgba(100,116,139,0.08)', border: 'rgba(100,116,139,0.2)', label: 'Pending' },
+                };
+                const cfg = statusConfig[stage.status];
+                return (
+                  <div key={idx} className="relative">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2 relative"
+                        style={{ background: cfg.bg, border: `1px solid ${cfg.border}` }}>
+                        <StageIcon size={16} style={{ color: cfg.color }} />
+                        {stage.status === 'active' && (
+                          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-violet-400 animate-pulse" style={{ boxShadow: '0 0 8px rgba(167,139,250,0.6)' }} />
+                        )}
+                        {stage.status === 'done' && (
+                          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 flex items-center justify-center">
+                            <CheckCircle2 size={8} className="text-emerald-950" />
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-white font-bold text-[11px] leading-tight">{stage.label}</p>
+                      <p className="text-[9px] mt-0.5 font-semibold uppercase tracking-wider" style={{ color: cfg.color }}>{cfg.label}</p>
+                    </div>
+                    {/* Connector line */}
+                    {idx < RELEASE_STAGES.length - 1 && (
+                      <div className="absolute top-5 left-[60%] w-[80%] h-px"
+                        style={{ background: stage.status === 'done' ? 'rgba(52,211,153,0.3)' : 'rgba(255,255,255,0.05)' }} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/5">
+              <div className="flex items-center gap-2 text-xs">
+                <Clock size={12} className="text-violet-400" />
+                <span className="text-slate-400">Estimated release:</span>
+                <span className="text-white font-semibold">Q3 2026</span>
               </div>
-              <ExternalLink size={14} className="ml-1 opacity-70" />
-            </a>
-            <span className="text-slate-500 text-xs">Requires iOS 14.0 or later · iPhone, iPad & iPod touch</span>
+              <span className="text-slate-700">·</span>
+              <div className="flex items-center gap-2 text-xs">
+                <Smartphone size={12} className="text-violet-400" />
+                <span className="text-slate-400">Requires iOS 14.0+ · iPhone, iPad & iPod touch</span>
+              </div>
+            </div>
           </div>
+        </motion.div>
+
+        {/* What to expect — setup preview */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}
+          className="rounded-2xl border border-cyan-500/15 bg-[#0d1420] p-5 mb-8">
+          <div className="flex items-center gap-2 mb-2">
+            <Bell size={14} className="text-cyan-400" />
+            <h3 className="text-white font-bold text-sm">What happens when it's released?</h3>
+          </div>
+          <p className="text-slate-400 text-xs leading-relaxed">
+            Once Apple approves the app, this page will update with a direct App Store download button. You'll install VoxVPN,
+            sign in with your existing account, and follow the 7-step guide below to configure the VPN profile on your device.
+            Your subscription already includes iOS access — no extra purchase needed.
+          </p>
         </motion.div>
 
         {/* Credentials reminder */}
