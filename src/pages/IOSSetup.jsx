@@ -12,9 +12,9 @@ import {
 } from 'lucide-react';
 
 const RELEASE_STAGES = [
-  { icon: PackageCheck, label: 'Development', status: 'done', date: 'Completed' },
-  { icon: FileCheck2, label: 'App Store Submission', status: 'done', date: 'Submitted' },
-  { icon: Clock, label: 'Apple Review', status: 'active', date: 'In Progress' },
+  { icon: PackageCheck, label: 'Development', status: 'active', date: 'In Progress' },
+  { icon: FileCheck2, label: 'App Store Submission', status: 'pending', date: 'Pending' },
+  { icon: Clock, label: 'Apple Review', status: 'pending', date: 'Pending' },
   { icon: Rocket, label: 'Public Release', status: 'pending', date: 'Coming Soon' },
 ];
 
@@ -122,10 +122,10 @@ export default function IOSSetup() {
                 <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" /> Coming Soon
               </span>
             </div>
-            <h2 className="text-white font-black text-xl mb-1">iOS Installer — In Apple Review</h2>
+            <h2 className="text-white font-black text-xl mb-1">iOS Installer — Coming Soon</h2>
             <p className="text-slate-400 text-xs leading-relaxed mb-5">
-              The VoxVPN iOS app has been submitted to the Apple App Store and is currently undergoing Apple's review process.
-              Once approved, you'll be able to download it directly from the App Store and follow the setup guide below.
+              The VoxVPN iOS app is currently in development. Once it's built, submitted, and approved by Apple,
+              you'll be able to download it directly from the App Store and follow the setup guide below to get connected.
             </p>
 
             {/* Release progress tracker */}
