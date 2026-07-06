@@ -44,8 +44,7 @@ export default function DownloadsSection({ isAdmin = false }) {
     base44.entities.Download.list()
       .then(records => {
         const active = (records || []).filter(d => d.is_active !== false);
-        const filtered = isAdmin ? active : active.filter(d => d.platform === detectedPlatform);
-        setDownloads(filtered);
+        setDownloads(active);
       })
       .catch(() => setDownloads([]))
       .finally(() => setLoading(false));
@@ -131,7 +130,7 @@ export default function DownloadsSection({ isAdmin = false }) {
 
         {!isAdmin && (
           <p className="text-slate-500 text-xs text-center">
-            Showing installer for your device: <span className="text-white font-semibold">{detectedPlatform}</span>
+            Showing all available installers · Your device: <span className="text-white font-semibold">{detectedPlatform}</span>
           </p>
         )}
 
