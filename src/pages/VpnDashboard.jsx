@@ -7,6 +7,7 @@ import { base44 } from '@/api/base44Client';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ServerSelector from '@/components/vpn/ServerSelector';
+import RegistrationConfirmation from '@/components/auth/RegistrationConfirmation';
 
 // Fallback static servers if backend is unreachable (matches lib/vpnServers.js)
 const FALLBACK_SERVERS = [
@@ -37,6 +38,9 @@ function normalizeServers(raw) {
 }
 
 export default function VpnDashboard() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const isNewUser = urlParams.get('is_new_user') === 'true';
+
   const [user, setUser] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [servers, setServers] = useState(FALLBACK_SERVERS);
@@ -48,6 +52,10 @@ export default function VpnDashboard() {
   useEffect(() => {
     init();
   }, []);
+
+  if (isNewUser) {
+    return <RegistrationConfirmation />;
+  }
 
   const init = async () => {
     setLoadingInit(true);
