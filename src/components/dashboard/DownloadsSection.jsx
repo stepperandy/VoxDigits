@@ -147,7 +147,8 @@ export default function DownloadsSection({ isAdmin = false }) {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* iOS — Coming Soon */}
+            {/* iOS — Coming Soon (only for iOS users) */}
+            {detectedPlatform === 'iOS' && (
             <Link to="/ios-setup"
               className="flex items-center gap-4 p-4 rounded-2xl text-left transition-all group"
               style={{ border: '1px solid rgba(167,139,250,0.25)', background: 'rgba(167,139,250,0.06)' }}>
@@ -170,6 +171,7 @@ export default function DownloadsSection({ isAdmin = false }) {
                 </div>
               </div>
             </Link>
+            )}
             {downloads.map((d) => {
               const Icon = platformIcons[d.platform] || Download;
               const colors = platformColors[d.platform] || platformColors.Windows;
