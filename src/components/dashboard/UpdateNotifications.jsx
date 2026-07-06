@@ -3,7 +3,18 @@ import { base44 } from '@/api/base44Client';
 import { Bell, X, Download, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+function detectPlatform() {
+  const ua = navigator.userAgent.toLowerCase();
+  if (/android/.test(ua)) return 'Android';
+  if (/iphone|ipad|ipod/.test(ua)) return 'iOS';
+  if (/macintosh|mac os x/.test(ua) && !/iphone|ipad|mobile/.test(ua)) return 'macOS';
+  if (/windows/.test(ua) && !/iemobile|windows phone/.test(ua)) return 'Windows';
+  if (/linux/.test(ua)) return 'Linux';
+  return 'Windows';
+}
+
 export default function UpdateNotifications() {
+  const detectedPlatform = detectPlatform();
   const [notifications, setNotifications] = useState([]);
   const [dismissed, setDismissed] = useState(() => {
     try { return JSON.parse(localStorage.getItem('vox_dismissed_notifs') || '[]'); }
@@ -12,13 +23,15 @@ export default function UpdateNotifications() {
   const [expanded, setExpanded] = useState(true);
 
   useEffect(() => {
-    base44.entities.AppNotification.list('-created_date', 10)
+    base44.entities.AppNotification.list('-created_date', 20)
       .then(records => {
-        const active = (records || []).filter(r => r.is_active !== false);
+        const active = (records || [])
+          .filter(r => r.is_active !== false)
+          .filter(r => !r.platform || r.platform === detectedPlatform);
         setNotifications(active);
       })
       .catch(() => {});
-  }, []);
+  }, [detectedPlatform]);
 
   const dismiss = (id) => {
     const next = [...dismissed, id];
