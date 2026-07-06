@@ -135,20 +135,7 @@ export default function DownloadsSection({ isAdmin = false }) {
           </p>
         )}
 
-        {detectedPlatform === 'iOS' && !isAdmin ? (
-          <div className="rounded-2xl border border-violet-500/20 bg-violet-500/5 py-10 text-center px-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.25)' }}>
-              <Smartphone size={28} style={{ color: '#a78bfa' }} />
-            </div>
-            <p className="text-violet-300 font-black text-lg mb-1">VoxVPN for iOS</p>
-            <p className="text-slate-500 text-sm mb-4">Get step-by-step instructions to install the VPN<br />profile on your iPhone or iPad.</p>
-            <Link to="/ios-setup"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-white text-sm transition-all hover:scale-[1.02]"
-              style={{ background: 'linear-gradient(135deg, #a78bfa, #7c3aed)' }}>
-              <Smartphone size={14} /> iOS Setup Guide
-            </Link>
-          </div>
-        ) : loading ? (
+        {loading ? (
           <div className="flex items-center justify-center py-12 gap-2 text-slate-400">
             <Loader2 size={18} className="animate-spin text-cyan-400" />
             <span className="text-sm">Loading downloads...</span>
@@ -160,6 +147,29 @@ export default function DownloadsSection({ isAdmin = false }) {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* iOS — Coming Soon */}
+            <Link to="/ios-setup"
+              className="flex items-center gap-4 p-4 rounded-2xl text-left transition-all group"
+              style={{ border: '1px solid rgba(167,139,250,0.25)', background: 'rgba(167,139,250,0.06)' }}>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.3)' }}>
+                <Smartphone size={22} style={{ color: '#a78bfa' }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-white font-black text-sm">VoxVPN for iOS</p>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider" style={{ background: 'rgba(167,139,250,0.2)', color: '#c4b5fd', border: '1px solid rgba(167,139,250,0.3)' }}>
+                    Coming Soon
+                  </span>
+                </div>
+                <p className="text-slate-500 text-xs mt-1">iOS · IPA</p>
+                <p className="text-slate-600 text-[10px] mt-1 truncate">View setup guide & release status</p>
+              </div>
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all group-hover:scale-110" style={{ background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.3)' }}>
+                  <Smartphone size={14} style={{ color: '#a78bfa' }} />
+                </div>
+              </div>
+            </Link>
             {downloads.map((d) => {
               const Icon = platformIcons[d.platform] || Download;
               const colors = platformColors[d.platform] || platformColors.Windows;
