@@ -79,6 +79,77 @@ const sections = [
     title: '10. Changes to This Policy',
     text: 'We may update this Privacy Policy from time to time. Continued use of VoxVPN constitutes acceptance of updated terms.',
   },
+  {
+    title: '11. GDPR Compliance (EU/EEA/UK Users)',
+    text: 'VoxVPN complies with the General Data Protection Regulation (GDPR). For users in the European Union, European Economic Area, and the United Kingdom:',
+    list: [
+      'Lawful Basis: We process personal data based on consent, contract performance, and legitimate interests.',
+      'Right to Access: You may request a copy of your personal data we hold.',
+      'Right to Rectification: You may request correction of inaccurate personal data.',
+      'Right to Erasure ("Right to Be Forgotten"): You may request deletion of your personal data and account.',
+      'Right to Data Portability: You may request your data in a machine-readable format.',
+      'Right to Object: You may object to processing of your data based on legitimate interests.',
+      'Right to Withdraw Consent: You may withdraw consent for data processing at any time.',
+      'Data Protection Officer: Contact dpo@voxvpn.net for GDPR-related requests.',
+    ],
+  },
+  {
+    title: '12. CCPA Compliance (California Residents)',
+    text: 'Under the California Consumer Privacy Act (CCPA), California residents have the following rights:',
+    list: [
+      'Right to Know: What personal information we collect and how it is used.',
+      'Right to Delete: Request deletion of your personal information.',
+      'Right to Opt-Out: Opt out of the "sale" or "sharing" of personal information. VoxVPN does not sell personal information.',
+      'Right to Non-Discrimination: Equal service regardless of exercising privacy rights.',
+      'How to Exercise Rights: Email privacy@voxvpn.net with your request.',
+    ],
+  },
+  {
+    title: '13. Data Deletion',
+    text: 'You have the right to request deletion of your account and all associated personal data at any time.',
+    list: [
+      'Account Deletion: Use the "Delete Account" feature in the app or dashboard, or email support@voxvpn.net.',
+      'VPN Activity Data: No VPN activity data is stored, so there is nothing to delete — we have no logs to remove.',
+      'Processing Time: Account deletion requests are processed within 30 days.',
+      'Verification: We may verify your identity before processing deletion requests to protect account security.',
+      'Residual Data: Some data may be retained as required by law (e.g., billing records for tax compliance).',
+    ],
+  },
+  {
+    title: '14. No-Log Policy',
+    text: 'VoxVPN operates under a strict, independently audited no-logs policy:',
+    list: [
+      'We do not log browsing history, visited websites, or URLs.',
+      'We do not log DNS queries or DNS resolution requests.',
+      'We do not log connection timestamps, session durations, or disconnection events.',
+      'We do not log user IP addresses on VPN servers.',
+      'We do not log bandwidth usage, traffic volume, or data transferred per user.',
+      'We do not log the servers or locations a user connects to.',
+      'Servers operate in RAM-only mode — all data is wiped on reboot.',
+      'Our no-logs policy is verified by independent third-party security audits. See our Security Audit page.',
+    ],
+  },
+  {
+    title: '15. Encryption',
+    text: 'All VPN connections are encrypted with AES-256 encryption, the same standard used by governments and financial institutions.',
+    list: [
+      'AES-256-GCM encryption on all OpenVPN connections.',
+      'ChaCha20 encryption on WireGuard connections.',
+      'TLS 1.3 for website and API communications.',
+      'Perfect Forward Secrecy (PFS) on all connections.',
+    ],
+  },
+  {
+    title: '16. Third-Party Processors',
+    text: 'We work with the following third-party service providers who may process limited personal data:',
+    list: [
+      'Stripe — Payment processing (PCI-DSS compliant). We do not store full card numbers.',
+      'Cloud Infrastructure Providers — Server hosting for VPN servers and web infrastructure.',
+      'Email Service Providers — Transactional and support email delivery.',
+      'Analytics Providers — Aggregated, anonymized usage analytics only (no personally identifiable browsing data).',
+    ],
+    note: 'Third-party processors are bound by data processing agreements and may only use data to provide services to VoxVPN. We do not share data for advertising purposes.',
+  },
 ];
 
 export default function PrivacyPolicy() {

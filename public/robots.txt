@@ -1,13 +1,12 @@
 User-agent: *
 Allow: /
-Allow: /vpn-*
-Allow: /features/
-Allow: /solutions/
-Allow: /about/
-Allow: /blog/
-Disallow: /admin/
-Disallow: /api/
-Disallow: /dashboard/
-Disallow: /app/
 
-Sitemap: https://voxvpn.com/sitemap.xml
+# OpenAI ad crawler
+User-agent: OAI-AdsBot
+Allow: /
+
+# OpenAI search crawler
+User-agent: OAI-SearchBot
+Allow: /
+
+Sitemap: https://voxvpn.net/sitemap.xml

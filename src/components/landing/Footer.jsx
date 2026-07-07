@@ -85,12 +85,27 @@ const footerSections = [
     ],
   },
   {
-    title: 'Get Help',
+    title: 'Company',
     links: [
-      { label: 'Support Center', to: '/contact' },
+      { label: 'About Us', to: '/about' },
+      { label: 'Help Center', to: '/help-center' },
       { label: 'Contact Us', to: '/contact' },
-      { label: 'Status Page', to: '/status' },
+      { label: 'Server Status', to: '/status' },
       { label: 'Bug Bounty', to: '/bug-bounty' },
+      { label: 'Careers', to: '/careers' },
+      { label: 'Press Page', to: '/press' },
+      { label: 'Media Kit', to: '/media-kit' },
+    ],
+  },
+  {
+    title: 'Trust & Transparency',
+    links: [
+      { label: 'Security Audit', to: '/security-audit' },
+      { label: 'Transparency Report', to: '/transparency-report' },
+      { label: 'No-Logs Policy', to: '/no-logs-policy' },
+      { label: 'AES-256 Encryption', to: '/aes-256-encryption' },
+      { label: 'Kill Switch', to: '/kill-switch' },
+      { label: 'DNS Leak Protection', to: '/dns-leak-protection' },
     ],
   },
   {
@@ -145,7 +160,7 @@ export default function Footer() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-slate-500 text-xs">
                 <Mail size={13} className="text-cyan-500" />
-                <a href="mailto:support@voxdigits.com" className="hover:text-cyan-400 transition-colors">support@voxdigits.com</a>
+                <a href="mailto:support@voxvpn.net" className="hover:text-cyan-400 transition-colors">support@voxvpn.net</a>
               </div>
               <div className="flex items-center gap-2 text-slate-500 text-xs">
                 <Phone size={13} className="text-cyan-500" />
@@ -221,9 +236,13 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/5 pt-6 text-slate-600 text-xs flex flex-col sm:flex-row justify-between items-center gap-3">
           <span>© 2026 VoxDigits Communications LLC. All rights reserved. www.voxvpn.net</span>
-          <div className="flex gap-4 justify-center">
+          <div className="flex gap-4 justify-center flex-wrap">
+            <Link to="/about" className="hover:text-cyan-400 transition-colors">About</Link>
+            <Link to="/contact" className="hover:text-cyan-400 transition-colors">Contact</Link>
             <Link to="/privacy-policy" className="hover:text-cyan-400 transition-colors">Privacy Policy</Link>
-            <Link to="/terms-of-service" className="hover:text-cyan-400 transition-colors">Terms of Service</Link>
+            <Link to="/terms-of-service" className="hover:text-cyan-400 transition-colors">Terms</Link>
+            <Link to="/refund-policy" className="hover:text-cyan-400 transition-colors">Refund Policy</Link>
+            <Link to="/cookie-policy" className="hover:text-cyan-400 transition-colors">Cookie Policy</Link>
           </div>
         </div>
       </div>

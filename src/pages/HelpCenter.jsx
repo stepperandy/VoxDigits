@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Search, ChevronRight, HelpCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import Navbar from '@/components/landing/Navbar.jsx';
+import Footer from '@/components/landing/Footer.jsx';
 
 export default function HelpCenter() {
   const [search, setSearch] = useState('');
@@ -61,7 +63,9 @@ export default function HelpCenter() {
     : categories;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#080c18] to-[#0d1120] text-white p-6">
+    <div className="min-h-screen bg-gradient-to-b from-[#080c18] to-[#0d1120] text-white">
+      <Navbar />
+      <div className="pt-36 pb-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Hero */}
         <div className="text-center mb-12">
@@ -110,7 +114,7 @@ export default function HelpCenter() {
           <h3 className="text-xl font-bold mb-2">Still need help?</h3>
           <p className="text-slate-400 mb-4">Our support team is here 24/7</p>
           <div className="flex gap-3 flex-wrap">
-            <a href="mailto:support@voxvpn.com" className="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-black font-bold">
+            <a href="mailto:support@voxvpn.net" className="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-black font-bold">
               Email Support
             </a>
             <a href="/contact" className="px-4 py-2 rounded-lg border border-cyan-500 text-cyan-400 hover:bg-cyan-500/10">
@@ -119,6 +123,8 @@ export default function HelpCenter() {
           </div>
         </div>
       </div>
+      </div>
+      <Footer />
     </div>
   );
 }

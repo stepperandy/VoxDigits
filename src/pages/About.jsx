@@ -132,13 +132,15 @@ Keep the tone professional, trustworthy, and human. No buzzword overload.`,
               </div>
             </div>
             {[
-              { label: "Founded", value: "2020" },
-              { label: "Jurisdiction", value: "Privacy-friendly" },
-              { label: "Audit Status", value: "✓ Verified No-Logs" },
-              { label: "Protocol", value: "OpenVPN + WireGuard" },
-              { label: "Encryption", value: "AES-256" },
-              { label: "Support", value: "24/7 Live Chat" },
-            ].map(item => (
+               { label: "Legal Entity", value: "VoxDigits Communications LLC" },
+               { label: "Founded", value: "2020" },
+               { label: "Jurisdiction", value: "Privacy-friendly" },
+               { label: "Registration", value: "USA — Maine" },
+               { label: "Audit Status", value: "✓ Verified No-Logs" },
+               { label: "Protocol", value: "OpenVPN + WireGuard" },
+               { label: "Encryption", value: "AES-256" },
+               { label: "Support", value: "24/7 Live Chat" },
+             ].map(item => (
               <div key={item.label} className="flex justify-between items-center py-2 border-b border-white/5 last:border-0">
                 <span className="text-slate-500 text-sm">{item.label}</span>
                 <span className="text-white font-semibold text-sm">{item.value}</span>

@@ -1,6 +1,6 @@
 import Navbar from '@/components/landing/Navbar.jsx';
 import Footer from '@/components/landing/Footer.jsx';
-import { Mail, Phone, MessageSquare, Clock, Loader2 } from 'lucide-react';
+import { Mail, Phone, MessageSquare, Clock, Loader2, Building, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 
@@ -18,7 +18,7 @@ export default function ContactUs() {
     setLoading(true);
     try {
       await base44.integrations.Core.SendEmail({
-        to: 'support@voxdigits.com',
+        to: 'support@voxvpn.net',
         subject: `Contact Form: ${formData.subject}`,
         body: `From: ${formData.name} (${formData.email})\n\nMessage:\n${formData.message}`,
       });
@@ -41,12 +41,33 @@ export default function ContactUs() {
           <h1 className="text-4xl sm:text-5xl font-black text-white mb-4">Contact <span className="text-cyan-400">Us</span></h1>
           <p className="text-slate-400 text-lg">We're here to help. Reach out through any of the channels below.</p>
         </div>
+
+        {/* Business identity card */}
+        <div className="rounded-2xl border border-cyan-500/20 p-6 mb-8" style={{ background: 'rgba(0,212,255,0.05)' }}>
+          <div className="flex items-center gap-2 mb-4">
+            <Building size={16} className="text-cyan-400" />
+            <h2 className="text-white font-bold text-sm">Company Information</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            <div className="flex items-start gap-2 text-slate-400">
+              <Building size={14} className="text-cyan-400 mt-0.5 flex-shrink-0" />
+              <div><span className="text-slate-500 text-xs">Legal Name:</span> <span className="text-white font-medium">VoxDigits Communications LLC</span></div>
+            </div>
+            <div className="flex items-start gap-2 text-slate-400">
+              <MapPin size={14} className="text-cyan-400 mt-0.5 flex-shrink-0" />
+              <div><span className="text-slate-500 text-xs">Registered Address:</span> <span className="text-white font-medium">VoxDigits Communications LLC, 1040 Main St, Camden, ME 04843, USA</span></div>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
           {[
-            { icon: Mail, title: 'Email Support', desc: 'support@voxdigits.com', sub: 'We reply within 24 hours' },
-            { icon: MessageSquare, title: 'Live Chat', desc: 'Available in the app', sub: 'Monday–Friday, 9am–6pm UTC' },
+            { icon: Mail, title: 'Support Email', desc: 'support@voxvpn.net', sub: 'We reply within 24 hours' },
+            { icon: Mail, title: 'Sales Email', desc: 'sales@voxvpn.net', sub: 'For business & enterprise inquiries' },
+            { icon: Mail, title: 'Billing Email', desc: 'billing@voxvpn.net', sub: 'For billing & refund questions' },
             { icon: Phone, title: 'Phone', desc: '+1 207-287-1513', sub: 'Business hours only' },
-            { icon: Clock, title: 'Response Time', desc: '< 24 hours', sub: 'Average response time' },
+            { icon: MessageSquare, title: 'Live Chat', desc: 'Available in the app', sub: 'Monday–Friday, 9am–6pm UTC' },
+            { icon: Clock, title: 'Business Hours', desc: 'Mon–Fri, 9am–6pm UTC', sub: 'Email support available 24/7' },
           ].map(({ icon: Icon, title, desc, sub }) => (
             <div key={title} className="p-6 rounded-xl border border-white/5 bg-[#0d1120] flex items-start gap-4">
               <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
