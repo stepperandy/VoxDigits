@@ -111,6 +111,42 @@ const posts = [
     readTime: '5 min read',
     emoji: '📋',
   },
+  {
+    slug: 'public-wifi-security-guide',
+    category: 'Security',
+    title: 'Public Wi-Fi Security: How to Stay Safe on Untrusted Networks',
+    excerpt: 'Coffee shops, airports, hotels — public Wi-Fi is everywhere, and so are the risks. Learn how to protect yourself on any network.',
+    date: 'March 10, 2026',
+    readTime: '6 min read',
+    emoji: '📡',
+  },
+  {
+    slug: 'online-privacy-2026',
+    category: 'Privacy',
+    title: 'Online Privacy in 2026: What\'s Changed and What You Need to Know',
+    excerpt: 'From new data laws to AI-powered surveillance, privacy landscape is shifting fast. Here\'s what matters most in 2026.',
+    date: 'March 5, 2026',
+    readTime: '7 min read',
+    emoji: '👁️',
+  },
+  {
+    slug: 'choosing-the-right-vpn',
+    category: 'Beginner Guide',
+    title: 'How to Choose the Right VPN: 10 Questions to Ask Before You Buy',
+    excerpt: 'Not sure which VPN to trust? Use this checklist of 10 critical questions to evaluate any VPN provider before signing up.',
+    date: 'February 28, 2026',
+    readTime: '8 min read',
+    emoji: '✅',
+  },
+  {
+    slug: 'remote-work-security-best-practices',
+    category: 'Business',
+    title: 'Remote Work Security: Best Practices for Teams and Individuals',
+    excerpt: 'Remote work is here to stay. Here\'s how to secure your home office, protect company data, and avoid common security pitfalls.',
+    date: 'February 20, 2026',
+    readTime: '7 min read',
+    emoji: '🏠',
+  },
 ];
 
 const categoryColors = {

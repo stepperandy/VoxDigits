@@ -69,6 +69,70 @@ export default function TransparencyReport() {
           </div>
         </div>
 
+        {/* DMCA requests */}
+        <div className="rounded-2xl border border-white/5 bg-[#0d1120] p-8 mb-8">
+          <h2 className="text-white font-bold text-lg mb-2">DMCA & Copyright Requests</h2>
+          <p className="text-slate-500 text-sm mb-6">We received the following Digital Millennium Copyright Act (DMCA) and copyright takedown requests during the reporting period.</p>
+          <div className="space-y-3">
+            {[
+              { type: 'DMCA Takedown Notices', received: 2, action: 'Forwarded to user (no data shared)' },
+              { type: 'Copyright Infringement Claims', received: 1, action: 'No data available to provide' },
+            ].map((row, i) => (
+              <div key={i} className="grid grid-cols-2 sm:grid-cols-3 gap-4 py-3 border-b border-white/5 last:border-0 items-center">
+                <span className="text-slate-300 text-sm font-medium">{row.type}</span>
+                <span className="text-white text-sm text-center font-semibold">{row.received} received</span>
+                <span className="text-amber-400 text-xs text-center font-semibold">{row.action}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-slate-500 text-xs mt-4 leading-relaxed">
+            VoxVPN does not monitor or log user activity, so we cannot identify which user accessed specific content. We forward DMCA notices to the user's registered email and take no further action unless required by valid court order.
+          </p>
+        </div>
+
+        {/* Abuse reports */}
+        <div className="rounded-2xl border border-white/5 bg-[#0d1120] p-8 mb-8">
+          <h2 className="text-white font-bold text-lg mb-2">Abuse Reports</h2>
+          <p className="text-slate-500 text-sm mb-6">Abuse reports received from third parties regarding VoxVPN IP addresses.</p>
+          <div className="space-y-3">
+            {[
+              { type: 'Spam / Unsolicited Email', received: 4, resolved: 4 },
+              { type: 'Port Scanning / Probing', received: 2, resolved: 2 },
+              { type: 'Brute Force Attempts', received: 3, resolved: 3 },
+            ].map((row, i) => (
+              <div key={i} className="grid grid-cols-3 gap-4 py-3 border-b border-white/5 last:border-0 items-center">
+                <span className="text-slate-300 text-sm font-medium">{row.type}</span>
+                <span className="text-white text-sm text-center font-semibold">{row.received} reported</span>
+                <span className="text-emerald-400 text-sm text-center font-bold">{row.resolved} resolved</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-slate-500 text-xs mt-4 leading-relaxed">
+            All abuse reports are investigated within 24 hours. Due to our no-logs policy, we cannot identify individual users. Accounts found in violation of our Acceptable Use Policy are suspended or terminated.
+          </p>
+        </div>
+
+        {/* Warrant Canary */}
+        <div className="rounded-2xl p-8 mb-8" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.08), rgba(16,185,129,0.02))', border: '1px solid rgba(16,185,129,0.2)' }}>
+          <div className="flex items-center gap-2 mb-4">
+            <ShieldCheck size={18} className="text-emerald-400" />
+            <h2 className="text-white font-bold text-lg">Warrant Canary</h2>
+          </div>
+          <p className="text-slate-400 text-sm leading-relaxed mb-3">
+            <strong className="text-emerald-400">As of July 7, 2026:</strong>
+          </p>
+          <ul className="space-y-2 text-slate-400 text-sm">
+            <li className="flex items-start gap-2"><CheckCircle2 size={14} className="text-emerald-400 mt-0.5 flex-shrink-0" /> VoxVPN has NOT received any National Security Letters (NSLs).</li>
+            <li className="flex items-start gap-2"><CheckCircle2 size={14} className="text-emerald-400 mt-0.5 flex-shrink-0" /> VoxVPN has NOT received any gag orders restricting our ability to disclose requests.</li>
+            <li className="flex items-start gap-2"><CheckCircle2 size={14} className="text-emerald-400 mt-0.5 flex-shrink-0" /> VoxVPN has NOT been required to modify our infrastructure to facilitate surveillance.</li>
+            <li className="flex items-start gap-2"><CheckCircle2 size={14} className="text-emerald-400 mt-0.5 flex-shrink-0" /> VoxVPN has NOT weakened our encryption or security protocols at any government's request.</li>
+            <li className="flex items-start gap-2"><CheckCircle2 size={14} className="text-emerald-400 mt-0.5 flex-shrink-0" /> VoxVPN has NOT provided any user browsing data, DNS queries, or connection logs to any party.</li>
+          </ul>
+          <p className="text-slate-500 text-xs mt-4 leading-relaxed">
+            This warrant canary is updated quarterly. If this section is removed or modified, it may indicate that we have received a request we are legally prohibited from disclosing.
+          </p>
+        </div>
+
         {/* No-logs verification */}
         <div className="rounded-2xl border border-white/5 bg-[#0d1120] p-8 mb-8">
           <h2 className="text-white font-bold text-lg mb-6">No-Logs Verification</h2>

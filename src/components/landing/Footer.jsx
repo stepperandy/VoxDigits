@@ -100,12 +100,12 @@ const footerSections = [
   {
     title: 'Trust & Transparency',
     links: [
+      { label: 'Security', to: '/security' },
       { label: 'Security Audit', to: '/security-audit' },
       { label: 'Transparency Report', to: '/transparency-report' },
+      { label: 'Server Status', to: '/status' },
       { label: 'No-Logs Policy', to: '/no-logs-policy' },
-      { label: 'AES-256 Encryption', to: '/aes-256-encryption' },
-      { label: 'Kill Switch', to: '/kill-switch' },
-      { label: 'DNS Leak Protection', to: '/dns-leak-protection' },
+      { label: 'Acceptable Use Policy', to: '/acceptable-use-policy' },
     ],
   },
   {
@@ -113,6 +113,7 @@ const footerSections = [
     links: [
       { label: 'Privacy Policy', to: '/privacy-policy' },
       { label: 'Terms of Service', to: '/terms-of-service' },
+      { label: 'Acceptable Use Policy', to: '/acceptable-use-policy' },
       { label: 'Cookie Policy', to: '/cookie-policy' },
       { label: 'Refund Policy', to: '/refund-policy' },
     ],

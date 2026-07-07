@@ -328,7 +328,7 @@ export default function Pricing() {
             ))}
           </div>
           <p className="text-slate-600 text-[10px] mt-4 leading-relaxed">
-            Payments are processed securely by Stripe. VoxVPN never stores your full card details. Subscriptions can be cancelled at any time from your account dashboard. See our <a href="/refund-policy" className="text-cyan-400 hover:underline">Refund Policy</a> for full details.
+            Payments are processed securely by Stripe. VoxVPN never stores your full card details. Subscriptions can be cancelled at any time from your account dashboard. See our <a href="/refund-policy" className="text-cyan-400 hover:underline">Refund Policy</a> for full details. Taxes may apply based on your jurisdiction and are calculated at checkout. Invoices are available for download from your account dashboard after purchase.
           </p>
         </div>
 

@@ -2,9 +2,11 @@ import { motion } from 'framer-motion';
 
 const TRUST_BADGES = [
   'No-Logs Policy',
-  'AES-256 Bit',
-  '20 Locations',
+  'AES-256 Encryption',
+  '60+ Locations',
   'Kill Switch',
+  '30-Day Money-Back',
+  '24/7 Support',
 ];
 
 // Floating particles config
@@ -252,11 +254,25 @@ export default function Hero() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.6 }}
-          className="text-slate-300 text-base sm:text-lg leading-relaxed mb-8 max-w-xl"
+          className="text-slate-300 text-base sm:text-lg leading-relaxed mb-4 max-w-xl"
         >
           VoxVPN shields your identity with military-grade encryption, a strict
-          no-logs policy, and blazing-fast VoxVPN servers in 20 locations.
+          no-logs policy, and blazing-fast servers in 60+ countries.
         </motion.p>
+
+        {/* Company info bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="flex items-center justify-center gap-4 text-slate-500 text-xs mb-8 flex-wrap"
+        >
+          <span>Founded 2020</span>
+          <span className="text-slate-700">|</span>
+          <span>VoxDigits Communications LLC</span>
+          <span className="text-slate-700">|</span>
+          <span>Woodbridge, VA, USA</span>
+        </motion.div>
 
         {/* CTAs */}
         <motion.div

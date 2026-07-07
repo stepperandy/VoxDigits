@@ -240,6 +240,60 @@ Keep the tone professional, trustworthy, and human. No buzzword overload.`,
         </div>
       </section>
 
+      {/* Vision & Security Philosophy */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#0a0e1a]">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <motion.div initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
+            <p className="text-cyan-400 text-xs font-bold uppercase tracking-widest mb-3">Our Vision</p>
+            <h2 className="text-2xl sm:text-3xl font-black text-white mb-4 leading-snug">
+              A World Where Privacy Is the Default, Not the Exception
+            </h2>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              We envision an internet where every person can communicate, browse, and transact without surveillance, tracking, or censorship. A world where encryption isn't a premium feature — it's the baseline. We're building the infrastructure to make that world a reality, one encrypted connection at a time.
+            </p>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.18 }}>
+            <p className="text-cyan-400 text-xs font-bold uppercase tracking-widest mb-3">Security Philosophy</p>
+            <h2 className="text-2xl sm:text-3xl font-black text-white mb-4 leading-snug">
+              Trust Through Transparency
+            </h2>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              We believe security through obscurity is a myth. That's why we use open-source protocols (OpenVPN, WireGuard), publish independent audit results, operate RAM-only servers, and maintain a strict no-logs policy verified by third parties. If we can't prove it, we don't claim it.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Future Roadmap */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-cyan-400 text-xs font-bold uppercase tracking-widest mb-3">What's Next</p>
+            <h2 className="text-3xl sm:text-4xl font-black text-white">Future Roadmap</h2>
+          </div>
+          <div className="space-y-4">
+            {[
+              { phase: 'Q3 2026', title: 'Native iOS App', desc: 'Full-featured iOS application with integrated WireGuard and kill switch support.' },
+              { phase: 'Q4 2026', title: 'Multi-Hop VPN', desc: 'Chain multiple VPN servers for enhanced anonymity — route traffic through 2+ countries.' },
+              { phase: 'Q1 2027', title: 'Next Security Audit', desc: 'Annual independent security audit covering no-logs verification and infrastructure.' },
+              { phase: 'Q2 2027', title: 'Dedicated IP Marketplace', desc: 'Purchase dedicated static IPs across multiple regions for streaming and remote access.' },
+              { phase: '2027+', title: 'Threat Protection Suite', desc: 'Integrated malware blocking, ad tracker prevention, and phishing protection at the network level.' },
+            ].map((item, i) => (
+              <motion.div key={i} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }}
+                className="flex items-start gap-4 p-5 rounded-xl border border-white/5 bg-[#0d1120]">
+                <div className="px-3 py-1 rounded-full text-xs font-bold flex-shrink-0" style={{ background: 'rgba(0,212,255,0.1)', color: '#22d3ee', border: '1px solid rgba(0,212,255,0.2)' }}>
+                  {item.phase}
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-sm mb-1">{item.title}</h3>
+                  <p className="text-slate-400 text-xs leading-relaxed">{item.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center">
