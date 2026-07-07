@@ -77,7 +77,7 @@ export default function Careers() {
           <h2 className="text-white font-bold text-xl mb-6">Open Positions</h2>
           <div className="space-y-3">
             {OPEN_ROLES.map((role, i) => (
-              <motion.a key={i} href={`mailto:careers@voxvpn.net?subject=Application: ${role.title}`}
+              <motion.a key={i} href={`mailto:info@voxdigits.com?subject=Application: ${role.title}`}
                 initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
                 className="flex items-center justify-between p-5 rounded-xl border border-white/5 bg-[#0d1120] hover:border-cyan-500/20 transition-all group">
                 <div className="min-w-0">
@@ -98,8 +98,8 @@ export default function Careers() {
         <div className="rounded-2xl p-8 text-center" style={{ background: 'linear-gradient(135deg, rgba(0,212,255,0.08), rgba(0,212,255,0.02))', border: '1px solid rgba(0,212,255,0.2)' }}>
           <h3 className="text-white font-bold text-lg mb-2">Don't see the right role?</h3>
           <p className="text-slate-400 text-sm mb-6">Send us your resume and tell us how you'd like to contribute. We're always looking for exceptional talent.</p>
-          <a href="mailto:careers@voxvpn.net" className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-bold transition-all text-sm">
-            <Mail size={16} /> careers@voxvpn.net
+          <a href="mailto:info@voxdigits.com" className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-bold transition-all text-sm">
+            <Mail size={16} /> info@voxdigits.com
           </a>
         </div>
       </div>

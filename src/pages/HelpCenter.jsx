@@ -114,7 +114,7 @@ export default function HelpCenter() {
           <h3 className="text-xl font-bold mb-2">Still need help?</h3>
           <p className="text-slate-400 mb-4">Our support team is here 24/7</p>
           <div className="flex gap-3 flex-wrap">
-            <a href="mailto:support@voxvpn.net" className="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-black font-bold">
+            <a href="mailto:info@voxdigits.com" className="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-black font-bold">
               Email Support
             </a>
             <a href="/contact" className="px-4 py-2 rounded-lg border border-cyan-500 text-cyan-400 hover:bg-cyan-500/10">

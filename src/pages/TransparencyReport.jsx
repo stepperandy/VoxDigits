@@ -122,7 +122,7 @@ export default function TransparencyReport() {
 
         {/* Download / contact */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="mailto:legal@voxvpn.net" className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-bold transition-all text-sm">
+          <a href="mailto:admin@voxdigits.com" className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-bold transition-all text-sm">
             <Mail size={16} /> Request Full Report
           </a>
           <a href="/security-audit" className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 transition-all text-sm font-semibold">

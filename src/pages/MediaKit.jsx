@@ -72,7 +72,7 @@ export default function MediaKit() {
               </div>
             ))}
           </div>
-          <p className="text-slate-500 text-xs mt-4">For additional formats (SVG, EPS, PDF) or custom assets, contact press@voxvpn.net</p>
+          <p className="text-slate-500 text-xs mt-4">For additional formats (SVG, EPS, PDF) or custom assets, contact info@voxdigits.com</p>
         </div>
 
         {/* Boilerplate */}
@@ -97,8 +97,8 @@ export default function MediaKit() {
           <h2 className="text-white font-bold text-lg mb-2">Press Contact</h2>
           <p className="text-slate-400 text-sm mb-4">For press inquiries, interviews, and partnership opportunities:</p>
           <div className="flex flex-col sm:flex-row gap-3">
-            <a href="mailto:press@voxvpn.net" className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-bold transition-all text-sm">
-              <Mail size={16} /> press@voxvpn.net
+            <a href="mailto:info@voxdigits.com" className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-bold transition-all text-sm">
+              <Mail size={16} /> info@voxdigits.com
             </a>
             <a href="/press" className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 transition-all text-sm font-semibold">
               <ExternalLink size={16} /> Press & News Page

@@ -74,7 +74,7 @@ export default function RefundPolicy() {
             <ol className="space-y-3">
               <li className="flex items-start gap-3 text-slate-400 text-sm">
                 <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: 'rgba(0,212,255,0.1)', color: '#22d3ee', border: '1px solid rgba(0,212,255,0.2)' }}>1</span>
-                <span>Email <a href="mailto:support@voxvpn.net" className="text-cyan-400 hover:underline">support@voxvpn.net</a> with the subject line "Refund Request"</span>
+                <span>Email <a href="mailto:info@voxdigits.com" className="text-cyan-400 hover:underline">info@voxdigits.com</a> with the subject line "Refund Request"</span>
               </li>
               <li className="flex items-start gap-3 text-slate-400 text-sm">
                 <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: 'rgba(0,212,255,0.1)', color: '#22d3ee', border: '1px solid rgba(0,212,255,0.2)' }}>2</span>
@@ -118,10 +118,10 @@ export default function RefundPolicy() {
           <div className="rounded-2xl p-6 text-center" style={{ background: 'linear-gradient(135deg, rgba(0,212,255,0.08), rgba(0,212,255,0.02))', border: '1px solid rgba(0,212,255,0.2)' }}>
             <h2 className="text-white font-bold text-base mb-2">Contact Us About Refunds</h2>
             <p className="text-slate-400 text-sm mb-4">Our support team is available 24/7 to help with refund requests.</p>
-            <a href="mailto:support@voxvpn.net?subject=Refund Request" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-bold transition-all text-sm">
-              <Mail size={16} /> support@voxvpn.net
+            <a href="mailto:info@voxdigits.com?subject=Refund Request" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-black font-bold transition-all text-sm">
+              <Mail size={16} /> info@voxdigits.com
             </a>
-            <p className="text-slate-500 text-xs mt-3">For billing questions: <a href="mailto:billing@voxvpn.net" className="text-cyan-400 hover:underline">billing@voxvpn.net</a></p>
+            <p className="text-slate-500 text-xs mt-3">For admin/legal questions: <a href="mailto:admin@voxdigits.com" className="text-cyan-400 hover:underline">admin@voxdigits.com</a></p>
           </div>
         </div>
       </div>

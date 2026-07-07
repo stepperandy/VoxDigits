@@ -18,7 +18,7 @@ export default function ContactUs() {
     setLoading(true);
     try {
       await base44.integrations.Core.SendEmail({
-        to: 'support@voxvpn.net',
+        to: 'info@voxdigits.com',
         subject: `Contact Form: ${formData.subject}`,
         body: `From: ${formData.name} (${formData.email})\n\nMessage:\n${formData.message}`,
       });
@@ -55,17 +55,16 @@ export default function ContactUs() {
             </div>
             <div className="flex items-start gap-2 text-slate-400">
               <MapPin size={14} className="text-cyan-400 mt-0.5 flex-shrink-0" />
-              <div><span className="text-slate-500 text-xs">Registered Address:</span> <span className="text-white font-medium">VoxDigits Communications LLC, 1040 Main St, Camden, ME 04843, USA</span></div>
+              <div><span className="text-slate-500 text-xs">Registered Address:</span> <span className="text-white font-medium">16809 Capon Tree Ln, Woodbridge, VA 22191, USA</span></div>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
           {[
-            { icon: Mail, title: 'Support Email', desc: 'support@voxvpn.net', sub: 'We reply within 24 hours' },
-            { icon: Mail, title: 'Sales Email', desc: 'sales@voxvpn.net', sub: 'For business & enterprise inquiries' },
-            { icon: Mail, title: 'Billing Email', desc: 'billing@voxvpn.net', sub: 'For billing & refund questions' },
-            { icon: Phone, title: 'Phone', desc: '+1 207-287-1513', sub: 'Business hours only' },
+            { icon: Mail, title: 'Support Email', desc: 'info@voxdigits.com', sub: 'We reply within 24 hours' },
+            { icon: Mail, title: 'Admin Email', desc: 'admin@voxdigits.com', sub: 'For business & legal inquiries' },
+            { icon: Phone, title: 'Phone', desc: '+1 207-387-1513', sub: 'Business hours only' },
             { icon: MessageSquare, title: 'Live Chat', desc: 'Available in the app', sub: 'Monday–Friday, 9am–6pm UTC' },
             { icon: Clock, title: 'Business Hours', desc: 'Mon–Fri, 9am–6pm UTC', sub: 'Email support available 24/7' },
           ].map(({ icon: Icon, title, desc, sub }) => (
@@ -88,10 +87,10 @@ export default function ContactUs() {
             <h3 className="text-white font-semibold text-sm mb-1">Knowledge Base</h3>
             <p className="text-slate-500 text-xs">Browse guides & FAQs</p>
           </a>
-          <a href="mailto:support@voxvpn.net" className="p-4 rounded-xl border border-white/5 bg-[#0d1120] hover:border-cyan-500/20 transition-all text-center">
+          <a href="mailto:info@voxdigits.com" className="p-4 rounded-xl border border-white/5 bg-[#0d1120] hover:border-cyan-500/20 transition-all text-center">
             <Mail size={20} className="text-cyan-400 mx-auto mb-2" />
             <h3 className="text-white font-semibold text-sm mb-1">Ticket System</h3>
-            <p className="text-slate-500 text-xs">Email support@voxvpn.net</p>
+            <p className="text-slate-500 text-xs">Email info@voxdigits.com</p>
           </a>
           <div className="p-4 rounded-xl border border-white/5 bg-[#0d1120] text-center">
             <MessageSquare size={20} className="text-cyan-400 mx-auto mb-2" />

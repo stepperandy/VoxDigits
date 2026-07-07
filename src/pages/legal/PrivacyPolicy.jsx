@@ -90,7 +90,7 @@ const sections = [
       'Right to Data Portability: You may request your data in a machine-readable format.',
       'Right to Object: You may object to processing of your data based on legitimate interests.',
       'Right to Withdraw Consent: You may withdraw consent for data processing at any time.',
-      'Data Protection Officer: Contact dpo@voxvpn.net for GDPR-related requests.',
+      'Data Protection Officer: Contact admin@voxdigits.com for GDPR-related requests.',
     ],
   },
   {
@@ -101,14 +101,14 @@ const sections = [
       'Right to Delete: Request deletion of your personal information.',
       'Right to Opt-Out: Opt out of the "sale" or "sharing" of personal information. VoxVPN does not sell personal information.',
       'Right to Non-Discrimination: Equal service regardless of exercising privacy rights.',
-      'How to Exercise Rights: Email privacy@voxvpn.net with your request.',
+      'How to Exercise Rights: Email admin@voxdigits.com with your request.',
     ],
   },
   {
     title: '13. Data Deletion',
     text: 'You have the right to request deletion of your account and all associated personal data at any time.',
     list: [
-      'Account Deletion: Use the "Delete Account" feature in the app or dashboard, or email support@voxvpn.net.',
+      'Account Deletion: Use the "Delete Account" feature in the app or dashboard, or email info@voxdigits.com.',
       'VPN Activity Data: No VPN activity data is stored, so there is nothing to delete — we have no logs to remove.',
       'Processing Time: Account deletion requests are processed within 30 days.',
       'Verification: We may verify your identity before processing deletion requests to protect account security.',
@@ -248,9 +248,9 @@ export default function PrivacyPolicy() {
                 className="flex items-center gap-2 text-cyan-400 text-sm hover:text-cyan-300 transition-colors">
                 <Globe size={14} /> voxvpn.net
               </a>
-              <a href="mailto:support@voxvpn.net"
+              <a href="mailto:info@voxdigits.com"
                 className="flex items-center gap-2 text-cyan-400 text-sm hover:text-cyan-300 transition-colors">
-                <Mail size={14} /> support@voxvpn.net
+                <Mail size={14} /> info@voxdigits.com
               </a>
             </div>
           </div>

@@ -160,11 +160,11 @@ export default function Footer() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-slate-500 text-xs">
                 <Mail size={13} className="text-cyan-500" />
-                <a href="mailto:support@voxvpn.net" className="hover:text-cyan-400 transition-colors">support@voxvpn.net</a>
+                <a href="mailto:info@voxdigits.com" className="hover:text-cyan-400 transition-colors">info@voxdigits.com</a>
               </div>
               <div className="flex items-center gap-2 text-slate-500 text-xs">
                 <Phone size={13} className="text-cyan-500" />
-                <span>+1 641 681 8821</span>
+                <span>+1 207-387-1513</span>
               </div>
             </div>
           </div>

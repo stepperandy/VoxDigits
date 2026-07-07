@@ -89,7 +89,7 @@ export default function StatusPage() {
           <div className="mt-12 p-6 rounded-xl border border-cyan-500/20 bg-cyan-500/5">
             <p className="text-white font-semibold text-sm mb-2">Get Status Updates</p>
             <p className="text-slate-400 text-xs mb-4">Subscribe to notifications for service incidents and maintenance.</p>
-            <a href="mailto:status@voxvpn.net" className="inline-block px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold rounded-lg transition-colors">
+            <a href="mailto:info@voxdigits.com" className="inline-block px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold rounded-lg transition-colors">
               Subscribe to Updates
             </a>
           </div>
