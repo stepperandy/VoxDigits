@@ -62,9 +62,10 @@ export default function ContactUs() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
           {[
-            { icon: Mail, title: 'Support Email', desc: 'info@voxdigits.com', sub: 'We reply within 24 hours' },
-            { icon: Mail, title: 'Admin Email', desc: 'admin@voxdigits.com', sub: 'For business & legal inquiries' },
-            { icon: Phone, title: 'Phone', desc: '+1 207-387-1513', sub: 'Business hours only' },
+            { icon: Mail, title: 'Support Email', desc: 'info@voxdigits.com', sub: 'General support & technical help' },
+            { icon: Mail, title: 'Billing Email', desc: 'billing@voxdigits.com', sub: 'Subscriptions, refunds & payments' },
+            { icon: Mail, title: 'Admin / Legal Email', desc: 'admin@voxdigits.com', sub: 'Business, legal & privacy inquiries' },
+            { icon: Phone, title: 'Phone', desc: '+1 207-387-1513', sub: 'Mon–Fri, 9am–6pm UTC' },
             { icon: MessageSquare, title: 'Live Chat', desc: 'Available in the app', sub: 'Monday–Friday, 9am–6pm UTC' },
             { icon: Clock, title: 'Business Hours', desc: 'Mon–Fri, 9am–6pm UTC', sub: 'Email support available 24/7' },
           ].map(({ icon: Icon, title, desc, sub }) => (

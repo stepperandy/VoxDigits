@@ -39,6 +39,23 @@
       "type": "string",
       "description": "Direct download URL or setup portal URL"
     },
+    "file_size": {
+      "type": "string",
+      "description": "Human-readable file size (e.g. 24.5 MB)"
+    },
+    "changelog": {
+      "type": "string",
+      "description": "Release notes / changelog for this version"
+    },
+    "sha256_checksum": {
+      "type": "string",
+      "description": "SHA-256 hash of the installer file for integrity verification"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date",
+      "description": "Date this download was last updated"
+    },
     "price": {
       "type": "number",
       "description": "Price in USD (0 = free)"

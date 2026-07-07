@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Download, Monitor, Smartphone, Loader2, Key, Copy, CheckCircle2, Shield, RefreshCw, Tag, XCircle, Zap, LogIn, Terminal, Wifi, Router } from 'lucide-react';
+import { Download, Monitor, Smartphone, Loader2, Key, Copy, CheckCircle2, Shield, RefreshCw, Tag, XCircle, Zap, LogIn, Terminal, Wifi, Router, FileText, Hash, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
@@ -38,6 +38,7 @@ export default function DownloadsSection({ isAdmin = false }) {
   const [tokenLoading, setTokenLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [expiredError, setExpiredError] = useState(null);
+  const [expandedDetails, setExpandedDetails] = useState({});
 
   useEffect(() => {
     setLoading(true);
@@ -178,42 +179,85 @@ export default function DownloadsSection({ isAdmin = false }) {
               const state = dlState[d.id] || 'idle';
               const rawExt = d.file_url?.split('?')[0]?.split('.').pop()?.toUpperCase();
               const ext = rawExt && rawExt.length <= 5 ? rawExt : (d.platform === 'Android' ? 'APK' : d.platform === 'Windows' ? 'EXE' : 'FILE');
+              const isExpanded = expandedDetails[d.id];
+              const hasDetails = d.file_size || d.last_updated || d.sha256_checksum || d.changelog;
 
               return (
-                <button
+                <div
                   key={d.id}
-                  onClick={() => handleDownload(d)}
-                  disabled={state !== 'idle'}
-                  className="flex items-center gap-4 p-4 rounded-2xl text-left transition-all disabled:opacity-70 group"
+                  className="rounded-2xl transition-all overflow-hidden"
                   style={{ border: `1px solid ${colors.borderColor}`, background: colors.bgColor }}
-                  onMouseEnter={e => e.currentTarget.style.background = colors.hoverBg}
-                  onMouseLeave={e => e.currentTarget.style.background = colors.bgColor}
                 >
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: colors.iconBg, border: `1px solid ${colors.iconBorder}` }}>
-                    <Icon size={22} style={{ color: colors.color }} />
-                  </div>
+                  <button
+                    onClick={() => handleDownload(d)}
+                    disabled={state !== 'idle'}
+                    className="w-full flex items-center gap-4 p-4 text-left transition-all disabled:opacity-70 group"
+                  >
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: colors.iconBg, border: `1px solid ${colors.iconBorder}` }}>
+                      <Icon size={22} style={{ color: colors.color }} />
+                    </div>
 
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white font-black text-sm">{d.name}</p>
-                    {d.version && (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded mt-1" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
-                        <Tag size={8} /> v{d.version}
-                      </span>
-                    )}
-                    <p className="text-slate-500 text-xs mt-1">{d.platform} · {ext}</p>
-                    {d.description && <p className="text-slate-600 text-[10px] mt-1 truncate">{d.description}</p>}
-                  </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-black text-sm">{d.name}</p>
+                      {d.version && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded mt-1" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }}>
+                          <Tag size={8} /> v{d.version}
+                        </span>
+                      )}
+                      <p className="text-slate-500 text-xs mt-1">{d.platform} · {ext}{d.file_size ? ` · ${d.file_size}` : ''}</p>
+                      {d.description && <p className="text-slate-600 text-[10px] mt-1 truncate">{d.description}</p>}
+                    </div>
 
-                  <div className="flex-shrink-0">
-                    {state === 'loading' && <Loader2 size={18} style={{ color: colors.color }} className="animate-spin" />}
-                    {state === 'done' && <CheckCircle2 size={18} className="text-emerald-400" />}
-                    {state === 'idle' && (
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all group-hover:scale-110" style={{ background: colors.iconBg, border: `1px solid ${colors.iconBorder}` }}>
-                        <Download size={14} style={{ color: colors.color }} />
-                      </div>
-                    )}
-                  </div>
-                </button>
+                    <div className="flex-shrink-0">
+                      {state === 'loading' && <Loader2 size={18} style={{ color: colors.color }} className="animate-spin" />}
+                      {state === 'done' && <CheckCircle2 size={18} className="text-emerald-400" />}
+                      {state === 'idle' && (
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all group-hover:scale-110" style={{ background: colors.iconBg, border: `1px solid ${colors.iconBorder}` }}>
+                          <Download size={14} style={{ color: colors.color }} />
+                        </div>
+                      )}
+                    </div>
+                  </button>
+
+                  {/* Expandable details */}
+                  {hasDetails && (
+                    <>
+                      <button
+                        onClick={() => setExpandedDetails(s => ({ ...s, [d.id]: !s[d.id] }))}
+                        className="w-full flex items-center justify-center gap-1.5 py-2 text-[10px] font-semibold transition-colors border-t"
+                        style={{ borderColor: colors.borderColor, color: 'rgba(255,255,255,0.4)' }}
+                      >
+                        {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                        {isExpanded ? 'Hide details' : 'Show details'}
+                      </button>
+                      {isExpanded && (
+                        <div className="px-4 pb-4 space-y-2.5" style={{ background: 'rgba(0,0,0,0.15)' }}>
+                          {d.last_updated && (
+                            <div className="flex items-center gap-2 text-xs">
+                              <Calendar size={11} className="text-slate-500 flex-shrink-0" />
+                              <span className="text-slate-500">Updated:</span>
+                              <span className="text-slate-300 font-medium">{new Date(d.last_updated).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                            </div>
+                          )}
+                          {d.sha256_checksum && (
+                            <div className="flex items-start gap-2 text-xs">
+                              <Hash size={11} className="text-slate-500 flex-shrink-0 mt-0.5" />
+                              <span className="text-slate-500 flex-shrink-0">SHA-256:</span>
+                              <code className="text-slate-400 font-mono text-[10px] break-all">{d.sha256_checksum}</code>
+                            </div>
+                          )}
+                          {d.changelog && (
+                            <div className="flex items-start gap-2 text-xs">
+                              <FileText size={11} className="text-slate-500 flex-shrink-0 mt-0.5" />
+                              <span className="text-slate-500 flex-shrink-0">Changelog:</span>
+                              <p className="text-slate-400 leading-relaxed">{d.changelog}</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
               );
             })}
           </div>

@@ -308,7 +308,7 @@ export default function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.55 }}
-          className="flex items-center justify-center gap-2 text-slate-400 text-sm mb-8 flex-wrap"
+          className="flex items-center justify-center gap-2 text-slate-400 text-sm mb-6 flex-wrap"
         >
           {TRUST_BADGES.map((label, i) => (
             <span key={label} className="flex items-center gap-2">
@@ -317,6 +317,17 @@ export default function Hero() {
             </span>
           ))}
         </motion.div>
+
+        {/* Contact link */}
+        <motion.a
+          href="/contact"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="text-slate-500 hover:text-cyan-400 text-xs transition-colors mb-8"
+        >
+          Questions? Contact us →
+        </motion.a>
 
         {/* VPN Status Bar */}
         <motion.div
