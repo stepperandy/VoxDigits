@@ -54,6 +54,10 @@ export default function ContactUs() {
               <div><span className="text-slate-500 text-xs">Legal Name:</span> <span className="text-white font-medium">VoxDigits Communications LLC</span></div>
             </div>
             <div className="flex items-start gap-2 text-slate-400">
+              <Building size={14} className="text-cyan-400 mt-0.5 flex-shrink-0" />
+              <div><span className="text-slate-500 text-xs">Registration No.:</span> <span className="text-white font-medium">11986542</span></div>
+            </div>
+            <div className="flex items-start gap-2 text-slate-400">
               <MapPin size={14} className="text-cyan-400 mt-0.5 flex-shrink-0" />
               <div><span className="text-slate-500 text-xs">Registered Address:</span> <span className="text-white font-medium">16809 Capon Tree Ln, Woodbridge, VA 22191, USA</span></div>
             </div>

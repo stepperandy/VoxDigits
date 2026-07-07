@@ -242,7 +242,9 @@ export default function PrivacyPolicy() {
           <div className="rounded-2xl p-8 mt-8 text-center"
             style={{ background: 'linear-gradient(135deg, rgba(0,212,255,0.08), rgba(0,212,255,0.02))', border: '1px solid rgba(0,212,255,0.2)' }}>
             <h2 className="text-white text-lg font-bold mb-2">11. Contact</h2>
-            <p className="text-slate-300 text-sm font-semibold mb-4">VoxDigits Communications LLC</p>
+            <p className="text-slate-300 text-sm font-semibold mb-1">VoxDigits Communications LLC</p>
+            <p className="text-slate-500 text-xs mb-1">16809 Capon Tree Ln, Woodbridge, VA 22191, USA</p>
+            <p className="text-slate-500 text-xs mb-4">Registration No. 11986542</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a href="https://voxvpn.net" target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2 text-cyan-400 text-sm hover:text-cyan-300 transition-colors">

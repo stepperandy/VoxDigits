@@ -158,6 +158,11 @@ export default function Footer() {
             <p className="text-slate-500 text-xs leading-relaxed mb-4">
               Your privacy is our priority. Stay protected, stay unrestricted.
             </p>
+            <div className="text-slate-600 text-[10px] space-y-0.5 mb-4">
+              <p>VoxDigits Communications LLC</p>
+              <p>Registration No. 11986542</p>
+              <p>16809 Capon Tree Ln, Woodbridge, VA 22191, USA</p>
+            </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-slate-500 text-xs">
                 <Mail size={13} className="text-cyan-500" />
