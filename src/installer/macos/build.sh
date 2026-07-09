@@ -29,7 +29,7 @@ npx electron-builder --mac dmg
 
 echo ""
 echo "[3/4] Copying .ovpn configs into app bundle..."
-APP_PATH="dist/mac/VoxVPN.app/Contents/Resources/configs"
+APP_PATH="dist/mac/VoxVPN Shield Agent.app/Contents/Resources/configs"
 mkdir -p "$APP_PATH"
 cp installer/assets/configs/*.ovpn "$APP_PATH/" 2>/dev/null || echo "No .ovpn configs found in installer/assets/configs/"
 
@@ -42,5 +42,5 @@ echo "================================================"
 echo "  NOTE: To code-sign the DMG:"
 echo "  codesign --deep --force --verify --verbose"
 echo "    --sign 'Developer ID Application: Your Name'"
-echo "    dist/VoxVPN-1.0.0.dmg"
+echo "    dist/VoxVPN Shield Agent-3.0.0.dmg"
 echo "================================================"

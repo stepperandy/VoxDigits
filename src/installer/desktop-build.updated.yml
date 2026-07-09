@@ -1,0 +1,96 @@
+# VoxVPN Shield Agent v3.0 — Build & Release
+# Copy this file to: .github/workflows/desktop-build.yml
+# This is a reference copy — the actual workflow file is at the repo root.
+
+name: VoxVPN Shield Agent v3.0 — Build & Release
+
+on:
+  push:
+    branches: [main, develop]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            build_cmd: npm run build:win
+            artifact_name: VoxVPN-Shield-Windows-Setup
+            artifact_path: installer/windows/output
+          - os: macos-latest
+            build_cmd: npm run build:mac
+            artifact_name: VoxVPN-Shield-macOS
+            artifact_path: dist
+          - os: ubuntu-latest
+            build_cmd: npm run build:linux
+            artifact_name: VoxVPN-Shield-Linux
+            artifact_path: dist
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Vite + Electron (unpackaged)
+        run: ${{ matrix.build_cmd }}
+        env:
+          BASE44_APP_ID: 69c84f61d5543b54fe26e1e5
+
+      - name: Install Inno Setup 6 (Windows only)
+        if: matrix.os == 'windows-latest'
+        uses: Minionguy/Inno-Setup-Action@v1.2.4
+        with:
+          path: installer/windows/VoxVPN.iss
+          options: /O+ installer/windows/output
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_path }}
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: VoxVPN Shield Agent ${{ github.ref_name }}
+          body: |
+            ## VoxVPN Shield Agent ${{ github.ref_name }}
+
+            ### What's new in v3.0
+            - Rebranded as VoxVPN Shield Agent with system tray integration
+            - DNS filtering with category-based blocking (malware, phishing, adult, etc.)
+            - Auto-start on login with background protection
+            - Unified authentication with voxvpn.net (Base44 backend)
+            - OS-encrypted token storage (Windows DPAPI / macOS Keychain)
+            - Auto-update notifications via `latestVersion` endpoint
+            - Heartbeat subscription enforcement
+            - Session lifecycle (start / end / heartbeat) fully wired to live backend
+          files: ${{ matrix.artifact_path }}/**/*
+          draft: false
+          prerelease: ${{ contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify Slack on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v2
+        with:
+          payload: |
+            {
+              "text": "❌ VoxVPN Shield Agent build failed on *${{ matrix.os }}* — <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

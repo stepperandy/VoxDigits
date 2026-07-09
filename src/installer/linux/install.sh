@@ -71,12 +71,12 @@ install_app() {
   mkdir -p "$INSTALL_DIR"
 
   # Copy AppImage or unpacked app
-  if [ -f "VoxVPN.AppImage" ]; then
-    cp VoxVPN.AppImage "$INSTALL_DIR/VoxVPN"
-    chmod +x "$INSTALL_DIR/VoxVPN"
+  if ls VoxVPN*Shield*Agent*.AppImage 1>/dev/null 2>&1; then
+    cp VoxVPN*Shield*Agent*.AppImage "$INSTALL_DIR/VoxVPN-Shield-Agent"
+    chmod +x "$INSTALL_DIR/VoxVPN-Shield-Agent"
   elif [ -d "linux-unpacked" ]; then
     cp -r linux-unpacked/* "$INSTALL_DIR/"
-    chmod +x "$INSTALL_DIR/voxvpn"
+    chmod +x "$INSTALL_DIR/voxvpn-shield-agent" 2>/dev/null || true
   else
     echo "ERROR: No VoxVPN app found. Build first with: npx electron-builder --linux"
     exit 1
@@ -107,7 +107,7 @@ create_desktop_entry() {
 [Desktop Entry]
 Name=VoxVPN
 Comment=Military-grade VPN protection
-Exec=$INSTALL_DIR/VoxVPN
+Exec=$INSTALL_DIR/VoxVPN-Shield-Agent
 Icon=$INSTALL_DIR/resources/icon.png
 Terminal=false
 Type=Application

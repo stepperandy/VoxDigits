@@ -109,7 +109,7 @@ echo       Done.
 if not exist "%SCRIPT_DIR%dist\win-unpacked" mkdir "%SCRIPT_DIR%dist\win-unpacked"
 xcopy /E /Y /I "%ROOT_DIR%installer\windows\output\win-unpacked" "%SCRIPT_DIR%dist\win-unpacked\" >nul 2>nul
 :: Fallback: look in the default electron-builder output location
-if not exist "%SCRIPT_DIR%dist\win-unpacked\VoxVPN.exe" (
+if not exist "%SCRIPT_DIR%dist\win-unpacked\VoxVPN Shield Agent.exe" (
     xcopy /E /Y /I "%ROOT_DIR%dist\win-unpacked" "%SCRIPT_DIR%dist\win-unpacked\" >nul 2>nul
 )
 
@@ -131,7 +131,7 @@ echo.
 echo  ===============================================
 echo   SUCCESS! Installer built.
 echo.
-echo   Output: installer\windows\output\VoxVPN-Setup-2.0.0.exe
+echo   Output: installer\windows\output\VoxVPN-Shield-Setup-3.0.0.exe
 echo.
 echo   Next steps:
 echo   1. Test the installer on a clean Windows 10/11 VM
