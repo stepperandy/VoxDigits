@@ -9,6 +9,7 @@ const navLinks = [
   { label: 'Features', href: '#features' },
   { label: 'Servers', href: '#servers' },
   { label: 'Pricing', href: '/pricing' },
+  { label: 'Business', href: '/shield' },
   { label: 'eSIM', href: 'https://www.voxdigits.net', external: true },
   { label: 'Virtual Numbers', href: 'https://www.voxdigits.net', external: true },
   { label: 'Support', href: '/contact' },
