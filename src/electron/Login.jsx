@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from './AuthContext';
 import { Loader2, Eye, EyeOff, AlertTriangle, Shield, ExternalLink, CreditCard } from 'lucide-react';
 
-const API_URL = 'https://voxvpn.net/api/functions/authLogin';
+const API_URL = 'https://api.base44.com/api/apps/69c84f61d5543b54fe26e1e5/functions/authLogin';
 
 function getDeviceId() {
   let id = localStorage.getItem('voxvpn_device_id');
@@ -103,7 +103,7 @@ export default function Login() {
           />
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
             style={{ background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.2)', color: '#00d4ff' }}>
-            <Shield size={11} /> Same login as voxvpn.net
+            <Shield size={11} /> VoxVPN Shield Agent
           </div>
         </div>
 
@@ -112,7 +112,7 @@ export default function Login() {
           style={{ background: 'linear-gradient(135deg,#0d1420,#060c1a)', border: '1px solid rgba(0,212,255,0.15)', boxShadow: '0 0 40px rgba(0,212,255,0.06)' }}>
 
           <h2 className="text-white font-black text-xl mb-1">Welcome back</h2>
-          <p className="text-slate-500 text-xs mb-6">Sign in with your voxvpn.net account to connect</p>
+          <p className="text-slate-500 text-xs mb-6">Sign in with your VoxVPN / VoxShield account</p>
 
           {/* Error messages */}
           {error && (
@@ -187,7 +187,7 @@ export default function Login() {
               className="w-full py-3.5 rounded-xl text-black font-black text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
               style={{ background: loading ? 'rgba(0,212,255,0.7)' : 'linear-gradient(135deg,#00d4ff,#00b8e6)', boxShadow: '0 8px 24px rgba(0,212,255,0.3)' }}
             >
-              {loading ? <><Loader2 size={16} className="animate-spin" /> Signing in…</> : 'Sign In to VoxVPN'}
+              {loading ? <><Loader2 size={16} className="animate-spin" /> Signing in…</> : 'Sign In to Shield'}
             </button>
           </form>
 
@@ -207,7 +207,7 @@ export default function Login() {
           </div>
         </div>
 
-        <p className="text-center text-slate-700 text-xs mt-5">VoxVPN · Military-grade privacy</p>
+        <p className="text-center text-slate-700 text-xs mt-5">VoxVPN Shield Agent · Military-grade privacy</p>
       </div>
     </div>
   );

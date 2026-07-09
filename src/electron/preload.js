@@ -2,7 +2,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronVPN', {
-  // Window controls
+  // Window controls — minimize to tray, not close
   minimize: () => ipcRenderer.send('win-minimize'),
   close:    () => ipcRenderer.send('win-close'),
 
@@ -24,7 +24,21 @@ contextBridge.exposeInMainWorld('electronVPN', {
   loadToken:  ()      => ipcRenderer.invoke('token-load'),
   clearToken: ()      => ipcRenderer.invoke('token-clear'),
 
+  // Auto-start with Windows
+  enableAutoStart:  () => ipcRenderer.invoke('autostart-enable'),
+  disableAutoStart: () => ipcRenderer.invoke('autostart-disable'),
+  getAutoStartStatus: () => ipcRenderer.invoke('autostart-status'),
+
+  // DNS filtering
+  applyDnsFilter:  (domains) => ipcRenderer.invoke('dns-apply', domains),
+  removeDnsFilter: ()        => ipcRenderer.invoke('dns-remove'),
+  getDnsStatus:    ()        => ipcRenderer.invoke('dns-status'),
+
+  // Tray update
+  updateTray: (connected) => ipcRenderer.send('tray-update', { connected }),
+
   // Version / update check
-  getVersion:   () => ipcRenderer.invoke('get-version'),
-  checkUpdate:  () => ipcRenderer.invoke('check-update'),
+  getVersion:  () => ipcRenderer.invoke('get-version'),
+  getAppName:  () => ipcRenderer.invoke('get-app-name'),
+  checkUpdate: () => ipcRenderer.invoke('check-update'),
 });

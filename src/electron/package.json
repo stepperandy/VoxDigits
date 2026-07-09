@@ -1,7 +1,7 @@
 {
-  "name": "voxvpn",
-  "version": "2.0.0",
-  "description": "VoxVPN Desktop Client V2",
+  "name": "voxvpn-shield-agent",
+  "version": "3.0.0",
+  "description": "VoxVPN Shield Agent — VPN + DNS Protection for Windows",
   "main": "electron/main.js",
   "private": true,
   "scripts": {
@@ -12,9 +12,9 @@
     "build:linux":"vite build && electron-builder --linux"
   },
   "build": {
-    "appId": "net.voxvpn.app",
-    "productName": "VoxVPN",
-    "copyright": "Copyright © 2025–2026 VoxVPN",
+    "appId": "net.voxvpn.shield",
+    "productName": "VoxVPN Shield Agent",
+    "copyright": "Copyright © 2026 VoxDigits Communications LLC",
     "directories": {
       "output": "installer/windows/output"
     },
@@ -44,7 +44,8 @@
       "uninstallerIcon": "installer/windows/assets/icon.ico",
       "installerHeaderIcon": "installer/windows/assets/icon.ico",
       "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true
     },
     "mac": {
       "target": "dmg",

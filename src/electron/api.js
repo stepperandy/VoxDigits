@@ -1,5 +1,6 @@
 /**
- * VoxVPN Electron — Direct HTTP API client
+ * VoxVPN Shield Agent — Direct HTTP API client
+ * Connects to the shared VoxVPN/VoxShield SaaS backend.
  * All requests go to Base44 backend functions via production endpoints.
  */
 
@@ -30,15 +31,15 @@ async function request(fn, body = {}, token = null) {
 }
 
 export const api = {
-  // Auth
+  // Auth — shared login with voxvpn.net / VoxShield dashboard
   login: (email, password, device_id, device_name, device_type = 'windows') =>
     request('authLogin', { email, password, device_id, device_name, device_type }),
 
-  // Subscription
+  // Subscription status — controls VPN access
   validateSubscription: (token) =>
     request('validateSubscription', {}, token),
 
-  // Servers
+  // Servers — list from backend
   getServers: (token, device_id) =>
     request('getVpnServersForUser', { device_id }, token),
 
@@ -59,7 +60,7 @@ export const api = {
   heartbeat: (token, device_id, server_id) =>
     request('heartbeatPing', { device_id, server_id }, token),
 
-  // Device
+  // Device management — admin can block/remove from VoxShield dashboard
   revokeDevice: (token, device_id) =>
     request('revokeDeviceSession', { device_id }, token),
 
@@ -67,7 +68,7 @@ export const api = {
   forgotPassword: (email) =>
     request('forgotPassword', { email }),
 
-  // Version check — hosted at voxvpn.net/downloads/
+  // Version check
   latestVersion: () =>
     request('latestVersion', { platform: 'Windows' }),
 
@@ -75,6 +76,40 @@ export const api = {
   runSpeedTest: (token, device_id) =>
     request('runSpeedTest', { device_id }, token),
 
-  // Direct installer URL (fallback if latestVersion has no download_url)
-  INSTALLER_URL: 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe',
+  // DNS filtering — fetch blocklist from VoxShield client config
+  getDnsConfig: async (token) => {
+    try {
+      // Try fetching the user's client DNS filter configuration
+      const res = await fetch(`${BASE}/getDnsFilterConfig`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error);
+      return data;
+    } catch {
+      // Fallback: built-in malware + phishing blocklist
+      return {
+        categories: { block_malware: true, block_phishing: true, block_adult: false, block_gambling: false, block_social_media: false, block_streaming: false },
+        blocklist: [
+          'malware-c2.evil.com', 'phishing-login.fake-bank.com', 'suspicious-download.xyz',
+          'trojan-download.net', 'phishing-portal.fake.com', 'malware-payload.malicious.org',
+        ],
+      };
+    }
+  },
+
+  // Security logging — send events to VoxShield backend
+  logSecurityEvent: (token, event_type, message, severity = 'info', device_name = null) => {
+    if (!token) return Promise.resolve();
+    return fetch(`${BASE}/logSecurityEvent`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ event_type, message, severity, device_name }),
+    }).catch(() => {});
+  },
+
+  // Installer URL (fallback)
+  INSTALLER_URL: 'https://voxvpn.net/download',
 };

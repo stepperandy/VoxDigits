@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Shield, Loader2, WifiOff, Lock, CheckCircle2, AlertTriangle, Minus, X, Search, LogOut, Download, Zap, Gauge, ToggleLeft, ToggleRight, Activity } from 'lucide-react';
+import { Shield, Loader2, WifiOff, Lock, CheckCircle2, AlertTriangle, Minus, X, Search, LogOut, Download, Zap, Gauge, ToggleLeft, ToggleRight, Activity, Globe, ShieldCheck, ShieldAlert, CreditCard } from 'lucide-react';
 import { api } from './api';
 import { useAuth } from './AuthContext';
 
 const HEARTBEAT_INTERVAL_MS = 60_000;
+const SUBSCRIPTION_CHECK_MS = 5 * 60_000; // 5 min
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -16,6 +17,17 @@ export default function Dashboard() {
   const [log, setLog]                   = useState('');
   const [forceLogout, setForceLogout]   = useState('');
   const [updateInfo, setUpdateInfo]     = useState(null);
+
+  // Subscription status
+  const [subStatus, setSubStatus] = useState(null); // { active, plan, renewal_date }
+
+  // DNS Filtering
+  const [dnsEnabled, setDnsEnabled]         = useState(() => localStorage.getItem('voxvpn_dns_filter') === 'true');
+  const [dnsStats, setDnsStats]           = useState({ blocked: 0 });
+  const [dnsCategories, setDnsCategories] = useState({ block_malware: true, block_phishing: true, block_adult: false, block_gambling: false, block_social_media: false, block_streaming: false });
+
+  // Auto-start with Windows
+  const [autoStart, setAutoStart] = useState(false);
 
   // Kill Switch
   const [killSwitch, setKillSwitch]         = useState(() => localStorage.getItem('voxvpn_kill_switch') === 'true');
@@ -31,19 +43,95 @@ export default function Dashboard() {
 
   const listRef      = useRef(null);
   const heartbeatRef = useRef(null);
+  const subCheckRef  = useRef(null);
   const sessionStart = useRef(null);
   const activeServer = useRef(null);
   const vpn = window.electronVPN;
 
-  // Check for updates on mount
+  // App name + version
+  const [appName, setAppName] = useState('VoxVPN Shield Agent');
+  const [appVersion, setAppVersion] = useState('3.0.0');
+
+  // Check for updates + get app info on mount
   useEffect(() => {
+    vpn?.getAppName?.().then(setAppName).catch(() => {});
+    vpn?.getVersion?.().then(setAppVersion).catch(() => {});
     vpn?.checkUpdate?.().then(res => {
       if (res?.hasUpdate) setUpdateInfo({
         ...res,
-        downloadUrl: res.downloadUrl || 'https://github.com/stepperandy/voxvpn/releases/download/v2.0.0/VoxVPN-Setup-v2.0.exe',
+        downloadUrl: res.downloadUrl || 'https://voxvpn.net/download',
       });
     }).catch(() => {});
   }, []);
+
+  // Load auto-start status
+  useEffect(() => {
+    vpn?.getAutoStartStatus?.().then(setAutoStart).catch(() => {});
+  }, []);
+
+  // Load DNS config from backend
+  useEffect(() => {
+    if (!user) return;
+    api.getDnsConfig(user.token).then(cfg => {
+      if (cfg?.categories) setDnsCategories(cfg.categories);
+    }).catch(() => {});
+  }, [user]);
+
+  // Apply DNS filtering on toggle
+  const toggleDnsFilter = useCallback(async () => {
+    const next = !dnsEnabled;
+    setDnsEnabled(next);
+    localStorage.setItem('voxvpn_dns_filter', String(next));
+    if (next) {
+      const cfg = await api.getDnsConfig(user?.token).catch(() => ({}));
+      const domains = cfg?.blocklist || [];
+      const result = await vpn?.applyDnsFilter?.(domains);
+      if (!result) {
+        setError('Failed to enable DNS filtering. Run as Administrator.');
+        setDnsEnabled(false);
+        localStorage.setItem('voxvpn_dns_filter', 'false');
+      } else {
+        api.logSecurityEvent(user?.token, 'dns_block', 'DNS filtering enabled', 'info').catch(() => {});
+      }
+    } else {
+      await vpn?.removeDnsFilter?.();
+    }
+  }, [dnsEnabled, user, vpn]);
+
+  // Toggle auto-start
+  const toggleAutoStart = useCallback(async () => {
+    const next = !autoStart;
+    setAutoStart(next);
+    if (next) {
+      await vpn?.enableAutoStart?.();
+    } else {
+      await vpn?.disableAutoStart?.();
+    }
+  }, [autoStart, vpn]);
+
+  // Subscription status check
+  const checkSubscription = useCallback(async () => {
+    if (!user?.token) return;
+    try {
+      const res = await api.validateSubscription(user.token);
+      setSubStatus({
+        active: res.subscriptionActive !== false,
+        plan: res.subscription?.plan || res.plan || user.plan,
+        renewal_date: res.subscription?.renewal_date || res.renewal_date,
+      });
+      if (res.subscriptionActive === false && res.disconnect) {
+        await forceDisconnect(res.reason || 'Subscription inactive. Renew at voxvpn.net');
+      }
+    } catch { /* network hiccup */ }
+  }, [user]);
+
+  // Initial sub check + periodic polling
+  useEffect(() => {
+    if (!user) return;
+    checkSubscription();
+    subCheckRef.current = setInterval(checkSubscription, SUBSCRIPTION_CHECK_MS);
+    return () => { if (subCheckRef.current) clearInterval(subCheckRef.current); };
+  }, [user, checkSubscription]);
 
   // Load servers on mount
   useEffect(() => {
@@ -74,7 +162,10 @@ export default function Dashboard() {
     if (!vpn) return;
     vpn.onStatus(s => setStatus(s));
     vpn.onLog(line => setLog(prev => (prev + '\n' + line).split('\n').slice(-30).join('\n')));
-    vpn.getStatus().then(({ connected }) => setStatus(connected ? 'connected' : 'idle'));
+    vpn.getStatus().then(({ connected }) => {
+      setStatus(connected ? 'connected' : 'idle');
+      vpn?.updateTray?.(connected);
+    });
 
     const handleClick = (e) => {
       if (listRef.current && !listRef.current.contains(e.target)) setServerListOpen(false);
@@ -222,7 +313,7 @@ export default function Dashboard() {
           <div className="w-6 h-6 bg-cyan-400 rounded-md flex items-center justify-center">
             <Shield size={13} className="text-black" />
           </div>
-          <span className="text-white font-bold text-sm">VoxVPN</span>
+          <span className="text-white font-bold text-sm">VoxVPN Shield</span>
         </div>
         <div className="flex items-center gap-1" style={{ WebkitAppRegion: 'no-drag' }}>
           <button onClick={logout} title="Sign out"
@@ -360,6 +451,51 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* Subscription Status */}
+        {subStatus && (
+          <div className="px-4 py-2.5 rounded-xl border border-white/8 bg-[#0d1120]">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-1.5">
+                <CreditCard size={11} className="text-slate-500" />
+                <p className="text-white text-xs font-bold">Subscription</p>
+              </div>
+              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${subStatus.active ? 'text-emerald-400 bg-emerald-500/10' : 'text-rose-400 bg-rose-500/10'}`}>
+                {subStatus.active ? 'ACTIVE' : 'INACTIVE'}
+              </span>
+            </div>
+            <p className="text-slate-600 text-[10px]">{subStatus.plan || 'No plan'}{subStatus.renewal_date ? ` · Renews ${new Date(subStatus.renewal_date).toLocaleDateString()}` : ''}</p>
+          </div>
+        )}
+
+        {/* DNS Filtering */}
+        <div className="flex items-center justify-between px-4 py-2.5 rounded-xl border border-white/8 bg-[#0d1120]">
+          <div className="flex items-center gap-2">
+            {dnsEnabled ? <ShieldCheck size={16} className="text-cyan-400" /> : <Globe size={16} className="text-slate-600" />}
+            <div>
+              <p className="text-white text-xs font-bold">DNS Protection</p>
+              <p className="text-slate-600 text-[10px]">{dnsEnabled ? `${dnsStats.blocked} threats blocked` : 'Malware & phishing filter'}</p>
+            </div>
+          </div>
+          <button onClick={toggleDnsFilter} className="transition-colors">
+            {dnsEnabled
+              ? <ToggleRight size={26} className="text-cyan-400" />
+              : <ToggleLeft  size={26} className="text-slate-600" />}
+          </button>
+        </div>
+
+        {/* Auto-start with Windows */}
+        <div className="flex items-center justify-between px-4 py-2.5 rounded-xl border border-white/8 bg-[#0d1120]">
+          <div>
+            <p className="text-white text-xs font-bold">Auto-start</p>
+            <p className="text-slate-600 text-[10px]">Launch with Windows</p>
+          </div>
+          <button onClick={toggleAutoStart} className="transition-colors">
+            {autoStart
+              ? <ToggleRight size={26} className="text-cyan-400" />
+              : <ToggleLeft  size={26} className="text-slate-600" />}
+          </button>
+        </div>
+
         {/* Kill Switch toggle */}
         <div className="flex items-center justify-between px-4 py-2.5 rounded-xl border border-white/8 bg-[#0d1120]">
           <div>
@@ -406,7 +542,7 @@ export default function Dashboard() {
         )}
 
         {/* User info */}
-        {user && <p className="text-slate-700 text-xs text-center pb-1">{user.email} · {user.plan || 'VoxVPN'} · v2.0.0</p>}
+        {user && <p className="text-slate-700 text-xs text-center pb-1">{user.email} · {subStatus?.plan || user.plan || 'VoxVPN Shield'} · v{appVersion}</p>}
       </div>
 
       {/* Log panel */}

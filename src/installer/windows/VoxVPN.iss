@@ -1,13 +1,14 @@
-; VoxVPN Windows Installer v1.5
+; VoxVPN Shield Agent — Windows Installer v3.0
 ; Installs OpenVPN CLI + GUI + TAP driver + Electron app + all server configs
+; Includes system tray, DNS filtering, auto-start, and background protection
 ; Requires Inno Setup 6 — https://jrsoftware.org/isinfo.php
-; Portable-ready: works on any Windows 10/11 PC, not just the build machine
 
-#define MyAppName      "VoxVPN"
-#define MyAppVersion   "1.5.0"
-#define MyAppPublisher "VoxVPN"
+#define MyAppName      "VoxVPN Shield Agent"
+#define MyAppShortName "VoxVPN Shield"
+#define MyAppVersion   "3.0.0"
+#define MyAppPublisher "VoxDigits Communications LLC"
 #define MyAppURL       "https://voxvpn.net"
-#define MyAppExeName   "VoxVPN.exe"
+#define MyAppExeName   "VoxVPN Shield Agent.exe"
 #define MyAppGUID      "{{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
 
 [Setup]
@@ -19,14 +20,14 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}/contact
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={autopf}\{#MyAppName}
-DefaultGroupName={#MyAppName}
+DefaultDirName={autopf}\VoxVPN Shield
+DefaultGroupName=VoxVPN Shield
 AllowNoIcons=yes
-; Require admin so TAP driver installs cleanly
+; Require admin so TAP driver installs cleanly + DNS filtering (hosts file) works
 PrivilegesRequired=admin
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=output
-OutputBaseFilename=VoxVPN-Setup-{#MyAppVersion}
+OutputBaseFilename=VoxVPN-Shield-Setup-{#MyAppVersion}
 ; Use icon only if present — set to a real .ico at build time
 ; SetupIconFile=assets\icon.ico
 Compression=lzma2/ultra64
@@ -40,14 +41,14 @@ UninstallDisplayName={#MyAppName}
 DisableDirPage=no
 DisableProgramGroupPage=auto
 ; Prevent running two instances of setup simultaneously
-SetupMutex=VoxVPNSetupMutex
+SetupMutex=VoxVPNShieldSetupMutex
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon";   Description: "Create a &desktop shortcut";        GroupDescription: "Additional Icons:"; Flags: unchecked
-Name: "startupicon";   Description: "Start VoxVPN automatically at login"; GroupDescription: "Additional Icons:"; Flags: unchecked
+Name: "desktopicon";   Description: "Create a &desktop shortcut";                    GroupDescription: "Additional Icons:"; Flags: unchecked
+Name: "startupicon";   Description: "Start {#MyAppShortName} automatically at login";  GroupDescription: "Additional Icons:"; Flags: checkedonce
 
 [Files]
 ; ── Electron app (electron-builder --dir output) ──────────────────────────────
@@ -65,41 +66,35 @@ Source: "assets\configs\*.ovpn"; DestDir: "{app}\configs"; \
   Flags: ignoreversion skipifsourcedoesntexist
 
 [Icons]
-Name: "{group}\{#MyAppName}";                        Filename: "{app}\{#MyAppExeName}"
-Name: "{group}\{cm:UninstallProgram,{#MyAppName}}";  Filename: "{uninstallexe}"
-Name: "{commondesktop}\{#MyAppName}";                 Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
-Name: "{userstartup}\{#MyAppName}";                   Filename: "{app}\{#MyAppExeName}"; Tasks: startupicon
+Name: "{group}\{#MyAppShortName}";                      Filename: "{app}\{#MyAppExeName}"
+Name: "{group}\{cm:UninstallProgram,{#MyAppShortName}}";  Filename: "{uninstallexe}"
+Name: "{commondesktop}\{#MyAppShortName}";                Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{userstartup}\{#MyAppShortName}";                  Filename: "{app}\{#MyAppExeName}"; Tasks: startupicon
 
 [Run]
 ; ── Kill any running VoxVPN / OpenVPN instances ───────────────────────────────
+Filename: "taskkill"; Parameters: "/F /IM ""{#MyAppExeName}""";  Flags: runhidden waitprocfinished
 Filename: "taskkill"; Parameters: "/F /IM openvpn-gui.exe";    Flags: runhidden waitprocfinished
 Filename: "taskkill"; Parameters: "/F /IM openvpn.exe";        Flags: runhidden waitprocfinished
 
 ; ── Install OpenVPN silently with all required components ─────────────────────
-;    /S              → silent install
-;    SELECT_OPENVPN  → openvpn.exe CLI binary
-;    SELECT_OPENVPNGUI → openvpn-gui.exe tray application
-;    SELECT_TAP      → TAP-Windows6 virtual adapter (essential for tunneling)
-;    SELECT_SERVICE  → OpenVPN service (auto-start VPN on Windows boot)
-;    SELECT_PATH     → adds openvpn.exe to system PATH
 Filename: "{tmp}\openvpn-installer.exe"; \
   Parameters: "/S /SELECT_OPENVPN=1 /SELECT_OPENVPNGUI=1 /SELECT_TAP=1 /SELECT_SERVICE=1 /SELECT_OPENSSL_UTILITIES=0 /SELECT_EASY_RSA=0 /SELECT_PATH=1"; \
   StatusMsg: "Installing OpenVPN & TAP driver (this may take a moment)..."; \
   Flags: waitprocfinished
 
 ; ── Copy all .ovpn configs to the OpenVPN config directory ────────────────────
-;    Works on all locales — uses {commonappdata} (C:\ProgramData) constant
 Filename: "{sys}\xcopy.exe"; \
   Parameters: """{app}\configs\*"" ""{commonappdata}\OpenVPN\config\"" /Y /E /I /Q"; \
   Flags: runhidden waitprocfinished
 
-; ── Launch VoxVPN after install ───────────────────────────────────────────────
+; ── Launch VoxVPN Shield Agent after install ──────────────────────────────────
 Filename: "{app}\{#MyAppExeName}"; \
-  Description: "Launch {#MyAppName}"; \
+  Description: "Launch {#MyAppShortName}"; \
   Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
-Filename: "taskkill"; Parameters: "/F /IM {#MyAppExeName}";  Flags: runhidden waitprocfinished
+Filename: "taskkill"; Parameters: "/F /IM ""{#MyAppExeName}""";  Flags: runhidden waitprocfinished
 Filename: "taskkill"; Parameters: "/F /IM openvpn.exe";      Flags: runhidden waitprocfinished
 Filename: "taskkill"; Parameters: "/F /IM openvpn-gui.exe";  Flags: runhidden waitprocfinished
 
