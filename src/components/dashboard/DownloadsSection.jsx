@@ -45,7 +45,20 @@ export default function DownloadsSection({ isAdmin = false }) {
     base44.entities.Download.list()
       .then(records => {
         const active = (records || []).filter(d => d.is_active !== false);
-        const filtered = isAdmin ? active : active.filter(d => d.platform === detectedPlatform);
+        let filtered;
+        if (isAdmin) {
+          filtered = active;
+        } else {
+          // Only show the installer matching the user's detected OS — one per platform
+          const seen = new Set();
+          filtered = active
+            .filter(d => d.platform === detectedPlatform)
+            .filter(d => {
+              if (seen.has(d.platform)) return false;
+              seen.add(d.platform);
+              return true;
+            });
+        }
         setDownloads(filtered);
       })
       .catch(() => setDownloads([]))

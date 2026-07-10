@@ -101,11 +101,21 @@ function canDownload(sub) {
   return ACTIVE_STATUSES.includes(sub.status);
 }
 
+function detectPlatform() {
+  const ua = navigator.userAgent.toLowerCase();
+  if (/android/.test(ua)) return 'android';
+  if (/iphone|ipad|ipod/.test(ua)) return 'ios';
+  if (/macintosh|mac os x/.test(ua) && !/iphone|ipad|mobile/.test(ua)) return 'macos';
+  if (/linux/.test(ua)) return 'linux';
+  return 'windows';
+}
+
 export default function DownloadPage() {
   const [user, setUser] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activePlatform, setActivePlatform] = useState('windows');
+  const detectedPlatform = detectPlatform();
+  const [activePlatform, setActivePlatform] = useState(detectedPlatform);
   const justPaid = new URLSearchParams(window.location.search).get('payment') === 'success';
 
   const [downloading, setDownloading] = useState(false);
@@ -267,7 +277,8 @@ export default function DownloadPage() {
             {/* ── VoxVPN Desktop V2.0 — Primary Download ── */}
              {canDownload(subscription) && (
                <>
-                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+                  {detectedPlatform === 'windows' && (
+                  <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
                    <div className="rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-[#0d1420] to-[#060c1a] p-8"
                      style={{ boxShadow: '0 0 60px rgba(0,212,255,0.08)' }}>
 
@@ -345,8 +356,9 @@ export default function DownloadPage() {
                    </p>
                 </div>
                 </motion.div>
+                )}
 
-                 {/* ── VoxVPN Android APK — Premium Download ── */}
+                {detectedPlatform === 'android' && (
                  <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-8">
                    <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-[#0d1420] to-[#060c1a] p-8"
                      style={{ boxShadow: '0 0 60px rgba(52,168,83,0.08)' }}>
@@ -391,7 +403,6 @@ export default function DownloadPage() {
                      </div>
                    </div>
                  </motion.div>
-                </>
                 )}
 
                 {/* Active — show platform tabs for mobile/config downloads */}
@@ -504,11 +515,11 @@ export default function DownloadPage() {
                 <Shield size={11} /> AES-256 Encryption · No-Logs Policy · VoxVPN
               </div>
             </div>
-          </>
-        )}
-      </div>
+            </>
+            )}
+            </div>
 
-      <Footer />
-    </div>
-  );
-}
+            <Footer />
+            </div>
+            );
+            }
