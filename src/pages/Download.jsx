@@ -274,11 +274,11 @@ export default function DownloadPage() {
                   {/* Badge row */}
                   <div className="flex flex-wrap items-center gap-2 mb-5">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-[#00d4ff] text-xs font-bold">
-                      <Star size={10} /> Official Installer
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-400 text-xs font-mono">
-                      <Tag size={10} /> v2.0.0
-                    </span>
+                       <Star size={10} /> Official Installer
+                     </span>
+                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-400 text-xs font-mono">
+                       <Tag size={10} /> v3.0.0
+                     </span>
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">
                       <CheckCircle2 size={10} /> Latest
                     </span>
@@ -293,9 +293,9 @@ export default function DownloadPage() {
 
                     {/* Info */}
                     <div className="flex-1">
-                      <h2 className="text-2xl font-black text-white mb-1">VoxVPN Desktop for Windows</h2>
+                      <h2 className="text-2xl font-black text-white mb-1">VoxVPN Shield Agent for Windows</h2>
                       <p className="text-slate-400 text-sm mb-3">
-                        One-click VPN client. Military-grade encryption. No config files needed.
+                        All-in-one VPN + DNS filtering + system tray protection. Military-grade encryption.
                       </p>
                       <div className="flex flex-wrap gap-3 text-xs text-slate-500">
                         <span className="flex items-center gap-1"><Shield size={11} className="text-emerald-400" /> AES-256</span>
@@ -321,17 +321,17 @@ export default function DownloadPage() {
                   {/* Release Notes */}
                   <div className="mt-6 pt-5 border-t border-white/5">
                     <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold mb-3">
-                      <FileText size={12} /> RELEASE NOTES — V2.0.0
-                    </div>
-                    <ul className="space-y-1.5 text-slate-400 text-xs">
-                      {[
-                        'Unified login with voxvpn.net — same credentials everywhere',
-                        'OS-encrypted token storage (Windows DPAPI / macOS Keychain)',
-                        'Auto-update notifications on launch',
-                        'Heartbeat subscription enforcement — expired plans auto-disconnect',
-                        'Session lifecycle fully synced with VoxVPN backend',
-                        'Removed dependency on local proxy server (V1.5 deprecated)',
-                      ].map((note, i) => (
+                       <FileText size={12} /> RELEASE NOTES — V3.0.0
+                     </div>
+                     <ul className="space-y-1.5 text-slate-400 text-xs">
+                       {[
+                         'Built-in DNS filtering — blocks malware, phishing, and custom domains',
+                         'System tray integration with auto-start on login',
+                         'Unified login with voxvpn.net — same credentials everywhere',
+                         'OS-encrypted token storage (Windows DPAPI)',
+                         'Heartbeat subscription enforcement — expired plans auto-disconnect',
+                         'Bundled OpenVPN CLI + TAP driver + all server configs',
+                       ].map((note, i) => (
                         <li key={i} className="flex items-start gap-2">
                           <CheckCircle2 size={11} className="text-emerald-400 flex-shrink-0 mt-0.5" />
                           {note}
@@ -341,8 +341,8 @@ export default function DownloadPage() {
                   </div>
 
                   <p className="text-slate-700 text-xs mt-4 text-center">
-                    Download v2.0.0 directly · No external links required
-                  </p>
+                     Download v3.0.0 directly · No external links required
+                   </p>
                 </div>
                 </motion.div>
 
