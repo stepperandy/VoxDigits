@@ -49,15 +49,8 @@ export default function DownloadsSection({ isAdmin = false }) {
         if (isAdmin) {
           filtered = active;
         } else {
-          // Only show the installer matching the user's detected OS — one per platform
-          const seen = new Set();
-          filtered = active
-            .filter(d => d.platform === detectedPlatform)
-            .filter(d => {
-              if (seen.has(d.platform)) return false;
-              seen.add(d.platform);
-              return true;
-            });
+          // Only show installers matching the user's detected OS
+          filtered = active.filter(d => d.platform === detectedPlatform);
         }
         setDownloads(filtered);
       })
