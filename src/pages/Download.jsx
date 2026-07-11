@@ -517,6 +517,8 @@ export default function DownloadPage() {
             </div>
             </>
             )}
+            </>
+            )}
             </div>
 
             <Footer />
