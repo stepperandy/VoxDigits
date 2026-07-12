@@ -11,7 +11,9 @@ Deno.serve(async (req) => {
 
     if (!response.ok) {
       const err = await response.text();
-      return Response.json({ error: `Vultr API error: ${err}` }, { status: response.status });
+      // Return a 200 with empty servers so the frontend doesn't throw an AxiosError.
+      // The error is surfaced as a message field for optional display.
+      return Response.json({ servers: [], error: `Vultr API unavailable: ${response.status}` });
     }
 
     const data = await response.json();

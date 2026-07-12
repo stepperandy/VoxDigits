@@ -48,9 +48,10 @@ export default function DashboardView() {
   const [loadingServers, setLoadingServers] = useState(true);
 
   useEffect(() => {
-    base44.entities.User.list().then(setUsers).finally(() => setLoadingUsers(false));
+    base44.entities.User.list().then(setUsers).catch(() => {}).finally(() => setLoadingUsers(false));
     base44.functions.invoke('getVultrServers', {})
-      .then((r) => setServers(r.data.servers || []))
+      .then((r) => setServers(r.data?.servers || []))
+      .catch(() => {})
       .finally(() => setLoadingServers(false));
   }, []);
 

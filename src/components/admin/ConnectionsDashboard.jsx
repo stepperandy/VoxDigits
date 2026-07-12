@@ -15,8 +15,10 @@ export default function ConnectionsDashboard() {
   const [exportResult, setExportResult] = useState(null);
 
   const load = async () => {
-    const data = await base44.entities.Analytics.list('-date', 30);
-    setAnalytics([...data].reverse());
+    try {
+      const data = await base44.entities.Analytics.list('-date', 30);
+      setAnalytics([...data].reverse());
+    } catch {}
   };
 
   useEffect(() => {
