@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Check, Zap } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PaymentMethodModal from '../PaymentMethodModal';
+import { useCurrencyDetection } from '@/hooks/useCurrencyDetection';
 
 const PLANS = [
   {
@@ -121,7 +122,7 @@ const PLANS = [
   },
 ];
 
-function PlanCard({ plan, isAdmin, onPaymentMethodSelect }) {
+function PlanCard({ plan, isAdmin, onPaymentMethodSelect, currency, convertPrice }) {
   const [loading, setLoading] = useState(false);
 
   const handleCheckout = () => {
@@ -142,10 +143,10 @@ function PlanCard({ plan, isAdmin, onPaymentMethodSelect }) {
       </div>
 
       <div className="flex items-baseline gap-1 mb-1">
-        <span className="text-3xl font-extrabold text-white">${plan.price}</span>
+        <span className="text-3xl font-extrabold text-white">{currency.symbol}{convertPrice(plan.price)}</span>
       </div>
       <p className="text-slate-600 text-xs mb-5">
-        ${plan.pricePerMonth}/mo
+        {currency.symbol}{convertPrice(plan.pricePerMonth)}/mo
         {plan.savingsPercent > 0 && <span className="ml-2 text-cyan-400 font-semibold">Save {plan.savingsPercent}% vs monthly</span>}
       </p>
 
@@ -175,6 +176,8 @@ export default function Pricing() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [selectedPriceId, setSelectedPriceId] = useState(null);
+  const { currency, countryCode } = useCurrencyDetection();
+  const convertPrice = (usdPrice) => (usdPrice * currency.rate).toFixed(currency.rate >= 100 ? 0 : 2);
 
   useEffect(() => {
     base44.auth.me()
@@ -244,7 +247,7 @@ export default function Pricing() {
 
         {/* Pricing info */}
         <div className="text-center mb-10">
-          <p className="text-slate-400 text-sm">Prices shown in <span className="font-semibold text-white">USD</span> <a href="#" className="text-cyan-400 hover:underline">(refresh)</a></p>
+          <p className="text-slate-400 text-sm">Prices shown in <span className="font-semibold text-white">{currency.code}</span> · Detected: <span className="text-cyan-400 font-semibold">{countryCode}</span></p>
         </div>
 
         {/* Plans grid */}
@@ -255,6 +258,8 @@ export default function Pricing() {
               plan={plan} 
               isAdmin={isAdmin}
               onPaymentMethodSelect={handlePaymentMethodSelect}
+              currency={currency}
+              convertPrice={convertPrice}
             />
           ))}
         </div>
@@ -266,8 +271,8 @@ export default function Pricing() {
           plan={selectedPlan}
           isAdmin={isAdmin}
           onProceed={handlePaymentProceed}
-          currency={{ code: 'USD' }}
-          countryCode="US"
+          currency={currency}
+          countryCode={countryCode}
         />
 
         {/* Trust bar */}
@@ -319,7 +324,7 @@ export default function Pricing() {
               { label: 'Auto-Renewal', value: 'Optional — cancel anytime' },
               { label: 'Cancellation Policy', value: 'Cancel anytime, no fees' },
               { label: 'Money-Back Guarantee', value: '30-day full refund' },
-              { label: 'Currency', value: 'USD' },
+              { label: 'Currency', value: `${currency.code} (auto-converted from USD)` },
             ].map(item => (
               <div key={item.label} className="flex justify-between items-center py-1.5 border-b border-white/5 last:border-0">
                 <span className="text-slate-500 text-xs">{item.label}</span>
@@ -333,7 +338,7 @@ export default function Pricing() {
         </div>
 
         <p className="text-center text-slate-600 text-xs mt-8">
-          All prices in USD. 30-day money-back guarantee. Secure payment via Stripe · Hubtel · Alipay · WeChat Pay.
+          All prices auto-converted to your local currency ({currency.code}). 30-day money-back guarantee. Secure payment via Stripe · Hubtel · Alipay · WeChat Pay.
         </p>
       </div>
     </section>

@@ -25,6 +25,27 @@ const CURRENCY_RATES = {
   'INR': 83,
   'BRL': 4.97,
   'AUD': 1.50,
+  'GHS': 12.5,
+  'CAD': 1.36,
+  'ZAR': 18.5,
+  'NGN': 1500,
+  'KES': 129,
+  'SGD': 1.35,
+  'HKD': 7.8,
+  'MXN': 18.5,
+  'AED': 3.67,
+  'RUB': 90,
+  'KRW': 1380,
+  'THB': 36,
+  'IDR': 16300,
+  'MYR': 4.7,
+  'PHP': 58,
+  'PKR': 278,
+  'EGP': 48,
+  'TRY': 32,
+  'SAR': 3.75,
+  'QAR': 3.64,
+  'NZD': 1.65,
   'USD': 1,
 };
 
@@ -32,7 +53,7 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
-    const { plan: rawPlan, isBilledYearly, isSixMonths, paymentMethod, currencyCode, countryCode, email: bodyEmail } = body;
+    const { plan: rawPlan, isBilledYearly, isSixMonths, paymentMethod, currencyCode, countryCode, rate: bodyRate, email: bodyEmail } = body;
     const plan = PLAN_ALIASES[rawPlan] || (PLAN_PRICES[rawPlan] ? rawPlan : null);
 
     if (!plan) {
@@ -56,9 +77,29 @@ Deno.serve(async (req) => {
     const planPrice = PLAN_PRICES[plan];
     let usdAmount = isBilledYearly ? planPrice.yearly : isSixMonths ? planPrice.sixmonths : planPrice.monthly;
     
-    // Use provided currency or default to USD
-    let currency = (currencyCode || 'USD').toLowerCase();
-    const rate = CURRENCY_RATES[currencyCode] || 1;
+    // Stripe supports a specific set of currencies. If the user's local currency
+    // isn't supported (e.g. GHS for Ghana), fall back to USD so the checkout
+    // session doesn't fail. The pricing page still shows converted prices for display.
+    const STRIPE_SUPPORTED = new Set([
+      'usd','aed','afn','all','amd','ang','aoa','ars','aud','awg','azn','bam','bbd',
+      'bdt','bgn','bif','bmd','bnd','bob','brl','bsd','bwp','byn','bzl','cad','cdf',
+      'chf','clp','cny','cop','crc','cve','czk','djf','dkk','dop','dzd','egp','etb',
+      'eur','fjd','fkp','gbp','gel','gip','gmd','gnf','gtq','gyd','hkd','hnl','hrk',
+      'htg','huf','idr','ils','inr','isk','jmd','jpy','kes','kgs','khr','kmf','krw',
+      'kyd','kzt','lak','lbp','lkr','lrd','lsl','mad','mdl','mga','mkd','mmk','mnt',
+      'mop','mur','mvr','mwk','mxn','myr','mzn','nad','ngn','nio','nok','npr','nzd',
+      'pab','pen','pgk','php','pkr','pln','pyg','qar','ron','rsd','rub','rwf','sar',
+      'sbd','scr','sek','sgd','shp','sle','sos','srd','std','szl','thb','tjs','top',
+      'try','ttd','twd','tzs','uah','ugx','uyu','uzs','vnd','vuv','wst','xaf','xcd',
+      'xcg','xof','xpf','yer','zar','zmw'
+    ]);
+    const requestedCurrency = (currencyCode || 'USD').toLowerCase();
+    // If the user's local currency isn't supported by Stripe, charge in USD
+    const currency = STRIPE_SUPPORTED.has(requestedCurrency) ? requestedCurrency : 'usd';
+    const effectiveCurrencyCode = currency.toUpperCase();
+    // Use the live rate from the frontend if provided (so the charged amount matches
+    // what the user saw on the pricing page). Fall back to the static rates below.
+    const rate = bodyRate || CURRENCY_RATES[effectiveCurrencyCode] || 1;
     const convertedAmount = usdAmount * rate;
     
     const amount = Math.round(convertedAmount * 100);

@@ -1,12 +1,15 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { CreditCard, X, Smartphone } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-// v2
+import { getPaymentMethods } from '@/hooks/useCurrencyDetection';
 
 export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, isAdmin, isBilledYearly, isSixMonths, currency, countryCode, userEmail }) {
   const [selectedMethod, setSelectedMethod] = useState('stripe');
   const [loading, setLoading] = useState(false);
   const [guestEmail, setGuestEmail] = useState('');
+
+  // Determine which payment methods to show based on detected country
+  const availableMethods = useMemo(() => getPaymentMethods(countryCode || 'US'), [countryCode]);
 
   // The email to attach to the checkout — uses logged-in user's email, or the guest email input
   const checkoutEmail = userEmail || guestEmail || null;
@@ -65,6 +68,7 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
         paymentMethod: selectedMethod,
         currencyCode: useCNY ? 'CNY' : (currency?.code || 'USD'),
         countryCode: useCNY ? 'CN' : (countryCode || 'US'),
+        rate: useCNY ? null : (currency?.rate || null),
         email: checkoutEmail,
       });
       const url = res?.data?.url;
@@ -119,16 +123,24 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
             </label>
           )}
 
-          {/* Stripe */}
+          {/* Stripe — always shown (cards, Apple Pay, Google Pay) */}
+          {availableMethods.includes('stripe') && (
           <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${selectedMethod === 'stripe' ? 'border-cyan-500 bg-cyan-500/5' : 'border-white/10 hover:border-white/20'}`}>
             <input type="radio" name="payment" value="stripe" checked={selectedMethod === 'stripe'} onChange={() => setSelectedMethod('stripe')} className="mt-1.5" />
             <div className="flex-1">
-              <p className="text-white font-bold text-sm">Stripe Checkout</p>
+              <div className="flex items-center gap-2">
+                <p className="text-white font-bold text-sm">Stripe Checkout</p>
+                {currency?.code && currency.code !== 'USD' && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400 font-bold">{currency.code}</span>
+                )}
+              </div>
               <p className="text-slate-400 text-xs mt-0.5">Card, Apple Pay, Google Pay, and more</p>
             </div>
           </label>
+          )}
 
-          {/* Hubtel */}
+          {/* Hubtel — Ghana only */}
+          {availableMethods.includes('hubtel') && (
           <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${selectedMethod === 'hubtel' ? 'border-orange-500 bg-orange-500/5' : 'border-white/10 hover:border-white/20'}`}>
             <input type="radio" name="payment" value="hubtel" checked={selectedMethod === 'hubtel'} onChange={(e) => setSelectedMethod(e.target.value)} className="mt-1.5" />
             <div className="flex-1">
@@ -140,8 +152,10 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
               <p className="text-slate-400 text-xs mt-0.5">Mobile Money, Visa, Mastercard (Ghana)</p>
             </div>
           </label>
+          )}
 
-          {/* WeChat Pay */}
+          {/* WeChat Pay — China only */}
+          {availableMethods.includes('wechat_pay') && (
           <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${selectedMethod === 'wechat_pay' ? 'border-green-500 bg-green-500/5' : 'border-white/10 hover:border-white/20'}`}>
             <input type="radio" name="payment" value="wechat_pay" checked={selectedMethod === 'wechat_pay'} onChange={(e) => setSelectedMethod(e.target.value)} className="mt-1.5" />
             <div className="flex-1">
@@ -153,8 +167,10 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
               <p className="text-slate-400 text-xs mt-0.5">Fast &amp; secure mobile payment</p>
             </div>
           </label>
+          )}
 
-          {/* Alipay */}
+          {/* Alipay — China only */}
+          {availableMethods.includes('alipay') && (
           <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${selectedMethod === 'alipay' ? 'border-blue-500 bg-blue-500/5' : 'border-white/10 hover:border-white/20'}`}>
             <input type="radio" name="payment" value="alipay" checked={selectedMethod === 'alipay'} onChange={(e) => setSelectedMethod(e.target.value)} className="mt-1.5" />
             <div className="flex-1">
@@ -166,6 +182,7 @@ export default function PaymentMethodModal({ isOpen, onClose, plan, onProceed, i
               <p className="text-slate-400 text-xs mt-0.5">Alibaba's digital wallet</p>
             </div>
           </label>
+          )}
 
           <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-white/10 cursor-pointer opacity-50">
             <input type="radio" name="payment" value="bank" disabled className="mt-1.5" />
