@@ -5,6 +5,7 @@ import AddClientModal from '@/components/voxshield/AddClientModal';
 import AssignVpnModal from '@/components/voxshield/AssignVpnModal';
 import DevicesTable from '@/components/voxshield/DevicesTable';
 import SecurityLogsSection from '@/components/voxshield/SecurityLogsSection';
+import SubscriptionSummary from '@/components/voxshield/SubscriptionSummary';
 
 const planColor = {
   basic: 'text-slate-400 bg-slate-500/10 border-slate-500/20',
@@ -50,7 +51,7 @@ export default function AgencyDashboard() {
       const [clientData, deviceData, subData] = await Promise.all([
         base44.entities.Client.list('-created_date', 200).catch(() => []),
         base44.entities.LinkedDevice.list('-created_date', 500).catch(() => []),
-        base44.entities.VPNSubscription.filter({ status: 'active' }, '-created_date', 500).catch(() => []),
+        base44.entities.VPNSubscription.list('-created_date', 500).catch(() => []),
       ]);
       setClients(clientData);
       setDevices(deviceData);
@@ -68,7 +69,7 @@ export default function AgencyDashboard() {
   }, [load]);
 
   const activeDevices = devices.filter((d) => d.status === 'active').length;
-  const totalUsers = subscriptions.length;
+  const totalUsers = subscriptions.filter((s) => s.status === 'active').length;
 
   const deviceCountFor = (clientId) => devices.filter((d) => d.subscription_id === clientId).length;
   const subCountFor = (clientId) => {
@@ -156,6 +157,12 @@ export default function AgencyDashboard() {
                 ))}
               </div>
             )}
+          </div>
+
+          {/* Subscription summary */}
+          <div>
+            <h2 className="text-white font-bold text-sm mb-3">Subscription Overview</h2>
+            <SubscriptionSummary subscriptions={subscriptions} clients={clients} />
           </div>
 
           {/* Security logs & threat reports */}
