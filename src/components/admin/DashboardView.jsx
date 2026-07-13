@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Users, Server, ShieldCheck, Activity, Loader2, TrendingUp, Globe, Cpu, ArrowUpRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
+import IndexNowPanel from '@/components/admin/IndexNowPanel';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { format, subDays } from 'date-fns';
 
@@ -81,6 +82,9 @@ export default function DashboardView() {
         <MetricCard icon={Server} label="Servers Online" value={loadingServers ? '—' : `${onlineServers}/${servers.length}`} sub="Live Vultr instances" color="violet" loading={loadingServers} />
         <MetricCard icon={ShieldCheck} label="Uptime" value="99.8%" sub="Last 30 days" color="rose" loading={false} />
       </div>
+
+      {/* IndexNow */}
+      <IndexNowPanel />
 
       {/* Charts row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
