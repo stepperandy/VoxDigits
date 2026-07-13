@@ -1,0 +1,98 @@
+# VoxShield Desktop — Build & Release
+# Copy this file to: .github/workflows/voxshield-build.yml
+# (GitHub Actions workflows cannot be edited from the app builder)
+
+name: VoxShield Desktop — Build & Release
+
+on:
+  push:
+    branches: [main]
+    tags: ['shield-v*']
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            build_cmd: npm run build:win
+            artifact_name: VoxShield-Windows
+            artifact_path: installer/voxshield/output
+          - os: macos-latest
+            build_cmd: npm run build:mac
+            artifact_name: VoxShield-macOS
+            artifact_path: installer/windows/output
+          - os: ubuntu-latest
+            build_cmd: npm run build:linux
+            artifact_name: VoxShield-Linux
+            artifact_path: installer/windows/output
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Vite + Electron
+        run: ${{ matrix.build_cmd }}
+        env:
+          BASE44_APP_ID: 69c84f61d5543b54fe26e1e5
+
+      - name: Compile Inno Setup (Windows only)
+        if: matrix.os == 'windows-latest'
+        run: |
+          iscc /O"installer/voxshield/output" "installer/voxshield/VoxShield.iss"
+        shell: cmd
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_path }}
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/shield-v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: VoxShield Desktop ${{ github.ref_name }}
+          body: |
+            ## VoxShield Business Security ${{ github.ref_name }}
+
+            ### Features
+            - Unified authentication with voxvpn.net / VoxShield dashboard
+            - OS-encrypted token storage (Windows DPAPI / macOS Keychain)
+            - DNS filtering with malware & phishing protection
+            - Kill switch, auto-start, system tray
+            - Heartbeat subscription enforcement
+            - Session lifecycle (start / end / heartbeat) fully wired to live backend
+
+            ### Install
+            - **Windows**: Download `VoxShield-Setup-*.exe`, run as Administrator
+            - **macOS**: Download `.dmg`, drag to Applications
+            - **Linux**: Download `.AppImage`, `chmod +x` and run
+          files: ${{ matrix.artifact_path }}/**/*
+          draft: false
+          prerelease: ${{ contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify Slack on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v2
+        with:
+          payload: |
+            {
+              "text": "❌ VoxShield desktop build failed on *${{ matrix.os }}* — <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

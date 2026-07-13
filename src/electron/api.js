@@ -64,6 +64,10 @@ export const api = {
   revokeDevice: (token, device_id) =>
     request('revokeDeviceSession', { device_id }, token),
 
+  // Signup — creates account, then user must purchase a plan at voxvpn.net/pricing
+  register: (full_name, email, password) =>
+    request('emailSignup', { full_name, email, password }),
+
   // Password
   forgotPassword: (email) =>
     request('forgotPassword', { email }),
