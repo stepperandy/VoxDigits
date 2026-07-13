@@ -1,0 +1,109 @@
+{
+  "name": "MarketingMetric",
+  "type": "object",
+  "properties": {
+    "plan": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "quarterly",
+        "semi_annual",
+        "annual",
+        "biennial"
+      ],
+      "description": "VPN plan these metrics relate to"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Reporting date (e.g. 2026-07-01)"
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "seo",
+        "ppc",
+        "social",
+        "email",
+        "referral"
+      ],
+      "default": "seo",
+      "description": "Marketing channel"
+    },
+    "campaign_name": {
+      "type": "string",
+      "description": "PPC or campaign name (e.g. 'Google Ads - Monthly Plan')"
+    },
+    "impressions": {
+      "type": "integer",
+      "default": 0,
+      "description": "Total impressions (search or ad views)"
+    },
+    "clicks": {
+      "type": "integer",
+      "default": 0,
+      "description": "Total clicks"
+    },
+    "conversions": {
+      "type": "integer",
+      "default": 0,
+      "description": "Total conversions (signups/purchases)"
+    },
+    "spend": {
+      "type": "number",
+      "default": 0,
+      "description": "Ad spend in USD"
+    },
+    "revenue": {
+      "type": "number",
+      "default": 0,
+      "description": "Attributed revenue in USD"
+    },
+    "avg_position": {
+      "type": "number",
+      "description": "Average SEO search ranking position"
+    },
+    "keyword_rankings": {
+      "type": "object",
+      "description": "Top keyword positions (keyword -> rank)",
+      "properties": {},
+      "additionalProperties": true
+    },
+    "backlinks": {
+      "type": "integer",
+      "default": 0,
+      "description": "Total backlinks (SEO)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional notes (up to 1000 characters)"
+    }
+  },
+  "required": [
+    "plan",
+    "date",
+    "channel"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

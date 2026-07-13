@@ -8,6 +8,7 @@ const pageMeta = {
   servers: { title: 'Server Infrastructure', sub: 'Live Vultr server status & configuration', breadcrumb: 'Home / Servers' },
   setups: { title: 'Setup Portals', sub: 'Manage customer setup portal entries', breadcrumb: 'Home / Setups' },
   downloads: { title: 'Downloads & Payments', sub: 'Manage VPN setup files with pricing', breadcrumb: 'Home / Downloads' },
+  'marketing-performance': { title: 'Marketing Performance', sub: 'Track SEO and PPC campaign results by plan', breadcrumb: 'Home / Marketing / Performance' },
 };
 
 export default function AdminHeader({ activePage }) {

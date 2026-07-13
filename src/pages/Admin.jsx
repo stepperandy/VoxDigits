@@ -11,6 +11,7 @@ import VPNServerManagement from '@/components/admin/VPNServerManagement';
 import VPNServerEditor from '@/components/admin/VPNServerEditor';
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
 import MarketingView from '@/components/admin/MarketingView';
+import MarketingPerformance from '@/components/admin/MarketingPerformance';
 import ServerStatusView from '@/components/admin/ServerStatusView';
 import ConnectionsDashboard from '@/components/admin/ConnectionsDashboard';
 import AffiliatesView from '@/components/admin/AffiliatesView';
@@ -37,6 +38,7 @@ export default function Admin() {
       case 'downloads': return <DownloadsView />;
       case 'analytics': return <AnalyticsDashboard />;
       case 'marketing': return <MarketingView />;
+      case 'marketing-performance': return <MarketingPerformance />;
       case 'server-status': return <ServerStatusView />;
       case 'connections': return <ConnectionsDashboard />;
       case 'affiliates': return <AffiliatesView />;

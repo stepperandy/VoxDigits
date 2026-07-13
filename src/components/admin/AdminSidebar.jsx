@@ -12,6 +12,7 @@ const navItems = [
   { icon: Activity, label: 'Server Status', id: 'server-status', desc: 'All VPN nodes & regions' },
   { icon: BarChart2, label: 'Connections', id: 'connections', desc: 'Connections, bandwidth & export' },
   { icon: Megaphone, label: 'Marketing', id: 'marketing', desc: 'SEO, PPC & AI campaigns' },
+  { icon: TrendingUp, label: 'Performance', id: 'marketing-performance', desc: 'SEO & PPC results by plan' },
   { icon: Handshake, label: 'Affiliates', id: 'affiliates', desc: 'Affiliates & partners' },
   { icon: Globe, label: 'Providers', id: 'providers', desc: 'Hybrid VPN provider APIs' },
   { icon: Users, label: 'Subscribers', id: 'subscribers', desc: 'Stats & download link' },
