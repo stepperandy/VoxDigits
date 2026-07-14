@@ -1,0 +1,47 @@
+{
+  "name": "UserProfile",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "Reference to User ID"
+    },
+    "app_identity": {
+      "type": "string",
+      "description": "App-specific identifier for the user"
+    },
+    "is_online": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether user is currently online"
+    },
+    "is_on_call": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether user is currently on a call"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "away",
+        "dnd"
+      ],
+      "default": "active",
+      "description": "User status"
+    },
+    "phone": {
+      "type": "string",
+      "description": "User phone number"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "user_id"
+  ]
+}

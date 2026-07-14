@@ -1,0 +1,82 @@
+{
+  "name": "ESim",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the purchasing user"
+    },
+    "product_id": {
+      "type": "string",
+      "description": "Airalo package ID"
+    },
+    "product_name": {
+      "type": "string",
+      "description": "Human-readable plan name"
+    },
+    "iccid": {
+      "type": "string",
+      "description": "ICCID returned by Airalo"
+    },
+    "qr_code": {
+      "type": "string",
+      "description": "QR code LPA activation string"
+    },
+    "airalo_order_id": {
+      "type": "string",
+      "description": "Airalo order ID"
+    },
+    "stripe_session_id": {
+      "type": "string",
+      "description": "Stripe checkout session ID"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "pending",
+        "expired",
+        "error"
+      ],
+      "default": "pending"
+    },
+    "price_paid": {
+      "type": "number",
+      "description": "Amount paid in USD"
+    },
+    "data_gb": {
+      "type": "number",
+      "description": "Total data in GB"
+    },
+    "data_used_gb": {
+      "type": "number",
+      "description": "Data consumed in GB"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Plan expiry date"
+    },
+    "auto_topup": {
+      "type": "boolean",
+      "default": false,
+      "description": "Automatically purchase a new plan when data hits 80%"
+    },
+    "auto_topup_triggered": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether auto-topup has already been triggered for current cycle"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "user_email",
+    "product_id",
+    "iccid",
+    "qr_code"
+  ]
+}

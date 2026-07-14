@@ -1,0 +1,22 @@
+{
+  "name": "AdminSettings",
+  "type": "object",
+  "properties": {
+    "setting_key": {
+      "type": "string",
+      "description": "Unique setting identifier"
+    },
+    "setting_value": {
+      "type": "string",
+      "description": "Setting value (JSON stringified if needed)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Setting description"
+    }
+  },
+  "required": [
+    "setting_key",
+    "setting_value"
+  ]
+}

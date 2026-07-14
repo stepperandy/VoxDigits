@@ -1,0 +1,89 @@
+{
+  "name": "KYCVerification",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "User email"
+    },
+    "full_name": {
+      "type": "string",
+      "description": "Legal full name"
+    },
+    "date_of_birth": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of birth"
+    },
+    "nationality": {
+      "type": "string",
+      "description": "Nationality / country"
+    },
+    "id_type": {
+      "type": "string",
+      "enum": [
+        "passport",
+        "national_id",
+        "drivers_license"
+      ],
+      "description": "Type of ID document"
+    },
+    "id_number": {
+      "type": "string",
+      "description": "Document ID number"
+    },
+    "id_front_url": {
+      "type": "string",
+      "description": "Front of ID document URL"
+    },
+    "id_back_url": {
+      "type": "string",
+      "description": "Back of ID document URL (optional for passport)"
+    },
+    "selfie_url": {
+      "type": "string",
+      "description": "Selfie with ID URL"
+    },
+    "address": {
+      "type": "string",
+      "description": "Full residential address"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "needs_review"
+      ],
+      "default": "pending"
+    },
+    "rejection_reason": {
+      "type": "string",
+      "description": "Reason for rejection if rejected"
+    },
+    "reviewed_by": {
+      "type": "string",
+      "description": "Admin email who reviewed"
+    },
+    "reviewed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "user_email",
+    "full_name",
+    "date_of_birth",
+    "nationality",
+    "id_type",
+    "id_number",
+    "id_front_url",
+    "selfie_url"
+  ]
+}

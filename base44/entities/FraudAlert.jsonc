@@ -1,0 +1,71 @@
+{
+  "name": "FraudAlert",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Flagged user email"
+    },
+    "alert_type": {
+      "type": "string",
+      "enum": [
+        "high_call_volume",
+        "high_sms_volume",
+        "rapid_spending",
+        "unusual_destinations",
+        "multiple_failed_payments"
+      ],
+      "description": "Type of fraud signal"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium"
+    },
+    "description": {
+      "type": "string",
+      "description": "Details of the suspicious activity"
+    },
+    "metric_value": {
+      "type": "number",
+      "description": "The metric that triggered the alert"
+    },
+    "metric_threshold": {
+      "type": "number",
+      "description": "The threshold that was exceeded"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "investigating",
+        "resolved",
+        "false_positive"
+      ],
+      "default": "open"
+    },
+    "account_suspended": {
+      "type": "boolean",
+      "default": false
+    },
+    "resolved_by": {
+      "type": "string"
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_email",
+    "alert_type",
+    "description"
+  ]
+}

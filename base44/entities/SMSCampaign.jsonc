@@ -1,0 +1,74 @@
+{
+  "name": "SMSCampaign",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user who created the campaign"
+    },
+    "from_number": {
+      "type": "string",
+      "description": "Virtual number to send from"
+    },
+    "campaign_name": {
+      "type": "string",
+      "description": "Name of the campaign"
+    },
+    "template": {
+      "type": "string",
+      "description": "SMS template with {{name}} variables"
+    },
+    "total_contacts": {
+      "type": "number",
+      "description": "Total number of contacts in campaign"
+    },
+    "sent_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of SMS successfully sent"
+    },
+    "failed_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of SMS that failed to send"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "sending",
+        "completed",
+        "failed"
+      ],
+      "default": "draft",
+      "description": "Campaign status"
+    },
+    "contacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "List of contacts with phone and name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "user_email",
+    "from_number",
+    "campaign_name",
+    "template",
+    "contacts"
+  ]
+}

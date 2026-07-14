@@ -1,0 +1,56 @@
+{
+  "name": "SMOCampaign",
+  "type": "object",
+  "properties": {
+    "campaign_name": {
+      "type": "string",
+      "description": "Name of the SMO campaign"
+    },
+    "platforms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Social media platforms (Facebook, Instagram, LinkedIn, Twitter, TikTok)"
+    },
+    "target_audience": {
+      "type": "string",
+      "description": "Description of target audience"
+    },
+    "engagement_goal": {
+      "type": "number",
+      "description": "Target engagement metric (likes, shares, comments)"
+    },
+    "current_engagement": {
+      "type": "number",
+      "description": "Current engagement metric"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "paused",
+        "completed"
+      ],
+      "default": "active",
+      "description": "Campaign status"
+    },
+    "budget": {
+      "type": "number",
+      "description": "Monthly budget in USD"
+    },
+    "content_calendar": {
+      "type": "string",
+      "description": "Link or description of content calendar"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    }
+  },
+  "required": [
+    "campaign_name",
+    "platforms",
+    "status"
+  ]
+}

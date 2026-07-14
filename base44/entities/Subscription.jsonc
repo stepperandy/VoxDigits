@@ -1,0 +1,91 @@
+{
+  "name": "Subscription",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "reseller_email": {
+      "type": "string",
+      "description": "Email of the reseller/agency managing this client subscription"
+    },
+    "service_type": {
+      "type": "string",
+      "enum": [
+        "virtual_number",
+        "esim",
+        "bundle"
+      ],
+      "default": "virtual_number"
+    },
+    "service_id": {
+      "type": "string",
+      "description": "ID of the VirtualNumber, ESim, etc."
+    },
+    "phone_number": {
+      "type": "string"
+    },
+    "plan_name": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Monthly renewal amount USD"
+    },
+    "billing_cycle": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "yearly"
+      ],
+      "default": "monthly"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "past_due",
+        "cancelled",
+        "paused"
+      ],
+      "default": "active"
+    },
+    "current_period_start": {
+      "type": "string",
+      "format": "date"
+    },
+    "current_period_end": {
+      "type": "string",
+      "format": "date"
+    },
+    "stripe_subscription_id": {
+      "type": "string"
+    },
+    "auto_renew": {
+      "type": "boolean",
+      "default": true
+    },
+    "last_renewal_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "failed_payment_count": {
+      "type": "number",
+      "default": 0
+    },
+    "provider": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "user_email",
+    "service_type",
+    "service_id",
+    "amount"
+  ]
+}

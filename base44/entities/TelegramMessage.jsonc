@@ -1,0 +1,70 @@
+{
+  "name": "TelegramMessage",
+  "type": "object",
+  "properties": {
+    "virtual_number_id": {
+      "type": "string",
+      "description": "Virtual number ID this Telegram is linked to"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "User email"
+    },
+    "from_telegram_id": {
+      "type": "string",
+      "description": "Sender Telegram user ID"
+    },
+    "to_telegram_id": {
+      "type": "string",
+      "description": "Recipient Telegram user ID"
+    },
+    "chat_id": {
+      "type": "string",
+      "description": "Telegram chat ID"
+    },
+    "message_body": {
+      "type": "string",
+      "description": "Message content"
+    },
+    "direction": {
+      "type": "string",
+      "enum": [
+        "inbound",
+        "outbound"
+      ],
+      "description": "Message direction"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "sent",
+        "delivered",
+        "failed",
+        "pending"
+      ],
+      "default": "pending"
+    },
+    "provider_message_id": {
+      "type": "string",
+      "description": "Telegram message ID"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "virtual_number_id",
+    "user_email",
+    "from_telegram_id",
+    "to_telegram_id",
+    "chat_id",
+    "message_body",
+    "direction"
+  ]
+}

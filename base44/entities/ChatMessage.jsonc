@@ -1,0 +1,48 @@
+{
+  "name": "ChatMessage",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user sending the message"
+    },
+    "message": {
+      "type": "string",
+      "description": "Chat message content"
+    },
+    "sender": {
+      "type": "string",
+      "enum": [
+        "user",
+        "support"
+      ],
+      "default": "user",
+      "description": "Who sent the message"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the message was sent"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "sent",
+        "read",
+        "failed"
+      ],
+      "default": "sent",
+      "description": "Message status"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "user_email",
+    "message",
+    "sender"
+  ]
+}

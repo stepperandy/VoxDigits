@@ -1,0 +1,83 @@
+{
+  "name": "CallLog",
+  "type": "object",
+  "properties": {
+    "virtual_number": {
+      "type": "string",
+      "description": "Virtual number that received/made the call"
+    },
+    "from_number": {
+      "type": "string",
+      "description": "Caller's phone number"
+    },
+    "to_number": {
+      "type": "string",
+      "description": "Recipient's phone number"
+    },
+    "to_owner_id": {
+      "type": "string",
+      "description": "User ID of the virtual number owner"
+    },
+    "provider": {
+      "type": "string",
+      "enum": [
+        "twilio",
+        "vonage",
+        "telnyx"
+      ],
+      "description": "Telecom provider"
+    },
+    "direction": {
+      "type": "string",
+      "enum": [
+        "inbound",
+        "outbound"
+      ],
+      "description": "Call direction"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "missed",
+        "no-answer",
+        "cancelled",
+        "failed"
+      ],
+      "default": "completed",
+      "description": "Call status"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Call start time"
+    },
+    "ended_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Call end time"
+    },
+    "duration_seconds": {
+      "type": "number",
+      "description": "Call duration in seconds"
+    },
+    "call_sid": {
+      "type": "string",
+      "description": "Provider's call ID"
+    },
+    "recording_url": {
+      "type": "string",
+      "description": "URL to call recording if available"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional call notes or transcription"
+    }
+  },
+  "required": [
+    "virtual_number",
+    "from_number",
+    "to_owner_id",
+    "direction"
+  ]
+}

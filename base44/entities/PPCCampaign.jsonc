@@ -1,0 +1,86 @@
+{
+  "name": "PPCCampaign",
+  "type": "object",
+  "properties": {
+    "campaign_name": {
+      "type": "string",
+      "description": "Name of the PPC campaign"
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "all",
+        "us",
+        "canada",
+        "uk",
+        "australia"
+      ],
+      "default": "all",
+      "description": "Which plan this campaign targets: all, us, canada, uk, australia"
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "Google Ads",
+        "Facebook Ads",
+        "LinkedIn Ads",
+        "Bing Ads"
+      ],
+      "description": "PPC platform"
+    },
+    "ad_group": {
+      "type": "string",
+      "description": "Ad group name"
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Paid keywords"
+    },
+    "daily_budget": {
+      "type": "number",
+      "description": "Daily budget in USD"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "paused",
+        "completed"
+      ],
+      "default": "active",
+      "description": "Campaign status"
+    },
+    "impressions": {
+      "type": "number",
+      "description": "Total impressions"
+    },
+    "clicks": {
+      "type": "number",
+      "description": "Total clicks"
+    },
+    "conversions": {
+      "type": "number",
+      "description": "Total conversions"
+    },
+    "ctr": {
+      "type": "number",
+      "description": "Click-through rate (%)"
+    },
+    "roi": {
+      "type": "number",
+      "description": "Return on investment (%)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    }
+  },
+  "required": [
+    "campaign_name",
+    "platform",
+    "status"
+  ]
+}

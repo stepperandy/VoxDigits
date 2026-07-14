@@ -1,0 +1,57 @@
+{
+  "name": "UsageAlert",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "User email who received the alert"
+    },
+    "alert_type": {
+      "type": "string",
+      "enum": [
+        "data_80",
+        "data_100",
+        "calls_80",
+        "calls_100",
+        "sms_80",
+        "sms_100"
+      ],
+      "description": "Type of usage alert"
+    },
+    "service_id": {
+      "type": "string",
+      "description": "ID of the service (eSIM or VirtualNumber)"
+    },
+    "service_name": {
+      "type": "string",
+      "description": "Display name of the service"
+    },
+    "current_usage": {
+      "type": "number",
+      "description": "Current usage value"
+    },
+    "limit": {
+      "type": "number",
+      "description": "Monthly limit"
+    },
+    "percentage": {
+      "type": "number",
+      "description": "Usage percentage"
+    },
+    "email_sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether email notification was sent"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "user_email",
+    "alert_type",
+    "service_id"
+  ]
+}

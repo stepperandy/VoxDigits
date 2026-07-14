@@ -1,0 +1,70 @@
+{
+  "name": "AndroidPurchase",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the purchasing user"
+    },
+    "purchase_token": {
+      "type": "string",
+      "description": "Google Play purchase token (unique per purchase)"
+    },
+    "product_id": {
+      "type": "string",
+      "description": "Google Play product ID"
+    },
+    "purchase_type": {
+      "type": "string",
+      "enum": [
+        "esim",
+        "credits",
+        "number"
+      ],
+      "description": "Type of product purchased"
+    },
+    "order_id": {
+      "type": "string",
+      "description": "Google Play order ID"
+    },
+    "purchase_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the purchase was made on Google Play"
+    },
+    "purchase_state": {
+      "type": "number",
+      "description": "Google Play purchase state: 0=purchased, 1=cancelled, 2=pending"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending_fulfillment",
+        "fulfilled",
+        "failed",
+        "duplicate"
+      ],
+      "default": "pending_fulfillment",
+      "description": "Fulfillment status"
+    },
+    "fulfillment_data": {
+      "type": "string",
+      "description": "JSON string of fulfillment result (iccid, credits added, etc.)"
+    },
+    "error": {
+      "type": "string",
+      "description": "Error message if fulfillment failed"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "user_email",
+    "purchase_token",
+    "product_id",
+    "purchase_type"
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "name": "WhatsAppMessage",
+  "type": "object",
+  "properties": {
+    "virtual_number_id": {
+      "type": "string",
+      "description": "Virtual number ID this WhatsApp is linked to"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "User email"
+    },
+    "from_whatsapp": {
+      "type": "string",
+      "description": "Sender WhatsApp ID"
+    },
+    "to_whatsapp": {
+      "type": "string",
+      "description": "Recipient WhatsApp ID"
+    },
+    "message_body": {
+      "type": "string",
+      "description": "Message content"
+    },
+    "direction": {
+      "type": "string",
+      "enum": [
+        "inbound",
+        "outbound"
+      ],
+      "description": "Message direction"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "sent",
+        "delivered",
+        "read",
+        "failed",
+        "pending"
+      ],
+      "default": "pending"
+    },
+    "provider_message_id": {
+      "type": "string",
+      "description": "WhatsApp provider message ID"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "virtual_number_id",
+    "user_email",
+    "from_whatsapp",
+    "to_whatsapp",
+    "message_body",
+    "direction"
+  ]
+}

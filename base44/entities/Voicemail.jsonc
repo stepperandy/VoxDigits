@@ -1,0 +1,40 @@
+{
+  "name": "Voicemail",
+  "type": "object",
+  "properties": {
+    "userId": {
+      "type": "string",
+      "description": "Owner user ID"
+    },
+    "fromNumber": {
+      "type": "string",
+      "description": "Caller phone number"
+    },
+    "toNumber": {
+      "type": "string",
+      "description": "Called number"
+    },
+    "recordingUrl": {
+      "type": "string",
+      "description": "URL to voicemail recording"
+    },
+    "duration": {
+      "type": "number",
+      "description": "Duration in seconds"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "userId",
+    "fromNumber",
+    "toNumber"
+  ]
+}

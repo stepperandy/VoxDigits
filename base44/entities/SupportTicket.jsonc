@@ -1,0 +1,79 @@
+{
+  "name": "SupportTicket",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "User's email address"
+    },
+    "title": {
+      "type": "string",
+      "description": "Ticket title/subject"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the issue"
+    },
+    "iccid": {
+      "type": "string",
+      "description": "eSIM ICCID related to the issue"
+    },
+    "esim_id": {
+      "type": "string",
+      "description": "ESim entity ID"
+    },
+    "order_id": {
+      "type": "string",
+      "description": "Related order ID"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "activation",
+        "data_issues",
+        "connection_dropped",
+        "slow_speeds",
+        "device_compatibility",
+        "billing",
+        "other"
+      ],
+      "description": "Issue category"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "in_progress",
+        "waiting_customer",
+        "resolved",
+        "closed"
+      ],
+      "default": "open",
+      "description": "Ticket status"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium",
+      "description": "Issue priority"
+    },
+    "resolution_notes": {
+      "type": "string",
+      "description": "Notes from support team"
+    },
+    "attachment_url": {
+      "type": "string",
+      "description": "URL to attached file"
+    }
+  },
+  "required": [
+    "user_email",
+    "title",
+    "description",
+    "category"
+  ]
+}

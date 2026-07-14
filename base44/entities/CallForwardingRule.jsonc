@@ -1,0 +1,56 @@
+{
+  "name": "CallForwardingRule",
+  "type": "object",
+  "properties": {
+    "virtual_number": {
+      "type": "string",
+      "description": "The virtual number to forward calls from"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user who owns this rule"
+    },
+    "destination_type": {
+      "type": "string",
+      "enum": [
+        "phone_number",
+        "sip_uri"
+      ],
+      "default": "phone_number",
+      "description": "Whether destination is a phone number or SIP URI"
+    },
+    "forwarding_number": {
+      "type": "string",
+      "description": "The destination phone number or SIP URI"
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether call forwarding is enabled"
+    },
+    "forward_unanswered_only": {
+      "type": "boolean",
+      "default": false,
+      "description": "Only forward unanswered calls"
+    },
+    "ring_timeout": {
+      "type": "number",
+      "description": "Seconds to ring before forwarding (10-60)"
+    },
+    "dialplan_applied": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the FreeSWITCH dialplan has been updated"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "virtual_number",
+    "user_email",
+    "forwarding_number"
+  ]
+}

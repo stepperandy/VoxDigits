@@ -1,0 +1,57 @@
+{
+  "name": "AutoReplyTemplate",
+  "type": "object",
+  "properties": {
+    "virtual_number": {
+      "type": "string",
+      "description": "The virtual number this auto-reply is for"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user who owns this auto-reply"
+    },
+    "message": {
+      "type": "string",
+      "description": "The auto-reply message text"
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether auto-reply is currently enabled"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "manual",
+        "scheduled"
+      ],
+      "default": "manual",
+      "description": "Manual (always enabled) or Scheduled (time-based)"
+    },
+    "start_hour": {
+      "type": "number",
+      "description": "Start hour for scheduled mode (0-23)"
+    },
+    "end_hour": {
+      "type": "number",
+      "description": "End hour for scheduled mode (0-23)"
+    },
+    "active_days": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Days when auto-reply is active (Monday-Sunday)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "virtual_number",
+    "user_email",
+    "message"
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "name": "Bundle",
+  "type": "object",
+  "properties": {
+    "bundle_type": {
+      "type": "string",
+      "enum": [
+        "esim",
+        "number",
+        "combo"
+      ],
+      "description": "Type of bundle"
+    },
+    "name": {
+      "type": "string",
+      "description": "Bundle display name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Bundle description"
+    },
+    "base_price": {
+      "type": "number",
+      "description": "Wholesale price (cost to resellers)"
+    },
+    "retail_price": {
+      "type": "number",
+      "description": "Recommended retail price"
+    },
+    "esim_products": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of ESimProduct IDs included"
+    },
+    "number_countries": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of country codes for virtual numbers"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "bundle_type",
+    "name",
+    "base_price",
+    "retail_price"
+  ]
+}

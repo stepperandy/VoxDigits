@@ -1,0 +1,95 @@
+{
+  "name": "PricingRule",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Human-readable rule name"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "number_local",
+        "number_tollfree",
+        "number_mobile",
+        "number_national",
+        "number_activation",
+        "call_inbound",
+        "call_outbound",
+        "sms_inbound",
+        "sms_outbound",
+        "esim_data",
+        "reseller_discount"
+      ],
+      "description": "Type of charge this rule applies to"
+    },
+    "country_code": {
+      "type": "string",
+      "description": "ISO2 country code, or * for global default"
+    },
+    "buy_cost": {
+      "type": "number",
+      "description": "What we pay the provider (USD)"
+    },
+    "sell_price": {
+      "type": "number",
+      "description": "What we charge the customer (USD)"
+    },
+    "reseller_price": {
+      "type": "number",
+      "description": "What approved resellers pay (USD)"
+    },
+    "activation_fee": {
+      "type": "number",
+      "default": 0,
+      "description": "One-time setup fee charged to customer"
+    },
+    "activation_cost": {
+      "type": "number",
+      "default": 0,
+      "description": "One-time setup cost from provider"
+    },
+    "billing_increment_secs": {
+      "type": "number",
+      "default": 60,
+      "description": "Call billing increment in seconds (60 = per-minute billing)"
+    },
+    "min_charge_secs": {
+      "type": "number",
+      "default": 60,
+      "description": "Minimum billable seconds per call"
+    },
+    "profit_margin_pct": {
+      "type": "number",
+      "default": 40,
+      "description": "Profit margin percentage applied on top of provider cost for dynamic pricing"
+    },
+    "is_premium": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this destination is a premium-rate number"
+    },
+    "is_blocked": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this destination is blocked for outgoing calls/SMS"
+    },
+    "currency": {
+      "type": "string",
+      "default": "USD"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "category",
+    "country_code",
+    "sell_price"
+  ]
+}

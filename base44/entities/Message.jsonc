@@ -1,0 +1,58 @@
+{
+  "name": "Message",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user who owns this message"
+    },
+    "our_number": {
+      "type": "string",
+      "description": "Our virtual number (from_number for outbound, to_number for inbound)"
+    },
+    "from_number": {
+      "type": "string",
+      "description": "Sender phone number"
+    },
+    "to_number": {
+      "type": "string",
+      "description": "Recipient phone number"
+    },
+    "body": {
+      "type": "string",
+      "description": "Message content"
+    },
+    "direction": {
+      "type": "string",
+      "enum": [
+        "inbound",
+        "outbound"
+      ],
+      "description": "Message direction"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "sent",
+        "delivered",
+        "read",
+        "failed",
+        "pending"
+      ],
+      "default": "pending",
+      "description": "Message status"
+    },
+    "provider_message_id": {
+      "type": "string",
+      "description": "Provider's message ID (e.g., Twilio SID)"
+    }
+  },
+  "required": [
+    "user_email",
+    "our_number",
+    "from_number",
+    "to_number",
+    "body",
+    "direction"
+  ]
+}

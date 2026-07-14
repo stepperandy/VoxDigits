@@ -1,0 +1,51 @@
+{
+  "name": "ResellerOrder",
+  "type": "object",
+  "properties": {
+    "reseller_email": {
+      "type": "string",
+      "description": "Email of reseller who placed order"
+    },
+    "bundle_id": {
+      "type": "string",
+      "description": "Bundle ID ordered"
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Number of bundles ordered"
+    },
+    "unit_cost": {
+      "type": "number",
+      "description": "Cost per bundle (wholesale)"
+    },
+    "total_cost": {
+      "type": "number",
+      "description": "Total order cost"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "completed",
+        "cancelled"
+      ],
+      "default": "pending",
+      "description": "Order status"
+    },
+    "order_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "reseller_email",
+    "bundle_id",
+    "quantity",
+    "unit_cost"
+  ]
+}

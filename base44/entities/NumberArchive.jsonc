@@ -1,0 +1,90 @@
+{
+  "name": "NumberArchive",
+  "type": "object",
+  "properties": {
+    "phone_number": {
+      "type": "string",
+      "description": "The archived phone number (E.164)"
+    },
+    "original_user_id": {
+      "type": "string",
+      "description": "User ID of the previous owner"
+    },
+    "original_user_email": {
+      "type": "string",
+      "description": "Email of the previous owner"
+    },
+    "country_code": {
+      "type": "string",
+      "description": "ISO country code"
+    },
+    "number_type": {
+      "type": "string",
+      "description": "local, toll-free, mobile, national"
+    },
+    "provider": {
+      "type": "string",
+      "description": "Provider: twilio, telnyx, etc."
+    },
+    "provider_number_sid": {
+      "type": "string",
+      "description": "Provider-side number SID"
+    },
+    "virtual_number_id": {
+      "type": "string",
+      "description": "Original VirtualNumber record ID"
+    },
+    "archived_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the number was archived"
+    },
+    "release_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the number was released to provider"
+    },
+    "reclaim_eligible_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the original user can reclaim this number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "archived",
+        "reclaimed",
+        "released",
+        "expired"
+      ],
+      "default": "archived",
+      "description": "Archive lifecycle status"
+    },
+    "reclaimed_by_user_id": {
+      "type": "string",
+      "description": "User ID who reclaimed (if reclaimed)"
+    },
+    "reclaimed_by_email": {
+      "type": "string",
+      "description": "Email of user who reclaimed"
+    },
+    "reclaimed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why the number was archived (failed_renewal, user_cancelled, admin_action)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional description (up to 1000 characters)",
+      "maxLength": 1000
+    }
+  },
+  "required": [
+    "phone_number",
+    "country_code",
+    "status"
+  ]
+}

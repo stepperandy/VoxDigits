@@ -1,0 +1,69 @@
+{
+  "name": "Transaction",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "User email"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "credit",
+        "debit",
+        "refund"
+      ],
+      "description": "Transaction direction"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "top_up",
+        "call",
+        "sms",
+        "esim",
+        "number_rental",
+        "renewal",
+        "refund",
+        "bonus",
+        "commission"
+      ],
+      "description": "Transaction category"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Amount in USD (always positive)"
+    },
+    "balance_before": {
+      "type": "number",
+      "description": "Wallet balance before transaction"
+    },
+    "balance_after": {
+      "type": "number",
+      "description": "Wallet balance after transaction"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description"
+    },
+    "reference_id": {
+      "type": "string",
+      "description": "Related entity ID (call_id, message_id, etc.)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "pending",
+        "failed"
+      ],
+      "default": "completed"
+    }
+  },
+  "required": [
+    "user_email",
+    "type",
+    "category",
+    "amount"
+  ]
+}

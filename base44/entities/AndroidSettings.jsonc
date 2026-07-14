@@ -1,0 +1,27 @@
+{
+  "name": "AndroidSettings",
+  "type": "object",
+  "properties": {
+    "setting_key": {
+      "type": "string",
+      "description": "Setting identifier (e.g., android:requestLegacyExternalStorage)"
+    },
+    "setting_value": {
+      "type": "string",
+      "description": "Setting value"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of the setting"
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this setting is enabled"
+    }
+  },
+  "required": [
+    "setting_key",
+    "setting_value"
+  ]
+}

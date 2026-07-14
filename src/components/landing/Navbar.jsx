@@ -11,7 +11,7 @@ const navLinks = [
   { label: 'Pricing', href: '/pricing' },
   { label: 'Business', href: '/shield' },
   { label: 'eSIM', href: 'https://www.voxdigits.net', external: true },
-  { label: 'Virtual Numbers', href: 'https://www.voxdigits.net', external: true },
+  { label: 'Virtual Numbers', href: '/virtual-numbers' },
   { label: 'Support', href: '/contact' },
   { label: 'Buy VPN', href: '/pricing' },
 ];

@@ -1,0 +1,64 @@
+{
+  "name": "SEOCampaign",
+  "type": "object",
+  "properties": {
+    "campaign_name": {
+      "type": "string",
+      "description": "Name of the SEO campaign"
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "all",
+        "us",
+        "canada",
+        "uk",
+        "australia"
+      ],
+      "default": "all",
+      "description": "Which plan this campaign targets: all, us, canada, uk, australia"
+    },
+    "target_keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Target keywords for this campaign"
+    },
+    "current_ranking": {
+      "type": "string",
+      "description": "Current search ranking position"
+    },
+    "target_ranking": {
+      "type": "string",
+      "description": "Target ranking position"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "paused",
+        "completed"
+      ],
+      "default": "active",
+      "description": "Campaign status"
+    },
+    "url": {
+      "type": "string",
+      "description": "Target URL for SEO"
+    },
+    "budget": {
+      "type": "number",
+      "description": "Monthly budget in USD"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    }
+  },
+  "required": [
+    "campaign_name",
+    "target_keywords",
+    "status"
+  ]
+}

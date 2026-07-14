@@ -112,6 +112,7 @@ const Blog = lazy(() => import('./pages/Blog.jsx'));
 const BlogPost = lazy(() => import('./pages/BlogPost.jsx'));
 const Press = lazy(() => import('./pages/Press.jsx'));
 const Pricing = lazy(() => import('./pages/Pricing.jsx'));
+const VirtualNumbers = lazy(() => import('./pages/VirtualNumbers.jsx'));
 const PaymentFailed = lazy(() => import('./pages/PaymentFailed.jsx'));
 const PublicDownload = lazy(() => import('./pages/PublicDownload.jsx'));
 const PlayReview = lazy(() => import('./pages/PlayReview.jsx'));
@@ -243,6 +244,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/blog/:slug" element={<PageTransition><BlogPost /></PageTransition>} />
           <Route path="/press" element={<PageTransition><Press /></PageTransition>} />
           <Route path="/pricing" element={<PageTransition><Pricing /></PageTransition>} />
+          <Route path="/virtual-numbers" element={<PageTransition><VirtualNumbers /></PageTransition>} />
           <Route path="/get" element={<PublicDownload />} />
           <Route path="/play-review" element={<PageTransition><PlayReview /></PageTransition>} />
           <Route path="/antivirus-signup" element={<PageTransition><AntivirusSignup /></PageTransition>} />

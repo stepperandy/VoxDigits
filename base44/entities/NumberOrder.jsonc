@@ -1,0 +1,82 @@
+{
+  "name": "NumberOrder",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "phone_number": {
+      "type": "string"
+    },
+    "country_code": {
+      "type": "string"
+    },
+    "number_type": {
+      "type": "string",
+      "enum": [
+        "local",
+        "toll_free",
+        "mobile"
+      ],
+      "default": "local"
+    },
+    "provider": {
+      "type": "string",
+      "enum": [
+        "telnyx",
+        "didww"
+      ],
+      "default": "telnyx"
+    },
+    "provider_number_id": {
+      "type": "string",
+      "description": "Provider-side number/reservation ID"
+    },
+    "monthly_fee": {
+      "type": "number"
+    },
+    "setup_fee": {
+      "type": "number",
+      "default": 0
+    },
+    "stripe_session_id": {
+      "type": "string"
+    },
+    "stripe_subscription_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending_payment",
+        "reserved",
+        "active",
+        "failed",
+        "cancelled"
+      ],
+      "default": "pending_payment"
+    },
+    "renewal_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "virtual_number_id": {
+      "type": "string",
+      "description": "Linked VirtualNumber entity ID after assignment"
+    },
+    "routing_configured": {
+      "type": "boolean",
+      "default": false
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_email",
+    "phone_number",
+    "country_code",
+    "provider",
+    "monthly_fee"
+  ]
+}

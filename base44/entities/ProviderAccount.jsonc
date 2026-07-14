@@ -1,0 +1,59 @@
+{
+  "name": "ProviderAccount",
+  "type": "object",
+  "properties": {
+    "provider_name": {
+      "type": "string",
+      "enum": [
+        "telnyx",
+        "didww",
+        "airalo",
+        "stripe"
+      ],
+      "description": "Provider identifier"
+    },
+    "label": {
+      "type": "string"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "api_endpoint": {
+      "type": "string"
+    },
+    "supported_countries": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "supports_sms": {
+      "type": "boolean",
+      "default": false
+    },
+    "supports_voice": {
+      "type": "boolean",
+      "default": false
+    },
+    "supports_esim": {
+      "type": "boolean",
+      "default": false
+    },
+    "balance": {
+      "type": "number",
+      "description": "Provider account balance if applicable"
+    },
+    "last_checked": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "provider_name",
+    "label"
+  ]
+}
