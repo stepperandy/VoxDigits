@@ -4,8 +4,8 @@ import { base44 } from '@/api/base44Client';
 import { Shield, LayoutDashboard, Users, Monitor, Lock, Download, CreditCard, LogOut, Home, Building2, Menu, X } from 'lucide-react';
 
 const navItems = [
+  { label: 'Team & Subscriptions', icon: Users, tab: 'team' },
   { label: 'Overview', icon: LayoutDashboard, tab: 'overview' },
-  { label: 'Team Members', icon: Users, tab: 'members' },
   { label: 'Devices', icon: Monitor, tab: 'devices' },
   { label: 'Security', icon: Lock, tab: 'security' },
   { label: 'Billing', icon: CreditCard, tab: 'billing' },

@@ -4,17 +4,17 @@ import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import BusinessLayout from '@/components/business/BusinessLayout';
 import OverviewTab from '@/components/business/tabs/OverviewTab';
-import MembersTab from '@/components/business/tabs/MembersTab';
 import DevicesTab from '@/components/business/tabs/DevicesTab';
 import SecurityTab from '@/components/business/tabs/SecurityTab';
 import InstallerTab from '@/components/business/tabs/InstallerTab';
 import BillingTab from '@/components/business/tabs/BillingTab';
+import TeamTableTab from '@/components/business/tabs/TeamTableTab';
 import { Loader2, AlertCircle, Rocket, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function TeamDashboard() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('team');
   const [teamData, setTeamData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -54,6 +54,7 @@ export default function TeamDashboard() {
         </motion.div>
       ) : (
         <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          {activeTab === 'team' && <TeamTableTab data={teamData} onRefresh={loadData} />}
           {activeTab === 'overview' && (
             <>
               {teamData?.client && (!teamData.client.domains || teamData.client.domains.length === 0) && (
@@ -74,7 +75,6 @@ export default function TeamDashboard() {
               <OverviewTab data={teamData} onNavigate={setActiveTab} />
             </>
           )}
-          {activeTab === 'members' && <MembersTab data={teamData} onRefresh={loadData} />}
           {activeTab === 'devices' && <DevicesTab data={teamData} />}
           {activeTab === 'security' && <SecurityTab client={teamData?.client} onRefresh={loadData} />}
           {activeTab === 'billing' && <BillingTab data={teamData} />}
