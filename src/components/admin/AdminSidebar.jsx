@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Server, LogOut, Menu, X, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2, Handshake, Globe, Gift, ShieldCheck, Building2, Search } from 'lucide-react';
+import { LayoutDashboard, Users, Server, LogOut, Menu, X, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2, Handshake, Globe, Gift, ShieldCheck, Building2, Search, Briefcase } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
@@ -85,6 +85,15 @@ export default function AdminSidebar({ activePage, onNavigate, onLogout }) {
 
         {/* Bottom */}
         <div className="p-3 border-t border-white/5 space-y-1">
+          <a
+            href="/business/dashboard"
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 hover:text-cyan-400 hover:bg-cyan-500/5 transition-all text-sm font-medium group border border-transparent hover:border-cyan-500/10"
+          >
+            <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-cyan-500/10 flex items-center justify-center transition-colors">
+              <Briefcase size={16} />
+            </div>
+            Business Dashboard
+          </a>
           <a
             href="/"
             className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 hover:text-cyan-400 hover:bg-cyan-500/5 transition-all text-sm font-medium group border border-transparent hover:border-cyan-500/10"
