@@ -10,12 +10,27 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Forbidden — not a business admin' }, { status: 403 });
     }
 
-    const clientId = user.client_id;
-    if (!clientId) return Response.json({ error: 'No business associated with this account' }, { status: 400 });
+    // Resolve the client — try client_id on user profile, then fallback by email/creator
+    let clientId = user.client_id;
+    let client = null;
 
-    // Fetch core data in parallel
-    const [client, teamMembers, securityLogs, dnsLogs] = await Promise.all([
-      base44.asServiceRole.entities.Client.get(clientId),
+    if (clientId) {
+      client = await base44.asServiceRole.entities.Client.get(clientId);
+    } else {
+      const byEmail = await base44.asServiceRole.entities.Client.filter({ contact_email: user.email }, '-created_date', 1);
+      client = byEmail?.[0];
+      if (!client) {
+        const byCreator = await base44.asServiceRole.entities.Client.filter({ created_by_id: user.id }, '-created_date', 1);
+        client = byCreator?.[0];
+      }
+      if (!client) {
+        return Response.json({ error: 'No business associated with this account' }, { status: 400 });
+      }
+      clientId = client.id;
+    }
+
+    // Fetch remaining data in parallel
+    const [teamMembers, securityLogs, dnsLogs] = await Promise.all([
       base44.asServiceRole.entities.User.filter({ client_id: clientId }),
       base44.asServiceRole.entities.SecurityLog.filter({ client_id: clientId }, '-timestamp', 30),
       base44.asServiceRole.entities.DNSFilterLog.filter({ client_id: clientId }, '-timestamp', 30),
