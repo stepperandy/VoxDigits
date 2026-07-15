@@ -54,16 +54,15 @@ export default function BusinessLayout({ activeTab, onTabChange, children }) {
       {/* Sidebar */}
       <aside className={`${sidebarOpen ? 'w-64' : 'w-0 md:w-64'} transition-all duration-300 overflow-hidden bg-[#0d1120] border-r border-white/5 flex-shrink-0 flex flex-col`}>
         <div className="p-5 border-b border-white/5">
-          <Link to="/business/dashboard" className="flex items-center gap-3" onClick={() => setSidebarOpen(false)}>
+          <Link to="/business/dashboard" className="flex flex-col gap-1" onClick={() => setSidebarOpen(false)}>
             <img
-              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/0e500e57e_generated_image.png"
-              alt="VoxShield"
-              className="w-10 h-10 rounded-lg flex-shrink-0"
+              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/4b7aaa837_image.png"
+              alt="VoxVPN Business Shield"
+              className="w-full max-w-[160px] h-auto"
             />
-            <div className="min-w-0">
-              <p className="text-white font-bold text-sm leading-tight">VoxShield</p>
-              <p className="text-slate-500 text-[10px]">{client?.name ? client.name : 'Business Dashboard'}</p>
-            </div>
+            {client?.name && (
+              <p className="text-slate-500 text-[10px] truncate">{client.name}</p>
+            )}
           </Link>
         </div>
 

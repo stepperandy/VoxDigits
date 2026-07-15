@@ -41,11 +41,9 @@ export default function BusinessSignup() {
     try {
       const res = await base44.functions.invoke('businessSignup', form);
       if (res.data?.error) throw new Error(res.data.error);
-      if (res.data?.redirect) {
-        navigate(res.data.redirect);
-      } else {
-        navigate('/pricing?business=1');
-      }
+      // Log the user in so they can access the dashboard immediately
+      await base44.auth.loginViaEmailPassword(form.email, form.password);
+      window.location.href = res.data?.redirect || '/business/dashboard';
     } catch (err) {
       setError(err.message || 'Signup failed. Please try again.');
     } finally {
@@ -63,9 +61,9 @@ export default function BusinessSignup() {
           {/* Hero */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
             <img
-              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/77b1fc2b8_image.png"
+              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/4b7aaa837_image.png"
               alt="VoxVPN Business Shield"
-              className="w-32 h-auto mx-auto mb-4"
+              className="w-40 h-auto mx-auto mb-4"
             />
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 text-xs font-semibold mb-4">
               <Building2 size={12} /> VoxShield Business

@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
       success: true,
       message: 'Business account created successfully',
       client_id: client.id,
-      redirect: '/pricing?new=1&business=1',
+      redirect: '/business/dashboard',
     });
   } catch (error) {
     console.error('Business signup error:', error.message);
