@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { Download, Monitor, Bug, Shield, Loader2, CheckCircle2, Terminal, Copy, Users, Lock, Tag } from 'lucide-react';
 import { FaWindows, FaAndroid } from 'react-icons/fa';
+import AdminAllInstallers from '@/components/business/tabs/AdminAllInstallers';
 
 const platformIcons = {
   Windows: FaWindows,
@@ -29,6 +30,7 @@ export default function InstallerTab({ client }) {
   const [downloading, setDownloading] = useState(null);
   const [copied, setCopied] = useState(false);
   const [installers, setInstallers] = useState([]);
+  const [allInstallers, setAllInstallers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const detectedPlatform = detectPlatform();
@@ -42,12 +44,13 @@ export default function InstallerTab({ client }) {
 
       try {
         const records = await base44.entities.Download.list();
-        const business = (records || []).filter(
-          d => d.is_active !== false && /voxshield/i.test(d.name)
-        );
+        const active = (records || []).filter(d => d.is_active !== false);
+        setAllInstallers(active);
+        const business = active.filter(d => /voxshield/i.test(d.name));
         setInstallers(business);
       } catch {
         setInstallers([]);
+        setAllInstallers([]);
       } finally {
         setLoading(false);
       }
@@ -197,6 +200,11 @@ export default function InstallerTab({ client }) {
           </div>
         </div>
       </div>
+
+      {/* Admin-only full installer list */}
+      {isAdmin && (
+        <AdminAllInstallers installers={allInstallers} onDownload={handleDownload} downloading={downloading} />
+      )}
 
       {/* What's included */}
       <div className="rounded-2xl border border-white/5 bg-[#0d1420] p-6">
