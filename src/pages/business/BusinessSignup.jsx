@@ -62,6 +62,11 @@ export default function BusinessSignup() {
 
           {/* Hero */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
+            <img
+              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/77b1fc2b8_image.png"
+              alt="VoxVPN Business Shield"
+              className="w-32 h-auto mx-auto mb-4"
+            />
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 text-xs font-semibold mb-4">
               <Building2 size={12} /> VoxShield Business
             </div>
@@ -191,7 +196,7 @@ export default function BusinessSignup() {
 
               <p className="text-slate-600 text-xs text-center mt-4">
                 Already have an account?{' '}
-                <Link to="/auth-login" className="text-cyan-400 hover:text-cyan-300 font-semibold">Sign in</Link>
+                <Link to="/business/login" className="text-cyan-400 hover:text-cyan-300 font-semibold">Sign in</Link>
               </p>
             </motion.div>
           </div>
