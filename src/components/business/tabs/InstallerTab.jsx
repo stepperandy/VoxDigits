@@ -27,7 +27,7 @@ function detectPlatform() {
 }
 
 // Display-only rename: Firebase mirror installers shown as "VoxFire Mirror"
-const displayLabel = (text) => (text ? text.replace(/firebase\s*mirror/gi, 'VoxFire Mirror').replace(/firebase/gi, 'VoxFire') : text);
+const displayLabel = (text) => (text ? text.replace(/firebase\s*mirror/gi, 'VoxFire mirror').replace(/firebase/gi, 'VoxFire') : text);
 
 export default function InstallerTab({ client }) {
   const [downloading, setDownloading] = useState(null);
