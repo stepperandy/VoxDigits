@@ -26,6 +26,9 @@ function detectPlatform() {
   return 'Windows';
 }
 
+// Display-only rename: Firebase mirror installers shown as "VoxFire Mirror"
+const displayLabel = (text) => (text ? text.replace(/firebase\s*mirror/gi, 'VoxFire Mirror').replace(/firebase/gi, 'VoxFire') : text);
+
 export default function InstallerTab({ client }) {
   const [downloading, setDownloading] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -122,7 +125,7 @@ export default function InstallerTab({ client }) {
                     <Icon size={28} style={{ color }} />
                   </div>
                   <div>
-                    <h3 className="text-white font-bold text-base">{inst.name}</h3>
+                    <h3 className="text-white font-bold text-base">{displayLabel(inst.name)}</h3>
                     <p className="text-slate-500 text-xs">{inst.platform}</p>
                   </div>
                 </div>
@@ -134,7 +137,7 @@ export default function InstallerTab({ client }) {
                   </span>
                 )}
 
-                <p className="text-slate-400 text-xs mb-4">{inst.description || 'VoxShield security suite installer'}</p>
+                <p className="text-slate-400 text-xs mb-4">{displayLabel(inst.description) || 'VoxShield security suite installer'}</p>
 
                 <div className="flex items-center gap-3 text-xs text-slate-500 mb-4">
                   <span className="flex items-center gap-1"><Bug size={11} style={{ color }} /> Antivirus</span>
