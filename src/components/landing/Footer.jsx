@@ -1,5 +1,6 @@
 import { Mail, Phone } from 'lucide-react';
 import SocialIcons from '@/components/landing/SocialIcons';
+import PaymentIcons from '@/components/landing/PaymentIcons';
 import { Link, useNavigate } from 'react-router-dom';
 
 const footerSections = [
@@ -197,11 +198,7 @@ export default function Footer() {
           {/* Payment methods — full width row */}
           <div className="flex flex-col items-center gap-3">
             <span className="text-slate-600 text-[10px] font-bold uppercase tracking-widest">We Accept</span>
-            <img
-              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/d9f1ec5eb_image.png"
-              alt="Payment Methods: Visa, Mastercard, Amex, Discover, Apple Pay, Google Pay, Hubtel, Alipay, WeChat Pay, MTN MoMo"
-              className="h-[54px] w-auto object-contain mix-blend-screen"
-            />
+            <PaymentIcons />
           </div>
 
           {/* App stores + Social — two columns */}
