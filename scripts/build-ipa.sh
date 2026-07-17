@@ -24,7 +24,7 @@ set -euo pipefail
 
 BUNDLE_ID="com.voxvpn.mobile"
 APP_VERSION="2.0.1"
-BUILD_NUMBER="3"
+BUILD_NUMBER="4"
 
 SCHEME="App"
 CONFIG="Release"
@@ -90,6 +90,7 @@ xcodebuild \
   PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
   MARKETING_VERSION="$APP_VERSION" \
   CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+  CODE_SIGN_ENTITLEMENTS="App/App.entitlements" \
   | xcpretty
 
 # ── Export IPA ────────────────────────────────────────────────────────────
