@@ -12,7 +12,7 @@
     <string>Apple Distribution</string>
     <key>provisioningProfiles</key>
     <dict>
-        <key>net.voxvpn.mobile</key>
+        <key>com.voxvpn.mobile</key>
         <string>$(PROVISIONING_PROFILE_UUID)</string>
     </dict>
     <key>uploadBitcode</key>

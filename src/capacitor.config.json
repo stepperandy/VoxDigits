@@ -5,6 +5,11 @@
   "server": {
     "androidScheme": "https"
   },
+  "ios": {
+    "version": "2.0.1",
+    "buildNumber": "3",
+    "scheme": "App"
+  },
   "android": {
     "buildOptions": {
       "keystorePath": "",
