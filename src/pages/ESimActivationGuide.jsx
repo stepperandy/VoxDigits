@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
-import QRCode from "qrcode";
 import {
   ArrowLeft, Smartphone, QrCode, CheckCircle2, AlertCircle,
   Zap, Phone, Wifi, ChevronDown, Copy, Download, Loader2, Info
@@ -164,13 +163,9 @@ export default function ESimActivationGuide() {
         }
       }
 
-      // Generate QR image
+      // Generate QR image via public API (no npm dependency needed)
       if (isValidLpa(record.qr_code)) {
-        const url = await QRCode.toDataURL(record.qr_code, {
-          width: 280,
-          margin: 2,
-          color: { dark: "#000000", light: "#ffffff" },
-        });
+        const url = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=2&color=000000&bgcolor=ffffff&data=${encodeURIComponent(record.qr_code)}`;
         setQrDataUrl(url);
       }
     } catch (err) {
