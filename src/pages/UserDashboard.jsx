@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import DownloadsSection from '@/components/dashboard/DownloadsSection';
 import UpdateNotifications from '@/components/dashboard/UpdateNotifications';
+import SubscriptionBillingSection from '@/components/dashboard/SubscriptionBillingSection';
 
 const STATUS_CONFIG = {
   active:    { label: 'Active',    color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30', dot: 'bg-emerald-400' },
@@ -289,6 +290,9 @@ export default function UserDashboard() {
             </Link>
           </div>
         </motion.div>
+
+        {/* Subscription & Billing Management */}
+        <SubscriptionBillingSection subscription={subscription} userEmail={user?.email} />
 
         {/* Update Notifications */}
         <UpdateNotifications />
