@@ -7,6 +7,7 @@ import UseCaseBanner from "../components/landing/UseCaseBanner";
 import PricingSection from "../components/landing/PricingSection";
 import VIPBanner from "../components/landing/VIPBanner";
 import TestimonialSection from "../components/landing/TestimonialSection";
+import BusinessTestimonials from "../components/landing/BusinessTestimonials";
 import FAQSection from "../components/landing/FAQSection";
 import Footer from "../components/landing/Footer";
 import CheckoutBanner from "../components/landing/CheckoutBanner";
@@ -33,6 +34,7 @@ export default function Home() {
       <ESimBenefitsBanner />
       <StayConnected />
       <UseCaseBanner />
+      <BusinessTestimonials />
       <SearchSection />
       <PricingSection />
       <VIPBanner />
