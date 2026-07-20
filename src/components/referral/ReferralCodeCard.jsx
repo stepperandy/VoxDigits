@@ -25,8 +25,8 @@ export default function ReferralCodeCard({ referralCode }) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Join VoxDigits',
-          text: 'Get a virtual number or eSIM with VoxDigits. Use my referral code:',
+          title: 'Join VoxTelefony',
+          text: 'Get a virtual number or eSIM with VoxTelefony. Use my referral code:',
           url: fullLink,
         });
       } catch {

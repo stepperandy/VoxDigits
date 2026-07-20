@@ -20,7 +20,7 @@ const STEPS_OVERVIEW = [
   { step: "1", title: "Submit Request", desc: "Fill in your number details and upload proof of ownership." },
   { step: "2", title: "Verification", desc: "Our team reviews your documents within 2–3 business days." },
   { step: "3", title: "Authorization", desc: "Obtain your number transfer PIN from your current provider." },
-  { step: "4", title: "Port Complete", desc: "Your number is transferred and active on VoxDigits." },
+  { step: "4", title: "Port Complete", desc: "Your number is transferred and active on VoxTelefony." },
 ];
 
 export default function PortingRequest() {
@@ -181,7 +181,7 @@ export default function PortingRequest() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Port Your Number</h1>
-          <p className="text-gray-400">Transfer your existing phone number to VoxDigits. Keep your number, switch your service.</p>
+          <p className="text-gray-400">Transfer your existing phone number to VoxTelefony. Keep your number, switch your service.</p>
         </div>
 
         {/* Process Overview */}

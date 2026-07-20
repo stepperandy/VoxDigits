@@ -36,7 +36,7 @@ export default function VIPBanner() {
           >
             <img
               src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/69b202c06dc5b1988efe9645/5cf138dab_generated_image.png"
-              alt="VoxDigits dialer interface"
+              alt="VoxTelefony dialer interface"
               className="w-72 h-80 object-cover rounded-3xl shadow-2xl shadow-orange-500/40"
             />
           </motion.div>

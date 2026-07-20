@@ -112,7 +112,7 @@ export default function StayConnected() {
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center mb-3 shadow-lg shadow-purple-900/50">
                       <Wifi className="w-7 h-7 text-white" />
                     </div>
-                    <p className="text-white font-bold text-base mb-0.5">VoxDigits</p>
+                    <p className="text-white font-bold text-base mb-0.5">VoxTelefony</p>
                     <p className="text-gray-500 text-[10px] mb-5">Stay connected globally</p>
 
                     {/* Dialer mockup */}

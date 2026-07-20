@@ -3,8 +3,8 @@ import { Download, Monitor, Apple, Smartphone, CheckCircle2, ArrowRight, Cloud, 
 import DownloadSuccessOverlay from "@/components/DownloadSuccessOverlay";
 
 const DEFAULT_URLS = {
-  "win-mirror1": "https://firebasestorage.googleapis.com/v0/b/voxvpn-setup-v2-2-exe.firebasestorage.app/o/VoxDigits%20Setup%201.0.0.exe?alt=media",
-  "win-mirror2": "https://github.com/stepperandy/voxvpn/releases/download/v1.0.0/VoxDigits.Setup.1.0.0.exe",
+  "win-mirror1": "https://firebasestorage.googleapis.com/v0/b/voxvpn-setup-v2-2-exe.firebasestorage.app/o/VoxTelefony%20Setup%201.0.0.exe?alt=media",
+  "win-mirror2": "https://github.com/stepperandy/voxvpn/releases/download/v1.0.0/VoxTelefony.Setup.1.0.0.exe",
   mac: "",
   android: "https://play.google.com/store/apps/details?id=com.base69b202c06dc5b1988efe9645.app",
   ios: "https://apps.apple.com",

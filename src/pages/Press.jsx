@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, Newspaper, Download, Mail, Image, FileText } from "lucide-react";
 
 const PRESS_RELEASES = [
-  { date: "Jul 2026", title: "VoxDigits Launches Global eSIM Marketplace with Multi-Provider Support", excerpt: "New platform aggregates eSIM plans from multiple telecom providers, offering competitive pricing and broader coverage." },
-  { date: "May 2026", title: "VoxDigits Reaches 50,000 Active Users Across 40 Countries", excerpt: "Milestone marks rapid growth in the virtual number and eSIM market since launch." },
-  { date: "Mar 2026", title: "VoxDigits Introduces End-to-End Encrypted Voice Calling", excerpt: "New security feature brings AES-256 encrypted voice calls to all virtual number subscribers." },
-  { date: "Jan 2026", title: "VoxDigits Secures Series A Funding to Expand Global Infrastructure", excerpt: "Funding will accelerate infrastructure expansion into Asia-Pacific and African markets." },
+  { date: "Jul 2026", title: "VoxTelefony Launches Global eSIM Marketplace with Multi-Provider Support", excerpt: "New platform aggregates eSIM plans from multiple telecom providers, offering competitive pricing and broader coverage." },
+  { date: "May 2026", title: "VoxTelefony Reaches 50,000 Active Users Across 40 Countries", excerpt: "Milestone marks rapid growth in the virtual number and eSIM market since launch." },
+  { date: "Mar 2026", title: "VoxTelefony Introduces End-to-End Encrypted Voice Calling", excerpt: "New security feature brings AES-256 encrypted voice calls to all virtual number subscribers." },
+  { date: "Jan 2026", title: "VoxTelefony Secures Series A Funding to Expand Global Infrastructure", excerpt: "Funding will accelerate infrastructure expansion into Asia-Pacific and African markets." },
 ];
 
 const BRAND_ASSETS = [
@@ -36,7 +36,7 @@ export default function Press() {
             Press & <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Media Kit</span>
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
-            Resources for journalists, bloggers, and partners covering VoxDigits. Download brand assets, read press releases, or get in touch with our media team.
+            Resources for journalists, bloggers, and partners covering VoxTelefony. Download brand assets, read press releases, or get in touch with our media team.
           </p>
         </div>
       </section>
@@ -75,10 +75,10 @@ export default function Press() {
           <h2 className="text-2xl font-bold mb-6">Our Logo</h2>
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="p-8 rounded-xl border border-white/10 bg-[#0d0620] flex items-center justify-center">
-              <img src="https://media.base44.com/images/public/69b202c06dc5b1988efe9645/e6163c0d6_TELLOGO11.png" alt="VoxDigits Logo" className="h-24 w-auto" />
+              <img src="https://media.base44.com/images/public/69b202c06dc5b1988efe9645/e6163c0d6_TELLOGO11.png" alt="VoxTelefony Logo" className="h-24 w-auto" />
             </div>
             <div className="p-8 rounded-xl border border-white/10 bg-white flex items-center justify-center">
-              <img src="https://media.base44.com/images/public/69b202c06dc5b1988efe9645/e6163c0d6_TELLOGO11.png" alt="VoxDigits Logo (Light)" className="h-24 w-auto" />
+              <img src="https://media.base44.com/images/public/69b202c06dc5b1988efe9645/e6163c0d6_TELLOGO11.png" alt="VoxTelefony Logo (Light)" className="h-24 w-auto" />
             </div>
           </div>
         </div>

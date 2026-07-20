@@ -35,7 +35,7 @@ export default function DeleteAccount() {
               <ul className="space-y-2">
                 <li className="flex items-start gap-3">
                   <span className="text-cyan-400 font-semibold flex-shrink-0">Subject:</span>
-                  <span className="text-gray-300">Delete my VoxDigits account</span>
+                  <span className="text-gray-300">Delete my VoxTelefony account</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-cyan-400 font-semibold flex-shrink-0">Include:</span>

@@ -208,7 +208,7 @@ export default function ServicesDashboard() {
             <Link to="/downloads" className="text-sm text-cyan-400 hover:underline">All platforms</Link>
           </div>
           <div className="bg-gradient-to-r from-cyan-500/5 to-purple-500/5 border border-cyan-500/20 rounded-xl p-6">
-            <p className="text-gray-400 text-sm mb-4">Get the VoxDigits app for your device — auto-detected for your current platform.</p>
+            <p className="text-gray-400 text-sm mb-4">Get the VoxTelefony app for your device — auto-detected for your current platform.</p>
             <DownloadButtons showAll={false} />
           </div>
         </div>

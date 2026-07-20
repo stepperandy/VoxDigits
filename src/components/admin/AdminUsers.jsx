@@ -26,14 +26,14 @@ function AddCreditsModal({ user, onClose, onSuccess }) {
       });
       await base44.integrations.Core.SendEmail({
         to: user.email,
-        subject: "VoxDigits – Credits Added to Your Account 💳",
+        subject: "VoxTelefony – Credits Added to Your Account 💳",
         body: `<div style="font-family:sans-serif;max-width:600px;margin:auto;padding:32px;background:#0d1f35;color:#fff;border-radius:12px;">
   <h2 style="color:#22d3ee;">Credits Added!</h2>
   <p style="color:#cbd5e1;">Hi ${user.full_name || user.email},</p>
-  <p style="color:#cbd5e1;"><strong style="color:#22d3ee;">$${credits.toFixed(2)}</strong> has been added to your VoxDigits account.</p>
+  <p style="color:#cbd5e1;"><strong style="color:#22d3ee;">$${credits.toFixed(2)}</strong> has been added to your VoxTelefony account.</p>
   <p style="color:#cbd5e1;">Your new balance is <strong style="color:#22d3ee;">$${newBalance.toFixed(2)}</strong>.</p>
   <p style="color:#cbd5e1;">You can use your credits to purchase eSIM data plans and virtual numbers.</p>
-  <p style="color:#64748b;font-size:12px;margin-top:24px;">— The VoxDigits Team</p>
+  <p style="color:#64748b;font-size:12px;margin-top:24px;">— The VoxTelefony Team</p>
 </div>`
       });
       onSuccess(user.id, newBalance);

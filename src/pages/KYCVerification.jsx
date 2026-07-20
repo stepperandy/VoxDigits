@@ -142,7 +142,7 @@ export default function KYCVerification() {
           <ShieldCheck className="w-8 h-8 text-cyan-400" />
           <h1 className="text-3xl font-bold text-white">Identity Verification</h1>
         </div>
-        <p className="text-gray-400 mb-8">Verify your identity to unlock all VoxDigits features</p>
+        <p className="text-gray-400 mb-8">Verify your identity to unlock all VoxTelefony features</p>
 
         {existingKYC?.status === 'rejected' && (
           <div className="mb-6">

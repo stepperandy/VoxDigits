@@ -79,8 +79,8 @@ export default function LaunchCampaign() {
     try {
       await base44.integrations.Core.SendEmail({
         to: email,
-        subject: "🚀 Welcome to VoxDigits Launch Week!",
-        body: `Thank you for joining the VoxDigits launch! Get your virtual number or eSIM at voxtelefony.com today. Launch week special pricing is live now.`,
+        subject: "🚀 Welcome to VoxTelefony Launch Week!",
+        body: `Thank you for joining the VoxTelefony launch! Get your virtual number or eSIM at voxtelefony.com today. Launch week special pricing is live now.`,
       });
     } catch (err) {
       console.error("Email send failed:", err);
@@ -117,7 +117,7 @@ export default function LaunchCampaign() {
             transition={{ duration: 0.7, delay: 0.1 }}
             className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight"
           >
-            VoxDigits Is Now Live
+            VoxTelefony Is Now Live
             <br />
             <span className="bg-gradient-to-r from-orange-400 to-purple-400 bg-clip-text text-transparent">
               Connect Globally Today

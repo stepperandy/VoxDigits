@@ -89,7 +89,7 @@ export default function Blog() {
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-blue-600/10 pointer-events-none" />
         <div className="max-w-4xl mx-auto text-center relative">
           <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-6">
-            The <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">VoxDigits Blog</span>
+            The <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">VoxTelefony Blog</span>
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
             Insights, guides, and news on privacy, security, virtual numbers, and global communication.
@@ -142,7 +142,7 @@ export default function Blog() {
       <section className="py-16 px-6 bg-white/[0.02] border-t border-white/5">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-2xl font-bold mb-4">Stay Updated</h2>
-          <p className="text-gray-400 mb-6">Subscribe to get the latest articles and updates from VoxDigits.</p>
+          <p className="text-gray-400 mb-6">Subscribe to get the latest articles and updates from VoxTelefony.</p>
           <Link to="/Contact" className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-bold rounded-xl transition-colors">
             Subscribe
           </Link>

@@ -36,16 +36,16 @@ export default function LegalPolicy() {
   }, [type]);
 
   const POLICY_CONTENT = {
-    privacy: `VOXDIGITS PRIVACY POLICY
+    privacy: `VOXTELEFONY PRIVACY POLICY
 
 Effective Date: 04/01/2026
 Last Updated: 03/01/2026
 
 1. INTRODUCTION
 
-VoxDigits ("we," "our," or "us") respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application, website, and related services (collectively, the "Services").
+VoxTelefony ("we," "our," or "us") respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application, website, and related services (collectively, the "Services").
 
-By using VoxDigits, you agree to the terms of this Privacy Policy.
+By using VoxTelefony, you agree to the terms of this Privacy Policy.
 
 2. INFORMATION WE COLLECT
 
@@ -71,7 +71,7 @@ We may collect limited technical data necessary for app functionality:
 
 We use your information solely to:
 
-• Provide and operate VoxDigits services
+• Provide and operate VoxTelefony services
 • Enable voice calls, messaging, and virtual number services
 • Authenticate users and maintain account security
 • Process payments and subscriptions (via third-party providers)
@@ -80,7 +80,7 @@ We use your information solely to:
 
 4. TRACKING AND ADVERTISING
 
-VoxDigits:
+VoxTelefony:
 
 • Does NOT track users across apps or websites
 • Does NOT use third-party advertising networks
@@ -134,7 +134,7 @@ info@voxtelefony.com
 
 9. CHILDREN'S PRIVACY
 
-VoxDigits is not intended for individuals under the age of 13.
+VoxTelefony is not intended for individuals under the age of 13.
 We do not knowingly collect data from children.
 
 10. INTERNATIONAL USERS
@@ -150,7 +150,7 @@ Changes will be posted with an updated "Last Updated" date.
 
 If you have any questions or concerns, contact us:
 
-VoxDigits
+VoxTelefony
 Email: info@voxtelefony.com
 Website: https://voxtelefony.com
 
@@ -162,17 +162,17 @@ This Privacy Policy is designed to comply with:
 • General Data Protection Regulation (GDPR)
 • Applicable data protection laws
 
-By using VoxDigits, you acknowledge that you have read and understood this Privacy Policy.`,
+By using VoxTelefony, you acknowledge that you have read and understood this Privacy Policy.`,
 
-    terms: `VoxDigits Communication LLC — Terms of Service
+    terms: `VoxTelefony Communication LLC — Terms of Service
 
 Effective Date: March 2026
 
-By accessing or using VoxDigits services, you agree to these Terms of Service.
+By accessing or using VoxTelefony services, you agree to these Terms of Service.
 
 1. Services
 
-VoxDigits provides telecommunications and communication-related services, including virtual numbers, eSIM solutions, and related tools.
+VoxTelefony provides telecommunications and communication-related services, including virtual numbers, eSIM solutions, and related tools.
 
 2. Eligibility
 
@@ -184,7 +184,7 @@ You are responsible for safeguarding your account credentials and for activities
 
 4. Acceptable Use
 
-You may not use VoxDigits services for:
+You may not use VoxTelefony services for:
 - Fraudulent, deceptive, or unlawful activity
 - Spam or abusive communications
 - Harassment or threats
@@ -209,15 +209,15 @@ We aim for reliable service but do not guarantee uninterrupted or error-free ope
 
 9. Limitation of Liability
 
-To the maximum extent permitted by law, VoxDigits will not be liable for indirect, incidental, special, or consequential damages.
+To the maximum extent permitted by law, VoxTelefony will not be liable for indirect, incidental, special, or consequential damages.
 
 10. Contact
 
 For service and legal inquiries, contact: info@voxtelefony.com`,
 
-    aup: `VoxDigits Communication LLC — Acceptable Use Policy
+    aup: `VoxTelefony Communication LLC — Acceptable Use Policy
 
-VoxDigits services must be used responsibly and lawfully.
+VoxTelefony services must be used responsibly and lawfully.
 
 Prohibited Activities
 
@@ -241,13 +241,13 @@ Contact
 
 For compliance questions: info@voxtelefony.com`,
 
-    refund: `VoxDigits Communications LLC — Refund Policy
+    refund: `VoxTelefony Communications LLC — Refund Policy
 
 Effective Date: March 2026
 
 1. 30-Day Money-Back Guarantee
 
-VoxDigits offers a 30-day money-back guarantee on eligible subscription plans. If you are not satisfied with our services, you may request a full refund within 30 days of your initial purchase.
+VoxTelefony offers a 30-day money-back guarantee on eligible subscription plans. If you are not satisfied with our services, you may request a full refund within 30 days of your initial purchase.
 
 2. Eligibility
 
@@ -294,11 +294,11 @@ You may cancel your subscription at any time from your account settings. Cancell
 
 For refund inquiries: billing@voxtelefony.com`,
 
-  cookies: `VoxDigits Cookie Policy
+  cookies: `VoxTelefony Cookie Policy
 
 Last Updated: March 2026
 
-This Cookie Policy explains how VoxDigits ("we", "our", or "us") uses cookies and similar tracking technologies when you visit our website at https://voxtelefony.com or use our web application.
+This Cookie Policy explains how VoxTelefony ("we", "our", or "us") uses cookies and similar tracking technologies when you visit our website at https://voxtelefony.com or use our web application.
 
 1. What Are Cookies?
 
@@ -387,7 +387,7 @@ We respect the "Do Not Track" browser signal where technically feasible and will
 
 6. Cookie Consent
 
-When you first visit VoxDigits, you will be presented with a cookie consent banner. By clicking "Accept All", you consent to all cookies described in this policy. You may select "Manage Preferences" to enable or disable specific categories.
+When you first visit VoxTelefony, you will be presented with a cookie consent banner. By clicking "Accept All", you consent to all cookies described in this policy. You may select "Manage Preferences" to enable or disable specific categories.
 
 You may withdraw consent at any time by clearing your browser cookies and re-visiting the site.
 
@@ -469,7 +469,7 @@ Address: 16809 Capon Tree Ln, Woodbridge, VA 22191, USA`
             </div>
             <div>
               <p className="text-gray-400 mb-1">Company</p>
-              <p>VoxDigits Communication LLC</p>
+              <p>VoxTelefony Communication LLC</p>
             </div>
           </div>
         </div>

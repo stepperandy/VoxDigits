@@ -11,12 +11,12 @@ const faqs = [
   { q: "Do you support international calls?", a: "Yes, our numbers support both inbound and outbound calls to most countries worldwide, at competitive per-minute rates. You can also forward calls to any phone number globally." },
   { q: "What countries are available for virtual numbers?", a: "We offer virtual numbers in 60+ countries including the US, Canada, UK, Australia, Germany, France, and many more. Local, toll-free, and mobile number types are available depending on the country." },
   { q: "Can I send and receive SMS messages?", a: "Yes! All our virtual numbers support two-way SMS — you can send and receive text messages from your dashboard, mobile app, or via our API. SMS is included in your monthly plan." },
-  { q: "What happens when I receive a call?", a: "Incoming calls ring directly in your VoxDigits app. You can also set up call forwarding to route calls to your real mobile number, a SIP address, or voicemail automatically." },
+  { q: "What happens when I receive a call?", a: "Incoming calls ring directly in your VoxTelefony app. You can also set up call forwarding to route calls to your real mobile number, a SIP address, or voicemail automatically." },
   { q: "How does billing and renewal work?", a: "Your virtual number is billed monthly on the same date you signed up. Renewals are automatic unless you cancel. You'll receive an email reminder 3 days before each renewal." },
   { q: "Can I have multiple virtual numbers?", a: "Absolutely. You can purchase as many virtual numbers as you need across different countries. Each number is managed independently from your dashboard with its own settings and inbox." },
   { q: "Is my number private and secure?", a: "Yes. Your real phone number is never exposed to callers or SMS recipients — they only see your virtual number. All communication is encrypted and we never share your data with third parties." },
   { q: "What if I don't use my number for a while?", a: "Your number stays active as long as your subscription is paid. There's no 'use it or lose it' policy — inactive numbers are retained and renewed normally on your billing date." },
-  { q: "Can I port my existing number to VoxDigits?", a: "Yes, number porting is supported for eligible numbers. The process typically takes 3-7 business days. Contact our support team to initiate a porting request." },
+  { q: "Can I port my existing number to VoxTelefony?", a: "Yes, number porting is supported for eligible numbers. The process typically takes 3-7 business days. Contact our support team to initiate a porting request." },
   { q: "Do you offer a free trial?", a: "We offer a risk-free 30-day period — if you're not satisfied, contact support for a full refund. You can also test with a basic plan before committing to premium features." },
   { q: "What payment methods do you accept?", a: "We accept all major credit and debit cards (Visa, Mastercard, Amex, Discover), as well as Apple Pay and Google Pay through our secure Stripe checkout." },
 ];
@@ -86,7 +86,7 @@ export default function FAQSection() {
               </button>
             )}
           </div>
-          <p className="text-gray-400">Answers to common questions about VoxDigits.</p>
+          <p className="text-gray-400">Answers to common questions about VoxTelefony.</p>
         </motion.div>
 
         <div className="space-y-3">

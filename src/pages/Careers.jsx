@@ -96,7 +96,7 @@ export default function Careers() {
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-2xl font-bold mb-4">Don't See Your Role?</h2>
           <p className="text-gray-400 mb-8">
-            We're always looking for talented people. Send your CV to <a href="mailto:careers@voxtelefony.com" className="text-cyan-400 hover:text-cyan-300">careers@voxtelefony.com</a> and tell us how you'd contribute to VoxDigits.
+            We're always looking for talented people. Send your CV to <a href="mailto:careers@voxtelefony.com" className="text-cyan-400 hover:text-cyan-300">careers@voxtelefony.com</a> and tell us how you'd contribute to VoxTelefony.
           </p>
           <Link to="/Company" className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-bold rounded-xl transition-colors">
             Learn More About Us

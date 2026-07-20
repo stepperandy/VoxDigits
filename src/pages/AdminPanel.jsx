@@ -228,11 +228,11 @@ export default function AdminPanel() {
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 h-16 border-b border-slate-800 flex-shrink-0">
         <Link to="/" className="flex-shrink-0">
-          <img src={ADMIN_LOGO} alt="VoxDigits" className="h-9 w-auto object-contain" />
+          <img src={ADMIN_LOGO} alt="VoxTelefony" className="h-9 w-auto object-contain" />
         </Link>
         <div className="min-w-0 border-l border-slate-700 pl-3">
           <p className="text-sm font-bold text-white truncate">Admin Console</p>
-          <p className="text-[10px] text-cyan-400 font-medium">VoxDigits</p>
+          <p className="text-[10px] text-cyan-400 font-medium">VoxTelefony</p>
         </div>
       </div>
 

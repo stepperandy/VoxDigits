@@ -338,7 +338,7 @@ export default function AdminNumberRouting() {
           <div className="space-y-3 text-sm text-gray-300">
             <div className="flex gap-3">
               <span className="text-cyan-400 font-semibold">1.</span>
-              <span>Inbound call arrives at VoxDigits virtual number</span>
+              <span>Inbound call arrives at VoxTelefony virtual number</span>
             </div>
             <div className="flex gap-3">
               <span className="text-cyan-400 font-semibold">2.</span>

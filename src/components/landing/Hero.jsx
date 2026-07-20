@@ -269,7 +269,7 @@ export default function Hero() {
         >
           <span>Founded 2020</span>
           <span className="text-slate-700">|</span>
-          <span>VoxDigits Communications LLC</span>
+          <span>VoxTelefony Communications LLC</span>
           <span className="text-slate-700">|</span>
           <span>Woodbridge, VA, USA</span>
         </motion.div>

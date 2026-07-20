@@ -21,7 +21,7 @@ export default function HeroSection() {
 
   return (
     <section className="relative px-6 md:px-10 pt-12 pb-8 max-w-7xl mx-auto overflow-hidden" style={{ background: "transparent" }}>
-      {/* VoxDigits Banner */}
+      {/* VoxTelefony Banner */}
       <a
         href="https://voxvpn.net"
         target="_blank"
@@ -189,7 +189,7 @@ export default function HeroSection() {
           <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at center, rgba(251,146,60,0.08) 0%, transparent 70%)" }} />
           <img
             src="https://media.base44.com/images/public/69b202c06dc5b1988efe9645/3c2b31751_image.png"
-            alt="VoxDigits Global Coverage Map"
+            alt="VoxTelefony Global Coverage Map"
             className="w-full h-auto object-contain"
             style={{ maxHeight: "420px" }}
           />

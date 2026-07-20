@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, Building2, Target, Eye, MapPin, Mail, Phone, FileText, Briefcase, Newspaper, Users } from "lucide-react";
 
 const COMPANY_INFO = [
-  { label: "Legal Company Name", value: "VoxDigits Communications LLC" },
+  { label: "Legal Company Name", value: "VoxTelefony Communications LLC" },
   { label: "Country of Registration", value: "United States of America" },
   { label: "Company Registration No.", value: "11986542" },
   { label: "Registered Office", value: "16809 Capon Tree Ln, Woodbridge, VA 22191, USA" },
@@ -28,10 +28,10 @@ export default function Company() {
             <Building2 className="w-3.5 h-3.5" /> Company
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-6">
-            About <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">VoxDigits</span>
+            About <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">VoxTelefony</span>
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
-            VoxDigits Communications LLC is a telecommunications technology company delivering global communication solutions — virtual phone numbers, eSIM connectivity, and cloud-based voice services.
+            VoxTelefony Communications LLC is a telecommunications technology company delivering global communication solutions — virtual phone numbers, eSIM connectivity, and cloud-based voice services.
           </p>
         </div>
       </section>
@@ -101,7 +101,7 @@ export default function Company() {
       {/* Quick Links */}
       <section className="py-12 px-6 bg-white/[0.02] border-t border-white/5">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold mb-8">Explore VoxDigits</h2>
+          <h2 className="text-2xl font-bold mb-8">Explore VoxTelefony</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Link to="/AboutUs" className="p-5 rounded-xl border border-white/10 bg-white/[0.03] hover:border-cyan-500/30 transition-colors">
               <Users className="w-5 h-5 text-cyan-400 mb-3" />

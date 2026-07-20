@@ -32,7 +32,7 @@ const INSTALLERS = [
     version: "v1.0.0",
     badge: "EXE",
     icon: HardDrive,
-    url: "https://github.com/stepperandy/voxvpn/releases/download/v1.0.0/VoxDigits.Setup.1.0.0.exe",
+    url: "https://github.com/stepperandy/voxvpn/releases/download/v1.0.0/VoxTelefony.Setup.1.0.0.exe",
     color: "#00a3ff",
     available: true,
   },
@@ -43,7 +43,7 @@ const INSTALLERS = [
     version: "v1.0.0",
     badge: "EXE",
     icon: Cpu,
-    url: "https://firebasestorage.googleapis.com/v0/b/voxvpn-setup-v2-2-exe.firebasestorage.app/o/VoxDigits%20Setup%201.0.0.exe?alt=media",
+    url: "https://firebasestorage.googleapis.com/v0/b/voxvpn-setup-v2-2-exe.firebasestorage.app/o/VoxTelefony%20Setup%201.0.0.exe?alt=media",
     color: "#8a2be2",
     available: true,
   },
@@ -146,7 +146,7 @@ export default function Dashboard() {
         <div className="rounded-2xl p-6 mb-6" style={{ background: "#111a26", border: "1px solid rgba(255,255,255,0.06)" }}>
           <div className="flex items-center gap-3 mb-1 flex-wrap">
             <Download className="w-5 h-5 text-cyan-400" />
-            <h2 className="text-lg font-bold text-white">Download VoxDigits</h2>
+            <h2 className="text-lg font-bold text-white">Download VoxTelefony</h2>
             <span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: "rgba(0,163,255,0.15)", color: "#00a3ff" }}>
               LATEST
             </span>
@@ -288,7 +288,7 @@ export default function Dashboard() {
         {/* ── Login Credentials ── */}
         <div className="rounded-2xl p-6" style={{ background: "#111a26", border: "1px solid rgba(255,255,255,0.06)" }}>
           <p className="text-sm text-[#8b949e] mb-5">
-            Use the same credentials to log in on <span className="text-white font-semibold">Windows, Android, iOS</span> and all other VoxDigits apps.
+            Use the same credentials to log in on <span className="text-white font-semibold">Windows, Android, iOS</span> and all other VoxTelefony apps.
           </p>
           <div className="space-y-4">
             <div>

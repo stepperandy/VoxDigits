@@ -14,7 +14,7 @@ const USE_CASES = [
 const FAQ_ITEMS = [
   { q: "How fast is activation?", a: "Your virtual phone number is activated instantly after checkout. You can start receiving calls and SMS within minutes — no waiting for a physical SIM card." },
   { q: "Can I receive SMS verification codes?", a: "Yes. Your virtual number supports inbound SMS, including OTP and verification codes from online services, banking apps, and social platforms." },
-  { q: "Do I need a SIM card or special hardware?", a: "No. VoxDigits virtual numbers work entirely through our app and web dashboard. There's no physical SIM or extra device required." },
+  { q: "Do I need a SIM card or special hardware?", a: "No. VoxTelefony virtual numbers work entirely through our app and web dashboard. There's no physical SIM or extra device required." },
   { q: "Can I cancel anytime?", a: "Absolutely. There are no long-term contracts. You can cancel your subscription at any time from your dashboard, no questions asked." },
   { q: "Is my number private?", a: "Yes. Each number is dedicated to you alone — never shared. All communications are encrypted and your data is never sold to third parties." },
 ];
@@ -23,7 +23,7 @@ export default function CountryLanding({ data }) {
   const { country, countryCode, flag, slug, monthlyPrice, annualPrice, setupFee, monthlyPriceId, annualPriceId } = data;
 
   useEffect(() => {
-    document.title = `Virtual Phone Number for ${country} | VoxDigits — $${monthlyPrice}/mo`;
+    document.title = `Virtual Phone Number for ${country} | VoxTelefony — $${monthlyPrice}/mo`;
     const setMeta = (name, content, attr = "name") => {
       let el = document.querySelector(`meta[${attr}="${name}"]`);
       if (!el) {
@@ -34,9 +34,9 @@ export default function CountryLanding({ data }) {
       el.setAttribute("content", content);
     };
 
-    setMeta("description", `Get a virtual ${country} phone number from $${monthlyPrice}/mo. Receive calls & SMS, verify accounts, and establish a local presence. Instant activation, no contracts. Buy online at VoxDigits.`);
+    setMeta("description", `Get a virtual ${country} phone number from $${monthlyPrice}/mo. Receive calls & SMS, verify accounts, and establish a local presence. Instant activation, no contracts. Buy online at VoxTelefony.`);
     setMeta("keywords", `${country} virtual phone number, buy ${country} phone number online, ${country} VoIP number, ${country} phone number for verification, virtual number ${country}, ${country} calling number, get ${country} number`);
-    setMeta("og:title", `Virtual Phone Number for ${country} | VoxDigits`, "property");
+    setMeta("og:title", `Virtual Phone Number for ${country} | VoxTelefony`, "property");
     setMeta("og:description", `Get a virtual ${country} phone number from $${monthlyPrice}/mo. Instant activation, SMS & voice enabled.`, "property");
 
     // JSON-LD structured data
@@ -50,7 +50,7 @@ export default function CountryLanding({ data }) {
       "@type": "Product",
       "name": `Virtual Phone Number — ${country}`,
       "description": `Dedicated virtual ${country} phone number with SMS and voice calling. Instant activation.`,
-      "brand": { "@type": "Brand", "name": "VoxDigits" },
+      "brand": { "@type": "Brand", "name": "VoxTelefony" },
       "offers": {
         "@type": "Offer",
         "price": monthlyPrice.toFixed(2),

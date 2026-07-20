@@ -6,7 +6,7 @@ const testimonials = [
     name: "Sarah Chen",
     role: "Founder, Digital Agency",
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80",
-    text: "VoxDigits transformed how we manage client communications. The reliability and ease of use are unmatched. We've cut our telecom costs by 40%.",
+    text: "VoxTelefony transformed how we manage client communications. The reliability and ease of use are unmatched. We've cut our telecom costs by 40%.",
     rating: 5
   },
   {
@@ -27,7 +27,7 @@ const testimonials = [
     name: "David Park",
     role: "Operations Director, Tech Company",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80",
-    text: "Scaling our communication infrastructure with VoxDigits was so simple. The eSIM data plans are perfect for our field teams across regions.",
+    text: "Scaling our communication infrastructure with VoxTelefony was so simple. The eSIM data plans are perfect for our field teams across regions.",
     rating: 5
   }
 ];
@@ -42,7 +42,7 @@ export default function TestimonialSection() {
             Trusted by Industry Leaders
           </h2>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            Thousands of businesses worldwide rely on VoxDigits for their communication needs. See what our customers have to say.
+            Thousands of businesses worldwide rely on VoxTelefony for their communication needs. See what our customers have to say.
           </p>
         </div>
 

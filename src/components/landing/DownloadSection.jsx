@@ -9,8 +9,8 @@ const PLATFORMS = [
     platform: "Windows",
     subtitle: "Windows 10/11",
     icon: Monitor,
-    url: "https://firebasestorage.googleapis.com/v0/b/voxvpn-setup-v2-2-exe.firebasestorage.app/o/VoxDigits%20Setup%201.0.0.exe?alt=media",
-    filename: "VoxDigits Setup 1.0.0.exe",
+    url: "https://firebasestorage.googleapis.com/v0/b/voxvpn-setup-v2-2-exe.firebasestorage.app/o/VoxTelefony%20Setup%201.0.0.exe?alt=media",
+    filename: "VoxTelefony Setup 1.0.0.exe",
     version: "v1.0.0",
     color: "#0ea5e9",
     badge: "Available Now",
@@ -93,7 +93,7 @@ export default function DownloadSection() {
           <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">
             Download{" "}
             <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-              VoxDigits
+              VoxTelefony
             </span>
           </h2>
           <p className="text-gray-400 text-base max-w-xl mx-auto">

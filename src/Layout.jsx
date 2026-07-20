@@ -19,7 +19,7 @@ const TABS = [
 ];
 
 // App name constant for easy updates
-const APP_NAME = "VoxDigits";
+const APP_NAME = "VoxTelefony";
 
 const MORE_LINKS = [
   { label: "SMS Messages",    path: "/SMSInbox",           icon: MessageSquare,  authRequired: true },
@@ -109,7 +109,7 @@ export default function Layout({ children, currentPageName }) {
         <Link to="/" onClick={onClose}>
           <img
             src="https://media.base44.com/images/public/69b202c06dc5b1988efe9645/e6163c0d6_TELLOGO11.png"
-            alt="VoxDigits"
+            alt="VoxTelefony"
             className="h-24 w-auto"
           />
         </Link>
@@ -234,7 +234,7 @@ export default function Layout({ children, currentPageName }) {
           <Link to="/">
             <img
               src="https://media.base44.com/images/public/69b202c06dc5b1988efe9645/e6163c0d6_TELLOGO11.png"
-              alt="VoxDigits"
+              alt="VoxTelefony"
               className="h-[72px] w-auto"
             />
           </Link>

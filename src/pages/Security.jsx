@@ -44,7 +44,7 @@ export default function Security() {
             <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Every Connection</span>
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
-            VoxDigits employs industry-leading encryption, strict no-logs policies, and advanced leak protection to safeguard your communications and data.
+            VoxTelefony employs industry-leading encryption, strict no-logs policies, and advanced leak protection to safeguard your communications and data.
           </p>
         </div>
       </section>
@@ -94,7 +94,7 @@ export default function Security() {
           </div>
           <h2 className="text-3xl font-bold mb-4">Our No-Logs Commitment</h2>
           <p className="text-gray-400 text-lg leading-relaxed mb-8">
-            VoxDigits does not log, store, or track your browsing activity, call contents, message content, or DNS queries.
+            VoxTelefony does not log, store, or track your browsing activity, call contents, message content, or DNS queries.
             We operate under a strict no-logs policy, meaning we have nothing to share — even if compelled by law.
             Our infrastructure is designed so that even our own engineers cannot access your communication content.
           </p>

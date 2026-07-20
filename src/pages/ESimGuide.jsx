@@ -15,7 +15,7 @@ const OS_STEPS = {
       { title: "Go to Cellular", detail: "Tap Cellular (or Mobile Data), then tap Add Cellular Plan." },
       { title: "Scan QR Code", detail: "Tap Use QR Code and point your camera at the eSIM QR code provided in your dashboard." },
       { title: "Confirm Activation", detail: "Tap Continue when prompted to add the plan." },
-      { title: "Name Your Plan", detail: "Label it something like 'VoxDigits Data' and tap Done." },
+      { title: "Name Your Plan", detail: "Label it something like 'VoxTelefony Data' and tap Done." },
       { title: "Enable the Line", detail: "Go to Cellular → select your new plan → toggle Turn On This Line." },
     ],
     manual: [

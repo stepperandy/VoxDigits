@@ -18,14 +18,14 @@ const CHAR_LIMITS = {
 
 // Pre-built ASO recommendations optimized for a virtual phone number + eSIM app
 const ASO_RECOMMENDATIONS = {
-  title: "VoxDigits: Virtual Phone Number & eSIM",
+  title: "VoxTelefony: Virtual Phone Number & eSIM",
   subtitle: "Private 2nd Number, SMS, Calling & eSIM",
   keywords: "virtual number,second phone number,burner number,us number,uk number,esim,travel esim,disposable number,voip,call forwarding,sms receive,privacy number,international number,virtual phone,dual sim",
   short_description: "Get a private 2nd phone number for calls, SMS & eSIM data. US, UK, CA, AU numbers.",
   promotional_text: "🔒 Private virtual numbers + global eSIM data. No contracts, cancel anytime. Download now!",
-  full_description: `VoxDigits gives you a private second phone number for calls, SMS, and eSIM data — perfect for privacy, business, travel, and online verification.
+  full_description: `VoxTelefony gives you a private second phone number for calls, SMS, and eSIM data — perfect for privacy, business, travel, and online verification.
 
-🔑 WHY VOXDIGITS?
+🔑 WHY VOXTELEFONY?
 • Private virtual numbers from US, UK, Canada & Australia
 • Receive SMS for verifications (WhatsApp, Telegram, Google, etc.)
 • Make and receive calls with crystal-clear VoIP quality
@@ -56,7 +56,7 @@ Activate data plans in 190+ countries instantly. No physical SIM swap, no roamin
 - eSIM data packages from $1
 - Refer friends and earn free credits
 
-Download VoxDigits today and get your private second number in seconds!`,
+Download VoxTelefony today and get your private second number in seconds!`,
 };
 
 function CharCounter({ value, max }) {
@@ -218,7 +218,7 @@ export default function ASOManager() {
           <div className="mb-6 rounded-2xl bg-amber-500/[0.05] border border-amber-500/20 p-5">
             <div className="flex items-center gap-2 mb-3">
               <Lightbulb size={16} className="text-amber-400" />
-              <h3 className="font-bold text-sm">ASO Recommendations for VoxDigits</h3>
+              <h3 className="font-bold text-sm">ASO Recommendations for VoxTelefony</h3>
             </div>
             <div className="grid md:grid-cols-2 gap-4 text-xs">
               <div className="space-y-3">
@@ -382,7 +382,7 @@ export default function ASOManager() {
                     <label className="text-xs text-slate-400 font-medium">App Title</label>
                     <CharCounter value={editingListing.app_title} max={activeLimits.app_title} />
                   </div>
-                  <input value={editingListing.app_title || ""} onChange={e => setEditingListing({...editingListing, app_title: e.target.value.slice(0, activeLimits.app_title)})} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white" placeholder="VoxDigits: Virtual Phone Number & eSIM" />
+                  <input value={editingListing.app_title || ""} onChange={e => setEditingListing({...editingListing, app_title: e.target.value.slice(0, activeLimits.app_title)})} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white" placeholder="VoxTelefony: Virtual Phone Number & eSIM" />
                 </div>
 
                 {/* Subtitle (iOS) / Short Description (Android) */}

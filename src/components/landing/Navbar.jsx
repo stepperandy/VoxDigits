@@ -42,7 +42,7 @@ export default function Navbar() {
   return (
     <nav className="flex items-center justify-between px-6 md:px-10 py-4 max-w-7xl mx-auto relative z-50">
       <div className="flex items-center flex-1">
-        <img src="https://media.base44.com/images/public/69b202c06dc5b1988efe9645/e6163c0d6_TELLOGO11.png" alt="VoxDigits" style={{height: "72px", width: "auto"}} />
+        <img src="https://media.base44.com/images/public/69b202c06dc5b1988efe9645/e6163c0d6_TELLOGO11.png" alt="VoxTelefony" style={{height: "72px", width: "auto"}} />
       </div>
 
       <div className="hidden md:flex space-x-8 font-semibold text-sm tracking-widest uppercase">

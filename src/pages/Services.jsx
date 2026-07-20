@@ -10,7 +10,7 @@ const SERVICES = [
     tag: "Voice over IP",
     title: "VoIP Calling",
     subtitle: "HD voice calls worldwide at a fraction of the cost",
-    description: "Our VoIP infrastructure delivers crystal-clear, enterprise-grade voice calls over the internet. Whether you're running a call centre, managing a remote team, or just need affordable international calling, VoxDigits VoIP has you covered.",
+    description: "Our VoIP infrastructure delivers crystal-clear, enterprise-grade voice calls over the internet. Whether you're running a call centre, managing a remote team, or just need affordable international calling, VoxTelefony VoIP has you covered.",
     features: [
       "HD voice quality with Opus codec",
       "WebRTC browser-based calling",
@@ -31,7 +31,7 @@ const SERVICES = [
     tag: "Virtual Numbers",
     title: "Virtual Phone Numbers",
     subtitle: "Local presence in 150+ countries, instantly",
-    description: "Get a real, dedicated phone number in any country within minutes. Receive SMS, voice calls, and manage everything from your VoxDigits dashboard. No SIM card required.",
+    description: "Get a real, dedicated phone number in any country within minutes. Receive SMS, voice calls, and manage everything from your VoxTelefony dashboard. No SIM card required.",
     features: [
       "Local, mobile & toll-free numbers",
       "Instant provisioning in 150+ countries",
@@ -52,7 +52,7 @@ const SERVICES = [
     tag: "eSIM Data",
     title: "Global eSIM",
     subtitle: "Stay connected abroad with instant data plans",
-    description: "Forget expensive roaming bills. VoxDigits eSIM gives you affordable, high-speed data in 150+ countries with instant digital delivery. Compatible with all modern unlocked smartphones.",
+    description: "Forget expensive roaming bills. VoxTelefony eSIM gives you affordable, high-speed data in 150+ countries with instant digital delivery. Compatible with all modern unlocked smartphones.",
     features: [
       "Coverage in 150+ countries",
       "Instant QR code delivery",

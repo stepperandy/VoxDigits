@@ -128,7 +128,7 @@ export default function AIAssistant() {
             <Bot className="w-5 h-5 text-cyan-400" />
           </div>
           <div>
-            <h1 className="font-bold text-white text-sm">VoxDigits AI Assistant</h1>
+            <h1 className="font-bold text-white text-sm">VoxTelefony AI Assistant</h1>
             <p className="text-xs text-green-400">● Online</p>
           </div>
           <button
@@ -151,7 +151,7 @@ export default function AIAssistant() {
                 <MessageCircle className="w-8 h-8 text-cyan-400" />
               </div>
               <h2 className="text-white font-bold text-lg mb-2">How can I help you?</h2>
-              <p className="text-gray-500 text-sm max-w-xs">Ask me about virtual numbers, eSIM plans, troubleshooting, or anything about VoxDigits.</p>
+              <p className="text-gray-500 text-sm max-w-xs">Ask me about virtual numbers, eSIM plans, troubleshooting, or anything about VoxTelefony.</p>
               <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-sm">
                 {[
                   "How do I activate my eSIM?",
@@ -194,7 +194,7 @@ export default function AIAssistant() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-              placeholder="Ask me anything about VoxDigits..."
+              placeholder="Ask me anything about VoxTelefony..."
               className="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cyan-500 placeholder-gray-600"
             />
             <button

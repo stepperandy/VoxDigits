@@ -17,7 +17,7 @@ const OS_STEPS = {
       "Tap **Cellular** → **Add Cellular Plan**",
       "Tap **Use QR Code** and scan the code below",
       "Tap **Continue** when prompted",
-      "Name the plan (e.g. 'VoxDigits Data') and tap **Done**",
+      "Name the plan (e.g. 'VoxTelefony Data') and tap **Done**",
       "Go to **Cellular** → select your new plan → enable **Turn On This Line**",
     ],
     manual: [

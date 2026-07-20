@@ -21,10 +21,10 @@ export default function AdminDownloads() {
       id: "win-firebase",
       name: "VoxBase",
       platform: "Windows",
-      category: "VoxDigits Installer",
+      category: "VoxTelefony Installer",
       version: "v1.0.0",
       description: "Windows desktop installer. Stable, high-speed download mirror for fast, reliable installs.",
-      url: "https://firebasestorage.googleapis.com/v0/b/voxvpn-setup-v2-2-exe.firebasestorage.app/o/VoxDigits%20Setup%201.0.0.exe?alt=media",
+      url: "https://firebasestorage.googleapis.com/v0/b/voxvpn-setup-v2-2-exe.firebasestorage.app/o/VoxTelefony%20Setup%201.0.0.exe?alt=media",
       isFree: true,
       price: "",
       icon: HardDrive,
@@ -34,10 +34,10 @@ export default function AdminDownloads() {
       id: "win-github",
       name: "VoxHub",
       platform: "Windows",
-      category: "VoxDigits Installer",
+      category: "VoxTelefony Installer",
       version: "v1.0.0",
       description: "Windows desktop installer. Alternative high-speed download mirror.",
-      url: "https://github.com/stepperandy/voxvpn/releases/download/v1.0.0/VoxDigits.Setup.1.0.0.exe",
+      url: "https://github.com/stepperandy/voxvpn/releases/download/v1.0.0/VoxTelefony.Setup.1.0.0.exe",
       isFree: true,
       price: "",
       icon: Monitor,
@@ -47,7 +47,7 @@ export default function AdminDownloads() {
       id: "android-github",
       name: "VoxHub for Android",
       platform: "Android",
-      category: "VoxDigits Installer",
+      category: "VoxTelefony Installer",
       version: "1.0.0 (debug)",
       description: "Android APK debug build. Sideload onto Android devices — enable 'Install from unknown sources' in Settings.",
       url: "https://github.com/stepperandy/voxvpn/releases/download/aV1.0.0/VoxTelephony-Android-1.0.0-debug.apk",
@@ -60,7 +60,7 @@ export default function AdminDownloads() {
       id: "android-firebase",
       name: "VoxBase for Android",
       platform: "Android",
-      category: "VoxDigits Installer",
+      category: "VoxTelefony Installer",
       version: "1.0.0 (debug)",
       description: "Android APK debug build. High-speed download mirror for fast, reliable installs. Sideload onto Android devices — enable 'Install from unknown sources' in Settings.",
       url: "https://firebasestorage.googleapis.com/v0/b/voxvpn-setup-v2-2-exe.firebasestorage.app/o/VoxTelephony-Android-1.0.0-debug.apk?alt=media",
@@ -266,7 +266,7 @@ export default function AdminDownloads() {
             <div className="space-y-3">
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Name</label>
-                <input value={newInstaller.name} onChange={e => setNewInstaller(p => ({ ...p, name: e.target.value }))} placeholder="VoxDigits Shield Agent" className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm placeholder-slate-600 focus:outline-none focus:border-cyan-500" />
+                <input value={newInstaller.name} onChange={e => setNewInstaller(p => ({ ...p, name: e.target.value }))} placeholder="VoxTelefony Shield Agent" className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm placeholder-slate-600 focus:outline-none focus:border-cyan-500" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>

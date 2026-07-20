@@ -25,7 +25,7 @@ const PAGE_LABELS = {
   "/SubscriptionManager": "Subscription Manager",
   "/PhoneNumberPorting": "Phone Number Porting",
   "/ESimActivationGuide": "eSIM Activation Guide",
-  "/AboutUs": "About VoxDigits",
+  "/AboutUs": "About VoxTelefony",
 };
 
 const QUICK_QUESTIONS = [

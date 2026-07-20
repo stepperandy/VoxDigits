@@ -16,7 +16,7 @@ export default function UseCaseBanner() {
           <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">
             Call, Text, and Connect<br />Across the World
           </h2>
-          <p className="text-orange-100 max-w-xl mx-auto">VoxDigits is the communication platform for everyone — from solo freelancers to global enterprises.</p>
+          <p className="text-orange-100 max-w-xl mx-auto">VoxTelefony is the communication platform for everyone — from solo freelancers to global enterprises.</p>
         </motion.div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">

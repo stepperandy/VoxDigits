@@ -60,7 +60,7 @@ export default function TermsAgreement() {
         <div className="text-center mb-8">
           <img
             src="https://media.base44.com/images/public/69b202c06dc5b1988efe9645/e6163c0d6_TELLOGO11.png"
-            alt="VoxDigits"
+            alt="VoxTelefony"
             className="h-20 w-auto mx-auto mb-4"
           />
           <h1 className="text-2xl font-extrabold text-white">Before you sign up</h1>

@@ -64,7 +64,7 @@ export default function LoyaltyProgram() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-purple-500/20 border border-yellow-500/30 mb-4 mx-auto">
             <Gift className="w-8 h-8 text-yellow-400" />
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">VoxDigits Loyalty Program</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">VoxTelefony Loyalty Program</h1>
           <p className="text-gray-400 text-lg">Earn points on every purchase and redeem for rewards</p>
         </div>
 

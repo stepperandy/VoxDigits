@@ -61,7 +61,7 @@ export default function ServerStatus() {
             {allOperational ? "All Systems Operational" : "Some Systems Experiencing Issues"}
           </h1>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
-            Real-time status of VoxDigits services and infrastructure.
+            Real-time status of VoxTelefony services and infrastructure.
           </p>
           <p className="text-gray-500 text-sm mt-4 flex items-center justify-center gap-2">
             <Clock className="w-4 h-4" /> Last checked: {now.toLocaleTimeString()}

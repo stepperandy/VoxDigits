@@ -9,7 +9,7 @@ const REQUEST_TYPES = [
 ];
 
 const DISCLOSURE_POLICY = [
-  "VoxDigits does not sell, rent, or trade user data to any third party.",
+  "VoxTelefony does not sell, rent, or trade user data to any third party.",
   "We only disclose user data when legally compelled by a valid court order, subpoena, or binding government request.",
   "We challenge overly broad or improper requests and notify affected users when legally permitted.",
   "We publish all government data requests in this transparency report, updated quarterly.",
@@ -129,7 +129,7 @@ export default function TransparencyReport() {
           </div>
           <h2 className="text-2xl font-bold mb-4">Warrant Canary</h2>
           <p className="text-gray-400 leading-relaxed mb-4">
-            As of <span className="text-white font-semibold">July 7, 2026</span>, VoxDigits has:
+            As of <span className="text-white font-semibold">July 7, 2026</span>, VoxTelefony has:
           </p>
           <ul className="text-left max-w-md mx-auto space-y-2 text-gray-400">
             <li className="flex items-start gap-2"><Shield className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" /> Never received a National Security Letter or FISA court order</li>

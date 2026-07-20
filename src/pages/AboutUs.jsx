@@ -34,14 +34,14 @@ export default function AboutUs() {
         <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="max-w-4xl mx-auto text-center relative">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 mb-6">
-            <Award className="w-3.5 h-3.5" /> VoxDigits Communication LLC
+            <Award className="w-3.5 h-3.5" /> VoxTelefony Communication LLC
           </span>
           <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-6">
             Global Communication,<br />
             <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Made Accessible</span>
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
-            VoxDigits Communication LLC is a telecommunications technology company focused on delivering global communication solutions. We provide virtual phone numbers, international voice services, and eSIM-based connectivity to help businesses and individuals operate seamlessly across borders.
+            VoxTelefony Communication LLC is a telecommunications technology company focused on delivering global communication solutions. We provide virtual phone numbers, international voice services, and eSIM-based connectivity to help businesses and individuals operate seamlessly across borders.
           </p>
         </div>
       </section>
@@ -60,12 +60,12 @@ export default function AboutUs() {
       <section className="py-24 px-6">
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-14 items-center">
           <div>
-            <h2 className="text-3xl font-bold mb-5">About VoxDigits</h2>
+            <h2 className="text-3xl font-bold mb-5">About VoxTelefony</h2>
             <p className="text-gray-400 leading-relaxed mb-4">
               Our platform is designed for customer support, remote teams, and international business communication. We aim to make global connectivity more accessible through reliable, scalable, and user-friendly telecom solutions.
             </p>
             <p className="text-gray-400 leading-relaxed">
-              VoxDigits supports businesses looking to expand internationally with scalable communication tools that work across multiple regions.
+              VoxTelefony supports businesses looking to expand internationally with scalable communication tools that work across multiple regions.
             </p>
           </div>
           <div className="relative rounded-2xl overflow-hidden h-72 md:h-auto">
@@ -110,7 +110,7 @@ export default function AboutUs() {
       {/* Values */}
       <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-3">Why VoxDigits</h2>
+          <h2 className="text-3xl font-bold text-center mb-3">Why VoxTelefony</h2>
           <p className="text-gray-500 text-center mb-12">Core principles that guide our platform and services</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {VALUES.map(({ icon: Icon, title, desc }) => (
@@ -130,7 +130,7 @@ export default function AboutUs() {
       <section className="py-20 px-6 bg-gradient-to-r from-cyan-500/10 via-blue-500/5 to-cyan-500/10 border-t border-white/5">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Power Your Global Communications?</h2>
-          <p className="text-gray-400 mb-8">Connect with our team to learn how VoxDigits can support your business communication needs.</p>
+          <p className="text-gray-400 mb-8">Connect with our team to learn how VoxTelefony can support your business communication needs.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link to="/VirtualNumbers" className="flex items-center justify-center gap-2 px-6 py-3 bg-cyan-500 hover:bg-cyan-400 text-gray-950 font-bold rounded-xl transition-colors">
               Get a Number <ChevronRight className="w-4 h-4" />

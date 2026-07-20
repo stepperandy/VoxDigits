@@ -58,7 +58,7 @@ export default function StatsTrustBadge() {
         <div className="text-center mb-10">
           <h2 className="text-2xl md:text-3xl font-bold text-white">Built on Trust & Security</h2>
           <p className="text-purple-200/70 text-sm md:text-base mt-2 max-w-2xl mx-auto">
-            VoxDigits is committed to protecting your privacy and keeping you connected — anywhere in the world.
+            VoxTelefony is committed to protecting your privacy and keeping you connected — anywhere in the world.
           </p>
         </div>
 
@@ -89,7 +89,7 @@ export default function StatsTrustBadge() {
         {/* Company Identity Line */}
         <div className="mt-12 text-center">
           <p className="text-purple-200/50 text-xs md:text-sm">
-            🏢 VoxDigits Communications LLC &nbsp;·&nbsp; Founded 2024 &nbsp;·&nbsp; 16809 Capon Tree Ln, Woodbridge, VA 22191, USA &nbsp;·&nbsp; Reg. No. 11986542
+            🏢 VoxTelefony Communications LLC &nbsp;·&nbsp; Founded 2024 &nbsp;·&nbsp; 16809 Capon Tree Ln, Woodbridge, VA 22191, USA &nbsp;·&nbsp; Reg. No. 11986542
           </p>
         </div>
       </div>
