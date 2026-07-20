@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Copy, Trash2, Calendar, Sparkles, RefreshCw, Filter, ImageIcon, Check, Send } from "lucide-react";
+import { Copy, Trash2, Calendar, Sparkles, RefreshCw, Filter, ImageIcon, Check, Send, Video } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PLATFORM_COLORS = {
@@ -182,6 +182,11 @@ export default function SMOPostList({ onGenerate, generating }) {
                       {post.platform}
                     </span>
                     <span className="text-xs text-gray-500 capitalize">{post.post_type}</span>
+                    {(post.video_prompt || post.video_url) && (
+                      <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium bg-orange-500/20 text-orange-300 border border-orange-500/30">
+                        <Video className="w-2.5 h-2.5" /> Video
+                      </span>
+                    )}
                   </div>
                   <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[post.status] || "bg-gray-500/20 text-gray-300"}`}>
                     {post.status}

@@ -40,6 +40,14 @@
       "type": "string",
       "description": "AI image generation prompt for accompanying visual"
     },
+    "video_prompt": {
+      "type": "string",
+      "description": "AI video generation prompt for accompanying video (used for Facebook/Instagram video posts)"
+    },
+    "video_url": {
+      "type": "string",
+      "description": "URL of the AI-generated video, populated after video generation"
+    },
     "post_type": {
       "type": "string",
       "enum": [

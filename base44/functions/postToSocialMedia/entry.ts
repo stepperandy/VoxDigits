@@ -17,7 +17,6 @@ Deno.serve(async (req) => {
       postsToPublish = await base44.asServiceRole.entities.SMOPost.filter({ id: body.post_id });
     } else {
       postsToPublish = await base44.asServiceRole.entities.SMOPost.filter({ status: "scheduled" });
-      // Filter to only posts scheduled for today or earlier
       postsToPublish = postsToPublish.filter(p => !p.scheduled_date || p.scheduled_date <= today);
     }
 
@@ -34,17 +33,36 @@ Deno.serve(async (req) => {
           (post.hashtags?.length ? "\n\n" + post.hashtags.map(h => `#${h}`).join(" ") : "") +
           (post.cta ? `\n\n${post.cta}` : "");
 
-        let postUrl = "";
+        // Generate video if the post has a video prompt but no video URL yet
+        let videoUrl = post.video_url || "";
+        if (!videoUrl && post.video_prompt) {
+          try {
+            const videoResult = await base44.asServiceRole.integrations.Core.GenerateVideo({
+              prompt: post.video_prompt,
+              duration: 6,
+              aspect_ratio: post.platform === "Instagram" ? "9:16" : "16:9"
+            });
+            videoUrl = videoResult.url;
+            await base44.asServiceRole.entities.SMOPost.update(post.id, { video_url: videoUrl });
+          } catch (vidErr) {
+            // Video generation failed — fall back to text/image-only post
+            console.error(`Video generation failed for post ${post.id}: ${vidErr.message}`);
+          }
+        }
+
         let platformNote = "";
 
         if (post.platform === "Facebook") {
-          platformNote = await postToFacebook(base44, fullContent);
+          platformNote = videoUrl
+            ? await postVideoToFacebook(base44, videoUrl, fullContent)
+            : await postToFacebook(base44, fullContent);
         } else if (post.platform === "LinkedIn") {
           platformNote = await postToLinkedIn(base44, fullContent);
         } else if (post.platform === "Instagram") {
-          platformNote = await postToInstagram(base44, post, fullContent);
+          platformNote = videoUrl
+            ? await postReelToInstagram(base44, videoUrl, fullContent)
+            : await postToInstagram(base44, post, fullContent);
         } else {
-          // Twitter / TikTok - not supported for auto-posting
           results.push({ id: post.id, platform: post.platform, status: "skipped", reason: "Platform not supported for auto-posting" });
           continue;
         }
@@ -54,7 +72,7 @@ Deno.serve(async (req) => {
           status: "posted",
           notes: `[Published ${new Date().toISOString()}] ${platformNote}`
         });
-        results.push({ id: post.id, platform: post.platform, status: "posted", detail: platformNote });
+        results.push({ id: post.id, platform: post.platform, status: "posted", detail: platformNote, video: !!videoUrl });
       } catch (err) {
         results.push({ id: post.id, platform: post.platform, status: "failed", error: err.message });
       }
@@ -66,11 +84,10 @@ Deno.serve(async (req) => {
   }
 });
 
-// ── Facebook Pages ──
+// ── Facebook Pages (text post) ──
 async function postToFacebook(base44, content) {
   const { accessToken } = await base44.asServiceRole.connectors.getConnection("facebook_pages");
 
-  // List managed Pages and get Page access token
   const pagesRes = await fetch(`https://graph.facebook.com/v25.0/me/accounts?fields=id,name,access_token&access_token=${accessToken}`);
   const pagesData = await pagesRes.json();
   if (!pagesData.data || pagesData.data.length === 0) {
@@ -78,7 +95,6 @@ async function postToFacebook(base44, content) {
   }
   const page = pagesData.data[0];
 
-  // Post to Page feed
   const postRes = await fetch(`https://graph.facebook.com/v25.0/${page.id}/feed`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -90,18 +106,42 @@ async function postToFacebook(base44, content) {
   return `Facebook Page "${page.name}" — post ID: ${postData.id}`;
 }
 
+// ── Facebook Pages (video post) ──
+async function postVideoToFacebook(base44, videoUrl, description) {
+  const { accessToken } = await base44.asServiceRole.connectors.getConnection("facebook_pages");
+
+  const pagesRes = await fetch(`https://graph.facebook.com/v25.0/me/accounts?fields=id,name,access_token&access_token=${accessToken}`);
+  const pagesData = await pagesRes.json();
+  if (!pagesData.data || pagesData.data.length === 0) {
+    throw new Error("No Facebook Pages found for video upload.");
+  }
+  const page = pagesData.data[0];
+
+  const postRes = await fetch(`https://graph.facebook.com/v25.0/${page.id}/videos`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      file_url: videoUrl,
+      description: description,
+      access_token: page.access_token
+    })
+  });
+  const postData = await postRes.json();
+  if (postData.error) throw new Error(`Facebook video: ${postData.error.message}`);
+
+  return `Facebook Page "${page.name}" — video ID: ${postData.id}`;
+}
+
 // ── LinkedIn ──
 async function postToLinkedIn(base44, content) {
   const { accessToken } = await base44.asServiceRole.connectors.getConnection("linkedin");
 
-  // Get user ID
   const profileRes = await fetch("https://api.linkedin.com/v2/userinfo", {
     headers: { Authorization: `Bearer ${accessToken}` }
   });
   const profile = await profileRes.json();
   if (!profile.sub) throw new Error("Could not get LinkedIn user ID");
 
-  // Post to LinkedIn feed
   const postRes = await fetch("https://api.linkedin.com/v2/ugcPosts", {
     method: "POST",
     headers: {
@@ -127,18 +167,15 @@ async function postToLinkedIn(base44, content) {
   return `LinkedIn — post ID: ${postData.id || "published"}`;
 }
 
-// ── Instagram Business ──
+// ── Instagram Business (image post) ──
 async function postToInstagram(base44, post, content) {
   const { accessToken } = await base44.asServiceRole.connectors.getConnection("instagram");
 
-  // Get Instagram user ID
   const meRes = await fetch(`https://graph.instagram.com/me?fields=id,username&access_token=${accessToken}`);
   const me = await meRes.json();
   if (!me.id) throw new Error("Could not get Instagram user ID");
 
-  // Instagram requires an image — generate one from the image_prompt if available
   let imageUrl = "";
-  // Check if an image URL is already stored in notes
   const existingUrlMatch = post.notes?.match(/\[Image URL: (https?:\/\/[^\]]+)\]/);
   if (existingUrlMatch) {
     imageUrl = existingUrlMatch[1];
@@ -149,7 +186,6 @@ async function postToInstagram(base44, post, content) {
     throw new Error("Instagram posts require an image. Add an image prompt to this post.");
   }
 
-  // Create media container
   const containerRes = await fetch(`https://graph.instagram.com/v21.0/${me.id}/media`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -162,7 +198,6 @@ async function postToInstagram(base44, post, content) {
   const container = await containerRes.json();
   if (container.error) throw new Error(`Instagram container: ${container.error.message}`);
 
-  // Publish the media container
   const publishRes = await fetch(`https://graph.instagram.com/v21.0/${me.id}/media_publish`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -175,4 +210,43 @@ async function postToInstagram(base44, post, content) {
   if (publishData.error) throw new Error(`Instagram publish: ${publishData.error.message}`);
 
   return `Instagram (@${me.username}) — media ID: ${publishData.id}`;
+}
+
+// ── Instagram Business (Reels video post) ──
+async function postReelToInstagram(base44, videoUrl, content) {
+  const { accessToken } = await base44.asServiceRole.connectors.getConnection("instagram");
+
+  const meRes = await fetch(`https://graph.instagram.com/me?fields=id,username&access_token=${accessToken}`);
+  const me = await meRes.json();
+  if (!me.id) throw new Error("Could not get Instagram user ID");
+
+  // Create Reels container
+  const containerRes = await fetch(`https://graph.instagram.com/v21.0/${me.id}/media`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      media_type: "REELS",
+      video_url: videoUrl,
+      caption: content,
+      access_token: accessToken
+    })
+  });
+  const container = await containerRes.json();
+  if (container.error) throw new Error(`Instagram Reels container: ${container.error.message}`);
+
+  // Wait for video processing (Instagram requires the container to be ready before publishing)
+  await new Promise(resolve => setTimeout(resolve, 15000));
+
+  const publishRes = await fetch(`https://graph.instagram.com/v21.0/${me.id}/media_publish`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      creation_id: container.id,
+      access_token: accessToken
+    })
+  });
+  const publishData = await publishRes.json();
+  if (publishData.error) throw new Error(`Instagram Reels publish: ${publishData.error.message}`);
+
+  return `Instagram (@${me.username}) — Reels ID: ${publishData.id}`;
 }

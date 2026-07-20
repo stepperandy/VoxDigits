@@ -42,17 +42,20 @@ Create ONE compelling ${platform} post that:
 - Has a clear, compelling call-to-action
 - Feels native to ${platform} (not generic)
 
-Return the post content, hashtags array, CTA, post type, and an image generation prompt for the accompanying visual.`,
-          response_json_schema: {
-            type: "object",
-            properties: {
-              content: { type: "string" },
-              hashtags: { type: "array", items: { type: "string" } },
-              cta: { type: "string" },
-              post_type: { type: "string" },
-              image_prompt: { type: "string" }
-            }
-          }
+Also generate a short video prompt (5-10 seconds) that could accompany this post as a promo clip. The video should be cinematic, visually engaging, and on-brand.
+
+Return the post content, hashtags array, CTA, post type, an image generation prompt, and a video generation prompt.`,
+  response_json_schema: {
+    type: "object",
+    properties: {
+      content: { type: "string" },
+      hashtags: { type: "array", items: { type: "string" } },
+      cta: { type: "string" },
+      post_type: { type: "string" },
+      image_prompt: { type: "string" },
+      video_prompt: { type: "string" }
+    }
+  }
         });
 
         // Spread posts across the week
@@ -68,6 +71,7 @@ Return the post content, hashtags array, CTA, post type, and an image generation
           hashtags: llmResult.hashtags || [],
           cta: llmResult.cta || "",
           image_prompt: llmResult.image_prompt || "",
+          video_prompt: llmResult.video_prompt || "",
           post_type: llmResult.post_type || "promotional",
           scheduled_date: scheduledDate.toISOString().split('T')[0],
           status: "scheduled"
