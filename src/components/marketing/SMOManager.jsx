@@ -47,11 +47,18 @@ export default function SMOManager() {
       const response = await base44.functions.invoke('generateSMOPosts', {});
       if (response.data?.success) {
         loadCampaigns();
+        return response.data;
+      } else {
+        alert(response.data?.error || "Generation failed");
+        return response.data;
       }
     } catch (e) {
       console.error("Post generation failed", e);
+      alert("Post generation failed: " + e.message);
+      return null;
+    } finally {
+      setGenerating(false);
     }
-    setGenerating(false);
   };
 
   useEffect(() => {

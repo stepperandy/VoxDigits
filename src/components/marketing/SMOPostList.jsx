@@ -144,7 +144,7 @@ export default function SMOPostList({ onGenerate, generating }) {
           <Button onClick={loadPosts} variant="ghost" size="sm" className="h-8 text-xs">
             <RefreshCw className="w-3 h-3 mr-1" /> Refresh
           </Button>
-          <Button onClick={onGenerate} disabled={generating} size="sm" className="h-8 bg-indigo-600 hover:bg-indigo-700 text-xs">
+          <Button onClick={async () => { const res = await onGenerate(); await loadPosts(); if (res?.generated > 0) alert(`Generated ${res.generated} new posts!`); }} disabled={generating} size="sm" className="h-8 bg-indigo-600 hover:bg-indigo-700 text-xs">
             {generating ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin mr-1" /> : <Sparkles className="w-3 h-3 mr-1" />}
             Auto-Generate Posts
           </Button>
