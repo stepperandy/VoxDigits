@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Copy, Trash2, Calendar, Sparkles, RefreshCw, Filter, ImageIcon, Check } from "lucide-react";
+import { Copy, Trash2, Calendar, Sparkles, RefreshCw, Filter, ImageIcon, Check, Send } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PLATFORM_COLORS = {
@@ -28,6 +28,10 @@ export default function SMOPostList({ onGenerate, generating }) {
   const [statusFilter, setStatusFilter] = useState("all");
   const [previewPost, setPreviewPost] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
+  const [publishingId, setPublishingId] = useState(null);
+  const [publishingAll, setPublishingAll] = useState(false);
+
+  const AUTOPOSTABLE = ["Facebook", "LinkedIn", "Instagram"];
 
   useEffect(() => {
     loadPosts();
@@ -68,6 +72,38 @@ export default function SMOPostList({ onGenerate, generating }) {
     } catch (e) {
       console.error("Image generation failed", e);
     }
+  };
+
+  const handlePublish = async (post) => {
+    setPublishingId(post.id);
+    try {
+      const res = await base44.functions.invoke("postToSocialMedia", { post_id: post.id });
+      if (res.data?.success) {
+        await loadPosts();
+      } else {
+        alert(res.data?.results?.[0]?.error || "Publish failed");
+      }
+    } catch (e) {
+      alert("Publish failed: " + e.message);
+    }
+    setPublishingId(null);
+  };
+
+  const handlePublishAllDue = async () => {
+    setPublishingAll(true);
+    try {
+      const res = await base44.functions.invoke("postToSocialMedia", {});
+      if (res.data?.success) {
+        await loadPosts();
+        const { published, total } = res.data;
+        alert(`Published ${published} of ${total} posts.`);
+      } else {
+        alert("Publish failed: " + (res.data?.error || "Unknown error"));
+      }
+    } catch (e) {
+      alert("Publish failed: " + e.message);
+    }
+    setPublishingAll(false);
   };
 
   const filteredPosts = posts.filter(p => {
@@ -111,6 +147,10 @@ export default function SMOPostList({ onGenerate, generating }) {
           <Button onClick={onGenerate} disabled={generating} size="sm" className="h-8 bg-indigo-600 hover:bg-indigo-700 text-xs">
             {generating ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin mr-1" /> : <Sparkles className="w-3 h-3 mr-1" />}
             Auto-Generate Posts
+          </Button>
+          <Button onClick={handlePublishAllDue} disabled={publishingAll} size="sm" className="h-8 bg-green-600 hover:bg-green-700 text-xs">
+            {publishingAll ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin mr-1" /> : <Send className="w-3 h-3 mr-1" />}
+            Publish All Due
           </Button>
         </div>
       </div>
@@ -181,6 +221,20 @@ export default function SMOPostList({ onGenerate, generating }) {
                   {post.image_prompt && (
                     <Button onClick={() => handleGenerateImage(post)} variant="ghost" size="sm" className="h-7 text-xs hover:text-purple-300">
                       <ImageIcon className="w-3 h-3 mr-1" /> Image
+                    </Button>
+                  )}
+                  {AUTOPOSTABLE.includes(post.platform) && post.status !== "posted" && (
+                    <Button
+                      onClick={() => handlePublish(post)}
+                      disabled={publishingId === post.id}
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs hover:text-green-400"
+                    >
+                      {publishingId === post.id
+                        ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin mr-1" />
+                        : <Send className="w-3 h-3 mr-1" />}
+                      Publish
                     </Button>
                   )}
                   <Button onClick={() => setPreviewPost(post)} variant="ghost" size="sm" className="h-7 text-xs">
