@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
           body: JSON.stringify({
             from: { type: 'phone', number: from_number },
             to: [{ type: 'phone', number: to_number }],
-            ncco: [{ action: 'talk', text: 'Test call from VoxDigits' }],
+            ncco: [{ action: 'talk', text: 'Test call from VoxTelefony' }],
           }),
         });
         const callData = await callRes.json();

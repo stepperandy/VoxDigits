@@ -3,8 +3,10 @@ import {
   resolveSenderNumber,
   getTwilioCredentials,
   sendSmsViaTwilio,
+  validateSmsRoute,
   normalizeE164,
   SenderResolutionError,
+  SmsRouteError,
 } from '../../shared/twilioSender.ts';
 
 Deno.serve(async (req) => {
@@ -35,6 +37,24 @@ Deno.serve(async (req) => {
       );
     }
     const toE164 = destCheck.normalized;
+
+    // ── Destination-aware SMS route validation (Ghana blocked, etc.) ──
+    const routeCheck = validateSmsRoute(from || '', toE164);
+    if (!routeCheck.allowed) {
+      console.error(
+        `[sendSms] Route blocked: ${toE164} (${routeCheck.destinationCountry}) — ${routeCheck.reason}: ${routeCheck.error}`
+      );
+      return Response.json(
+        {
+          success: false,
+          error: routeCheck.error,
+          code: routeCheck.reason,
+          destination_country: routeCheck.destinationCountry,
+          twilio_error_code: '21612',
+        },
+        { status: 400 }
+      );
+    }
 
     // ── Resolve sender: use the customer's active assigned VirtualNumber ──
     // If the caller provided a `from`, we validate it belongs to them.
@@ -92,7 +112,7 @@ Deno.serve(async (req) => {
       senderNumber = resolved.resolvedNumber;
     }
 
-    console.log(`[sendSms] Sending SMS from ${senderNumber} to ${toE164}`);
+    console.log(`[sendSms] Sending SMS from ${senderNumber} to ${toE164} (${routeCheck.destinationCountry})`);
 
     // ── Check wallet balance and get SMS rate ──
     const userBalance = user.credits || 0;
@@ -103,7 +123,7 @@ Deno.serve(async (req) => {
         user_email: user.email,
         category: 'sms',
         call_type: 'outbound',
-        country_code: 'US',
+        country_code: routeCheck.destinationCountry,
       });
       smsRate = rateRes?.sell_price || 0.03;
     } catch (e) {
@@ -129,7 +149,40 @@ Deno.serve(async (req) => {
     // ── Send via Twilio: Messaging Service SID + explicit From ──
     const result = await sendSmsViaTwilio(accountSid, authToken, senderNumber, toE164, message);
 
-    // ── Log to Message entity ──
+    if (!result.success) {
+      // Twilio API rejected the message — do not retry, do not claim success
+      console.error(`[sendSms] Twilio API error: code=${result.errorCode}, msg=${result.errorMessage}`);
+
+      // Persist the failed attempt for audit trail
+      try {
+        await base44.asServiceRole.entities.Message.create({
+          user_email: user.email,
+          our_number: senderNumber,
+          from_number: senderNumber,
+          to_number: toE164,
+          body: message,
+          direction: 'outbound',
+          status: 'failed',
+          provider_message_id: result.messageSid,
+          error_code: result.errorCode,
+          error_message: result.errorMessage,
+        });
+      } catch (logErr) {
+        console.error('[sendSms] Failed to log failed message:', logErr.message);
+      }
+
+      return Response.json(
+        {
+          success: false,
+          error: result.errorMessage,
+          twilio_error_code: result.errorCode,
+        },
+        { status: 400 }
+      );
+    }
+
+    // ── Log to Message entity — status is 'pending' (not delivered yet) ──
+    // API success ≠ delivered. Status is updated via Twilio status callbacks.
     try {
       await base44.asServiceRole.entities.Message.create({
         user_email: user.email,
@@ -138,7 +191,7 @@ Deno.serve(async (req) => {
         to_number: toE164,
         body: message,
         direction: 'outbound',
-        status: 'sent',
+        status: 'pending', // queued/sending — delivery confirmed via callback
         provider_message_id: result.messageSid,
       });
     } catch (logErr) {
@@ -159,15 +212,23 @@ Deno.serve(async (req) => {
       console.error('[sendSms] Charge failed:', chargeErr.message);
     }
 
-    console.log(`[sendSms] SMS sent successfully, SID: ${result.messageSid}`);
+    console.log(`[sendSms] SMS queued successfully, SID: ${result.messageSid}, status: pending (delivery confirmed via callback)`);
     return Response.json({
       success: true,
       message_sid: result.messageSid,
+      status: 'pending',
+      note: 'Message queued. Delivery status will be updated via Twilio callback.',
     });
   } catch (error) {
     if (error instanceof SenderResolutionError) {
       const status = error.code === 'AUTH_REQUIRED' ? 401 : 403;
       return Response.json({ success: false, error: error.message, code: error.code }, { status });
+    }
+    if (error instanceof SmsRouteError) {
+      return Response.json(
+        { success: false, error: error.message, code: error.code, destination_country: error.destinationCountry },
+        { status: 400 }
+      );
     }
     console.error('[sendSms] Error:', error.message);
     return Response.json({ success: false, error: error.message }, { status: 500 });

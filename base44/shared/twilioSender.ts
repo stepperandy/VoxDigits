@@ -1,5 +1,7 @@
 /**
- * Centralized Twilio sender resolution and E.164 normalization.
+ * Centralized Twilio sender resolution, E.164 normalization, and
+ * destination-aware SMS routing compliance.
+ *
  * Used by every SMS path (sendSms, auto-replies, notifications, automations)
  * and by outbound Voice functions to ensure tenant isolation.
  *
@@ -9,6 +11,8 @@
  *  - Voice: callerId must be the customer's assigned voice-capable Twilio number.
  *  - Never allows one tenant to use or expose another tenant's number.
  *  - Rejects sends when the user has no active eligible number.
+ *  - Destination-aware routing: Ghana (+233) blocked for two-way SMS;
+ *    US/Canada (+1) allowed with Messaging Service + A2P registration.
  *  - All Twilio secrets stay server-side (read via Deno.env).
  */
 
@@ -22,6 +26,18 @@ export class SenderResolutionError extends Error {
     super(message);
     this.name = 'SenderResolutionError';
     this.code = code;
+  }
+}
+
+/**
+ * Custom error for SMS routing compliance failures.
+ */
+export class SmsRouteError extends Error {
+  constructor(message, code, destinationCountry) {
+    super(message);
+    this.name = 'SmsRouteError';
+    this.code = code;
+    this.destinationCountry = destinationCountry;
   }
 }
 
@@ -153,6 +169,105 @@ export function normalizeUSCanadaE164(phone) {
     normalized: null,
     isValid: false,
     error: `US/Canada number must be 10 digits or 11 digits starting with 1 (got ${digitsOnly.length} digits)`,
+  };
+}
+
+/**
+ * Detect the destination country from an E.164 number.
+ * Returns ISO country code or 'INTERNATIONAL' / 'UNKNOWN'.
+ */
+export function detectDestinationCountry(e164) {
+  if (!e164 || typeof e164 !== 'string') return 'UNKNOWN';
+  const digits = e164.replace(/\D/g, '');
+  if (digits.startsWith('1') && digits.length === 11) return 'US/CA';
+  if (digits.startsWith('233')) return 'GH';
+  if (digits.startsWith('44')) return 'GB';
+  if (digits.startsWith('234')) return 'NG';
+  if (digits.startsWith('91')) return 'IN';
+  if (digits.startsWith('234')) return 'NG';
+  if (digits.startsWith('27')) return 'ZA';
+  if (digits.startsWith('61')) return 'AU';
+  if (digits.startsWith('33')) return 'FR';
+  if (digits.startsWith('49')) return 'DE';
+  if (digits.startsWith('81')) return 'JP';
+  if (digits.startsWith('86')) return 'CN';
+  if (digits.startsWith('55')) return 'BR';
+  if (digits.startsWith('52')) return 'MX';
+  if (digits.startsWith('971')) return 'AE';
+  if (digits.startsWith('966')) return 'SA';
+  if (digits.startsWith('92')) return 'PK';
+  if (digits.startsWith('880')) return 'BD';
+  if (digits.startsWith('62')) return 'ID';
+  if (digits.startsWith('63')) return 'PH';
+  if (digits.startsWith('66')) return 'TH';
+  if (digits.startsWith('84')) return 'VN';
+  if (digits.startsWith('7')) return 'RU/KZ';
+  if (digits.length >= 7 && digits.length <= 15) return 'INTERNATIONAL';
+  return 'UNKNOWN';
+}
+
+/**
+ * Destination-aware SMS route validation.
+ *
+ * Enforces compliance rules for Twilio SMS routing:
+ *  - Ghana (+233): BLOCKED — Twilio does not support two-way SMS to Ghana with
+ *    numeric international senders. A registered Ghana alphanumeric Sender ID
+ *    is required for outbound Ghana SMS. Inbound Ghana SMS is unsupported.
+ *    (Twilio error 21612 = unsupported To/From combination)
+ *  - US/Canada (+1): ALLOWED — uses customer's assigned active number +
+ *    Messaging Service SID, subject to A2P 10DLC registration.
+ *  - Other international: ALLOWED — may have carrier-specific restrictions.
+ *
+ * @param {string} from - Sender number (E.164 or raw)
+ * @param {string} to   - Destination number (E.164 or raw)
+ * @returns {{ allowed: boolean, error: string|null, reason: string, destinationCountry: string, note: string|null }}
+ */
+export function validateSmsRoute(from, to) {
+  const destCheck = normalizeE164(to);
+  if (!destCheck.isValid) {
+    return {
+      allowed: false,
+      error: `Invalid destination number: ${destCheck.error}`,
+      reason: 'INVALID_DESTINATION',
+      destinationCountry: 'UNKNOWN',
+      note: null,
+    };
+  }
+  const toE164 = destCheck.normalized;
+  const country = detectDestinationCountry(toE164);
+
+  // ── Ghana (+233): BLOCKED for two-way SMS ──
+  // Twilio error 21612: The 'To' and 'From' combination is not supported for this message.
+  // Ghana requires a registered alphanumeric Sender ID for outbound SMS.
+  // Inbound Ghana SMS is unsupported.
+  if (toE164.startsWith('+233')) {
+    return {
+      allowed: false,
+      error: 'A registered Ghana alphanumeric Sender ID is required for outbound Ghana SMS. Inbound Ghana SMS is unsupported. Please contact support to configure a Ghana alphanumeric Sender ID for this destination.',
+      reason: 'GHANA_REQUIRES_ALPHANUMERIC_SENDER_ID',
+      destinationCountry: 'GH',
+      note: 'Twilio does not support two-way SMS to Ghana with numeric international senders (error 21612).',
+    };
+  }
+
+  // ── US/Canada (+1): ALLOWED with Messaging Service + A2P ──
+  if (toE164.startsWith('+1')) {
+    return {
+      allowed: true,
+      error: null,
+      reason: 'US_CANADA_ROUTE',
+      destinationCountry: 'US/CA',
+      note: 'Uses customer assigned active number + Messaging Service SID. Subject to A2P 10DLC registration.',
+    };
+  }
+
+  // ── Other international: ALLOWED (carrier restrictions may apply) ──
+  return {
+    allowed: true,
+    error: null,
+    reason: 'INTERNATIONAL_ROUTE',
+    destinationCountry: country,
+    note: 'International SMS may have carrier-specific restrictions. Delivery not guaranteed.',
   };
 }
 
@@ -334,7 +449,7 @@ export async function validateCallerIdOwnership(base44, callerId, user) {
  * @param {string} toNumber   - Destination (E.164)
  * @param {string} body       - Message body
  * @param {string} messagingServiceSid - The Messaging Service SID
- * @returns {Promise<{ success: boolean, messageSid: string, provider: string }>}
+ * @returns {Promise<{ success: boolean, messageSid: string, provider: string, status: string }>}
  */
 export async function sendSmsViaTwilio(
   accountSid,
@@ -376,12 +491,25 @@ export async function sendSmsViaTwilio(
   const data = await res.json();
   if (!res.ok) {
     console.error(
-      `[twilioSender] Twilio SMS error: ${JSON.stringify({ code: data.code, message: data.message, moreInfo: data.more_info })}`
+      `[twilioSender] Twilio SMS error: ${JSON.stringify({ code: data.code, message: data.message, moreInfo: data.more_info, status: data.status })}`
     );
-    throw new Error(
-      data.message || `Twilio SMS failed (code ${data.code || 'unknown'})`
-    );
+    return {
+      success: false,
+      messageSid: data.sid || null,
+      provider: 'twilio',
+      status: 'failed',
+      errorCode: data.code ? String(data.code) : null,
+      errorMessage: data.message || `Twilio SMS failed (code ${data.code || 'unknown'})`,
+    };
   }
 
-  return { success: true, provider: 'twilio', messageSid: data.sid };
+  // API success ≠ delivered. The message is queued; delivery is confirmed via status callback.
+  return {
+    success: true,
+    messageSid: data.sid,
+    provider: 'twilio',
+    status: 'pending', // queued/sending — not delivered yet
+    errorCode: null,
+    errorMessage: null,
+  };
 }
