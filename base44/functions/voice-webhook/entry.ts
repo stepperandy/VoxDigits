@@ -1,8 +1,13 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import {
+  normalizeE164,
+  normalizeUSCanadaE164,
+  validateCallerIdOwnership,
+} from '../../shared/twilioSender.ts';
 
 const xml = (body) => new Response(body, {
   status: 200,
-  headers: { 'Content-Type': 'text/xml; charset=utf-8' }
+  headers: { 'Content-Type': 'text/xml; charset=utf-8' },
 });
 
 Deno.serve(async (req) => {
@@ -12,7 +17,6 @@ Deno.serve(async (req) => {
   try {
     const text = await req.text();
     params = new URLSearchParams(text);
-    // Log ALL params for debugging
     const allParams = {};
     for (const [k, v] of params.entries()) allParams[k] = v;
     console.log('[voiceWebhook] ALL PARAMS:', JSON.stringify(allParams));
@@ -30,22 +34,14 @@ Deno.serve(async (req) => {
 
   console.log(`[voiceWebhook] From=${from} | To=${stdTo} | Direction=${direction} | callerId=${callerId} | CallStatus=${callStatus}`);
 
-  // ── STATUS CALLBACKS: Twilio sends these after call ends — ignore them ──
-  // They arrive with CallbackSource=call-progress-events or CallStatus=completed/busy/failed/no-answer
+  // ── STATUS CALLBACKS: ignore them ──
   if (callbackSource || ['completed', 'busy', 'failed', 'no-answer', 'canceled'].includes(callStatus)) {
     console.log('[voiceWebhook] Status callback received, ignoring:', callStatus);
     return xml(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`);
   }
 
   // ── OUTBOUND: From is a browser client identity (client:xxx) ──
-  // When Twilio JS SDK places a call, From = "client:<identity>"
-  // The custom params we passed (To=phoneNumber, callerId=virtualNumber) come through as form fields
   if (from.startsWith('client:')) {
-    // For outbound via TwiML App, the destination number is in the custom 'To' param
-    // BUT stdTo might be the TwiML App SID (APxx...) — we need the actual phone number
-    // Twilio sends custom params alongside standard ones, so params.get('To') IS the custom To we set
-    // However if it's an AP... SID, fall back to nothing (shouldn't happen if dialer sets it correctly)
-    // If To is the TwiML App SID (starts with AP), use our custom PhoneNumber param instead
     let dest = stdTo.trim();
     if (!dest || dest.startsWith('AP')) {
       dest = (params.get('PhoneNumber') || '').trim();
@@ -57,77 +53,168 @@ Deno.serve(async (req) => {
       return xml(`<?xml version="1.0" encoding="UTF-8"?><Response><Say>No destination number provided.</Say></Response>`);
     }
 
-    // Ensure E.164
-    if (!dest.startsWith('+') && !dest.startsWith('client:')) {
-      dest = '+' + dest.replace(/\D/g, '');
+    // ── Normalize destination to strict E.164 ──
+    // US/Canada: normalize to +1XXXXXXXXXX (never drop +1)
+    // International: preserve valid E.164
+    let destE164 = null;
+    let destError = null;
+
+    const destCheck = normalizeE164(dest);
+    if (destCheck.isValid) {
+      destE164 = destCheck.normalized;
+    } else {
+      destError = destCheck.error;
     }
 
-    // Use the virtual number (callerId custom param) as the caller ID
-    const finalCallerId = callerId && !callerId.startsWith('client:') ? callerId : '';
-    console.log(`[voiceWebhook] OUTBOUND — dialing ${dest} with callerId=${finalCallerId}`);
+    if (!destE164) {
+      console.error(`[voiceWebhook] OUTBOUND — cannot normalize destination "${dest}": ${destError}`);
+      return xml(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="alice">The destination number is invalid. Please check the number and try again.</Say>
+</Response>`);
+    }
 
-    // Check wallet balance — block outgoing calls if insufficient
-    if (finalCallerId) {
+    console.log(`[voiceWebhook] OUTBOUND — normalized destination: ${dest} → ${destE164}`);
+
+    // ── Validate callerId belongs to the user (tenant isolation) ──
+    // Extract user identity from client:xxx format
+    // The identity is the user's email sanitized (email.replace(/[@.]/g, '_'))
+    // We need to resolve the actual user to validate callerId ownership
+    let finalCallerId = '';
+
+    if (callerId && !callerId.startsWith('client:')) {
+      // Resolve the user from the client identity
+      const clientIdentity = from.replace('client:', '');
+      // Reverse the identity sanitization: foo_bar_com → foo@bar.com
+      // This is a best-effort — we query VirtualNumber by the callerId to find the owner
+      let ownerUser = null;
       try {
-        let callerVnums = await base44.asServiceRole.entities.VirtualNumber.filter({ number: finalCallerId });
+        const callerDigits = callerId.replace(/\D/g, '');
+        let callerVnums = await base44.asServiceRole.entities.VirtualNumber.filter({ phone_number: callerId });
         if (!callerVnums || callerVnums.length === 0) {
-          callerVnums = await base44.asServiceRole.entities.VirtualNumber.filter({ phone_number: finalCallerId });
+          callerVnums = await base44.asServiceRole.entities.VirtualNumber.filter({ number: callerId });
         }
+        if (!callerVnums || callerVnums.length === 0) {
+          const allNums = await base44.asServiceRole.entities.VirtualNumber.list('-created_date', 200);
+          callerVnums = (allNums || []).filter((n) => {
+            const nd = (n.phone_number || n.number || '').replace(/\D/g, '');
+            return nd === callerDigits || nd.endsWith(callerDigits) || callerDigits.endsWith(nd);
+          });
+        }
+
         if (callerVnums && callerVnums.length > 0) {
-          const callerEmail = callerVnums[0].customer_email || '';
-          if (callerEmail) {
-            const users = await base44.asServiceRole.entities.User.filter({ email: callerEmail });
-            if (users && users.length > 0) {
-              const balance = users[0].credits || 0;
-              if (balance < 0.03) {
-                console.log(`[voiceWebhook] OUTBOUND blocked — insufficient balance for ${callerEmail}: $${balance}`);
-                return xml(`<?xml version="1.0" encoding="UTF-8"?>
+          const vnum = callerVnums[0];
+          // Verify the number is active and voice-capable
+          if (vnum.status && vnum.status !== 'active') {
+            console.error(`[voiceWebhook] OUTBOUND — callerId ${callerId} is ${vnum.status}`);
+            return xml(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="alice">Your virtual number is not active. Please contact support.</Say>
+</Response>`);
+          }
+          if (vnum.voice_enabled === false) {
+            console.error(`[voiceWebhook] OUTBOUND — callerId ${callerId} has no voice capability`);
+            return xml(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="alice">Your virtual number does not have voice capability enabled.</Say>
+</Response>`);
+          }
+
+          // Verify the client identity matches the number owner
+          let ownerEmail = vnum.customer_email || '';
+          if (!ownerEmail && vnum.userId) {
+            const users = await base44.asServiceRole.entities.User.filter({ id: vnum.userId });
+            if (users && users.length > 0) ownerEmail = users[0].email || '';
+          }
+          if (ownerEmail) {
+            const expectedIdentity = ownerEmail.replace(/[@.]/g, '_');
+            if (expectedIdentity !== clientIdentity) {
+              console.error(
+                `[voiceWebhook] TENANT VIOLATION: client identity ${clientIdentity} does not match callerId owner ${ownerEmail} (expected identity: ${expectedIdentity})`
+              );
+              return xml(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="alice">Caller ID verification failed. Please contact support.</Say>
+</Response>`);
+            }
+          }
+
+          finalCallerId = vnum.phone_number || vnum.number || callerId;
+        } else {
+          console.error(`[voiceWebhook] OUTBOUND — callerId ${callerId} not found in VirtualNumber records`);
+          return xml(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="alice">The caller ID is not recognized. Please contact support.</Say>
+</Response>`);
+        }
+      } catch (e) {
+        console.warn('[voiceWebhook] CallerId validation error:', e.message);
+      }
+    } else {
+      console.error('[voiceWebhook] OUTBOUND — no callerId provided or callerId is client identity');
+      return xml(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="alice">No caller ID configured. Please contact support.</Say>
+</Response>`);
+    }
+
+    console.log(`[voiceWebhook] OUTBOUND — dialing ${destE164} with callerId=${finalCallerId}`);
+
+    // ── Check wallet balance — block outgoing calls if insufficient ──
+    try {
+      let callerVnums = await base44.asServiceRole.entities.VirtualNumber.filter({ phone_number: finalCallerId });
+      if (!callerVnums || callerVnums.length === 0) {
+        callerVnums = await base44.asServiceRole.entities.VirtualNumber.filter({ number: finalCallerId });
+      }
+      if (callerVnums && callerVnums.length > 0) {
+        const callerEmail = callerVnums[0].customer_email || '';
+        if (callerEmail) {
+          const users = await base44.asServiceRole.entities.User.filter({ email: callerEmail });
+          if (users && users.length > 0) {
+            const balance = users[0].credits || 0;
+            if (balance < 0.03) {
+              console.log(`[voiceWebhook] OUTBOUND blocked — insufficient balance for ${callerEmail}: $${balance}`);
+              return xml(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say voice="alice">Your account balance is insufficient to make outgoing calls. Please add calling credit to your account.</Say>
 </Response>`);
-              }
             }
           }
         }
-      } catch (e) {
-        console.warn('[voiceWebhook] Balance check error:', e.message);
       }
+    } catch (e) {
+      console.warn('[voiceWebhook] Balance check error:', e.message);
     }
 
-    const callerIdAttr = finalCallerId ? `callerId="${finalCallerId}"` : '';
     return xml(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Dial ${callerIdAttr} timeout="30">
-    <Number>${dest}</Number>
+  <Dial callerId="${finalCallerId}" timeout="30">
+    <Number>${destE164}</Number>
   </Dial>
 </Response>`);
   }
 
   // ── INBOUND: a real PSTN call to one of our Twilio numbers ──
-  // Guard: From must look like a real phone number (starts with + or digits)
   if (!from.match(/^[+\d]/)) {
     console.warn('[voiceWebhook] Unexpected From format, ignoring:', from);
     return xml(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`);
   }
   console.log('[voiceWebhook] INBOUND — to:', stdTo);
 
-  let toNormalized = stdTo.trim();
+  const inboundCheck = normalizeE164(stdTo);
+  const toNormalized = inboundCheck.normalized || stdTo.trim();
+
   if (!toNormalized) {
     console.error('[voiceWebhook] INBOUND but To is empty');
     return xml(`<?xml version="1.0" encoding="UTF-8"?><Response><Say>Number not found.</Say></Response>`);
   }
-  if (!toNormalized.startsWith('+')) {
-    toNormalized = '+' + toNormalized.replace(/\D/g, '');
-  }
 
   try {
     // Find virtual number owner — always use service role (no user auth on Twilio webhooks)
-    // Try multiple formats: exact, with/without +, digits-only match
     let vnums = await base44.asServiceRole.entities.VirtualNumber.filter({ phone_number: toNormalized });
     if (!vnums || vnums.length === 0) {
       vnums = await base44.asServiceRole.entities.VirtualNumber.filter({ number: toNormalized });
     }
-    // Try without leading + in case stored differently
     if (!vnums || vnums.length === 0) {
       const toNoPlus = toNormalized.replace(/^\+/, '');
       vnums = await base44.asServiceRole.entities.VirtualNumber.filter({ phone_number: toNoPlus });
@@ -136,12 +223,11 @@ Deno.serve(async (req) => {
       const toNoPlus = toNormalized.replace(/^\+/, '');
       vnums = await base44.asServiceRole.entities.VirtualNumber.filter({ number: toNoPlus });
     }
-    // Last resort: scan all and match by digits
     if (!vnums || vnums.length === 0) {
       const toDigits = toNormalized.replace(/\D/g, '');
       console.log('[voiceWebhook] Falling back to full scan for digits:', toDigits);
       const allNums = await base44.asServiceRole.entities.VirtualNumber.list('-created_date', 200);
-      vnums = (allNums || []).filter(n => {
+      vnums = (allNums || []).filter((n) => {
         const nd = (n.phone_number || n.number || '').replace(/\D/g, '');
         return nd === toDigits || nd.endsWith(toDigits) || toDigits.endsWith(nd);
       });
@@ -156,10 +242,19 @@ Deno.serve(async (req) => {
     }
 
     const vnum = vnums[0];
-    let ownerEmail = vnum.customer_email || '';
-    console.log('[voiceWebhook] Found VirtualNumber:', JSON.stringify({ id: vnum.id, number: vnum.number, phone_number: vnum.phone_number, customer_email: vnum.customer_email, userId: vnum.userId }));
 
-    // Resolve owner email via userId if missing — MUST use asServiceRole (no user auth on webhooks)
+    // ── Tenant authorization: verify the number is active ──
+    if (vnum.status && vnum.status !== 'active') {
+      console.warn(`[voiceWebhook] INBOUND — VirtualNumber ${toNormalized} is ${vnum.status}`);
+      return xml(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say>This number is not in service.</Say>
+</Response>`);
+    }
+
+    let ownerEmail = vnum.customer_email || '';
+    console.log('[voiceWebhook] Found VirtualNumber:', JSON.stringify({ id: vnum.id, number: vnum.number, phone_number: vnum.phone_number, customer_email: vnum.customer_email, userId: vnum.userId, status: vnum.status }));
+
     if (!ownerEmail && vnum.userId) {
       const users = await base44.asServiceRole.entities.User.filter({ id: vnum.userId });
       if (users && users.length > 0) ownerEmail = users[0].email || '';
@@ -173,11 +268,8 @@ Deno.serve(async (req) => {
 </Response>`);
     }
 
-    // Build browser client identity — MUST match what twilioToken generates
-    // twilioToken uses email.replace(/[@.]/g, '_')
     const identity = ownerEmail.replace(/[@.]/g, '_');
     console.log('[voiceWebhook] Resolved ownerEmail:', ownerEmail, '→ identity:', identity);
-    console.log(`[voiceWebhook] Routing inbound to client identity: ${identity}`);
 
     // Check call forwarding rules
     let forwardingRules = [];

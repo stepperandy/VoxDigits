@@ -1,4 +1,9 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import {
+  getTwilioCredentials,
+  sendSmsViaTwilio,
+  normalizeE164,
+} from '../../shared/twilioSender.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -18,7 +23,7 @@ Deno.serve(async (req) => {
     console.log(`[smsIncomingWebhook] From=${from} To=${to} Status=${messageStatus} Body=${messageBody?.substring(0, 50)}`);
 
     const twimlOk = new Response(`<?xml version="1.0" encoding="UTF-8"?><Response/>`, {
-      headers: { 'Content-Type': 'application/xml' }
+      headers: { 'Content-Type': 'application/xml' },
     });
 
     // ── STATUS CALLBACKS: Twilio posts delivery status updates — ignore them ──
@@ -32,9 +37,9 @@ Deno.serve(async (req) => {
       return twimlOk;
     }
 
-    // Find the virtual number owner — check both schemas + digits-only fallback
-    let toNorm = to.trim();
-    if (!toNorm.startsWith('+')) toNorm = '+' + toNorm.replace(/\D/g, '');
+    // ── Find the virtual number owner — tenant isolation ──
+    const toCheck = normalizeE164(to);
+    const toNorm = toCheck.normalized || to;
 
     let numbers = await base44.asServiceRole.entities.VirtualNumber.filter({ phone_number: toNorm });
     if (!numbers || numbers.length === 0) {
@@ -51,9 +56,8 @@ Deno.serve(async (req) => {
     // Last resort: scan all and match by digits
     if (!numbers || numbers.length === 0) {
       const toDigits = toNorm.replace(/\D/g, '');
-      console.log('[smsIncomingWebhook] Falling back to full scan for digits:', toDigits);
       const allNums = await base44.asServiceRole.entities.VirtualNumber.list('-created_date', 200);
-      numbers = (allNums || []).filter(n => {
+      numbers = (allNums || []).filter((n) => {
         const nd = (n.phone_number || n.number || '').replace(/\D/g, '');
         return nd === toDigits || nd.endsWith(toDigits) || toDigits.endsWith(nd);
       });
@@ -64,15 +68,21 @@ Deno.serve(async (req) => {
     }
 
     const virtualNumber = numbers[0];
-    let ownerEmail = virtualNumber.customer_email || null;
 
+    // ── Tenant authorization: verify the number is active ──
+    if (virtualNumber.status && virtualNumber.status !== 'active') {
+      console.warn(`[smsIncomingWebhook] VirtualNumber ${to} is ${virtualNumber.status}, not accepting inbound`);
+      return twimlOk;
+    }
+
+    let ownerEmail = virtualNumber.customer_email || null;
     if (!ownerEmail && virtualNumber.userId) {
       const users = await base44.asServiceRole.entities.User.filter({ id: virtualNumber.userId });
       if (users && users.length > 0) ownerEmail = users[0].email;
     }
 
     if (ownerEmail) {
-      // Check if message already logged (dedup)
+      // Dedup check
       const existing = await base44.asServiceRole.entities.Message.filter({ provider_message_id: messageSid });
       if (!existing || existing.length === 0) {
         await base44.asServiceRole.entities.Message.create({
@@ -85,12 +95,12 @@ Deno.serve(async (req) => {
           status: 'received',
           provider_message_id: messageSid,
         });
-        console.log(`[smsIncomingWebhook] ✅ Saved inbound SMS for ${ownerEmail}`);
+        console.log(`[smsIncomingWebhook] Saved inbound SMS for ${ownerEmail}`);
       } else {
         console.log(`[smsIncomingWebhook] Duplicate SID ${messageSid}, skipping`);
       }
 
-      // Check for auto-reply
+      // ── Auto-reply: use centralized sender resolution ──
       try {
         const autoReplies = await base44.asServiceRole.entities.AutoReplyTemplate.filter({
           virtual_number: to,
@@ -99,17 +109,18 @@ Deno.serve(async (req) => {
         });
         if (autoReplies && autoReplies.length > 0) {
           const replyMsg = autoReplies[0].message;
-          const twilioSid = Deno.env.get('TWILIO_ACCOUNT_SID');
-          const twilioToken = Deno.env.get('TWILIO_AUTH_TOKEN');
-          if (twilioSid && twilioToken) {
-            const auth = btoa(`${twilioSid}:${twilioToken}`);
-            await fetch(`https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`, {
-              method: 'POST',
-              headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: new URLSearchParams({ From: to, To: from, Body: replyMsg }),
-            });
-            console.log(`[smsIncomingWebhook] Auto-replied to ${from}`);
+          const senderNumber = virtualNumber.phone_number || virtualNumber.number;
+
+          // Normalize the recipient (original sender) for the reply
+          const replyDestCheck = normalizeE164(from);
+          if (!replyDestCheck.isValid) {
+            console.warn(`[smsIncomingWebhook] Cannot normalize auto-reply destination ${from}: ${replyDestCheck.error}`);
+            return twimlOk;
           }
+
+          const { accountSid, authToken } = getTwilioCredentials();
+          await sendSmsViaTwilio(accountSid, authToken, senderNumber, replyDestCheck.normalized, replyMsg);
+          console.log(`[smsIncomingWebhook] Auto-replied from ${senderNumber} to ${replyDestCheck.normalized}`);
         }
       } catch (e) {
         console.warn('[smsIncomingWebhook] Auto-reply error:', e.message);
@@ -117,11 +128,10 @@ Deno.serve(async (req) => {
     }
 
     return twimlOk;
-
   } catch (error) {
     console.error('[smsIncomingWebhook] Error:', error.message);
     return new Response(`<?xml version="1.0" encoding="UTF-8"?><Response/>`, {
-      headers: { 'Content-Type': 'application/xml' }
+      headers: { 'Content-Type': 'application/xml' },
     });
   }
 });
