@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RefreshCw, Filter, CheckCircle, XCircle, MinusCircle, Video, Send } from "lucide-react";
+import { RefreshCw, Send, CheckCircle, XCircle, Clock, Video } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PLATFORM_COLORS = {
@@ -13,17 +12,29 @@ const PLATFORM_COLORS = {
   TikTok: "bg-purple-500/20 text-purple-300 border-purple-500/30",
 };
 
-const STATUS_CONFIG = {
-  posted: { icon: CheckCircle, color: "text-green-400", badge: "bg-green-500/20 text-green-300", label: "Posted" },
-  failed: { icon: XCircle, color: "text-red-400", badge: "bg-red-500/20 text-red-300", label: "Failed" },
-  skipped: { icon: MinusCircle, color: "text-gray-400", badge: "bg-gray-500/20 text-gray-300", label: "Skipped" },
+const STATUS_ICON = {
+  posted: CheckCircle,
+  failed: XCircle,
+  skipped: Clock,
 };
+
+const STATUS_COLOR = {
+  posted: "text-green-400",
+  failed: "text-red-400",
+  skipped: "text-gray-400",
+};
+
+function formatDate(dateStr) {
+  if (!dateStr) return "—";
+  return new Date(dateStr).toLocaleString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+    hour: 'numeric', minute: '2-digit'
+  });
+}
 
 export default function SMOSendHistory() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [platformFilter, setPlatformFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
     loadLogs();
@@ -31,75 +42,60 @@ export default function SMOSendHistory() {
 
   const loadLogs = async () => {
     setLoading(true);
-    const data = await base44.entities.SMOSendLog.list('-sent_at', 100).catch(() => []);
+    const data = await base44.entities.SMOSendLog.list('-sent_at', 200).catch(() => []);
     setLogs(data || []);
     setLoading(false);
   };
 
-  const filteredLogs = logs.filter(l => {
-    if (platformFilter !== "all" && l.platform !== platformFilter) return false;
-    if (statusFilter !== "all" && l.status !== statusFilter) return false;
-    return true;
-  });
+  // Group logs by post_id — one entry per post, showing all platforms it was sent to
+  const groupedPosts = React.useMemo(() => {
+    const groups = {};
+    for (const log of logs) {
+      const key = log.post_id || log.id;
+      if (!groups[key]) {
+        groups[key] = {
+          post_id: key,
+          content: log.post_content_snapshot || "",
+          campaign_name: log.campaign_name || "",
+          sent_at: log.sent_at,
+          platforms: [],
+          trigger_source: log.trigger_source,
+          sent_by: log.sent_by,
+        };
+      }
+      // Track earliest sent_at for the group
+      if (log.sent_at && (!groups[key].sent_at || new Date(log.sent_at) < new Date(groups[key].sent_at))) {
+        groups[key].sent_at = log.sent_at;
+      }
+      groups[key].platforms.push({
+        name: log.platform,
+        status: log.status,
+        video_used: log.video_used,
+        platform_response: log.platform_response,
+        error_message: log.error_message,
+      });
+    }
+    return Object.values(groups).sort((a, b) => new Date(b.sent_at) - new Date(a.sent_at));
+  }, [logs]);
 
-  const stats = {
-    total: logs.length,
-    posted: logs.filter(l => l.status === "posted").length,
-    failed: logs.filter(l => l.status === "failed").length,
-    skipped: logs.filter(l => l.status === "skipped").length,
-  };
+  const totalPosts = groupedPosts.length;
+  const totalSends = logs.length;
+  const autoCount = logs.filter(l => l.trigger_source === 'bulk' || l.trigger_source === 'automation').length;
+  const manualCount = logs.filter(l => l.trigger_source === 'manual').length;
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-lg font-bold text-white flex items-center gap-2">
-          <Send className="w-5 h-5 text-green-400" /> Send History
+          <Send className="w-5 h-5 text-green-400" /> Post History
         </h3>
-        <div className="flex flex-wrap items-center gap-2">
-          <Select value={platformFilter} onValueChange={setPlatformFilter}>
-            <SelectTrigger className="w-[130px] h-8 bg-slate-700 border-slate-600 text-white text-xs">
-              <Filter className="w-3 h-3 mr-1" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-slate-700 border-slate-600">
-              <SelectItem value="all">All Platforms</SelectItem>
-              {Object.keys(PLATFORM_COLORS).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[110px] h-8 bg-slate-700 border-slate-600 text-white text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-slate-700 border-slate-600">
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="posted">Posted</SelectItem>
-              <SelectItem value="failed">Failed</SelectItem>
-              <SelectItem value="skipped">Skipped</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="flex items-center gap-4 text-xs text-gray-400">
+          <span>{totalPosts} posts · {totalSends} sends</span>
+          <span className="text-cyan-400">{autoCount} auto</span>
+          <span className="text-purple-400">{manualCount} manual</span>
           <Button onClick={loadLogs} variant="ghost" size="sm" className="h-8 text-xs">
             <RefreshCw className="w-3 h-3 mr-1" /> Refresh
           </Button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-2">
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-3 text-center">
-          <p className="text-2xl font-bold text-white">{stats.total}</p>
-          <p className="text-xs text-gray-500">Total Sent</p>
-        </div>
-        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-center">
-          <p className="text-2xl font-bold text-green-400">{stats.posted}</p>
-          <p className="text-xs text-gray-500">Posted</p>
-        </div>
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-center">
-          <p className="text-2xl font-bold text-red-400">{stats.failed}</p>
-          <p className="text-xs text-gray-500">Failed</p>
-        </div>
-        <div className="bg-gray-500/10 border border-gray-500/20 rounded-lg p-3 text-center">
-          <p className="text-2xl font-bold text-gray-400">{stats.skipped}</p>
-          <p className="text-xs text-gray-500">Skipped</p>
         </div>
       </div>
 
@@ -107,66 +103,82 @@ export default function SMOSendHistory() {
         <div className="flex justify-center py-8">
           <div className="w-8 h-8 border-4 border-green-500/20 border-t-green-500 rounded-full animate-spin"></div>
         </div>
-      ) : filteredLogs.length === 0 ? (
+      ) : groupedPosts.length === 0 ? (
         <div className="text-center py-12 bg-slate-800/50 rounded-lg border border-slate-700">
           <Send className="w-10 h-10 text-green-400/50 mx-auto mb-3" />
-          <p className="text-gray-400 mb-2">No send records yet.</p>
-          <p className="text-gray-500 text-sm">Records will appear here after posts are published to social media.</p>
+          <p className="text-gray-400 mb-2">No posts published yet.</p>
+          <p className="text-gray-500 text-sm">Published posts will appear here automatically — both manual and automated.</p>
         </div>
       ) : (
-        <div className="space-y-2 max-h-[500px] overflow-y-auto">
+        <div className="space-y-2 max-h-[600px] overflow-y-auto">
           <AnimatePresence>
-            {filteredLogs.map((log) => {
-              const StatusIcon = STATUS_CONFIG[log.status]?.icon || MinusCircle;
-              return (
-                <motion.div
-                  key={log.id}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  className="bg-slate-800/60 border border-slate-700 rounded-lg p-3 flex items-start gap-3"
-                >
-                  <StatusIcon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${STATUS_CONFIG[log.status]?.color}`} />
-                  <div className="flex-1 min-w-0 space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium border ${PLATFORM_COLORS[log.platform] || "bg-gray-500/20 text-gray-300"}`}>
-                        {log.platform}
+            {groupedPosts.map((post) => (
+              <motion.div
+                key={post.post_id}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                className="bg-slate-800/60 border border-slate-700 rounded-lg p-3 hover:border-slate-600 transition-colors"
+              >
+                {/* Date + trigger badge */}
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="text-sm text-gray-300 font-medium">
+                    {formatDate(post.sent_at)}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {(post.trigger_source === 'bulk' || post.trigger_source === 'automation') && (
+                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                        Auto
                       </span>
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_CONFIG[log.status]?.badge}`}>
-                        {STATUS_CONFIG[log.status]?.label}
+                    )}
+                    {post.trigger_source === 'manual' && (
+                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                        Manual
                       </span>
-                      {log.video_used && (
-                        <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium bg-orange-500/20 text-orange-300 border border-orange-500/30">
-                          <Video className="w-2.5 h-2.5" /> Video
-                        </span>
-                      )}
-                      <span className="text-xs text-gray-600 capitalize">{log.trigger_source}</span>
-                    </div>
-
-                    {log.post_content_snapshot && (
-                      <p className="text-sm text-gray-300 line-clamp-2">{log.post_content_snapshot}</p>
                     )}
-
-                    {log.platform_response && (
-                      <p className="text-xs text-green-400/70">{log.platform_response}</p>
-                    )}
-
-                    {log.error_message && (
-                      <p className="text-xs text-red-400">{log.error_message}</p>
-                    )}
-
-                    <div className="flex items-center gap-3 text-xs text-gray-600">
-                      <span>{log.sent_at ? new Date(log.sent_at).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) : '—'}</span>
-                      {log.sent_by && <span>by {log.sent_by}</span>}
-                      {log.campaign_name && <span>· {log.campaign_name}</span>}
-                    </div>
                   </div>
-                </motion.div>
-              );
-            })}
+                </div>
+
+                {/* Content snippet */}
+                <p className="text-sm text-gray-300 line-clamp-2 mb-2">
+                  {post.content}
+                </p>
+
+                {/* Target platforms */}
+                <div className="flex flex-wrap items-center gap-2">
+                  {post.platforms.map((p, idx) => {
+                    const StatusIcon = STATUS_ICON[p.status] || Clock;
+                    return (
+                      <span
+                        key={idx}
+                        className={`flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border ${PLATFORM_COLORS[p.name] || "bg-gray-500/20 text-gray-300 border-gray-500/30"}`}
+                      >
+                        {p.name}
+                        <StatusIcon className={`w-3 h-3 ${STATUS_COLOR[p.status]}`} />
+                        {p.video_used && <Video className="w-2.5 h-2.5 text-orange-400" />}
+                      </span>
+                    );
+                  })}
+                </div>
+
+                {/* Campaign */}
+                {post.campaign_name && (
+                  <p className="text-xs text-gray-600 mt-2">Campaign: {post.campaign_name}</p>
+                )}
+              </motion.div>
+            ))}
           </AnimatePresence>
         </div>
       )}
+
+      {/* Info note about automation */}
+      <div className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-3 text-xs text-gray-500">
+        <p className="flex items-center gap-1.5">
+          <Clock className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+          Automated posts appear here when the <strong className="text-gray-400">Daily Auto-Poster</strong> (09:00 UTC) publishes scheduled posts.
+          New posts are generated weekly by the <strong className="text-gray-400">SMO Post Generator</strong> (Mondays 08:00).
+        </p>
+      </div>
     </div>
   );
 }
