@@ -6,10 +6,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Edit2, Trash2, Share2, Sparkles, ExternalLink, Send } from "lucide-react";
+import { Plus, Edit2, Trash2, Share2, Sparkles, ExternalLink, Send, BarChart3 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import SMOPostList from "./SMOPostList";
 import SMOSendHistory from "./SMOSendHistory";
+import SMOPerformanceReport from "./SMOPerformanceReport";
 
 const PLATFORMS = ["Facebook", "Instagram", "LinkedIn", "Twitter", "TikTok"];
 
@@ -319,10 +320,22 @@ export default function SMOManager() {
           >
             <Send className="w-4 h-4" /> Send History
           </button>
+          <button
+            onClick={() => setActiveTab("performance")}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === "performance"
+                ? "bg-indigo-600 text-white"
+                : "bg-slate-700/50 text-gray-400 hover:text-white"
+            }`}
+          >
+            <BarChart3 className="w-4 h-4" /> Performance
+          </button>
         </div>
 
         {activeTab === "posts" ? (
           <SMOPostList onGenerate={handleGeneratePosts} generating={generating} />
+        ) : activeTab === "performance" ? (
+          <SMOPerformanceReport />
         ) : (
           <SMOSendHistory />
         )}
