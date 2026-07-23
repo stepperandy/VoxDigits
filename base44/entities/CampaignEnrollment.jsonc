@@ -35,6 +35,11 @@
       "type": "string",
       "default": "subscription",
       "description": "How the subscriber was enrolled"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional notes (up to 1000 characters)",
+      "maxLength": 1000
     }
   },
   "required": [
