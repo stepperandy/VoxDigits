@@ -142,6 +142,7 @@ import ClientOnboarding from './pages/ClientOnboarding.jsx';
 import ASOManager from './pages/ASOManager.jsx';
 import Support from './pages/Support.jsx';
 import PromoLanding from './pages/PromoLanding.jsx';
+import AdLanding from './pages/AdLanding.jsx';
 import SmsConsentOptIn from './pages/SmsConsentOptIn.jsx';
 import SecurePortal from './pages/SecurePortal.jsx';
 import USVirtualNumber from './pages/countries/USVirtualNumber';
@@ -269,6 +270,7 @@ const AnimatedRoutes = () => {
       <Route path="/ASOManager" element={<RequireAuth><LayoutWrapper currentPageName="ASOManager"><ASOManager /></LayoutWrapper></RequireAuth>} />
       <Route path="/support" element={<LayoutWrapper currentPageName="Support"><Support /></LayoutWrapper>} />
       <Route path="/PromoLanding" element={<LayoutWrapper currentPageName="PromoLanding"><PromoLanding /></LayoutWrapper>} />
+      <Route path="/ad" element={<LayoutWrapper currentPageName="AdLanding"><AdLanding /></LayoutWrapper>} />
       <Route path="/sms-consent" element={<SmsConsentOptIn />} />
       <Route path="/secure" element={<RequireAuth><LayoutWrapper currentPageName="SecurePortal"><SecurePortal /></LayoutWrapper></RequireAuth>} />
       <Route path="/secure/" element={<RequireAuth><LayoutWrapper currentPageName="SecurePortal"><SecurePortal /></LayoutWrapper></RequireAuth>} />
