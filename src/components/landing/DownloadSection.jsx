@@ -32,7 +32,7 @@ const PLATFORMS = [
     platform: "iOS",
     subtitle: "iPhone & iPad",
     icon: Apple,
-    url: "https://apps.apple.com",
+    url: "https://apps.apple.com/us/search?term=voxtelefony",
     version: null,
     color: "#f59e0b",
     badge: "App Store",
