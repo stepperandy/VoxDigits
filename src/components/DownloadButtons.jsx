@@ -7,7 +7,7 @@ const DEFAULT_URLS = {
   "win-mirror2": "https://github.com/stepperandy/voxvpn/releases/download/v1.0.0/VoxTelefony.Setup.1.0.0.exe",
   mac: "",
   android: "https://play.google.com/store/apps/details?id=com.base69b202c06dc5b1988efe9645.app",
-  ios: "https://apps.apple.com",
+  ios: "https://apps.apple.com/gh/app/voxtelefony-virtual-numbers/id6760922995",
 };
 
 const PLATFORM_META = [
