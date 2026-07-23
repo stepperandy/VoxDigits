@@ -85,6 +85,39 @@ export default function HeroSection() {
             </Link>
           </div>
 
+          {/* App Store badges */}
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <span className="text-xs font-semibold text-purple-300/70 uppercase tracking-widest">Download the App</span>
+            <a
+              href="https://play.google.com/store/apps/details?id=com.base69b202c06dc5b1988efe9645.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:opacity-80 transition-opacity active:scale-95"
+              aria-label="Get it on Google Play"
+            >
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                alt="Get it on Google Play"
+                className="h-10 w-auto"
+                loading="lazy"
+              />
+            </a>
+            <a
+              href="https://apps.apple.com/gh/app/voxtelefony-virtual-numbers/id6760922995"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:opacity-80 transition-opacity active:scale-95"
+              aria-label="Download VoxTelefony on the App Store"
+            >
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg"
+                alt="Download on the App Store"
+                className="h-10 w-auto"
+                loading="lazy"
+              />
+            </a>
+          </div>
+
           {/* Mission / Founding / Location trust line */}
           <div className="mt-6 flex flex-wrap items-center gap-3 text-xs">
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: "rgba(251,146,60,0.12)", border: "1px solid rgba(251,146,60,0.3)" }}>
