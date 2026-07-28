@@ -123,8 +123,35 @@ const PLANS = [
   },
 ];
 
+const PLAN_KEYS = {
+  '1 Month': { nameKey: 'plan1Month', periodKey: 'plan1Month', daysKey: 'days30', badgeKey: null },
+  '3 Months': { nameKey: 'plan3Months', periodKey: 'plan3Months', daysKey: 'days90', badgeKey: null },
+  '6 Months': { nameKey: 'plan6Months', periodKey: 'plan6Months', daysKey: 'days180', badgeKey: 'badgeMostPopular' },
+  '1 Year': { nameKey: 'plan1Year', periodKey: 'plan1Year', daysKey: 'days365', badgeKey: 'badgeBestValue' },
+  '2 Years': { nameKey: 'plan2Years', periodKey: 'plan2Years', daysKey: 'days730', badgeKey: null },
+};
+
+const FEATURE_KEYS = {
+  'Unlimited Bandwidth': 'featUnlimitedBandwidth',
+  'AES-256 Encryption': 'featAes',
+  'No-Logs Policy': 'featNoLogs',
+  'All Server Locations': 'featAllServers',
+  'Kill Switch': 'featKillSwitch',
+  'Split Tunneling': 'featSplit',
+  'DNS Leak Protection': 'featDnsLeak',
+  'Priority Support': 'featPrioritySupport',
+  'DNS & IPv6 Leak Protection': 'featDnsIpv6',
+  'Dedicated IP Address': 'featDedicatedIp',
+  '24/7 Priority Support': 'feat247Priority',
+  'Static Dedicated IP': 'featStaticIp',
+  'Double VPN (Multi-hop)': 'featDoubleVpn',
+  'Dedicated Account Manager': 'featAccountManager',
+};
+
 function PlanCard({ plan, isAdmin, onPaymentMethodSelect, currency, convertPrice }) {
   const [loading, setLoading] = useState(false);
+  const { t } = useLanguage();
+  const planKeys = PLAN_KEYS[plan.name];
 
   const handleCheckout = () => {
     onPaymentMethodSelect(plan, plan.priceId, false);
@@ -132,23 +159,23 @@ function PlanCard({ plan, isAdmin, onPaymentMethodSelect, currency, convertPrice
 
   return (
     <div className={`relative rounded-xl p-6 flex flex-col ${plan.color}`}>
-      {plan.badge && (
+      {planKeys.badgeKey && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className={`px-3 py-1 text-xs font-bold rounded-full ${plan.badgeColor}`}>{plan.badge}</span>
+          <span className={`px-3 py-1 text-xs font-bold rounded-full ${plan.badgeColor}`}>{t(planKeys.badgeKey)}</span>
         </div>
       )}
 
       <div className="mb-4">
-        <h3 className="text-white font-bold text-base mb-0.5">{plan.name}</h3>
-        <p className="text-slate-600 text-xs">{plan.days}</p>
+        <h3 className="text-white font-bold text-base mb-0.5">{t(planKeys.nameKey)}</h3>
+        <p className="text-slate-600 text-xs">{t(planKeys.daysKey)}</p>
       </div>
 
       <div className="flex items-baseline gap-1 mb-1">
         <span className="text-3xl font-extrabold text-white">{currency.symbol}{convertPrice(plan.price)}</span>
       </div>
       <p className="text-slate-600 text-xs mb-5">
-        {currency.symbol}{convertPrice(plan.pricePerMonth)}/mo
-        {plan.savingsPercent > 0 && <span className="ml-2 text-cyan-400 font-semibold">Save {plan.savingsPercent}% vs monthly</span>}
+        {currency.symbol}{convertPrice(plan.pricePerMonth)}{t('perMonth')}
+        {plan.savingsPercent > 0 && <span className="ml-2 text-cyan-400 font-semibold">{t('saveVsMonthly').replace('{percent}', plan.savingsPercent)}</span>}
       </p>
 
       <button
@@ -156,14 +183,14 @@ function PlanCard({ plan, isAdmin, onPaymentMethodSelect, currency, convertPrice
         disabled={loading}
         className={`w-full py-2.5 rounded-lg text-sm font-bold mb-5 transition-all disabled:opacity-50 ${plan.btnClass}`}
       >
-        {loading ? 'Processing...' : `Get ${plan.period}`}
+        {loading ? t('btnProcessing') : t('btnGet').replace('{period}', t(planKeys.periodKey))}
       </button>
 
       <ul className="space-y-2.5 flex-1">
         {plan.features.map((f, fi) => (
           <li key={fi} className="flex items-center gap-2">
             <Check size={13} className="text-cyan-400 flex-shrink-0" />
-            <span className="text-slate-400 text-xs">{f}</span>
+            <span className="text-slate-400 text-xs">{t(FEATURE_KEYS[f] || f)}</span>
           </li>
         ))}
       </ul>
@@ -309,14 +336,14 @@ export default function Pricing() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
             {[
-              { label: 'Payment Processor', value: 'Stripe (PCI-DSS Level 1)' },
-              { label: 'Accepted Cards', value: 'Visa, Mastercard, Amex, Discover' },
-              { label: 'Alternative Methods', value: 'Apple Pay, Google Pay, Hubtel, Alipay' },
-              { label: 'Billing Cycle', value: 'One-time per period (1mo–2yr)' },
-              { label: 'Auto-Renewal', value: 'Optional — cancel anytime' },
-              { label: 'Cancellation Policy', value: 'Cancel anytime, no fees' },
-              { label: 'Money-Back Guarantee', value: '30-day full refund' },
-              { label: 'Currency', value: `${currency.code} (auto-converted from USD)` },
+              { label: t('payProcessor'), value: t('payProcessorVal') },
+              { label: t('payCards'), value: t('payCardsVal') },
+              { label: t('payAltMethods'), value: t('payAltVal') },
+              { label: t('payBillingCycle'), value: t('payBillingVal') },
+              { label: t('payAutoRenewal'), value: t('payAutoVal') },
+              { label: t('payCancellation'), value: t('payCancelVal') },
+              { label: t('payMoneyBack'), value: t('payMoneyBackVal') },
+              { label: t('payCurrency'), value: t('payCurrencyVal').replace('{code}', currency.code) },
             ].map(item => (
               <div key={item.label} className="flex justify-between items-center py-1.5 border-b border-white/5 last:border-0">
                 <span className="text-slate-500 text-xs">{item.label}</span>
@@ -325,7 +352,7 @@ export default function Pricing() {
             ))}
           </div>
           <p className="text-slate-600 text-[10px] mt-4 leading-relaxed">
-            Payments are processed securely by Stripe. VoxVPN never stores your full card details. Subscriptions can be cancelled at any time from your account dashboard. See our <a href="/refund-policy" className="text-cyan-400 hover:underline">Refund Policy</a> for full details. Taxes may apply based on your jurisdiction and are calculated at checkout. Invoices are available for download from your account dashboard after purchase.
+            {t('payDisclaimerPre')}<a href="/refund-policy" className="text-cyan-400 hover:underline">{t('refundPolicyLink')}</a>{t('payDisclaimerPost')}
           </p>
         </div>
 

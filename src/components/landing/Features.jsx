@@ -3,14 +3,14 @@ import { Lock, Zap, Shield, Globe, AlertCircle, Smartphone, Wifi, GitBranch } fr
 import { useLanguage } from '@/lib/LanguageContext';
 
 const features = [
-  { icon: Lock,         title: 'No-Logs Policy',       description: 'We never record your browsing activity, IP address, or DNS queries.',       color: 'text-cyan-400',   bg: 'from-cyan-500/10 to-transparent',   border: 'border-cyan-500/20' },
-  { icon: Zap,          title: 'Lightning Fast',        description: 'Optimized VoxVPN routing ensures minimal speed loss globally.',           color: 'text-amber-400',  bg: 'from-amber-500/10 to-transparent',  border: 'border-amber-500/20' },
-  { icon: Shield,       title: 'AES-256 Encryption',    description: 'Military-grade encryption protects every byte of your data in transit.',    color: 'text-violet-400', bg: 'from-violet-500/10 to-transparent', border: 'border-violet-500/20' },
-  { icon: Globe,        title: 'Bypass Geo-Blocks',     description: 'Access Netflix, BBC iPlayer, Hulu and any geo-restricted content from 20 locations.',         color: 'text-emerald-400',bg: 'from-emerald-500/10 to-transparent',border: 'border-emerald-500/20' },
-  { icon: AlertCircle,  title: 'Kill Switch',           description: 'If your VPN drops, our kill switch instantly cuts your internet.',           color: 'text-rose-400',   bg: 'from-rose-500/10 to-transparent',   border: 'border-rose-500/20' },
-  { icon: Smartphone,   title: 'All Your Devices',      description: 'Windows, macOS, iOS, Android, Linux — connect from 20 global locations.',  color: 'text-blue-400',   bg: 'from-blue-500/10 to-transparent',   border: 'border-blue-500/20' },
-  { icon: Wifi,         title: 'Public WiFi Protection',description: 'Stay safe on coffee shop and airport WiFi automatically.',                   color: 'text-pink-400',   bg: 'from-pink-500/10 to-transparent',   border: 'border-pink-500/20' },
-  { icon: GitBranch,    title: 'Split Tunneling',       description: 'Choose which apps use the VPN and which use your normal connection.',        color: 'text-indigo-400', bg: 'from-indigo-500/10 to-transparent', border: 'border-indigo-500/20' },
+  { icon: Lock,         title: 'featNoLogs',  description: 'featNoLogsDesc',  color: 'text-cyan-400',   bg: 'from-cyan-500/10 to-transparent',   border: 'border-cyan-500/20' },
+  { icon: Zap,          title: 'featFast',    description: 'featFastDesc',    color: 'text-amber-400',  bg: 'from-amber-500/10 to-transparent',  border: 'border-amber-500/20' },
+  { icon: Shield,       title: 'featAes',     description: 'featAesDesc',     color: 'text-violet-400', bg: 'from-violet-500/10 to-transparent', border: 'border-violet-500/20' },
+  { icon: Globe,        title: 'featGeo',     description: 'featGeoDesc',     color: 'text-emerald-400',bg: 'from-emerald-500/10 to-transparent',border: 'border-emerald-500/20' },
+  { icon: AlertCircle,  title: 'featKill',    description: 'featKillDesc',    color: 'text-rose-400',   bg: 'from-rose-500/10 to-transparent',   border: 'border-rose-500/20' },
+  { icon: Smartphone,   title: 'featDevices', description: 'featDevicesDesc', color: 'text-blue-400',   bg: 'from-blue-500/10 to-transparent',   border: 'border-blue-500/20' },
+  { icon: Wifi,         title: 'featWifi',    description: 'featWifiDesc',    color: 'text-pink-400',   bg: 'from-pink-500/10 to-transparent',   border: 'border-pink-500/20' },
+  { icon: GitBranch,    title: 'featSplit',   description: 'featSplitDesc',   color: 'text-indigo-400', bg: 'from-indigo-500/10 to-transparent', border: 'border-indigo-500/20' },
 ];
 
 export default function Features() {
@@ -58,8 +58,8 @@ export default function Features() {
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 border ${border} bg-[#06080f]`}>
                   <Icon size={20} className={color} />
                 </div>
-                <h3 className="text-white font-bold text-sm mb-2">{title}</h3>
-                <p className="text-slate-400 text-xs leading-relaxed">{description}</p>
+                <h3 className="text-white font-bold text-sm mb-2">{t(title)}</h3>
+                <p className="text-slate-400 text-xs leading-relaxed">{t(description)}</p>
               </div>
             </motion.div>
           ))}

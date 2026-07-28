@@ -5,45 +5,45 @@ import { useLanguage } from '@/lib/LanguageContext';
 const testimonials = [
   {
     name: 'Marcus Reed',
-    role: 'Software Engineer',
+    roleKey: 'roleSoftwareEngineer',
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face',
     rating: 5,
-    text: 'VoxVPN is the fastest VPN I have used. Streaming is buffer-free and the kill switch gives me peace of mind on public Wi-Fi.',
+    textKey: 'testimonial1',
   },
   {
     name: 'Elena Petrova',
-    role: 'Digital Nomad',
+    roleKey: 'roleDigitalNomad',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face',
     rating: 5,
-    text: 'I travel full-time and VoxVPN keeps me connected everywhere. The global server coverage is incredible and setup took two minutes.',
+    textKey: 'testimonial2',
   },
   {
     name: 'James Okoye',
-    role: 'Small Business Owner',
+    roleKey: 'roleBusinessOwner',
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face',
     rating: 5,
-    text: 'Running a remote team means security is non-negotiable. The no-logs policy and AES-256 encryption checked every box for us.',
+    textKey: 'testimonial3',
   },
   {
     name: 'Priya Sharma',
-    role: 'Content Creator',
+    roleKey: 'roleContentCreator',
     avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face',
     rating: 5,
-    text: 'I access geo-restricted content daily for my work. VoxVPN unblocks everything seamlessly with zero speed loss. Highly recommend.',
+    textKey: 'testimonial4',
   },
   {
     name: 'David Chen',
-    role: 'IT Consultant',
+    roleKey: 'roleItConsultant',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face',
     rating: 5,
-    text: 'The customer support team resolved my issue in minutes. Professional, fast, and reliable — exactly what I need from a VPN provider.',
+    textKey: 'testimonial5',
   },
   {
     name: 'Sofia Almeida',
-    role: 'Freelance Designer',
+    roleKey: 'roleFreelanceDesigner',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop&crop=face',
     rating: 5,
-    text: 'Affordable, secure, and easy to use. The split tunneling feature is a game-changer for managing work and personal traffic.',
+    textKey: 'testimonial6',
   },
 ];
 
@@ -64,9 +64,9 @@ export default function Testimonials() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {testimonials.map((t, i) => (
+          {testimonials.map((item, i) => (
             <motion.div
-              key={t.name}
+              key={item.name}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -77,18 +77,18 @@ export default function Testimonials() {
               <Quote size={28} className="text-cyan-400/15 absolute top-4 right-4" />
 
               <div className="flex items-center gap-1">
-                {Array.from({ length: t.rating }).map((_, idx) => (
+                {Array.from({ length: item.rating }).map((_, idx) => (
                   <Star key={idx} size={13} className="text-amber-400 fill-amber-400" />
                 ))}
               </div>
 
-              <p className="text-slate-300 text-sm leading-relaxed flex-1">"{t.text}"</p>
+              <p className="text-slate-300 text-sm leading-relaxed flex-1">"{t(item.textKey)}"</p>
 
               <div className="flex items-center gap-3 pt-3 border-t border-white/5">
-                <img src={t.avatar} alt={t.name} className="w-9 h-9 rounded-full object-cover" />
+                <img src={item.avatar} alt={item.name} className="w-9 h-9 rounded-full object-cover" />
                 <div>
-                  <p className="text-white text-xs font-bold">{t.name}</p>
-                  <p className="text-slate-500 text-[10px]">{t.role}</p>
+                  <p className="text-white text-xs font-bold">{item.name}</p>
+                  <p className="text-slate-500 text-[10px]">{t(item.roleKey)}</p>
                 </div>
               </div>
             </motion.div>
