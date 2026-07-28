@@ -1,6 +1,7 @@
 import { Mail, Phone } from 'lucide-react';
 import SocialIcons from '@/components/landing/SocialIcons';
 import { Link, useNavigate } from 'react-router-dom';
+import { useLanguage } from '@/lib/LanguageContext';
 
 const footerSections = [
   {
@@ -132,6 +133,7 @@ function FooterLinkItem({ link, onHash }) {
 
 export default function Footer() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleHash = (link) => {
     navigate(link.to);
@@ -156,7 +158,7 @@ export default function Footer() {
               />
             </Link>
             <p className="text-slate-500 text-xs leading-relaxed mb-4">
-              Your privacy is our priority. Stay protected, stay unrestricted.
+              {t('footerTagline')}
             </p>
             <div className="text-slate-600 text-[10px] space-y-0.5 mb-4">
               <p>VoxDigits Communications LLC</p>
@@ -196,7 +198,7 @@ export default function Footer() {
         <div className="border-t border-white/5 pt-10 pb-8 space-y-8">
           {/* Payment methods — full width row */}
           <div className="flex flex-col items-center gap-3">
-            <span className="text-slate-600 text-[10px] font-bold uppercase tracking-widest">We Accept</span>
+            <span className="text-slate-600 text-[10px] font-bold uppercase tracking-widest">{t('weAccept')}</span>
             <img
               src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/d9f1ec5eb_image.png"
               alt="Payment Methods: Visa, Mastercard, Amex, Discover, Apple Pay, Google Pay, Hubtel, Alipay, WeChat Pay, MTN MoMo"
@@ -233,7 +235,7 @@ export default function Footer() {
 
             {/* Social media */}
             <div className="flex flex-col items-center sm:items-end gap-2">
-              <span className="text-slate-600 text-[10px] font-bold uppercase tracking-widest">Follow Us</span>
+              <span className="text-slate-600 text-[10px] font-bold uppercase tracking-widest">{t('followUs')}</span>
               <SocialIcons />
             </div>
           </div>
@@ -241,14 +243,14 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-white/5 pt-6 text-slate-600 text-xs flex flex-col sm:flex-row justify-between items-center gap-3">
-          <span>© 2026 VoxDigits Communications LLC. All rights reserved. www.voxvpn.net</span>
+          <span>{t('footerRights')}</span>
           <div className="flex gap-4 justify-center flex-wrap">
-            <Link to="/about" className="hover:text-cyan-400 transition-colors">About</Link>
-            <Link to="/contact" className="hover:text-cyan-400 transition-colors">Contact</Link>
-            <Link to="/privacy-policy" className="hover:text-cyan-400 transition-colors">Privacy Policy</Link>
-            <Link to="/terms-of-service" className="hover:text-cyan-400 transition-colors">Terms</Link>
-            <Link to="/refund-policy" className="hover:text-cyan-400 transition-colors">Refund Policy</Link>
-            <Link to="/cookie-policy" className="hover:text-cyan-400 transition-colors">Cookie Policy</Link>
+            <Link to="/about" className="hover:text-cyan-400 transition-colors">{t('footerAbout')}</Link>
+            <Link to="/contact" className="hover:text-cyan-400 transition-colors">{t('footerContact')}</Link>
+            <Link to="/privacy-policy" className="hover:text-cyan-400 transition-colors">{t('footerPrivacy')}</Link>
+            <Link to="/terms-of-service" className="hover:text-cyan-400 transition-colors">{t('footerTerms')}</Link>
+            <Link to="/refund-policy" className="hover:text-cyan-400 transition-colors">{t('footerRefund')}</Link>
+            <Link to="/cookie-policy" className="hover:text-cyan-400 transition-colors">{t('footerCookie')}</Link>
           </div>
         </div>
       </div>

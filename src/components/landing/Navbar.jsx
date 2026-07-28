@@ -1,4 +1,4 @@
-import { Menu, X, LogOut, Shield, Globe } from 'lucide-react';
+import { Menu, X, LogOut, Shield, Globe, MessageCircle } from 'lucide-react';
 import { useState, useEffect, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -111,6 +111,15 @@ export default function Navbar() {
                   Admin
                 </Link>
               )}
+
+              {/* AI Assistant */}
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('open-voxvpn-assistant'))}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-cyan-400 hover:text-cyan-300 transition-all"
+                title={t('aiAssistant')}
+              >
+                <MessageCircle size={14} /> {t('aiAssistant')}
+              </button>
 
               {/* Language dropdown */}
               <div className="relative">

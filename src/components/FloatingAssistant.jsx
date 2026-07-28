@@ -17,6 +17,12 @@ export default function FloatingAssistant() {
   const unsubscribeRef = useRef(null);
 
   useEffect(() => {
+    const handler = () => setOpen(true);
+    window.addEventListener('open-voxvpn-assistant', handler);
+    return () => window.removeEventListener('open-voxvpn-assistant', handler);
+  }, []);
+
+  useEffect(() => {
     if (open && !conversation && !initializing) {
       initConversation();
     }
