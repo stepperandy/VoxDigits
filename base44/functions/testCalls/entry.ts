@@ -1,5 +1,5 @@
 // Test SMS, calls, and webhook functionality
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.39';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
 
 Deno.serve(async (req) => {
   try {
@@ -12,26 +12,17 @@ Deno.serve(async (req) => {
 
     // Test 1: SMS Receipt (send test SMS)
     if (test_type === '1' || test_type === 'all') {
-      // Require actual numbers — no hard-coded fallback
-      if (!from_number || !to_number) {
-        results.push({
-          test: '1_sms',
-          status: 'SKIP',
-          message: 'from_number and to_number are required for SMS test',
-        });
-      } else {
-        console.log('[testCalls] Test 1: Testing SMS...');
-        const smsRes = await base44.functions.invoke('sendSms', {
-          from: from_number,
-          to: to_number,
-          message: '[TEST] SMS Receipt Test - ' + new Date().toISOString(),
-        });
-        results.push({
-          test: '1_sms',
-          status: smsRes.data?.success ? 'PASS' : 'FAIL',
-          message: smsRes.data?.success ? `SMS sent` : smsRes.data?.error,
-        });
-      }
+      console.log('[testCalls] Test 1: Testing SMS...');
+      const smsRes = await base44.functions.invoke('sendSms', {
+        from_number: from_number || '+1234567890',
+        to_number: to_number || user.email, // Will fail if not a real number
+        body: '[TEST] SMS Receipt Test - ' + new Date().toISOString(),
+      });
+      results.push({
+        test: '1_sms',
+        status: smsRes.data?.success ? 'PASS' : 'FAIL',
+        message: smsRes.data?.success ? `SMS sent via ${smsRes.data.provider}` : smsRes.data?.error,
+      });
     }
 
     // Test 2: Call Making (Vonage Voice API check)
@@ -39,14 +30,8 @@ Deno.serve(async (req) => {
       console.log('[testCalls] Test 2: Checking Vonage Voice API...');
       const vonageKey = Deno.env.get('VONAGE_API_KEY');
       const vonageSecret = Deno.env.get('VONAGE_API_SECRET');
-
-      if (!from_number || !to_number) {
-        results.push({
-          test: '2_calls',
-          status: 'SKIP',
-          message: 'from_number and to_number are required for call test',
-        });
-      } else if (vonageKey && vonageSecret) {
+      
+      if (vonageKey && vonageSecret) {
         const auth = btoa(`${vonageKey}:${vonageSecret}`);
         const callRes = await fetch('https://api.vonage.com/v1/calls', {
           method: 'POST',
@@ -55,9 +40,9 @@ Deno.serve(async (req) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: { type: 'phone', number: from_number },
-            to: [{ type: 'phone', number: to_number }],
-            ncco: [{ action: 'talk', text: 'Test call from VoxTelefony' }],
+            from: { type: 'phone', number: from_number || '+1234567890' },
+            to: [{ type: 'phone', number: to_number || '+1234567890' }],
+            ncco: [{ action: 'talk', text: 'Test call from VoxDigits' }],
           }),
         });
         const callData = await callRes.json();
@@ -92,12 +77,13 @@ Deno.serve(async (req) => {
       });
     }
 
-    return Response.json({
-      success: true,
+    return Response.json({ 
+      success: true, 
       user_email: user.email,
       tests: results,
-      summary: `${results.filter((r) => r.status === 'PASS').length} passed, ${results.filter((r) => r.status === 'FAIL').length} failed, ${results.filter((r) => r.status === 'SKIP').length} skipped`,
+      summary: `${results.filter(r => r.status === 'PASS').length} passed, ${results.filter(r => r.status === 'FAIL').length} failed, ${results.filter(r => r.status === 'SKIP').length} skipped`
     });
+
   } catch (error) {
     console.error('[testCalls] Error:', error.message);
     return Response.json({ error: error.message }, { status: 500 });

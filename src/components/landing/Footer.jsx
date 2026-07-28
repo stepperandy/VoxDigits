@@ -32,7 +32,7 @@ const navigationLinks = {
 };
 
 const CONTACT_EMAILS = [
-  { label: "Support", email: "support@voxdigits.com" },
+  { label: "Support", email: "support@voxtelefony.com" },
   { label: "Admin", email: "admin@voxtelefony.com" },
   { label: "Privacy", email: "privacy@voxtelefony.com" },
   { label: "Billing", email: "billing@voxtelefony.com" },
@@ -46,7 +46,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-6 gap-6 mb-8">
           <div className="col-span-2 md:col-span-2">
             <div className="mb-3">
-              <img src="https://media.base44.com/images/public/69b202c06dc5b1988efe9645/e6163c0d6_TELLOGO11.png" alt="VoxTelefony" style={{height: "48px", width: "auto"}} />
+              <img src="https://media.base44.com/images/public/69b202c06dc5b1988efe9645/e6163c0d6_TELLOGO11.png" alt="VoxDigits" style={{height: "48px", width: "auto"}} />
             </div>
             <p className="text-xs leading-relaxed text-gray-500 mb-4">VoxDigits Communications LLC — Virtual phone numbers, eSIM connectivity, and cloud-based communication solutions for businesses and individuals.</p>
             <div className="space-y-1">

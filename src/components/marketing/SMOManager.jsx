@@ -6,10 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Edit2, Trash2, Share2, Sparkles, ExternalLink, Send } from "lucide-react";
+import { Plus, Edit2, Trash2, Share2, Sparkles, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import SMOPostList from "./SMOPostList";
-import SMOSendHistory from "./SMOSendHistory";
 
 const PLATFORMS = ["Facebook", "Instagram", "LinkedIn", "Twitter", "TikTok"];
 
@@ -40,28 +38,6 @@ export default function SMOManager() {
   });
 
   const [aiLoading, setAiLoading] = useState(false);
-  const [generating, setGenerating] = useState(false);
-  const [activeTab, setActiveTab] = useState("posts");
-
-  const handleGeneratePosts = async () => {
-    setGenerating(true);
-    try {
-      const response = await base44.functions.invoke('generateSMOPosts', {});
-      if (response.data?.success) {
-        loadCampaigns();
-        return response.data;
-      } else {
-        alert(response.data?.error || "Generation failed");
-        return response.data;
-      }
-    } catch (e) {
-      console.error("Post generation failed", e);
-      alert("Post generation failed: " + e.message);
-      return null;
-    } finally {
-      setGenerating(false);
-    }
-  };
 
   useEffect(() => {
     loadCampaigns();
@@ -295,38 +271,6 @@ export default function SMOManager() {
           </AnimatePresence>
         </div>
       )}
-
-      <div className="mt-8 pt-6 border-t border-slate-700">
-        {/* Tab Switcher */}
-        <div className="flex gap-2 mb-4">
-          <button
-            onClick={() => setActiveTab("posts")}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === "posts"
-                ? "bg-purple-600 text-white"
-                : "bg-slate-700/50 text-gray-400 hover:text-white"
-            }`}
-          >
-            <Sparkles className="w-4 h-4" /> Posts
-          </button>
-          <button
-            onClick={() => setActiveTab("history")}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === "history"
-                ? "bg-green-600 text-white"
-                : "bg-slate-700/50 text-gray-400 hover:text-white"
-            }`}
-          >
-            <Send className="w-4 h-4" /> Send History
-          </button>
-        </div>
-
-        {activeTab === "posts" ? (
-          <SMOPostList onGenerate={handleGeneratePosts} generating={generating} />
-        ) : (
-          <SMOSendHistory />
-        )}
-      </div>
     </div>
   );
 }

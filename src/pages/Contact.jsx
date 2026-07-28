@@ -6,10 +6,10 @@ const CONTACT_CHANNELS = [
   {
     icon: Mail,
     label: "Email",
-    value: "support@voxdigits.com",
+    value: "support@voxtelefony.com",
     sub: "Partnership, support & business inquiries",
     color: "cyan",
-    href: "mailto:support@voxdigits.com",
+    href: "mailto:support@voxtelefony.com",
   },
   {
     icon: Phone,
@@ -22,7 +22,7 @@ const CONTACT_CHANNELS = [
   {
     icon: Building,
     label: "Company",
-    value: "VoxTelefony Communication LLC",
+    value: "VoxDigits Communication LLC",
     sub: "Telecommunications technology",
     color: "purple",
     href: "#",
@@ -44,16 +44,16 @@ export default function Contact() {
     setError(null);
     try {
       await base44.integrations.Core.SendEmail({
-        to: "support@voxdigits.com",
+        to: "support@voxtelefony.com",
         subject: `[${form.topic || "Contact Form"}] Message from ${form.name}`,
         body: `Name: ${form.name}\nEmail: ${form.email}\nTopic: ${form.topic}\n\n${form.message}`,
-        from_name: "VoxTelefony Contact Form",
+        from_name: "VoxDigits Contact Form",
       });
       // Send confirmation to user
       await base44.integrations.Core.SendEmail({
         to: form.email,
-        subject: "We received your message — VoxTelefony",
-        body: `Hi ${form.name},\n\nThanks for reaching out to VoxTelefony. We've received your message and will get back to you within 4 business hours.\n\nYour topic: ${form.topic || "General Inquiry"}\n\nBest regards,\nThe VoxTelefony Team`,
+        subject: "We received your message — VoxDigits",
+        body: `Hi ${form.name},\n\nThanks for reaching out to VoxDigits. We've received your message and will get back to you within 4 business hours.\n\nYour topic: ${form.topic || "General Inquiry"}\n\nBest regards,\nThe VoxDigits Team`,
         from_name: "VoxDigits Support",
       });
       setSent(true);
@@ -194,7 +194,7 @@ export default function Contact() {
               <div className="space-y-3 text-sm text-gray-300">
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-cyan-400 flex-shrink-0" />
-                  <a href="mailto:support@voxdigits.com" className="text-cyan-300 hover:text-cyan-200 transition-colors">support@voxdigits.com</a>
+                  <a href="mailto:support@voxtelefony.com" className="text-cyan-300 hover:text-cyan-200 transition-colors">support@voxtelefony.com</a>
                 </div>
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-blue-400 flex-shrink-0" />
@@ -210,7 +210,7 @@ export default function Contact() {
 
             <div className="p-5 rounded-xl border border-white/10 bg-white/[0.02]">
               <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Company</div>
-              <p className="text-gray-300 text-sm font-medium">VoxTelefony Communication LLC</p>
+              <p className="text-gray-300 text-sm font-medium">VoxDigits Communication LLC</p>
               <p className="text-gray-500 text-xs mt-1">Telecommunications Technology</p>
             </div>
           </div>

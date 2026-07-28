@@ -33,7 +33,6 @@ import PPCManager from '@/components/marketing/PPCManager.jsx';
 import LaunchManager from '@/components/marketing/LaunchManager.jsx';
 import MarketingDashboard from '@/components/marketing/MarketingDashboard.jsx';
 import SitemapManager from '@/components/marketing/SitemapManager.jsx';
-import ASOManager from '@/pages/ASOManager.jsx';
 
 const ADMIN_LOGO = "https://media.base44.com/images/public/69b202c06dc5b1988efe9645/e6163c0d6_TELLOGO11.png";
 
@@ -144,7 +143,6 @@ function renderTabContent(activeTab) {
             <TabsTrigger value="ppc" className="flex items-center gap-2 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300"><Zap className="w-4 h-4" /> PPC</TabsTrigger>
             <TabsTrigger value="launch" className="flex items-center gap-2 data-[state=active]:bg-orange-500/20 data-[state=active]:text-orange-300"><Rocket className="w-4 h-4" /> Launch</TabsTrigger>
             <TabsTrigger value="sitemap" className="flex items-center gap-2 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300"><Globe className="w-4 h-4" /> Sitemap</TabsTrigger>
-            <TabsTrigger value="aso" className="flex items-center gap-2 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300"><Store className="w-4 h-4" /> ASO</TabsTrigger>
           </TabsList>
           <TabsContent value="performance"><MarketingDashboard /></TabsContent>
           <TabsContent value="seo"><SEOManager /></TabsContent>
@@ -152,7 +150,6 @@ function renderTabContent(activeTab) {
           <TabsContent value="ppc"><PPCManager /></TabsContent>
           <TabsContent value="launch"><LaunchManager /></TabsContent>
           <TabsContent value="sitemap"><SitemapManager /></TabsContent>
-          <TabsContent value="aso"><ASOManager /></TabsContent>
         </Tabs>
       );
     default: return <AdminOverview />;
@@ -228,11 +225,11 @@ export default function AdminPanel() {
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 h-16 border-b border-slate-800 flex-shrink-0">
         <Link to="/" className="flex-shrink-0">
-          <img src={ADMIN_LOGO} alt="VoxTelefony" className="h-9 w-auto object-contain" />
+          <img src={ADMIN_LOGO} alt="VoxDigits" className="h-9 w-auto object-contain" />
         </Link>
         <div className="min-w-0 border-l border-slate-700 pl-3">
           <p className="text-sm font-bold text-white truncate">Admin Console</p>
-          <p className="text-[10px] text-cyan-400 font-medium">VoxTelefony</p>
+          <p className="text-[10px] text-cyan-400 font-medium">VoxDigits</p>
         </div>
       </div>
 

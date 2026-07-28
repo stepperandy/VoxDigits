@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Loader2, Download, CreditCard, AlertCircle } from "lucide-react";
-import DiscountCodeManager from "@/components/billing/DiscountCodeManager";
 
 
 export default function Billing() {

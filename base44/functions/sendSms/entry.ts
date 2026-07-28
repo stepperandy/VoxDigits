@@ -1,13 +1,28 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.39';
-import {
-  resolveSenderNumber,
-  getTwilioCredentials,
-  sendSmsViaTwilio,
-  validateSmsRoute,
-  normalizeE164,
-  SenderResolutionError,
-  SmsRouteError,
-} from '../../shared/twilioSender.ts';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
+
+async function sendViaTwilio(accountSid, authToken, fromNumber, toNumber, body) {
+  const auth = btoa(`${accountSid}:${authToken}`);
+  const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      From: fromNumber,
+      To: toNumber,
+      Body: body,
+    }),
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    console.error('[sendSms] Twilio error:', JSON.stringify(data));
+    throw new Error(data.message || 'Failed to send SMS via Twilio');
+  }
+
+  return { success: true, provider: 'twilio', messageSid: data.sid };
+}
 
 Deno.serve(async (req) => {
   try {
@@ -20,101 +35,34 @@ Deno.serve(async (req) => {
 
     const { from, to, message } = await req.json();
 
-    if (!to || !message) {
+    if (!from || !to || !message) {
       return Response.json(
-        { success: false, error: 'Missing required fields: to, message' },
+        { success: false, error: 'Missing required fields: from, to, message' },
         { status: 400 }
       );
     }
 
-    // ── Normalize destination to E.164 ──
-    const destCheck = normalizeE164(to);
-    if (!destCheck.isValid) {
-      console.error(`[sendSms] Invalid destination "${to}": ${destCheck.error}`);
+    console.log(`[sendSms] Sending SMS from ${from} to ${to}`);
+
+    // Verify the from_number belongs to this user (check both field schemas)
+    let numbers = await base44.asServiceRole.entities.VirtualNumber.filter({ number: from, userId: user.id });
+    if (!numbers || numbers.length === 0) {
+      numbers = await base44.asServiceRole.entities.VirtualNumber.filter({ phone_number: from, customer_email: user.email });
+    }
+    if (!numbers || numbers.length === 0) {
+      numbers = await base44.asServiceRole.entities.VirtualNumber.filter({ number: from, customer_email: user.email });
+    }
+
+    if (!numbers || numbers.length === 0) {
+      console.error(`[sendSms] Number ${from} not found for user ${user.email} (id: ${user.id})`);
       return Response.json(
-        { success: false, error: `Invalid destination number: ${destCheck.error}` },
-        { status: 400 }
-      );
-    }
-    const toE164 = destCheck.normalized;
-
-    // ── Destination-aware SMS route validation (Ghana blocked, etc.) ──
-    const routeCheck = validateSmsRoute(from || '', toE164);
-    if (!routeCheck.allowed) {
-      console.error(
-        `[sendSms] Route blocked: ${toE164} (${routeCheck.destinationCountry}) — ${routeCheck.reason}: ${routeCheck.error}`
-      );
-      return Response.json(
-        {
-          success: false,
-          error: routeCheck.error,
-          code: routeCheck.reason,
-          destination_country: routeCheck.destinationCountry,
-          twilio_error_code: '21612',
-        },
-        { status: 400 }
+        { success: false, error: 'You do not own this virtual number' },
+        { status: 403 }
       );
     }
 
-    // ── Resolve sender: use the customer's active assigned VirtualNumber ──
-    // If the caller provided a `from`, we validate it belongs to them.
-    // If not, we auto-resolve from their active numbers.
-    let senderNumber = null;
-
-    if (from) {
-      // Validate the provided `from` belongs to this user (tenant isolation)
-      const fromCheck = normalizeE164(from);
-      if (!fromCheck.isValid) {
-        return Response.json(
-          { success: false, error: `Invalid sender number: ${fromCheck.error}` },
-          { status: 400 }
-        );
-      }
-      const fromDigits = fromCheck.normalized.replace(/\D/g, '');
-
-      let userNumbers = await base44.asServiceRole.entities.VirtualNumber.filter({
-        userId: user.id,
-        status: 'active',
-      });
-      if (!userNumbers || userNumbers.length === 0) {
-        userNumbers = await base44.asServiceRole.entities.VirtualNumber.filter({
-          customer_email: user.email,
-          status: 'active',
-        });
-      }
-
-      const match = (userNumbers || []).find((n) => {
-        const nd = (n.phone_number || n.number || '').replace(/\D/g, '');
-        return nd === fromDigits || nd.endsWith(fromDigits) || fromDigits.endsWith(nd);
-      });
-
-      if (!match) {
-        console.error(
-          `[sendSms] TENANT VIOLATION: user ${user.email} attempted to send from ${from} which is not assigned to them`
-        );
-        return Response.json(
-          { success: false, error: 'You do not own this virtual number' },
-          { status: 403 }
-        );
-      }
-
-      if (match.sms_enabled === false) {
-        return Response.json(
-          { success: false, error: 'This virtual number does not have SMS capability enabled' },
-          { status: 403 }
-        );
-      }
-
-      senderNumber = match.phone_number || match.number;
-    } else {
-      // Auto-resolve from the user's active SMS-capable numbers
-      const resolved = await resolveSenderNumber(base44.asServiceRole, user, { requireSms: true });
-      senderNumber = resolved.resolvedNumber;
-    }
-
-    console.log(`[sendSms] Sending SMS from ${senderNumber} to ${toE164} (${routeCheck.destinationCountry})`);
-
-    // ── Check wallet balance and get SMS rate ──
+    // Check wallet balance and get SMS rate
+    const vnCountryCode = numbers[0].country_code || 'US';
     const userBalance = user.credits || 0;
     let smsRate = 0.03;
     try {
@@ -123,7 +71,7 @@ Deno.serve(async (req) => {
         user_email: user.email,
         category: 'sms',
         call_type: 'outbound',
-        country_code: routeCheck.destinationCountry,
+        country_code: vnCountryCode,
       });
       smsRate = rateRes?.sell_price || 0.03;
     } catch (e) {
@@ -133,104 +81,70 @@ Deno.serve(async (req) => {
     if (userBalance < smsRate) {
       console.warn(`[sendSms] Insufficient balance for ${user.email}: has $${userBalance}, needs $${smsRate}`);
       return Response.json(
-        {
-          success: false,
-          error: 'Insufficient balance. Please add calling & SMS credit to send messages.',
-          balance: userBalance,
-          required: smsRate,
-        },
+        { success: false, error: 'Insufficient balance. Please add calling & SMS credit to send messages.', balance: userBalance, required: smsRate },
         { status: 402 }
       );
     }
 
-    // ── Get Twilio credentials (server-side only) ──
-    const { accountSid, authToken } = getTwilioCredentials();
+    // Get Twilio credentials
+    const twilioSid = Deno.env.get('TWILIO_ACCOUNT_SID');
+    const twilioToken = Deno.env.get('TWILIO_AUTH_TOKEN');
 
-    // ── Send via Twilio: Messaging Service SID + explicit From ──
-    const result = await sendSmsViaTwilio(accountSid, authToken, senderNumber, toE164, message);
-
-    if (!result.success) {
-      // Twilio API rejected the message — do not retry, do not claim success
-      console.error(`[sendSms] Twilio API error: code=${result.errorCode}, msg=${result.errorMessage}`);
-
-      // Persist the failed attempt for audit trail
-      try {
-        await base44.asServiceRole.entities.Message.create({
-          user_email: user.email,
-          our_number: senderNumber,
-          from_number: senderNumber,
-          to_number: toE164,
-          body: message,
-          direction: 'outbound',
-          status: 'failed',
-          provider_message_id: result.messageSid,
-          error_code: result.errorCode,
-          error_message: result.errorMessage,
-        });
-      } catch (logErr) {
-        console.error('[sendSms] Failed to log failed message:', logErr.message);
-      }
-
+    if (!twilioSid || !twilioToken) {
+      console.error('[sendSms] Twilio credentials not configured');
       return Response.json(
-        {
-          success: false,
-          error: result.errorMessage,
-          twilio_error_code: result.errorCode,
-        },
-        { status: 400 }
+        { success: false, error: 'SMS service not configured' },
+        { status: 500 }
       );
     }
 
-    // ── Log to Message entity — status is 'pending' (not delivered yet) ──
-    // API success ≠ delivered. Status is updated via Twilio status callbacks.
+    // Send via Twilio
+    const result = await sendViaTwilio(twilioSid, twilioToken, from, to, message);
+
+    // Log to Message entity
     try {
-      await base44.asServiceRole.entities.Message.create({
+      const msgData = {
         user_email: user.email,
-        our_number: senderNumber,
-        from_number: senderNumber,
-        to_number: toE164,
+        our_number: from,
+        from_number: from,
+        to_number: to,
         body: message,
         direction: 'outbound',
-        status: 'pending', // queued/sending — delivery confirmed via callback
+        status: 'sent',
         provider_message_id: result.messageSid,
-      });
+      };
+      console.log('[sendSms] Saving message:', JSON.stringify(msgData));
+      await base44.asServiceRole.entities.Message.create(msgData);
+      console.log('[sendSms] ✅ Message saved');
     } catch (logErr) {
-      console.error('[sendSms] Failed to log message:', logErr.message);
+      console.error('[sendSms] ❌ Failed to log message:', logErr);
     }
 
-    // ── Charge user for SMS ──
+    // Charge user for SMS
     try {
       await base44.asServiceRole.functions.invoke('billingEngine', {
         action: 'charge',
         user_email: user.email,
         amount: smsRate,
         category: 'sms',
-        description: `SMS from ${senderNumber} to ${toE164}`,
+        description: `SMS from ${from} to ${to}`,
         reference_id: result.messageSid,
       });
+      console.log(`[sendSms] Charged $${smsRate} for SMS to ${user.email}`);
     } catch (chargeErr) {
       console.error('[sendSms] Charge failed:', chargeErr.message);
     }
 
-    console.log(`[sendSms] SMS queued successfully, SID: ${result.messageSid}, status: pending (delivery confirmed via callback)`);
+    console.log(`[sendSms] SMS sent successfully, SID: ${result.messageSid}`);
     return Response.json({
       success: true,
       message_sid: result.messageSid,
-      status: 'pending',
-      note: 'Message queued. Delivery status will be updated via Twilio callback.',
     });
   } catch (error) {
-    if (error instanceof SenderResolutionError) {
-      const status = error.code === 'AUTH_REQUIRED' ? 401 : 403;
-      return Response.json({ success: false, error: error.message, code: error.code }, { status });
-    }
-    if (error instanceof SmsRouteError) {
-      return Response.json(
-        { success: false, error: error.message, code: error.code, destination_country: error.destinationCountry },
-        { status: 400 }
-      );
-    }
     console.error('[sendSms] Error:', error.message);
-    return Response.json({ success: false, error: error.message }, { status: 500 });
+    return Response.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
   }
 });
