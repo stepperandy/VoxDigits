@@ -4,17 +4,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { LanguageContext } from '@/lib/LanguageContext';
 
-const navLinks = [
-  { label: 'Home', href: '/' },
-  { label: 'Features', href: '#features' },
-  { label: 'Servers', href: '#servers' },
-  { label: 'Pricing', href: '/pricing' },
-  { label: 'eSIM', href: 'https://www.voxtelefony.com', external: true },
-  { label: 'Virtual Numbers', href: 'https://www.voxtelefony.com', external: true },
-  { label: 'Support', href: '/contact' },
-  { label: 'Buy VPN', href: '/pricing' },
-];
-
 const LANGUAGES = [
   { code: 'en', label: 'English', flag: '🇬🇧' },
   { code: 'es', label: 'Español', flag: '🇪🇸' },
@@ -27,7 +16,7 @@ const LANGUAGES = [
 ];
 
 export default function Navbar() {
-  const { language, changeLanguage } = useContext(LanguageContext);
+  const { language, changeLanguage, t } = useContext(LanguageContext);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [activeHash, setActiveHash] = useState('');
@@ -66,6 +55,17 @@ export default function Navbar() {
   };
 
   const isAdmin = user?.role === 'admin';
+
+  const navLinks = [
+    { label: t('home'), href: '/' },
+    { label: t('features'), href: '#features' },
+    { label: t('servers'), href: '#servers' },
+    { label: t('pricing'), href: '/pricing' },
+    { label: 'eSIM', href: 'https://www.voxtelefony.com', external: true },
+    { label: 'Virtual Numbers', href: 'https://www.voxtelefony.com', external: true },
+    { label: t('support'), href: '/contact' },
+    { label: t('choosePlan'), href: '/pricing' },
+  ];
 
   return (
     <header className="fixed top-0 w-full z-50">
@@ -169,13 +169,13 @@ export default function Navbar() {
                     to="/vpn-login"
                     className="px-3 py-1.5 text-slate-300 hover:text-white text-xs font-medium transition-colors border border-white/10 hover:border-white/20 rounded-full"
                   >
-                    Log In
+                    {t('logIn')}
                   </Link>
                   <Link
                     to="/vpn-signup"
                     className="px-3 py-1.5 bg-white/10 hover:bg-white/15 text-white text-xs font-semibold rounded-full transition-all border border-white/10"
                   >
-                    Sign Up
+                    {t('signUp')}
                   </Link>
                 </>
               )}
@@ -195,7 +195,7 @@ export default function Navbar() {
                 to="/pricing"
                 className="px-4 py-1.5 bg-white/10 hover:bg-white/15 text-white text-xs font-semibold rounded-full transition-all border border-white/10"
               >
-                Choose a Plan
+                {t('choosePlan')}
               </Link>
             </div>
 
@@ -262,8 +262,8 @@ export default function Navbar() {
                   <button onClick={() => base44.auth.logout('/')} className="flex-1 py-2 border border-white/10 text-slate-300 text-sm font-medium rounded-full">Log Out</button>
                 ) : (
                   <>
-                    <Link to="/vpn-login" onClick={() => setMobileOpen(false)} className="flex-1 py-2 text-center border border-white/10 text-slate-300 text-sm font-medium rounded-full">Log In</Link>
-                    <Link to="/vpn-signup" onClick={() => setMobileOpen(false)} className="flex-1 py-2 text-center bg-white/10 text-white text-sm font-semibold rounded-full">Sign Up</Link>
+                    <Link to="/vpn-login" onClick={() => setMobileOpen(false)} className="flex-1 py-2 text-center border border-white/10 text-slate-300 text-sm font-medium rounded-full">{t('logIn')}</Link>
+                    <Link to="/vpn-signup" onClick={() => setMobileOpen(false)} className="flex-1 py-2 text-center bg-white/10 text-white text-sm font-semibold rounded-full">{t('signUp')}</Link>
                   </>
                 )}
               </div>
@@ -274,7 +274,7 @@ export default function Navbar() {
                 Business Sign Up
               </Link>
               <Link to="/pricing" onClick={() => setMobileOpen(false)} className="block mt-1 py-2 text-center bg-white/10 text-white text-sm font-semibold rounded-full border border-white/10">
-                Choose a Plan
+                {t('choosePlan')}
               </Link>
             </div>
           )}
