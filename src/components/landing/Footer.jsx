@@ -208,7 +208,7 @@ export default function Footer() {
           <div className="flex flex-col sm:flex-row gap-6 items-center justify-between">
             {/* App store badges */}
             <div className="flex items-center gap-3 flex-wrap justify-center">
-              <a href="https://play.google.com/store/apps/details?id=net.openvpn.openvpn" target="_blank" rel="noopener noreferrer"
+              <a href="https://play.google.com/store/apps/details?id=com.base69c84f61d5543b54fe26e1e5.app" target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2 px-4 py-2 bg-black border border-white/20 rounded-xl hover:opacity-90 transition-opacity">
                 <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
                   <path d="M3.18 23.76c.3.17.65.19.97.06l13.2-7.62-2.82-2.82-11.35 10.38z" fill="#EA4335"/>

@@ -23,7 +23,11 @@ let _instance = null;
 export async function getVpnPlugin() {
   if (_instance) return _instance;
   if (isNative) {
-    const { registerPlugin } = await import('@capacitor/core');
+    // Use @vite-ignore + variable so Vite does not try to resolve @capacitor/core
+    // during the web build (the package is injected by the Capacitor runtime on
+    // native devices, not available in the browser bundle context).
+    const capMod = '@capacitor/core';
+    const { registerPlugin } = await import(/* @vite-ignore */ capMod);
     _instance = registerPlugin('VoxVpnPlugin', {
       web: () => import('./vpnNativePluginWebFallback').then(m => new m.VoxVpnPluginWeb()),
     });
