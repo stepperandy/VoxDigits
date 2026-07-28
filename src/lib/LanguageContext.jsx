@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 
 export const LanguageContext = createContext();
 
-const translations = {
+export const translations = {
   en: {
     home: 'Home', features: 'Features', servers: 'Servers', pricing: 'Pricing',
     support: 'Support', logIn: 'Log In', signUp: 'Sign Up', choosePlan: 'Choose a Plan',
