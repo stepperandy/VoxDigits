@@ -153,7 +153,7 @@ export default function UserDashboard() {
     try {
       const res = await base44.functions.invoke('createStripePortal', {});
       if (res.data?.url) {
-        window.open(res.data.url, '_blank');
+        window.location.href = res.data.url;
       } else {
         window.location.href = '/pricing';
       }
