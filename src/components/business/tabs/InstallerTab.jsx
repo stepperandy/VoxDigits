@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { Download, Monitor, Bug, Shield, Loader2, CheckCircle2, Terminal, Copy, Users, Lock, Tag, Zap } from 'lucide-react';
+import { Download, Monitor, Bug, Shield, Loader2, CheckCircle2, Terminal, Copy, Users, Lock, Tag, Zap, Smartphone } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { FaWindows, FaAndroid } from 'react-icons/fa';
 
 
 const platformIcons = {
-  Windows: FaWindows,
-  Android: FaAndroid,
+  Windows: Monitor,
+  Android: Smartphone,
 };
 
 const platformColors = {
