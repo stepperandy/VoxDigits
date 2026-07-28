@@ -32,7 +32,7 @@ const PLATFORMS = [
     platform: "iOS",
     subtitle: "iPhone & iPad",
     icon: Apple,
-    url: "https://apps.apple.com/gh/app/voxtelefony-virtual-numbers/id6760922995",
+    url: "https://apps.apple.com",
     version: null,
     color: "#f59e0b",
     badge: "App Store",
@@ -41,14 +41,13 @@ const PLATFORMS = [
   {
     id: "mac",
     platform: "macOS",
-    subtitle: "macOS 12+ · Intel & Apple Silicon",
+    subtitle: "macOS 12+",
     icon: Apple,
-    url: "https://api.base44.com/api/apps/69c84f61d5543b54fe26e1e5/functions/downloadMacInstaller",
-    filename: "VoxTelefony-macOS.dmg",
-    version: "v1.0.0",
+    url: null,
+    version: "v1.0",
     color: "#a78bfa",
-    badge: "Available Now",
-    available: true,
+    badge: "Coming Soon",
+    available: false,
   },
 ];
 
@@ -107,7 +106,7 @@ export default function DownloadSection() {
               style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.3)", color: "#34d399" }}>
               <CheckCircle2 className="w-3.5 h-3.5" />
               {detectedOS === "windows" && "We detected you're on Windows — your download is ready!"}
-              {detectedOS === "mac" && "We detected you're on macOS — your download is ready!"}
+              {detectedOS === "mac" && "We detected you're on macOS"}
               {detectedOS === "android" && "We detected you're on Android — get it on Google Play!"}
               {detectedOS === "ios" && "We detected you're on iOS — get it on the App Store!"}
               {detectedOS === "linux" && "We detected you're on Linux — use the web app below."}

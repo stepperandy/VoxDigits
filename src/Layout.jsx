@@ -85,10 +85,6 @@ export default function Layout({ children, currentPageName }) {
   };
 
   const handleLogin = () => {
-    base44.auth.redirectToLogin('/Dashboard');
-  };
-
-  const handleSignup = () => {
     const next = encodeURIComponent(window.location.origin + '/Dashboard');
     window.location.href = `/TermsAgreement?next=${next}`;
   };
@@ -185,22 +181,13 @@ export default function Layout({ children, currentPageName }) {
             Logout
           </button>
         ) : (
-          <div className="space-y-2">
-            <button
-              onClick={handleLogin}
-              className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-cyan-400 hover:bg-cyan-500/10 transition-colors font-semibold"
-            >
-              <LogIn className="w-5 h-5" />
-              Log In
-            </button>
-            <button
-              onClick={handleSignup}
-              className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-white bg-cyan-500 hover:bg-cyan-400 transition-colors font-semibold"
-            >
-              <UserPlus className="w-5 h-5" />
-              Sign Up
-            </button>
-          </div>
+          <button
+            onClick={handleLogin}
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-cyan-400 hover:bg-cyan-500/10 transition-colors font-semibold"
+          >
+            <LogIn className="w-5 h-5" />
+            Login / Sign Up
+          </button>
         )}
       </div>
     </div>
@@ -257,22 +244,13 @@ export default function Layout({ children, currentPageName }) {
               ${credits.toFixed(2)}
             </Link>
           ) : (
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={handleLogin}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-cyan-400 border border-cyan-500/40"
-              >
-                <LogIn className="w-3.5 h-3.5" />
-                Log In
-              </button>
-              <button
-                onClick={handleSignup}
-                className="flex items-center gap-1 px-2.5 py-1.5 bg-cyan-500 rounded-lg text-xs font-bold text-gray-950"
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                Sign Up
-              </button>
-            </div>
+            <button
+              onClick={handleLogin}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-500 rounded-lg text-xs font-bold text-gray-950"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              Login
+            </button>
           )}
         </header>
 
@@ -351,7 +329,6 @@ export default function Layout({ children, currentPageName }) {
                     <span className="text-sm font-medium">Logout</span>
                   </button>
                 ) : (
-                  <div className="space-y-1">
                   <button
                     onClick={() => { setShowMore(false); handleLogin(); }}
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-cyan-500/10 text-cyan-400 transition-colors"
@@ -359,18 +336,8 @@ export default function Layout({ children, currentPageName }) {
                     <div className="w-9 h-9 rounded-xl bg-cyan-500/10 flex items-center justify-center flex-shrink-0">
                       <LogIn className="w-4 h-4" />
                     </div>
-                    <span className="text-sm font-medium">Log In</span>
+                    <span className="text-sm font-medium">Login / Sign Up</span>
                   </button>
-                  <button
-                    onClick={() => { setShowMore(false); handleSignup(); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-cyan-500/10 text-white transition-colors"
-                  >
-                    <div className="w-9 h-9 rounded-xl bg-cyan-500 flex items-center justify-center flex-shrink-0">
-                      <UserPlus className="w-4 h-4 text-gray-950" />
-                    </div>
-                    <span className="text-sm font-medium">Sign Up</span>
-                  </button>
-                  </div>
                 )}
               </div>
             </div>

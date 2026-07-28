@@ -85,8 +85,6 @@ export default function HeroSection() {
             </Link>
           </div>
 
-
-
           {/* Mission / Founding / Location trust line */}
           <div className="mt-6 flex flex-wrap items-center gap-3 text-xs">
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: "rgba(251,146,60,0.12)", border: "1px solid rgba(251,146,60,0.3)" }}>

@@ -101,11 +101,11 @@ export default function Footer() {
               />
             </a>
             <a
-              href="https://apps.apple.com/gh/app/voxtelefony-virtual-numbers/id6760922995"
+              href="https://apps.apple.com"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:opacity-80 transition-opacity active:scale-95"
-              aria-label="Download VoxTelefony on the App Store"
+              aria-label="Download on the App Store"
             >
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg"

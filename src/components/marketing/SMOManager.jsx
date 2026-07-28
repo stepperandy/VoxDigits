@@ -6,12 +6,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Edit2, Trash2, Share2, Sparkles, ExternalLink, Send, BarChart3, Calendar } from "lucide-react";
-import { toast } from "react-hot-toast";
+import { Plus, Edit2, Trash2, Share2, Sparkles, ExternalLink, Send } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import SMOPostList from "./SMOPostList";
 import SMOSendHistory from "./SMOSendHistory";
-import SMOPerformanceReport from "./SMOPerformanceReport";
 
 const PLATFORMS = ["Facebook", "Instagram", "LinkedIn", "Twitter", "TikTok"];
 
@@ -43,7 +41,6 @@ export default function SMOManager() {
 
   const [aiLoading, setAiLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
-  const [syncing, setSyncing] = useState(false);
   const [activeTab, setActiveTab] = useState("posts");
 
   const handleGeneratePosts = async () => {
@@ -63,26 +60,6 @@ export default function SMOManager() {
       return null;
     } finally {
       setGenerating(false);
-    }
-  };
-
-  const handleSyncCalendar = async () => {
-    setSyncing(true);
-    const toastId = toast.loading("Syncing scheduled posts to Google Calendar...");
-    try {
-      const response = await base44.functions.invoke('syncSMOToCalendar', {});
-      const data = response.data;
-      if (data?.success) {
-        const msg = `Synced ${data.created + data.updated} of ${data.total} posts (${data.created} created, ${data.updated} updated${data.errors ? `, ${data.errors} failed` : ""})`;
-        toast.success(msg, { id: toastId });
-      } else {
-        toast.error(data?.error || "Calendar sync failed", { id: toastId });
-      }
-    } catch (e) {
-      console.error("Calendar sync failed", e);
-      toast.error("Calendar sync failed: " + e.message, { id: toastId });
-    } finally {
-      setSyncing(false);
     }
   };
 
@@ -184,10 +161,6 @@ export default function SMOManager() {
           <Share2 className="w-5 h-5" /> SMO Campaigns
         </h2>
         <div className="flex gap-2">
-        <Button onClick={handleSyncCalendar} disabled={syncing} className="bg-blue-600 hover:bg-blue-700">
-          {syncing ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" /> : <Calendar className="w-4 h-4 mr-2" />}
-          Sync to Calendar
-        </Button>
         <Button onClick={handleAIGenerate} disabled={aiLoading} className="bg-indigo-600 hover:bg-indigo-700">
           {aiLoading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
           AI Generate
@@ -346,22 +319,10 @@ export default function SMOManager() {
           >
             <Send className="w-4 h-4" /> Send History
           </button>
-          <button
-            onClick={() => setActiveTab("performance")}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === "performance"
-                ? "bg-indigo-600 text-white"
-                : "bg-slate-700/50 text-gray-400 hover:text-white"
-            }`}
-          >
-            <BarChart3 className="w-4 h-4" /> Performance
-          </button>
         </div>
 
         {activeTab === "posts" ? (
           <SMOPostList onGenerate={handleGeneratePosts} generating={generating} />
-        ) : activeTab === "performance" ? (
-          <SMOPerformanceReport />
         ) : (
           <SMOSendHistory />
         )}

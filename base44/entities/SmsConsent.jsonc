@@ -53,11 +53,6 @@
     "ip_address": {
       "type": "string",
       "description": "Request IP for audit trail"
-    },
-    "description": {
-      "type": "string",
-      "description": "Optional notes (up to 1000 characters)",
-      "maxLength": 1000
     }
   },
   "required": [
