@@ -314,13 +314,20 @@ export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState('en');
 
   useEffect(() => {
-    // Respect a previously saved manual choice
+    const manual = localStorage.getItem('voxvpn_language_manual') === '1';
     const saved = localStorage.getItem('voxvpn_language');
-    if (saved && translations[saved]) {
+    // Respect an explicit manual choice (including English)
+    if (manual && saved && translations[saved]) {
       setLanguage(saved);
       return;
     }
-    // No saved preference — detect from the visitor's IP (once)
+    // Use a cached non-English detection from a previous visit
+    if (saved && saved !== 'en' && translations[saved]) {
+      setLanguage(saved);
+      return;
+    }
+    // Otherwise detect from the visitor's IP.
+    // Don't cache a default 'en' fallback, so a failed lookup self-corrects next visit.
     let cancelled = false;
     base44.functions.invoke('detectLanguageByIp', {})
       .then((res) => {
@@ -328,7 +335,9 @@ export function LanguageProvider({ children }) {
         const detected = data?.language;
         if (!cancelled && detected && translations[detected]) {
           setLanguage(detected);
-          localStorage.setItem('voxvpn_language', detected);
+          if (detected !== 'en') {
+            localStorage.setItem('voxvpn_language', detected);
+          }
         }
       })
       .catch(() => { /* fall back to English silently */ });
@@ -344,6 +353,7 @@ export function LanguageProvider({ children }) {
   const changeLanguage = (lang) => {
     setLanguage(lang);
     localStorage.setItem('voxvpn_language', lang);
+    localStorage.setItem('voxvpn_language_manual', '1');
   };
 
   const t = (key) => {
