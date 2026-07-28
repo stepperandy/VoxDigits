@@ -1,5 +1,6 @@
 import { Star, Quote } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/lib/LanguageContext';
 
 const testimonials = [
   {
@@ -47,17 +48,18 @@ const testimonials = [
 ];
 
 export default function Testimonials() {
+  const { t } = useLanguage();
   return (
     <section className="bg-[#080c18] border-t border-white/5 py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full mb-4" style={{ background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.2)' }}>
             <Star size={12} className="text-cyan-400 fill-cyan-400" />
-            <span className="text-cyan-400 text-xs font-bold tracking-wide">4.9 / 5 — 12,000+ REVIEWS</span>
+            <span className="text-cyan-400 text-xs font-bold tracking-wide">{t('reviewsBadge')}</span>
           </div>
-          <h2 className="text-white text-3xl sm:text-4xl font-black tracking-tight">Loved by Users Worldwide</h2>
+          <h2 className="text-white text-3xl sm:text-4xl font-black tracking-tight">{t('testimonialsTitle')}</h2>
           <p className="text-slate-500 text-sm mt-3 max-w-2xl mx-auto">
-            Join thousands of satisfied customers who trust VoxVPN to protect their privacy every day.
+            {t('testimonialsSubtitle')}
           </p>
         </div>
 

@@ -3,6 +3,7 @@ import { Check, Zap } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PaymentMethodModal from '../PaymentMethodModal';
 import { useCurrencyDetection } from '@/hooks/useCurrencyDetection';
+import { useLanguage } from '@/lib/LanguageContext';
 
 const PLANS = [
   {
@@ -177,6 +178,7 @@ export default function Pricing() {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [selectedPriceId, setSelectedPriceId] = useState(null);
   const { currency, countryCode } = useCurrencyDetection();
+  const { t } = useLanguage();
   const convertPrice = (usdPrice) => (usdPrice * currency.rate).toFixed(currency.rate >= 100 ? 0 : 2);
 
   useEffect(() => {
@@ -227,14 +229,14 @@ export default function Pricing() {
       />
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10">
-          <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-3">Pricing</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Simple, Transparent Pricing</h2>
-          <p className="text-slate-400 text-sm">All plans include AES-256 encryption and a strict no-logs policy. Cancel anytime.</p>
+          <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-3">{t('pricingLabel')}</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">{t('pricingTitle')}</h2>
+          <p className="text-slate-400 text-sm">{t('pricingSubtitle')}</p>
         </div>
 
         {/* Pricing info */}
         <div className="text-center mb-10">
-          <p className="text-slate-400 text-sm">Prices shown in <span className="font-semibold text-white">{currency.code}</span> · Detected: <span className="text-cyan-400 font-semibold">{countryCode}</span></p>
+          <p className="text-slate-400 text-sm">{t('pricesIn')} <span className="font-semibold text-white">{currency.code}</span> · {t('detectedLabel')} <span className="text-cyan-400 font-semibold">{countryCode}</span></p>
         </div>
 
         {/* Plans grid */}
@@ -271,10 +273,10 @@ export default function Pricing() {
           <div className="flex items-start gap-4 p-6 rounded-2xl border border-white/5 bg-[#0d1120]">
             <div className="text-3xl flex-shrink-0">💬</div>
             <div className="flex-1">
-              <h3 className="text-white font-bold text-base mb-1">Live, 24-hour customer support</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mb-4">Real support from real people. We're available through instant live chat and email to help you set up and troubleshoot.</p>
+              <h3 className="text-white font-bold text-base mb-1">{t('liveSupport')}</h3>
+              <p className="text-slate-400 text-sm leading-relaxed mb-4">{t('liveSupportDesc')}</p>
               <a href="/contact" className="inline-flex items-center gap-1.5 px-4 py-2 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-sm font-semibold rounded-lg transition-all">
-                Contact Support →
+                {t('contactSupport')}
               </a>
             </div>
           </div>
@@ -285,10 +287,10 @@ export default function Pricing() {
               <span className="text-cyan-400 font-black text-sm">30</span>
             </div>
             <div className="flex-1">
-              <h3 className="text-white font-bold text-base mb-1">30-day money-back guarantee</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mb-4">Our VPN is easy to use. So is our guarantee. If you're not satisfied, just ask Support for a full refund. No hassle, no risk.</p>
+              <h3 className="text-white font-bold text-base mb-1">{t('moneyBackTitle')}</h3>
+              <p className="text-slate-400 text-sm leading-relaxed mb-4">{t('moneyBackDesc')}</p>
               <a href="#pricing" className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-sm font-semibold rounded-lg transition-all">
-                Get VoxVPN →
+                {t('getVoxvpnCta')}
               </a>
             </div>
           </div>
@@ -300,9 +302,9 @@ export default function Pricing() {
             <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
               <path d="M13.5 6H5.5C4.4 6 3.5 6.9 3.5 8v8c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2v-2h2v2c0 1.1.9 2 2 2s2-.9 2-2v-3c0-.55-.22-1.05-.59-1.41L18.5 10h-3c-1.1 0-2-.9-2-2V6z" fill="#635BFF"/>
             </svg>
-            <h3 className="text-white font-bold text-sm">Secure Payment by Stripe</h3>
+            <h3 className="text-white font-bold text-sm">{t('securePayment')}</h3>
             <span className="ml-auto px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider" style={{ background: 'rgba(99,91,255,0.15)', color: '#8b80ff', border: '1px solid rgba(99,91,255,0.3)' }}>
-              PCI-DSS Compliant
+              {t('pciCompliant')}
             </span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
@@ -328,7 +330,7 @@ export default function Pricing() {
         </div>
 
         <p className="text-center text-slate-600 text-xs mt-8">
-          All prices auto-converted to your local currency ({currency.code}). 30-day money-back guarantee. Secure payment via Stripe · Hubtel · Alipay · WeChat Pay.
+          {t('pricingFooter').replace('{code}', currency.code)}
         </p>
       </div>
     </section>
