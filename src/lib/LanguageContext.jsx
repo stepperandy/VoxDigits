@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useContext } from 'react';
+import { base44 } from '@/api/base44Client';
 
 export const LanguageContext = createContext();
 
@@ -89,10 +90,32 @@ export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState('en');
 
   useEffect(() => {
-    // Load from localStorage on mount
-    const saved = localStorage.getItem('voxvpn_language') || 'en';
-    setLanguage(saved);
+    // Respect a previously saved manual choice
+    const saved = localStorage.getItem('voxvpn_language');
+    if (saved && translations[saved]) {
+      setLanguage(saved);
+      return;
+    }
+    // No saved preference — detect from the visitor's IP (once)
+    let cancelled = false;
+    base44.functions.invoke('detectLanguageByIp', {})
+      .then((res) => {
+        const data = res?.data || res;
+        const detected = data?.language;
+        if (!cancelled && detected && translations[detected]) {
+          setLanguage(detected);
+          localStorage.setItem('voxvpn_language', detected);
+        }
+      })
+      .catch(() => { /* fall back to English silently */ });
+    return () => { cancelled = true; };
   }, []);
+
+  // Sync <html lang> and text direction (RTL for Arabic) whenever language changes
+  useEffect(() => {
+    document.documentElement.lang = language;
+    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+  }, [language]);
 
   const changeLanguage = (lang) => {
     setLanguage(lang);
