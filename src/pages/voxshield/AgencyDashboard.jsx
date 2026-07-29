@@ -7,6 +7,7 @@ import AssignVpnModal from '@/components/voxshield/AssignVpnModal';
 import DevicesTable from '@/components/voxshield/DevicesTable';
 import SecurityLogsSection from '@/components/voxshield/SecurityLogsSection';
 import SubscriptionSummary from '@/components/voxshield/SubscriptionSummary';
+import ClientRenewalTable from '@/components/voxshield/ClientRenewalTable';
 
 const planColor = {
   basic: 'text-slate-400 bg-slate-500/10 border-slate-500/20',
@@ -115,6 +116,12 @@ export default function AgencyDashboard() {
         <div className="flex justify-center py-20"><Loader2 className="animate-spin text-cyan-400" /></div>
       ) : (
         <>
+          {/* Client subscription summary table */}
+          <div>
+            <h2 className="text-white font-bold text-sm mb-3">Subscription & Renewal Summary</h2>
+            <ClientRenewalTable clients={clients} subscriptions={subscriptions} />
+          </div>
+
           {/* Client cards */}
           <div>
             <h2 className="text-white font-bold text-sm mb-3">Client Accounts</h2>
