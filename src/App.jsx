@@ -82,7 +82,9 @@ import { base44 } from '@/api/base44Client';
 import AccountPendingBlock from '@/components/AccountPendingBlock';
 import TermsAgreement from './pages/TermsAgreement';
 import { TwilioDeviceProvider } from '@/lib/TwilioDeviceContext';
+import { LanguageProvider } from '@/lib/LanguageContext';
 import GlobalIncomingCallPopup from '@/components/GlobalIncomingCallPopup.jsx';
+import GeoLanguageWidget from '@/components/GeoLanguageWidget.jsx';
 import Billing from './pages/Billing';
 import LegalPolicy from './pages/LegalPolicy';
 import ApplicationForm from './pages/ApplicationForm.jsx';
@@ -316,17 +318,20 @@ function App() {
 
   return (
     <AppErrorBoundary>
-      <AuthProvider>
-        <QueryClientProvider client={queryClientInstance}>
-          <TwilioDeviceProvider>
-            <Router>
-              <AuthenticatedApp />
-            </Router>
-            <GlobalIncomingCallPopup />
-          </TwilioDeviceProvider>
-          <Toaster />
-        </QueryClientProvider>
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <QueryClientProvider client={queryClientInstance}>
+            <TwilioDeviceProvider>
+              <Router>
+                <AuthenticatedApp />
+              </Router>
+              <GlobalIncomingCallPopup />
+              <GeoLanguageWidget />
+            </TwilioDeviceProvider>
+            <Toaster />
+          </QueryClientProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </AppErrorBoundary>
   )
 }

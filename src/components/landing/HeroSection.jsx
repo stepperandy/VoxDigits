@@ -85,6 +85,51 @@ export default function HeroSection() {
             </Link>
           </div>
 
+          {/* App store badges */}
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <a
+              href="https://apps.apple.com/gh/app/voxtelefony-virtual-numbers/id6760922995"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:opacity-80 transition-opacity active:scale-95"
+              aria-label="Download VoxTelefony on the App Store"
+            >
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg"
+                alt="Download on the App Store"
+                className="h-11 w-auto"
+                loading="lazy"
+              />
+            </a>
+            <a
+              href="https://play.google.com/store/apps/details?id=com.base69b202c06dc5b1988efe9645.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:opacity-80 transition-opacity active:scale-95"
+              aria-label="Get it on Google Play"
+            >
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                alt="Get it on Google Play"
+                className="h-11 w-auto"
+                loading="lazy"
+              />
+            </a>
+            <a
+              href="https://firebasestorage.googleapis.com/v0/b/voxvpn-setup-v2-2-exe.firebasestorage.app/o/VoxTelefony%20Setup%201.0.0.exe?alt=media"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 h-11 px-4 rounded-lg bg-black hover:bg-gray-900 border border-white/15 transition-colors active:scale-95"
+              aria-label="Download VoxTelefony for Windows"
+            >
+              <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor"><path fill="#F25022" d="M0 0h11.5v11.5H0z"/><path fill="#7FBA00" d="M12.5 0H24v11.5H12.5z"/><path fill="#00A4EF" d="M0 12.5h11.5V24H0z"/><path fill="#FFB900" d="M12.5 12.5H24V24H12.5z"/></svg>
+              <span className="text-white text-xs leading-tight">
+                <span className="block text-[9px] text-gray-400">Download for</span>
+                <span className="block font-semibold">Windows</span>
+              </span>
+            </a>
+          </div>
+
           {/* Mission / Founding / Location trust line */}
           <div className="mt-6 flex flex-wrap items-center gap-3 text-xs">
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: "rgba(251,146,60,0.12)", border: "1px solid rgba(251,146,60,0.3)" }}>

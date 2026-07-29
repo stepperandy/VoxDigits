@@ -114,6 +114,19 @@ export default function Footer() {
                 loading="lazy"
               />
             </a>
+            <a
+              href="https://firebasestorage.googleapis.com/v0/b/voxvpn-setup-v2-2-exe.firebasestorage.app/o/VoxTelefony%20Setup%201.0.0.exe?alt=media"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 h-10 px-3.5 rounded-lg bg-black hover:bg-gray-900 border border-white/15 transition-colors active:scale-95"
+              aria-label="Download VoxTelefony for Windows"
+            >
+              <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor"><path fill="#F25022" d="M0 0h11.5v11.5H0z"/><path fill="#7FBA00" d="M12.5 0H24v11.5H12.5z"/><path fill="#00A4EF" d="M0 12.5h11.5V24H0z"/><path fill="#FFB900" d="M12.5 12.5H24V24H12.5z"/></svg>
+              <span className="text-white text-[10px] leading-tight">
+                <span className="block text-gray-400">Download for</span>
+                <span className="block font-semibold">Windows</span>
+              </span>
+            </a>
           </div>
         </div>
 

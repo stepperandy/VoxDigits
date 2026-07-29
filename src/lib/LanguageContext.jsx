@@ -2,96 +2,201 @@ import { createContext, useState, useEffect, useContext } from 'react';
 
 export const LanguageContext = createContext();
 
-const translations = {
-  en: {
-    home: 'Home',
-    features: 'Features',
-    servers: 'Servers',
-    pricing: 'Pricing',
-    support: 'Support',
-    logIn: 'Log In',
-    signUp: 'Sign Up',
-    choosePlan: 'Choose a Plan',
-  },
-  es: {
-    home: 'Inicio',
-    features: 'Características',
-    servers: 'Servidores',
-    pricing: 'Precios',
-    support: 'Soporte',
-    logIn: 'Iniciar sesión',
-    signUp: 'Registrarse',
-    choosePlan: 'Elegir un plan',
-  },
-  fr: {
-    home: 'Accueil',
-    features: 'Caractéristiques',
-    servers: 'Serveurs',
-    pricing: 'Tarification',
-    support: 'Support',
-    logIn: 'Connexion',
-    signUp: 'S\'inscrire',
-    choosePlan: 'Choisir un forfait',
-  },
-  de: {
-    home: 'Startseite',
-    features: 'Funktionen',
-    servers: 'Server',
-    pricing: 'Preisgestaltung',
-    support: 'Unterstützung',
-    logIn: 'Anmelden',
-    signUp: 'Registrieren',
-    choosePlan: 'Plan wählen',
-  },
-  zh: {
-    home: '首页',
-    features: '功能',
-    servers: '服务器',
-    pricing: '定价',
-    support: '支持',
-    logIn: '登录',
-    signUp: '注册',
-    choosePlan: '选择计划',
-  },
-  ja: {
-    home: 'ホーム',
-    features: '機能',
-    servers: 'サーバー',
-    pricing: '料金',
-    support: 'サポート',
-    logIn: 'ログイン',
-    signUp: '登録',
-    choosePlan: 'プランを選択',
-  },
-  ru: {
-    home: 'Главная',
-    features: 'Возможности',
-    servers: 'Серверы',
-    pricing: 'Цены',
-    support: 'Поддержка',
-    logIn: 'Вход',
-    signUp: 'Зарегистрироваться',
-    choosePlan: 'Выбрать план',
-  },
-  ar: {
-    home: 'الرئيسية',
-    features: 'الميزات',
-    servers: 'الخوادم',
-    pricing: 'التسعير',
-    support: 'الدعم',
-    logIn: 'تسجيل الدخول',
-    signUp: 'التسجيل',
-    choosePlan: 'اختر خطة',
-  },
+/**
+ * Country (ISO 3166-1 alpha-2) → language code.
+ * Covers every recognised country; unmapped ones fall back to English.
+ */
+export const COUNTRY_LANGUAGE = {
+  // English
+  US: 'en', GB: 'en', AU: 'en', NZ: 'en', IE: 'en', ZA: 'en', NG: 'en', GH: 'en',
+  KE: 'en', UG: 'en', TZ: 'en', JM: 'en', TT: 'en', BZ: 'en', GY: 'en', BW: 'en',
+  ZW: 'en', ZM: 'en', MW: 'en', GM: 'en', SL: 'en', LR: 'en', BB: 'en', BS: 'en',
+  AG: 'en', DM: 'en', GD: 'en', KN: 'en', LC: 'en', VC: 'en', FJ: 'en', PG: 'en',
+  SB: 'en', VU: 'en', NA: 'en', LS: 'en', SZ: 'en', MT: 'en', PH: 'en', SG: 'en',
+  MY: 'en', IN: 'hi', CM: 'en', RW: 'en', BI: 'en', SO: 'en', SS: 'en', CA: 'en',
+  // Spanish
+  ES: 'es', MX: 'es', AR: 'es', CO: 'es', CL: 'es', PE: 'es', VE: 'es', EC: 'es',
+  GT: 'es', CU: 'es', DO: 'es', UY: 'es', PY: 'es', BO: 'es', CR: 'es', PA: 'es',
+  HN: 'es', SV: 'es', NI: 'es', PR: 'es', GQ: 'es',
+  // French
+  FR: 'fr', BE: 'fr', LU: 'fr', MC: 'fr', CD: 'fr', CI: 'fr', SN: 'fr', ML: 'fr',
+  BF: 'fr', NE: 'fr', GN: 'fr', BJ: 'fr', TG: 'fr', CF: 'fr', GA: 'fr', CG: 'fr',
+  TD: 'fr', KM: 'fr', DJ: 'fr', RE: 'fr', MQ: 'fr', GF: 'fr', HT: 'fr', MA: 'fr',
+  DZ: 'fr', TN: 'fr',
+  // German
+  DE: 'de', AT: 'de', LI: 'de', CH: 'de',
+  // Chinese
+  CN: 'zh', TW: 'zh', HK: 'zh',
+  // Japanese
+  JP: 'ja',
+  // Russian
+  RU: 'ru', BY: 'ru', KZ: 'ru', KG: 'ru',
+  // Arabic
+  SA: 'ar', AE: 'ar', EG: 'ar', IQ: 'ar', JO: 'ar', KW: 'ar', LB: 'ar', OM: 'ar',
+  QA: 'ar', YE: 'ar', PS: 'ar', SY: 'ar', SD: 'ar', LY: 'ar', MR: 'ar', EH: 'ar',
+  BH: 'ar',
+  // Portuguese
+  PT: 'pt', BR: 'pt', AO: 'pt', MZ: 'pt', CV: 'pt', GW: 'pt', TL: 'pt', ST: 'pt',
+  // Italian
+  IT: 'it', SM: 'it', VA: 'it',
+  // Dutch
+  NL: 'nl', SR: 'nl',
+  // Polish
+  PL: 'pl',
+  // Turkish
+  TR: 'tr', AZ: 'tr', TM: 'tr', UZ: 'tr',
+  // Korean
+  KR: 'ko', KP: 'ko',
+  // Indonesian
+  ID: 'id',
+  // Thai
+  TH: 'th',
+  // Vietnamese
+  VN: 'vi',
+  // Swedish
+  SE: 'sv',
+  // Norwegian
+  NO: 'no',
+  // Danish
+  DK: 'da',
+  // Finnish
+  FI: 'fi',
+  // Hebrew
+  IL: 'he',
+  // Greek
+  GR: 'el',
+  // Czech
+  CZ: 'cs',
+  // Romanian
+  RO: 'ro',
+  // Hungarian
+  HU: 'hu',
+  // Ukrainian
+  UA: 'uk',
+  // Persian
+  IR: 'fa', AF: 'fa',
+  // Hindi / Bengali / Urdu
+  LK: 'hi', PK: 'ur', BD: 'bn',
 };
+
+/** Languages that render right-to-left. */
+export const RTL_LANGUAGES = new Set(['ar', 'he', 'fa', 'ur']);
+
+/** Human-friendly labels + flag for each supported language. */
+export const LANGUAGES = {
+  en: { label: 'English',    flag: '🇬🇧' },
+  es: { label: 'Español',    flag: '🇪🇸' },
+  fr: { label: 'Français',   flag: '🇫🇷' },
+  de: { label: 'Deutsch',    flag: '🇩🇪' },
+  zh: { label: '中文',        flag: '🇨🇳' },
+  ja: { label: '日本語',      flag: '🇯🇵' },
+  ru: { label: 'Русский',    flag: '🇷🇺' },
+  ar: { label: 'العربية',     flag: '🇸🇦' },
+  pt: { label: 'Português',  flag: '🇵🇹' },
+  it: { label: 'Italiano',   flag: '🇮🇹' },
+  nl: { label: 'Nederlands', flag: '🇳🇱' },
+  pl: { label: 'Polski',     flag: '🇵🇱' },
+  tr: { label: 'Türkçe',     flag: '🇹🇷' },
+  ko: { label: '한국어',      flag: '🇰🇷' },
+  id: { label: 'Indonesia',  flag: '🇮🇩' },
+  th: { label: 'ไทย',         flag: '🇹🇭' },
+  vi: { label: 'Tiếng Việt', flag: '🇻🇳' },
+  sv: { label: 'Svenska',    flag: '🇸🇪' },
+  no: { label: 'Norsk',      flag: '🇳🇴' },
+  da: { label: 'Dansk',      flag: '🇩🇰' },
+  fi: { label: 'Suomi',      flag: '🇫🇮' },
+  he: { label: 'עברית',       flag: '🇮🇱' },
+  el: { label: 'Ελληνικά',    flag: '🇬🇷' },
+  cs: { label: 'Čeština',    flag: '🇨🇿' },
+  ro: { label: 'Română',     flag: '🇷🇴' },
+  hu: { label: 'Magyar',     flag: '🇭🇺' },
+  uk: { label: 'Українська', flag: '🇺🇦' },
+  fa: { label: 'فارسی',        flag: '🇮🇷' },
+  hi: { label: 'हिन्दी',       flag: '🇮🇳' },
+  ur: { label: 'اردو',        flag: '🇵🇰' },
+  bn: { label: 'বাংলা',       flag: '🇧🇩' },
+};
+
+const translations = {
+  en: { home: 'Home', features: 'Features', servers: 'Servers', pricing: 'Pricing', support: 'Support', logIn: 'Log In', signUp: 'Sign Up', choosePlan: 'Choose a Plan' },
+  es: { home: 'Inicio', features: 'Características', servers: 'Servidores', pricing: 'Precios', support: 'Soporte', logIn: 'Iniciar sesión', signUp: 'Registrarse', choosePlan: 'Elegir un plan' },
+  fr: { home: 'Accueil', features: 'Caractéristiques', servers: 'Serveurs', pricing: 'Tarification', support: 'Support', logIn: 'Connexion', signUp: "S'inscrire", choosePlan: 'Choisir un forfait' },
+  de: { home: 'Startseite', features: 'Funktionen', servers: 'Server', pricing: 'Preisgestaltung', support: 'Unterstützung', logIn: 'Anmelden', signUp: 'Registrieren', choosePlan: 'Plan wählen' },
+  zh: { home: '首页', features: '功能', servers: '服务器', pricing: '定价', support: '支持', logIn: '登录', signUp: '注册', choosePlan: '选择计划' },
+  ja: { home: 'ホーム', features: '機能', servers: 'サーバー', pricing: '料金', support: 'サポート', logIn: 'ログイン', signUp: '登録', choosePlan: 'プランを選択' },
+  ru: { home: 'Главная', features: 'Возможности', servers: 'Серверы', pricing: 'Цены', support: 'Поддержка', logIn: 'Вход', signUp: 'Зарегистрироваться', choosePlan: 'Выбрать план' },
+  ar: { home: 'الرئيسية', features: 'الميزات', servers: 'الخوادم', pricing: 'التسعير', support: 'الدعم', logIn: 'تسجيل الدخول', signUp: 'التسجيل', choosePlan: 'اختر خطة' },
+  pt: { home: 'Início', features: 'Recursos', servers: 'Servidores', pricing: 'Preços', support: 'Suporte', logIn: 'Entrar', signUp: 'Registrar', choosePlan: 'Escolher um plano' },
+  it: { home: 'Home', features: 'Funzioni', servers: 'Server', pricing: 'Prezzi', support: 'Supporto', logIn: 'Accedi', signUp: 'Registrati', choosePlan: 'Scegli un piano' },
+  nl: { home: 'Home', features: 'Functies', servers: 'Servers', pricing: 'Prijzen', support: 'Ondersteuning', logIn: 'Inloggen', signUp: 'Registreren', choosePlan: 'Kies een abonnement' },
+  pl: { home: 'Strona główna', features: 'Funkcje', servers: 'Serwery', pricing: 'Cennik', support: 'Wsparcie', logIn: 'Zaloguj', signUp: 'Zarejestruj', choosePlan: 'Wybierz plan' },
+  tr: { home: 'Ana Sayfa', features: 'Özellikler', servers: 'Sunucular', pricing: 'Fiyatlandırma', support: 'Destek', logIn: 'Giriş', signUp: 'Kayıt Ol', choosePlan: 'Plan Seç' },
+  ko: { home: '홈', features: '기능', servers: '서버', pricing: '가격', support: '지원', logIn: '로그인', signUp: '가입', choosePlan: '플랜 선택' },
+  id: { home: 'Beranda', features: 'Fitur', servers: 'Server', pricing: 'Harga', support: 'Dukungan', logIn: 'Masuk', signUp: 'Daftar', choosePlan: 'Pilih Paket' },
+  th: { home: 'หน้าแรก', features: 'คุณสมบัติ', servers: 'เซิร์ฟเวอร์', pricing: 'ราคา', support: 'สนับสนุน', logIn: 'เข้าสู่ระบบ', signUp: 'สมัคร', choosePlan: 'เลือกแผน' },
+  vi: { home: 'Trang chủ', features: 'Tính năng', servers: 'Máy chủ', pricing: 'Giá', support: 'Hỗ trợ', logIn: 'Đăng nhập', signUp: 'Đăng ký', choosePlan: 'Chọn gói' },
+  sv: { home: 'Hem', features: 'Funktioner', servers: 'Servrar', pricing: 'Priser', support: 'Support', logIn: 'Logga in', signUp: 'Registrera', choosePlan: 'Välj ett abonnemang' },
+  he: { home: 'בית', features: 'תכונות', servers: 'שרתים', pricing: 'תמחור', support: 'תמיכה', logIn: 'התחבר', signUp: 'הרשמה', choosePlan: 'בחר תוכנית' },
+  hi: { home: 'होम', features: 'विशेषताएँ', servers: 'सर्वर', pricing: 'मूल्य', support: 'सहायता', logIn: 'लॉग इन', signUp: 'साइन अप', choosePlan: 'योजना चुनें' },
+  fa: { home: 'خانه', features: 'ویژگی‌ها', servers: 'سرورها', pricing: 'قیمت', support: 'پشتیبانی', logIn: 'ورود', signUp: 'ثبت‌نام', choosePlan: 'یک طرح انتخاب کنید' },
+  no: { home: 'Hjem', features: 'Funksjoner', servers: 'Servere', pricing: 'Priser', support: 'Støtte', logIn: 'Logg inn', signUp: 'Registrer', choosePlan: 'Velg et abonnement' },
+  da: { home: 'Hjem', features: 'Funktioner', servers: 'Servere', pricing: 'Priser', support: 'Support', logIn: 'Log ind', signUp: 'Tilmeld', choosePlan: 'Vælg et abonnement' },
+  fi: { home: 'Etusivu', features: 'Ominaisuudet', servers: 'Palvelimet', pricing: 'Hinnat', support: 'Tuki', logIn: 'Kirjaudu', signUp: 'Rekisteröidy', choosePlan: 'Valitse suunnitelma' },
+  el: { home: 'Αρχική', features: 'Χαρακτηριστικά', servers: 'Διακομιστές', pricing: 'Τιμές', support: 'Υποστήριξη', logIn: 'Σύνδεση', signUp: 'Εγγραφή', choosePlan: 'Επιλογή πακέτου' },
+  cs: { home: 'Domů', features: 'Funkce', servers: 'Servery', pricing: 'Ceny', support: 'Podpora', logIn: 'Přihlášení', signUp: 'Registrace', choosePlan: 'Vybrat plán' },
+  ro: { home: 'Acasă', features: 'Funcții', servers: 'Servere', pricing: 'Prețuri', support: 'Suport', logIn: 'Conectare', signUp: 'Înregistrare', choosePlan: 'Alege un plan' },
+  hu: { home: 'Főoldal', features: 'Funkciók', servers: 'Szerverek', pricing: 'Árak', support: 'Támogatás', logIn: 'Bejelentkezés', signUp: 'Regisztráció', choosePlan: 'Válasszon csomagot' },
+  uk: { home: 'Головна', features: 'Можливості', servers: 'Сервери', pricing: 'Ціни', support: 'Підтримка', logIn: 'Увійти', signUp: 'Реєстрація', choosePlan: 'Обрати план' },
+  ur: { home: 'ہوم', features: 'خصوصیات', servers: 'سرورز', pricing: 'قیمتیں', support: 'معاونت', logIn: 'لاگ اِن', signUp: 'سائن اپ', choosePlan: 'پلان منتخب کریں' },
+  bn: { home: 'হোম', features: 'বৈশিষ্ট্য', servers: 'সার্ভার', pricing: 'মূল্য', support: 'সহায়তা', logIn: 'লগ ইন', signUp: 'সাইন আপ', choosePlan: 'প্ল্যান বেছে নিন' },
+};
+
+export function languageForCountry(countryCode) {
+  if (!countryCode) return 'en';
+  return COUNTRY_LANGUAGE[countryCode.toUpperCase()] || 'en';
+}
 
 export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState('en');
+  const [country, setCountry] = useState(null);
+  const [detected, setDetected] = useState(false);
+
+  // Apply RTL direction whenever language changes
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const isRtl = RTL_LANGUAGES.has(language);
+    document.documentElement.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
+    document.documentElement.setAttribute('lang', language);
+  }, [language]);
 
   useEffect(() => {
-    // Load from localStorage on mount
-    const saved = localStorage.getItem('voxvpn_language') || 'en';
-    setLanguage(saved);
+    const saved = localStorage.getItem('voxvpn_language');
+    const savedCountry = localStorage.getItem('voxvpn_country');
+    if (saved) {
+      setLanguage(saved);
+      if (savedCountry) setCountry(savedCountry);
+      setDetected(true);
+      return;
+    }
+    // Auto-detect via IP geolocation
+    (async () => {
+      try {
+        const res = await fetch('https://ipwho.is/?fields=country_code,success');
+        const data = await res.json();
+        if (data && data.success !== false && data.country_code) {
+          const cc = data.country_code.toUpperCase();
+          setCountry(cc);
+          localStorage.setItem('voxvpn_country', cc);
+          const lang = languageForCountry(cc);
+          setLanguage(lang);
+          localStorage.setItem('voxvpn_language', lang);
+        }
+      } catch (e) {
+        // silent fallback to English
+      } finally {
+        setDetected(true);
+      }
+    })();
   }, []);
 
   const changeLanguage = (lang) => {
@@ -99,12 +204,10 @@ export function LanguageProvider({ children }) {
     localStorage.setItem('voxvpn_language', lang);
   };
 
-  const t = (key) => {
-    return translations[language]?.[key] || translations.en[key] || key;
-  };
+  const t = (key) => translations[language]?.[key] || translations.en[key] || key;
 
   return (
-    <LanguageContext.Provider value={{ language, changeLanguage, t }}>
+    <LanguageContext.Provider value={{ language, country, detected, changeLanguage, t, languages: LANGUAGES, rtl: RTL_LANGUAGES.has(language) }}>
       {children}
     </LanguageContext.Provider>
   );
