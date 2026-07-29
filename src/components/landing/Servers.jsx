@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Signal, Loader2, Globe, Zap, Shield, Wifi } from 'lucide-react';
 import { useEffect, useState, lazy, Suspense } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useLanguage } from '@/lib/LanguageContext';
 
 const WorldMap = lazy(() => import('./WorldMap'));
 
@@ -43,6 +44,7 @@ const PERKS = [
 ];
 
 export default function Servers() {
+  const { t } = useLanguage();
   const [servers, setServers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -79,13 +81,13 @@ export default function Servers() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <p className="text-cyan-400 text-xs font-bold tracking-[0.2em] uppercase mb-3">Global Network</p>
+          <p className="text-cyan-400 text-xs font-bold tracking-[0.2em] uppercase mb-3">{t('globalNetwork')}</p>
           <h2 className="text-4xl sm:text-5xl font-black text-white mb-4 leading-tight">
-            Servers on Every
-            <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent"> Continent</span>
+            {t('serversTitle1')}
+            <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">{t('serversTitle2')}</span>
           </h2>
           <p className="text-slate-400 text-base max-w-lg mx-auto">
-            Connect through our high-speed infrastructure in 20 locations across 4 continents. Every server runs VoxVPN with AES-256 encryption.
+            {t('serversSubtitle')}
           </p>
         </motion.div>
 
@@ -98,14 +100,14 @@ export default function Servers() {
             className="flex items-center justify-center gap-6 mb-8 flex-wrap"
           >
             {[
-              { label: 'Total Servers', value: servers.length, color: 'text-white' },
-              { label: 'Online Now', value: onlineCount, color: 'text-emerald-400' },
-              { label: 'Locations', value: Object.keys(regionNames).length, color: 'text-cyan-400' },
-              { label: 'Uptime', value: '99.8%', color: 'text-violet-400' },
+              { label: 'totalServers', value: servers.length, color: 'text-white' },
+              { label: 'onlineNow', value: onlineCount, color: 'text-emerald-400' },
+              { label: 'locationsLabel', value: Object.keys(regionNames).length, color: 'text-cyan-400' },
+              { label: 'uptimeLabel', value: '99.8%', color: 'text-violet-400' },
             ].map(({ label, value, color }) => (
               <div key={label} className="flex items-center gap-2.5 px-4 py-2 rounded-full border border-white/10 bg-white/3">
                 <span className={`text-lg font-black ${color}`}>{value}</span>
-                <span className="text-slate-500 text-sm">{label}</span>
+                <span className="text-slate-500 text-sm">{t(label)}</span>
               </div>
             ))}
           </motion.div>
@@ -121,13 +123,13 @@ export default function Servers() {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-32 rounded-3xl border border-white/5 bg-[#040810]">
               <Loader2 size={32} className="animate-spin text-cyan-400 mb-3" />
-              <p className="text-slate-400 text-sm">Loading live server network…</p>
+              <p className="text-slate-400 text-sm">{t('loadingNetwork')}</p>
             </div>
           ) : (
             <Suspense fallback={
               <div className="flex flex-col items-center justify-center py-32 rounded-3xl border border-white/5 bg-[#040810]">
                 <Loader2 size={32} className="animate-spin text-cyan-400 mb-3" />
-                <p className="text-slate-400 text-sm">Loading map…</p>
+                <p className="text-slate-400 text-sm">{t('loadingMap')}</p>
               </div>
             }>
               <WorldMap servers={servers} />
@@ -157,7 +159,7 @@ export default function Servers() {
                   <span className="text-2xl">{flag}</span>
                   <div>
                     <p className={`font-black text-sm ${color}`}>{name}</p>
-                    <p className="text-slate-500 text-xs">{locs.length} locations</p>
+                    <p className="text-slate-500 text-xs">{locs.length} {t('regionLocations')}</p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -167,7 +169,7 @@ export default function Servers() {
                     </span>
                   ))}
                   {locs.length > 5 && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-500">+{locs.length - 5} more</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-500">+{locs.length - 5} {t('moreLabel')}</span>
                   )}
                 </div>
               </motion.div>

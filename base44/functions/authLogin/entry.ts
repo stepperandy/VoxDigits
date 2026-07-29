@@ -76,8 +76,25 @@ Deno.serve(async (req) => {
 
     const userEmail = authUser?.email || email;
 
+    // ── Admin bypass: admins have no device limits, no subscription required ──
+    // Admins can log in on any device system without credits or expiry.
+    const isAdmin = registeredUsers[0]?.role === 'admin' || authUser?.role === 'admin';
+    if (isAdmin) {
+      return new Response(JSON.stringify({
+        success: true,
+        token,
+        user: { email: userEmail, name: authUser?.full_name || null },
+        subscription: {
+          plan: 'Admin',
+          status: 'active',
+          renewal_date: null,
+          max_devices: 999,
+          plan_tier: 5,
+        },
+      }), { status: 200, headers: CORS });
+    }
+
     // ── Step 3: Verify the user has an ACTIVE VoxVPN subscription ──
-    // Applies to ALL users — no admin bypass, no exceptions.
     const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
     const activeSub = subs && subs.length > 0
       ? subs.find(s => s.status === 'active' || s.status === 'trial')
