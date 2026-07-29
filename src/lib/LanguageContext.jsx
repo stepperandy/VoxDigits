@@ -164,66 +164,6 @@ export function countryFlag(countryCode) {
   );
 }
 
-/**
- * IANA timezone → ISO 3166-1 alpha-2 country code.
- * Offline fallback used when every IP geolocation provider is blocked/fails.
- */
-const TZ_TO_COUNTRY = {
-  'Africa/Accra': 'GH', 'Africa/Lagos': 'NG', 'Africa/Nairobi': 'KE',
-  'Africa/Kampala': 'UG', 'Africa/Dar_es_Salaam': 'TZ', 'Africa/Cairo': 'EG',
-  'Africa/Casablanca': 'MA', 'Africa/Johannesburg': 'ZA', 'Africa/Tunis': 'TN',
-  'Africa/Algiers': 'DZ', 'Africa/Khartoum': 'SD', 'Africa/Dakar': 'SN',
-  'Africa/Abidjan': 'CI', 'Africa/Addis_Ababa': 'ET', 'Africa/Douala': 'CM',
-  'Africa/Kinshasa': 'CD', 'Africa/Brazzaville': 'CG', 'Africa/Libreville': 'GA',
-  'Africa/Bangui': 'CF', 'Africa/Lome': 'TG', 'Africa/Porto-Novo': 'BJ',
-  'Africa/Ouagadougou': 'BF', 'Africa/Niamey': 'NE', 'Africa/Bamako': 'ML',
-  'Africa/Conakry': 'GN', 'Africa/Freetown': 'SL', 'Africa/Monrovia': 'LR',
-  'Africa/Banjul': 'GM', 'Africa/Nouakchott': 'MR', 'Africa/Luanda': 'AO',
-  'Africa/Maputo': 'MZ', 'Africa/Harare': 'ZW', 'Africa/Lusaka': 'ZM',
-  'Africa/Blantyre': 'MW', 'Africa/Gaborone': 'BW', 'Africa/Windhoek': 'NA',
-  'Africa/Maseru': 'LS', 'Africa/Mbabane': 'SZ', 'Africa/Tripoli': 'LY',
-  'America/New_York': 'US', 'America/Chicago': 'US', 'America/Denver': 'US',
-  'America/Los_Angeles': 'US', 'America/Phoenix': 'US', 'America/Anchorage': 'US',
-  'America/Honolulu': 'US', 'America/Toronto': 'CA', 'America/Vancouver': 'CA',
-  'America/Halifax': 'CA', 'America/Edmonton': 'CA', 'America/Winnipeg': 'CA',
-  'America/Mexico_City': 'MX', 'America/Bogota': 'CO', 'America/Lima': 'PE',
-  'America/Santiago': 'CL', 'America/Buenos_Aires': 'AR', 'America/Sao_Paulo': 'BR',
-  'America/Caracas': 'VE', 'America/Guayaquil': 'EC', 'America/Montevideo': 'UY',
-  'America/Asuncion': 'PY', 'America/La_Paz': 'BO', 'America/Havana': 'CU',
-  'America/Santo_Domingo': 'DO', 'America/San_Juan': 'PR', 'America/Panama': 'PA',
-  'America/Costa_Rica': 'CR', 'America/Guatemala': 'GT', 'America/Tegucigalpa': 'HN',
-  'America/El_Salvador': 'SV', 'America/Managua': 'NI', 'America/Belize': 'BZ',
-  'America/Jamaica': 'JM', 'America/Port_of_Spain': 'TT', 'America/Barbados': 'BB',
-  'America/Nassau': 'BS', 'America/Port-au-Prince': 'HT',
-  'Europe/London': 'GB', 'Europe/Dublin': 'IE', 'Europe/Paris': 'FR',
-  'Europe/Berlin': 'DE', 'Europe/Madrid': 'ES', 'Europe/Rome': 'IT',
-  'Europe/Amsterdam': 'NL', 'Europe/Brussels': 'BE', 'Europe/Vienna': 'AT',
-  'Europe/Zurich': 'CH', 'Europe/Lisbon': 'PT', 'Europe/Stockholm': 'SE',
-  'Europe/Oslo': 'NO', 'Europe/Copenhagen': 'DK', 'Europe/Helsinki': 'FI',
-  'Europe/Warsaw': 'PL', 'Europe/Prague': 'CZ', 'Europe/Budapest': 'HU',
-  'Europe/Bucharest': 'RO', 'Europe/Sofia': 'BG', 'Europe/Athens': 'GR',
-  'Europe/Istanbul': 'TR', 'Europe/Moscow': 'RU', 'Europe/Kiev': 'UA',
-  'Europe/Vilnius': 'LT', 'Europe/Riga': 'LV', 'Europe/Tallinn': 'EE',
-  'Europe/Zagreb': 'HR', 'Europe/Belgrade': 'RS', 'Europe/Bratislava': 'SK',
-  'Europe/Ljubljana': 'SI', 'Europe/Sarajevo': 'BA', 'Europe/Skopje': 'MK',
-  'Europe/Tirane': 'AL', 'Europe/Reykjavik': 'IS', 'Europe/Luxembourg': 'LU',
-  'Europe/Monaco': 'MC', 'Europe/Malta': 'MT',
-  'Asia/Tokyo': 'JP', 'Asia/Seoul': 'KR', 'Asia/Shanghai': 'CN',
-  'Asia/Hong_Kong': 'HK', 'Asia/Taipei': 'TW', 'Asia/Singapore': 'SG',
-  'Asia/Kuala_Lumpur': 'MY', 'Asia/Bangkok': 'TH', 'Asia/Jakarta': 'ID',
-  'Asia/Manila': 'PH', 'Asia/Ho_Chi_Minh': 'VN', 'Asia/Kolkata': 'IN',
-  'Asia/Karachi': 'PK', 'Asia/Dhaka': 'BD', 'Asia/Colombo': 'LK',
-  'Asia/Kathmandu': 'NP', 'Asia/Tehran': 'IR', 'Asia/Baghdad': 'IQ',
-  'Asia/Riyadh': 'SA', 'Asia/Dubai': 'AE', 'Asia/Doha': 'QA',
-  'Asia/Kuwait': 'KW', 'Asia/Muscat': 'OM', 'Asia/Baku': 'AZ',
-  'Asia/Tashkent': 'UZ', 'Asia/Almaty': 'KZ', 'Asia/Bishkek': 'KG',
-  'Asia/Yerevan': 'AM', 'Asia/Tbilisi': 'GE', 'Asia/Jerusalem': 'IL',
-  'Asia/Beirut': 'LB', 'Asia/Damascus': 'SY', 'Asia/Amman': 'JO',
-  'Australia/Sydney': 'AU', 'Australia/Melbourne': 'AU', 'Australia/Brisbane': 'AU',
-  'Australia/Perth': 'AU', 'Australia/Adelaide': 'AU', 'Pacific/Auckland': 'NZ',
-  'Pacific/Fiji': 'FJ', 'Pacific/Guam': 'GU',
-};
-
 export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState('en');
   const [country, setCountry] = useState(null);
@@ -243,15 +183,13 @@ export function LanguageProvider({ children }) {
     const savedManual = localStorage.getItem('voxvpn_language_manual');
     if (savedManual) setLanguage(savedManual);
 
-    // ALWAYS re-detect the country from the IP on every load for accuracy —
-    // never trust a persisted country blindly, so "France shows France".
     let done = false;
 
     const finish = (cc) => {
       if (done) return;
       done = true;
-      // Re-read the manual flag at resolution time (not at mount time) so a
-      // manual change made while detection was in-flight is never overwritten.
+      // Re-read the manual flag at resolution time so a manual change made
+      // while detection was in-flight is never overwritten.
       const manualNow = localStorage.getItem('voxvpn_language_manual');
       if (cc) {
         const code = cc.toUpperCase();
@@ -262,9 +200,6 @@ export function LanguageProvider({ children }) {
           setLanguage(lang);
           localStorage.setItem('voxvpn_language', lang);
         }
-      } else if (!manualNow) {
-        // No IP info and no manual choice — keep default 'en'.
-        setLanguage((prev) => prev);
       }
       setDetected(true);
     };
@@ -285,21 +220,7 @@ export function LanguageProvider({ children }) {
     const jsonProvider = (url, parse) =>
       fetchWithTimeout(url, 3500).then((d) => (d && parse(d)) || null);
 
-    // Offline fallback: infer the country from the browser timezone so
-    // detection still resolves when every IP provider is blocked/fails.
-    const tzFallback = () => {
-      try {
-        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        return TZ_TO_COUNTRY[tz] || null;
-      } catch {
-        return null;
-      }
-    };
-
-    const safety = setTimeout(() => {
-      const tz = tzFallback();
-      finish(tz);
-    }, 5000);
+    const safety = setTimeout(() => finish(null), 5000);
 
     Promise.any([
       cfTrace(),
@@ -309,8 +230,8 @@ export function LanguageProvider({ children }) {
       jsonProvider('https://api.db-ip.com/v2/free/self', (d) => d && d.country_code),
       jsonProvider('https://ipinfo.io/json', (d) => d && d.country),
     ])
-      .then((cc) => { clearTimeout(safety); finish(cc || tzFallback()); })
-      .catch(() => { clearTimeout(safety); finish(tzFallback()); });
+      .then((cc) => { clearTimeout(safety); finish(cc); })
+      .catch(() => { clearTimeout(safety); finish(null); });
   }, []);
 
   const changeLanguage = (lang) => {
