@@ -5,8 +5,6 @@ import { base44 } from '@/api/base44Client';
 import { Shield, Building2, Users, Lock, Mail, User, Phone, Loader2, CheckCircle2, AlertCircle, Antenna, Bug, Eye, ArrowRight, KeyRound } from 'lucide-react';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
-import ChinaAccessNotice from '@/components/auth/ChinaAccessNotice';
-import { useLanguage } from '@/lib/LanguageContext';
 
 const TEAM_SIZES = [
   { value: '5', label: '1–5 employees' },
@@ -36,8 +34,6 @@ export default function BusinessSignup() {
   const [needsVerification, setNeedsVerification] = useState(false);
   const [otpCode, setOtpCode] = useState('');
   const [verifying, setVerifying] = useState(false);
-  const { language } = useLanguage();
-  const skipOtp = language === 'zh';
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -48,16 +44,8 @@ export default function BusinessSignup() {
     try {
       const res = await base44.functions.invoke('businessSignup', form);
       if (res.data?.error) throw new Error(res.data.error);
-
-      // Chinese users skip email OTP (email delivery is unreliable behind the
-      // Great Firewall) — log them straight in since the account is pre-verified.
-      if (skipOtp) {
-        await base44.auth.loginViaEmailPassword(form.email, form.password);
-        window.location.href = '/business/dashboard';
-        return;
-      }
-
-      // Everyone else must verify a 6-digit OTP code sent to their email.
+      // Registration sends a 6-digit OTP code to the user's email —
+      // they must verify it before they can log in.
       setNeedsVerification(true);
     } catch (err) {
       setError(err.message || 'Signup failed. Please try again.');
@@ -153,10 +141,6 @@ export default function BusinessSignup() {
 
               <h2 className="text-white font-black text-2xl mb-1">Create Business Account</h2>
               <p className="text-slate-500 text-sm mb-6">Start your 14-day trial — no credit card required.</p>
-
-              <div className="mb-4">
-                <ChinaAccessNotice />
-              </div>
 
               {error && (
                 <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center gap-2 text-rose-400 text-sm">
