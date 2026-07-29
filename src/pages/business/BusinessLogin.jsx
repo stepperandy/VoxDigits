@@ -1,21 +1,46 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
-import { Shield, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, ArrowRight, Building2 } from 'lucide-react';
+import { Shield, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, ArrowRight, Building2, Zap } from 'lucide-react';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import ChinaAccessNotice from '@/components/auth/ChinaAccessNotice';
+import { LanguageContext } from '@/lib/LanguageContext';
 
 const LOGO_URL = 'https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/9d3567c74_image.png';
 
 export default function BusinessLogin() {
   const navigate = useNavigate();
+  const { language } = useContext(LanguageContext);
+  const isZh = language === 'zh';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Magic-link (passwordless) login
+  const [magicLoading, setMagicLoading] = useState(false);
+  const [magicSent, setMagicSent] = useState(false);
+
+  const handleMagicLink = async () => {
+    setError('');
+    if (!email || !email.includes('@')) {
+      setError('Enter your work email first.');
+      return;
+    }
+    setMagicLoading(true);
+    localStorage.setItem('voxvpn_magic_email', email.trim());
+    try {
+      await base44.functions.invoke('sendMagicLink', { email: email.trim() });
+      setMagicSent(true);
+    } catch (err) {
+      setError(err?.message || 'Could not send login link. Please try again.');
+    } finally {
+      setMagicLoading(false);
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -116,6 +141,23 @@ export default function BusinessLogin() {
                 {loading ? 'Signing in...' : 'Sign In to Dashboard'}
                 {!loading && <ArrowRight size={18} />}
               </button>
+
+              {magicSent ? (
+                <div className="p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-center">
+                  <Mail size={24} className="text-cyan-400 mx-auto mb-2" />
+                  <p className="text-white font-semibold text-sm mb-1">Check your inbox</p>
+                  <p className="text-slate-400 text-xs leading-relaxed">
+                    We sent a login link to <span className="text-white font-semibold">{email}</span>.
+                    Open the email, click the link, then press <span className="text-cyan-400 font-semibold">⚡ Instant Login</span>.
+                  </p>
+                </div>
+              ) : (
+                <button type="button" onClick={handleMagicLink} disabled={magicLoading || !email}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/10 transition-all disabled:opacity-50">
+                  {magicLoading ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
+                  {magicLoading ? 'Sending…' : (isZh ? '发送登录链接（无需密码）' : 'Send me a login link instead')}
+                </button>
+              )}
             </form>
 
             <p className="text-slate-600 text-xs text-center mt-6">
