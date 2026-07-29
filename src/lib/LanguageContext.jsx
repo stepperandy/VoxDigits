@@ -179,8 +179,7 @@ export function LanguageProvider({ children }) {
       return;
     }
 
-    // Race several fast geolocation providers so detection completes quickly.
-    // Each provider has a 2.5s timeout; the first one to resolve wins.
+    // Race all geolocation providers in PARALLEL so the fastest one wins.
     let done = false;
     const finish = (cc) => {
       if (done) return;
@@ -196,39 +195,29 @@ export function LanguageProvider({ children }) {
       setDetected(true);
     };
 
-    const withTimeout = (url, ms) =>
+    const fetchWithTimeout = (url, ms) =>
       Promise.race([
-        fetch(url).then((r) => r.json()),
+        fetch(url, { cache: 'no-store' }).then((r) => r.json()),
         new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
       ]);
 
-    const tryProvider = async (url, parse, ms = 2500) => {
-      try {
-        const data = await withTimeout(url, ms);
-        const cc = parse(data);
-        if (cc) return cc;
-      } catch (e) {
-        /* try next */
-      }
-      return null;
-    };
+    const provider = (url, parse) =>
+      fetchWithTimeout(url, 3500)
+        .then((d) => (d && parse(d)) || Promise.reject(new Error('no cc')))
+        .catch(() => null);
 
-    (async () => {
-      const providers = [
-        () => tryProvider('https://ipapi.co/json/', (d) => d && d.country_code),
-        () => tryProvider('https://ipwho.is/?fields=country_code,success', (d) => d && d.success !== false && d.country_code),
-        () => tryProvider('https://get.geojs.io/v1/ip/country.json', (d) => d && d.country),
-        () => tryProvider('https://ipinfo.io/json', (d) => d && d.country),
-      ];
-      for (const p of providers) {
-        const cc = await p();
-        if (cc) {
-          finish(cc);
-          return;
-        }
-      }
-      finish(null);
-    })();
+    // Hard 4s safety cap so detection always completes quickly
+    const safety = setTimeout(() => finish(null), 4000);
+
+    Promise.any([
+      provider('https://ipapi.co/json/', (d) => d && d.country_code),
+      provider('https://ipwho.is/?fields=country_code,success', (d) => d && d.success !== false && d.country_code),
+      provider('https://get.geojs.io/v1/ip/country.json', (d) => d && d.country),
+      provider('https://ipinfo.io/json', (d) => d && d.country),
+      provider('https://ip-api.com/json/?fields=countryCode', (d) => d && d.countryCode),
+    ])
+      .then((cc) => { clearTimeout(safety); finish(cc); })
+      .catch(() => { clearTimeout(safety); finish(null); });
   }, []);
 
   const changeLanguage = (lang) => {
