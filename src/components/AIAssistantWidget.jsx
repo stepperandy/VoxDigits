@@ -3,8 +3,28 @@ import { base44 } from "@/api/base44Client";
 import { Bot, X, Send, Loader2, Plus, HelpCircle, Minimize2, ChevronDown } from "lucide-react";
 import MessageBubble from "@/components/agent/MessageBubble";
 import ReactMarkdown from "react-markdown";
+import ModelSelector from "@/components/ModelSelector";
 
 const AGENT_NAME = "customer_support";
+
+// System prompt used for the direct InvokeLLM path (non-auto models).
+const SYSTEM_PROMPT = `You are the VoxTelefony customer support assistant, embedded in the app. Be concise, friendly, and helpful. Never make up pricing or features.
+
+APP OVERVIEW — VoxTelefony is a telecom platform offering:
+- Virtual Phone Numbers (US, CA, GB, AU and more) with SMS and Voice
+- eSIM plans for international travel data
+- In-app SMS inbox and dialer
+- Credits-based billing; call forwarding, auto-reply, voicemail
+
+QUICK FACTS:
+- US numbers ~$4.99/mo, CA ~$5.99, GB ~$6.99, AU ~$7.99
+- Buy numbers via the Buy Virtual Number page (pay with credits or Stripe)
+- Buy eSIMs via Buy eSIM; QR code is emailed and shown in My eSIMs
+- SMS ~$0.01–0.05/msg; calls billed per minute by destination
+- View SMS in SMS Inbox; make calls in the Dialer
+- Manage subscriptions in Subscription Manager; submit tickets in Support
+
+If unsure, direct the user to submit a support ticket. The user's current page may be provided at the start of their message.`;
 
 const PAGE_LABELS = {
   "/": "Home page",
@@ -45,6 +65,7 @@ export default function AIAssistantWidget({ currentPageName }) {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [showQuick, setShowQuick] = useState(true);
+  const [selectedModel, setSelectedModel] = useState("auto");
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -81,21 +102,35 @@ export default function AIAssistantWidget({ currentPageName }) {
   const openChat = async () => {
     setOpen(true);
     setMinimized(false);
-    if (!conversation) await startConversation();
+    if (selectedModel === "auto" && !conversation) await startConversation();
   };
 
   const resetChat = async () => {
-    const conv = await startConversation();
-    setConversation(conv);
     setShowQuick(true);
+    if (selectedModel === "auto") {
+      const conv = await startConversation();
+      setConversation(conv);
+    } else {
+      setConversation(null);
+      setMessages([]);
+    }
+  };
+
+  const changeModel = async (id) => {
+    setSelectedModel(id);
+    setShowQuick(true);
+    setMessages([]);
+    if (id === "auto") {
+      const conv = await startConversation();
+      setConversation(conv);
+    } else {
+      setConversation(null);
+    }
   };
 
   const sendMessage = async (text) => {
     const msg = (text || input).trim();
     if (!msg || sending) return;
-
-    let conv = conversation;
-    if (!conv) conv = await startConversation();
 
     setInput("");
     setShowQuick(false);
@@ -103,11 +138,36 @@ export default function AIAssistantWidget({ currentPageName }) {
 
     const isFirst = messages.filter((m) => m.role === "user").length === 0;
     const contextPrefix = isFirst ? `[User is on: ${currentPage}]\n` : "";
+    const userContent = contextPrefix + msg;
 
-    await base44.agents.addMessage(conv, {
-      role: "user",
-      content: contextPrefix + msg,
-    });
+    if (selectedModel === "auto") {
+      // Agent flow (preserves entity tools)
+      let conv = conversation;
+      if (!conv) conv = await startConversation();
+      await base44.agents.addMessage(conv, { role: "user", content: userContent });
+    } else {
+      // Direct InvokeLLM flow with the selected model
+      const newHistory = [...messages, { role: "user", content: userContent }];
+      setMessages(newHistory);
+      const historyText = newHistory
+        .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
+        .join("\n\n");
+      const prompt = `${SYSTEM_PROMPT}\n\n${historyText}\n\nAssistant:`;
+      try {
+        const res = await base44.integrations.Core.InvokeLLM({
+          prompt,
+          model: selectedModel,
+        });
+        const reply = typeof res === "string" ? res : (res?.content || JSON.stringify(res));
+        setMessages([...newHistory, { role: "assistant", content: reply }]);
+      } catch (e) {
+        setMessages([
+          ...newHistory,
+          { role: "assistant", content: "Sorry, I ran into an error with that model. Please try again or switch to Auto mode." },
+        ]);
+      }
+    }
+
     setSending(false);
   };
 
@@ -120,15 +180,18 @@ export default function AIAssistantWidget({ currentPageName }) {
           }`}
         >
           {/* Header */}
-          <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-b border-white/8 flex-shrink-0">
-            <div className="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center">
+          <div className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-b border-white/8 flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center flex-shrink-0">
               <Bot className="w-4 h-4 text-cyan-400" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white font-semibold text-sm">VoxTelefony Assistant</p>
+              <p className="text-white font-semibold text-sm truncate">VoxTelefony Assistant</p>
               {!minimized && <p className="text-xs text-cyan-400/70 truncate">📍 {currentPage}</p>}
             </div>
-            <div className="flex items-center gap-1">
+            {!minimized && (
+              <ModelSelector value={selectedModel} onChange={changeModel} />
+            )}
+            <div className="flex items-center gap-1 flex-shrink-0">
               <button onClick={resetChat} title="New conversation" className="p-1.5 text-gray-500 hover:text-gray-300 rounded-lg hover:bg-white/5 transition-colors">
                 <Plus className="w-3.5 h-3.5" />
               </button>
