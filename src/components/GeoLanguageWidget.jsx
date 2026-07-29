@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Globe, X, Check, MapPin } from "lucide-react";
-import { useLanguage, LANGUAGES, countryFlag } from "@/lib/LanguageContext";
+import { Globe, X, Check, MapPin, RotateCcw } from "lucide-react";
+import { useLanguage, LANGUAGES, countryFlag, languageForCountry } from "@/lib/LanguageContext";
 
 /**
  * Floating geo-language switcher — sits below the AI assistant in the
@@ -8,7 +8,9 @@ import { useLanguage, LANGUAGES, countryFlag } from "@/lib/LanguageContext";
  * (handled in LanguageContext) and lets them override the language.
  */
 export default function GeoLanguageWidget() {
-  const { language, country, changeLanguage, detected } = useLanguage();
+  const { language, country, changeLanguage, resetToAuto, detected } = useLanguage();
+  const isManual = !!localStorage.getItem('voxvpn_language_manual');
+  const isAuto = country ? languageForCountry(country) === language : !isManual;
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const ref = useRef(null);
@@ -59,9 +61,18 @@ export default function GeoLanguageWidget() {
           {country && (
             <div className="px-4 py-2 bg-white/5 border-b border-white/8 flex items-center gap-2">
               <span className="text-lg">{countryFlag(country)}</span>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-400 flex-1">
                 Detected: <span className="text-cyan-400 font-semibold">{country}</span> · <span className="text-white">{current.label}</span>
               </p>
+              {!isAuto && (
+                <button
+                  onClick={resetToAuto}
+                  className="flex items-center gap-1 text-[10px] text-cyan-400 hover:text-cyan-300 px-2 py-1 rounded-md hover:bg-white/5"
+                  title="Reset to detected language"
+                >
+                  <RotateCcw className="w-3 h-3" /> Auto
+                </button>
+              )}
             </div>
           )}
 
