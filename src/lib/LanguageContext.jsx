@@ -195,26 +195,36 @@ export function LanguageProvider({ children }) {
       setDetected(true);
     };
 
-    const fetchWithTimeout = (url, ms) =>
+    const fetchWithTimeout = (url, ms, isText = false) =>
       Promise.race([
-        fetch(url, { cache: 'no-store' }).then((r) => r.json()),
+        fetch(url, { cache: 'no-store' }).then((r) => (isText ? r.text() : r.json())),
         new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
       ]);
 
-    const provider = (url, parse) =>
+    // Cloudflare trace — anycast, no rate limits, always CORS-enabled, text format
+    const cfTrace = () =>
+      fetchWithTimeout('https://www.cloudflare.com/cdn-cgi/trace', 3000, true)
+        .then((text) => {
+          const m = text.match(/^loc=(\w{2})$/m);
+          if (m && m[1]) return m[1];
+          return Promise.reject(new Error('no cc'));
+        })
+        .catch(() => null);
+
+    const jsonProvider = (url, parse) =>
       fetchWithTimeout(url, 3500)
         .then((d) => (d && parse(d)) || Promise.reject(new Error('no cc')))
         .catch(() => null);
 
-    // Hard 4s safety cap so detection always completes quickly
-    const safety = setTimeout(() => finish(null), 4000);
+    // Hard 5s safety cap so detection always completes quickly
+    const safety = setTimeout(() => finish(null), 5000);
 
     Promise.any([
-      provider('https://ipapi.co/json/', (d) => d && d.country_code),
-      provider('https://ipwho.is/?fields=country_code,success', (d) => d && d.success !== false && d.country_code),
-      provider('https://get.geojs.io/v1/ip/country.json', (d) => d && d.country),
-      provider('https://ipinfo.io/json', (d) => d && d.country),
-      provider('https://ip-api.com/json/?fields=countryCode', (d) => d && d.countryCode),
+      cfTrace(),
+      jsonProvider('https://ipwho.is/?fields=country_code,success', (d) => d && d.success !== false && d.country_code),
+      jsonProvider('https://ipapi.co/json/', (d) => d && d.country_code),
+      jsonProvider('https://get.geojs.io/v1/ip/country.json', (d) => d && d.country),
+      jsonProvider('https://ipinfo.io/json', (d) => d && d.country),
     ])
       .then((cc) => { clearTimeout(safety); finish(cc); })
       .catch(() => { clearTimeout(safety); finish(null); });
