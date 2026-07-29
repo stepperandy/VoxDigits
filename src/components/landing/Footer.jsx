@@ -90,6 +90,7 @@ const footerSections = [
     links: [
       { label: 'About Us', to: '/about' },
       { label: 'Help Center', to: '/help-center' },
+      { label: 'Help & Support', to: '/help-support' },
       { label: 'Contact Us', to: '/contact' },
       { label: 'Server Status', to: '/status' },
       { label: 'Bug Bounty', to: '/bug-bounty' },
