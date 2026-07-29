@@ -6,6 +6,7 @@ import { Shield, Building2, Users, Lock, Mail, User, Phone, Loader2, CheckCircle
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import ChinaAccessNotice from '@/components/auth/ChinaAccessNotice';
+import { useLanguage } from '@/lib/LanguageContext';
 
 const TEAM_SIZES = [
   { value: '5', label: '1–5 employees' },
@@ -35,6 +36,8 @@ export default function BusinessSignup() {
   const [needsVerification, setNeedsVerification] = useState(false);
   const [otpCode, setOtpCode] = useState('');
   const [verifying, setVerifying] = useState(false);
+  const { language } = useLanguage();
+  const skipOtp = language === 'zh';
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -45,8 +48,16 @@ export default function BusinessSignup() {
     try {
       const res = await base44.functions.invoke('businessSignup', form);
       if (res.data?.error) throw new Error(res.data.error);
-      // Registration sends a 6-digit OTP code to the user's email —
-      // they must verify it before they can log in.
+
+      // Chinese users skip email OTP (email delivery is unreliable behind the
+      // Great Firewall) — log them straight in since the account is pre-verified.
+      if (skipOtp) {
+        await base44.auth.loginViaEmailPassword(form.email, form.password);
+        window.location.href = '/business/dashboard';
+        return;
+      }
+
+      // Everyone else must verify a 6-digit OTP code sent to their email.
       setNeedsVerification(true);
     } catch (err) {
       setError(err.message || 'Signup failed. Please try again.');
