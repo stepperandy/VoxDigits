@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { Shield, Building2, Users, Lock, Mail, User, Phone, Loader2, CheckCircle2, AlertCircle, Antenna, Bug, Eye, ArrowRight, KeyRound } from 'lucide-react';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
+import ChinaAccessNotice from '@/components/auth/ChinaAccessNotice';
 
 const TEAM_SIZES = [
   { value: '5', label: '1–5 employees' },
@@ -141,6 +142,10 @@ export default function BusinessSignup() {
 
               <h2 className="text-white font-black text-2xl mb-1">Create Business Account</h2>
               <p className="text-slate-500 text-sm mb-6">Start your 14-day trial — no credit card required.</p>
+
+              <div className="mb-4">
+                <ChinaAccessNotice />
+              </div>
 
               {error && (
                 <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center gap-2 text-rose-400 text-sm">

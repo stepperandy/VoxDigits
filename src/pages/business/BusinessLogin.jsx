@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { Shield, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, ArrowRight, Building2 } from 'lucide-react';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
+import ChinaAccessNotice from '@/components/auth/ChinaAccessNotice';
 
 const LOGO_URL = 'https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/9d3567c74_image.png';
 
@@ -65,6 +66,10 @@ export default function BusinessLogin() {
               </div>
               <h1 className="text-white font-black text-2xl mb-1">Welcome Back</h1>
               <p className="text-slate-500 text-sm">Sign in to your business dashboard</p>
+            </div>
+
+            <div className="mb-4">
+              <ChinaAccessNotice />
             </div>
 
             {error && (
