@@ -178,24 +178,56 @@ export function LanguageProvider({ children }) {
       setDetected(true);
       return;
     }
-    // Auto-detect via IP geolocation
-    (async () => {
-      try {
-        const res = await fetch('https://ipwho.is/?fields=country_code,success');
-        const data = await res.json();
-        if (data && data.success !== false && data.country_code) {
-          const cc = data.country_code.toUpperCase();
-          setCountry(cc);
-          localStorage.setItem('voxvpn_country', cc);
-          const lang = languageForCountry(cc);
-          setLanguage(lang);
-          localStorage.setItem('voxvpn_language', lang);
-        }
-      } catch (e) {
-        // silent fallback to English
-      } finally {
-        setDetected(true);
+
+    // Race several fast geolocation providers so detection completes quickly.
+    // Each provider has a 2.5s timeout; the first one to resolve wins.
+    let done = false;
+    const finish = (cc) => {
+      if (done) return;
+      done = true;
+      if (cc) {
+        const code = cc.toUpperCase();
+        setCountry(code);
+        localStorage.setItem('voxvpn_country', code);
+        const lang = languageForCountry(code);
+        setLanguage(lang);
+        localStorage.setItem('voxvpn_language', lang);
       }
+      setDetected(true);
+    };
+
+    const withTimeout = (url, ms) =>
+      Promise.race([
+        fetch(url).then((r) => r.json()),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
+      ]);
+
+    const tryProvider = async (url, parse, ms = 2500) => {
+      try {
+        const data = await withTimeout(url, ms);
+        const cc = parse(data);
+        if (cc) return cc;
+      } catch (e) {
+        /* try next */
+      }
+      return null;
+    };
+
+    (async () => {
+      const providers = [
+        () => tryProvider('https://ipapi.co/json/', (d) => d && d.country_code),
+        () => tryProvider('https://ipwho.is/?fields=country_code,success', (d) => d && d.success !== false && d.country_code),
+        () => tryProvider('https://get.geojs.io/v1/ip/country.json', (d) => d && d.country),
+        () => tryProvider('https://ipinfo.io/json', (d) => d && d.country),
+      ];
+      for (const p of providers) {
+        const cc = await p();
+        if (cc) {
+          finish(cc);
+          return;
+        }
+      }
+      finish(null);
     })();
   }, []);
 
