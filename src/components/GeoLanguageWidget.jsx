@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Globe, X, Check, MapPin } from "lucide-react";
-import { useLanguage, LANGUAGES } from "@/lib/LanguageContext";
+import { useLanguage, LANGUAGES, countryFlag } from "@/lib/LanguageContext";
 
 /**
  * Floating geo-language switcher — sits below the AI assistant in the
@@ -55,10 +55,10 @@ export default function GeoLanguageWidget() {
             </button>
           </div>
 
-          {/* Detected country banner */}
+          {/* Detected country banner — shows the REAL country flag from the IP */}
           {country && (
             <div className="px-4 py-2 bg-white/5 border-b border-white/8 flex items-center gap-2">
-              <span className="text-lg">{current.flag}</span>
+              <span className="text-lg">{countryFlag(country)}</span>
               <p className="text-xs text-gray-400">
                 Detected: <span className="text-cyan-400 font-semibold">{country}</span> · <span className="text-white">{current.label}</span>
               </p>
@@ -104,7 +104,7 @@ export default function GeoLanguageWidget() {
         title={`${current.label} (${country || 'auto'})`}
       >
         {open ? <X className="w-5 h-5 text-cyan-400" /> : (
-          <span className="text-lg leading-none">{current.flag}</span>
+          <span className="text-lg leading-none">{country ? countryFlag(country) : current.flag}</span>
         )}
       </button>
     </div>

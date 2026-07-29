@@ -156,6 +156,14 @@ export function languageForCountry(countryCode) {
   return COUNTRY_LANGUAGE[countryCode.toUpperCase()] || 'en';
 }
 
+/** Derive a country flag emoji from an ISO 3166-1 alpha-2 code (e.g. "GH" → 🇬🇭). */
+export function countryFlag(countryCode) {
+  if (!countryCode || countryCode.length !== 2) return '🏳️';
+  return String.fromCodePoint(
+    ...[...countryCode.toUpperCase()].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65)
+  );
+}
+
 export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState('en');
   const [country, setCountry] = useState(null);
@@ -170,16 +178,17 @@ export function LanguageProvider({ children }) {
   }, [language]);
 
   useEffect(() => {
-    const saved = localStorage.getItem('voxvpn_language');
-    const savedCountry = localStorage.getItem('voxvpn_country');
-    if (saved) {
-      setLanguage(saved);
-      if (savedCountry) setCountry(savedCountry);
-      setDetected(true);
-      return;
+    // A "manual" language is one the user explicitly picked and must persist
+    // without being overwritten by auto-detection. Tracked separately from the
+    // auto-detected language so re-detection never creates a stale mismatch.
+    const manualLang = localStorage.getItem('voxvpn_language_manual');
+
+    if (manualLang) {
+      setLanguage(manualLang);
     }
 
-    // Race all geolocation providers in PARALLEL so the fastest one wins.
+    // ALWAYS re-detect the country from the IP on every load for accuracy —
+    // never trust a persisted country blindly, so "France shows France".
     let done = false;
     const finish = (cc) => {
       if (done) return;
@@ -188,9 +197,13 @@ export function LanguageProvider({ children }) {
         const code = cc.toUpperCase();
         setCountry(code);
         localStorage.setItem('voxvpn_country', code);
-        const lang = languageForCountry(code);
-        setLanguage(lang);
-        localStorage.setItem('voxvpn_language', lang);
+        // Only auto-switch the language to the country's language when the
+        // user hasn't manually chosen one.
+        if (!manualLang) {
+          const lang = languageForCountry(code);
+          setLanguage(lang);
+          localStorage.setItem('voxvpn_language', lang);
+        }
       }
       setDetected(true);
     };
@@ -233,12 +246,24 @@ export function LanguageProvider({ children }) {
   const changeLanguage = (lang) => {
     setLanguage(lang);
     localStorage.setItem('voxvpn_language', lang);
+    localStorage.setItem('voxvpn_language_manual', lang); // mark as a deliberate user choice
   };
 
   const t = (key) => translations[language]?.[key] || translations.en[key] || key;
 
   return (
-    <LanguageContext.Provider value={{ language, country, detected, changeLanguage, t, languages: LANGUAGES, rtl: RTL_LANGUAGES.has(language) }}>
+    <LanguageContext.Provider
+      value={{
+        language,
+        country,
+        detected,
+        changeLanguage,
+        t,
+        languages: LANGUAGES,
+        countryFlag,
+        rtl: RTL_LANGUAGES.has(language),
+      }}
+    >
       {children}
     </LanguageContext.Provider>
   );
