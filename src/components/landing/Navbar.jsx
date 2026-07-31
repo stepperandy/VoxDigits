@@ -54,7 +54,7 @@ export default function Navbar() {
     }
   };
 
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = ['admin', 'super_admin'].includes(user?.role);
 
   const navLinks = [
     { label: t('home'), href: '/' },
