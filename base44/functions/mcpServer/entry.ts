@@ -1,137 +1,150 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 /**
- * VoxVPN MCP Server
- * Exposes VPN server/network data as Model Context Protocol tools so that
- * AI clients (Claude Desktop, Cursor, etc.) can query the VoxVPN network.
- *
- *  GET  /mcpServer        -> server discovery (capabilities + tool list)
- *  POST /mcpServer        -> invoke a tool: { tool, arguments }
- *      tools: list_servers, recommend_server, get_server, server_status
+ * VoxVPN Streamable HTTP MCP server.
+ * Public, read-only network discovery; it never exposes VPN credentials,
+ * customer data, internal server addresses, or management endpoints.
  */
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Content-Type': 'application/json',
+  'Access-Control-Allow-Headers': 'Content-Type, Accept, Mcp-Session-Id',
+  'Access-Control-Expose-Headers': 'Mcp-Session-Id',
 };
+
+const PROTOCOL_VERSION = '2025-03-26';
 
 const TOOLS = [
   {
-    name: 'list_servers',
-    description: 'List all online VoxVPN servers, optionally limited to a count.',
+    name: 'list_voxvpn_servers',
+    description: 'List public VoxVPN server locations that are currently online. Results never include VPN credentials or server IP addresses.',
     inputSchema: {
       type: 'object',
-      properties: { limit: { type: 'number', description: 'Max servers to return (default 50, max 200)' } },
+      properties: {
+        limit: { type: 'integer', minimum: 1, maximum: 50, description: 'Maximum locations to return (default 20).' },
+        country: { type: 'string', description: 'Optional ISO 3166-1 alpha-2 country code, for example US or GB.' },
+      },
+      additionalProperties: false,
     },
   },
   {
-    name: 'recommend_server',
-    description: 'Return the least-loaded server, optionally filtered by ISO country code (e.g. US, GB).',
+    name: 'recommend_voxvpn_server',
+    description: 'Recommend the least-loaded public VoxVPN location, optionally in a requested country.',
     inputSchema: {
       type: 'object',
-      properties: { country: { type: 'string', description: 'ISO 2-letter country code' } },
+      properties: {
+        country: { type: 'string', description: 'Optional ISO 3166-1 alpha-2 country code.' },
+      },
+      additionalProperties: false,
     },
   },
   {
-    name: 'get_server',
-    description: 'Fetch a single server by its id.',
-    inputSchema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
-  },
-  {
-    name: 'server_status',
-    description: 'Return an overall network health summary (online count, countries, avg load).',
-    inputSchema: { type: 'object' },
+    name: 'get_voxvpn_network_status',
+    description: 'Get the public VoxVPN network health summary, including online location count and average load.',
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
   },
 ];
 
-function mapServer(s) {
+function publicServer(server) {
   return {
-    id: s.id,
-    name: `VoxVPN ${s.city || s.region || s.country}`,
-    region: s.region,
-    country: s.country,
-    city: s.city,
-    ip_address: s.ip_address,
-    port: s.port || 1194,
-    load: s.current_load || 0,
-    status: s.status,
-    uptime: s.uptime_percentage || 99.9,
+    id: server.id,
+    name: `VoxVPN ${server.city || server.region || server.country || 'Location'}`,
+    country: server.country || null,
+    region: server.region || null,
+    city: server.city || null,
+    load_percent: Math.round(Number(server.current_load) || 0),
+    uptime_percent: Number(server.uptime_percentage) || 99.9,
+    status: server.status || 'online',
   };
+}
+
+function rpcResult(id, result) {
+  return Response.json({ jsonrpc: '2.0', id, result }, { headers: { ...CORS, 'Content-Type': 'application/json' } });
+}
+
+function rpcError(id, code, message) {
+  return Response.json(
+    { jsonrpc: '2.0', id: id ?? null, error: { code, message } },
+    { headers: { ...CORS, 'Content-Type': 'application/json' } }
+  );
 }
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
+  if (req.method !== 'POST') return new Response('MCP endpoint: send JSON-RPC requests with POST.', { status: 405, headers: { ...CORS, Allow: 'POST, OPTIONS' } });
 
-  const base44 = createClientFromRequest(req);
+  let request;
+  try {
+    request = await req.json();
+  } catch {
+    return rpcError(null, -32700, 'Parse error');
+  }
+
+  if (!request || request.jsonrpc !== '2.0' || typeof request.method !== 'string') {
+    return rpcError(request?.id, -32600, 'Invalid JSON-RPC request');
+  }
+
+  const isNotification = request.id === undefined;
+  const respond = (result) => (isNotification ? new Response(null, { status: 202, headers: CORS }) : rpcResult(request.id, result));
 
   try {
-    // GET -> MCP discovery document
-    if (req.method === 'GET') {
-      return Response.json(
-        {
-          server: { name: 'voxvpn', version: '1.0.0', title: 'VoxVPN MCP Server' },
-          protocol: 'mcp/1.0',
-          capabilities: { tools: true },
-          tools: TOOLS,
-        },
-        { headers: CORS }
-      );
+    if (request.method === 'initialize') {
+      const requestedVersion = request.params?.protocolVersion;
+      if (!requestedVersion) return rpcError(request.id, -32602, 'protocolVersion is required');
+      return respond({
+        protocolVersion: PROTOCOL_VERSION,
+        capabilities: { tools: { listChanged: false } },
+        serverInfo: { name: 'voxvpn', version: '1.0.0', title: 'VoxVPN' },
+        instructions: 'Use these public, read-only tools to compare VoxVPN server locations and network status. Never request or expose credentials.',
+      });
     }
 
-    // POST -> tool invocation
-    if (req.method === 'POST') {
-      const body = await req.json().catch(() => ({}));
-      const tool = body.tool || body.method;
-      const args = body.arguments || body.params || {};
-
-      const servers = await base44.asServiceRole.entities.VPNServer.filter({ status: 'online' });
-
-      let result;
-      switch (tool) {
-        case 'list_servers': {
-          const limit = Math.min(parseInt(args.limit) || 50, 200);
-          const mapped = servers.map(mapServer).sort((a, b) => (a.load || 0) - (b.load || 0));
-          result = { servers: mapped.slice(0, limit), total: mapped.length };
-          break;
-        }
-        case 'recommend_server': {
-          const country = String(args.country || '').toUpperCase();
-          const pool = country ? servers.filter((s) => String(s.country || '').toUpperCase() === country) : servers;
-          const sorted = pool.map(mapServer).sort((a, b) => (a.load || 0) - (b.load || 0));
-          result = sorted.length ? sorted[0] : { message: 'No servers available for that country' };
-          break;
-        }
-        case 'get_server': {
-          if (!args.id) return Response.json({ error: 'id is required' }, { status: 400, headers: CORS });
-          const s = servers.find((x) => x.id === args.id);
-          result = s ? mapServer(s) : { error: 'Server not found' };
-          break;
-        }
-        case 'server_status': {
-          const online = servers.length;
-          const avgLoad = online ? Math.round(servers.reduce((a, s) => a + (s.current_load || 0), 0) / online) : 0;
-          const countries = new Set(servers.map((s) => s.country).filter(Boolean)).size;
-          result = {
-            online_servers: online,
-            countries,
-            avg_load: avgLoad,
-            status: online > 0 ? 'operational' : 'degraded',
-            timestamp: new Date().toISOString(),
-          };
-          break;
-        }
-        default:
-          return Response.json({ error: `Unknown tool: ${tool}`, tools: TOOLS.map((t) => t.name) }, { status: 400, headers: CORS });
-      }
-
-      return Response.json({ tool, result }, { headers: CORS });
+    if (request.method === 'notifications/initialized' || request.method === 'ping') {
+      return respond({});
     }
 
-    return Response.json({ error: 'Method not allowed' }, { status: 405, headers: CORS });
+    if (request.method === 'tools/list') {
+      return respond({ tools: TOOLS });
+    }
+
+    if (request.method !== 'tools/call') return rpcError(request.id, -32601, 'Method not found');
+
+    const name = request.params?.name;
+    const args = request.params?.arguments || {};
+    const base44 = createClientFromRequest(req);
+    const servers = await base44.asServiceRole.entities.VPNServer.filter({ status: 'online' });
+    const sorted = servers.map(publicServer).sort((a, b) => a.load_percent - b.load_percent);
+
+    if (name === 'list_voxvpn_servers') {
+      const country = String(args.country || '').trim().toUpperCase();
+      const limit = Math.max(1, Math.min(Number.parseInt(args.limit, 10) || 20, 50));
+      const locations = country ? sorted.filter((server) => String(server.country || '').toUpperCase() === country) : sorted;
+      return respond({ content: [{ type: 'text', text: JSON.stringify({ servers: locations.slice(0, limit), total: locations.length }) }] });
+    }
+
+    if (name === 'recommend_voxvpn_server') {
+      const country = String(args.country || '').trim().toUpperCase();
+      const candidate = (country ? sorted.filter((server) => String(server.country || '').toUpperCase() === country) : sorted)[0];
+      const result = candidate || { message: country ? 'No online VoxVPN location is currently available in that country.' : 'No online VoxVPN locations are currently available.' };
+      return respond({ content: [{ type: 'text', text: JSON.stringify(result) }] });
+    }
+
+    if (name === 'get_voxvpn_network_status') {
+      const loads = sorted.map((server) => server.load_percent);
+      const status = {
+        online_locations: sorted.length,
+        countries: new Set(sorted.map((server) => server.country).filter(Boolean)).size,
+        average_load_percent: loads.length ? Math.round(loads.reduce((total, load) => total + load, 0) / loads.length) : 0,
+        status: sorted.length ? 'operational' : 'degraded',
+        checked_at: new Date().toISOString(),
+      };
+      return respond({ content: [{ type: 'text', text: JSON.stringify(status) }] });
+    }
+
+    return rpcError(request.id, -32602, 'Unknown tool');
   } catch (error) {
-    console.error('mcpServer error:', error.message);
-    return Response.json({ error: error.message }, { status: 500, headers: CORS });
+    console.error('mcpServer error:', error);
+    return rpcError(request.id, -32603, 'Internal server error');
   }
 });
