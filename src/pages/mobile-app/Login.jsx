@@ -44,7 +44,7 @@ export default function Login() {
       if (data?.success === true && data?.subscription) {
         const subStatus = data.subscription.status;
         if (subStatus !== 'active' && subStatus !== 'trial') {
-          setError('Your subscription is not active. Please choose a plan at voxvpn.net to access VoxVPN.');
+          setError('Your subscription is not active. Please contact support to activate your account.');
           return;
         }
         await base44.auth.loginViaEmailPassword(email, password);

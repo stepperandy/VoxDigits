@@ -2,13 +2,17 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Home, Zap, DollarSign, User } from 'lucide-react';
 import { useTabContext } from '@/mobile/MobileTabContext';
+import { isNativeCapacitor } from '@/lib/platform';
 
-const tabs = [
+const ALL_TABS = [
   { id: 'home', label: 'Home', icon: Home, path: '/' },
   { id: 'features', label: 'Features', icon: Zap, path: '/features-mobile' },
   { id: 'pricing', label: 'Pricing', icon: DollarSign, path: '/pricing-mobile' },
   { id: 'account', label: 'Account', icon: User, path: '/account-mobile' },
 ];
+
+// Hide the Pricing tab in native app builds (no in-app purchase / external payment links).
+const tabs = isNativeCapacitor() ? ALL_TABS.filter((t) => t.id !== 'pricing') : ALL_TABS;
 
 export default function MobileBottomNav() {
   const location = useLocation();

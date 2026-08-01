@@ -1,6 +1,7 @@
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Shield, CreditCard, Check, Zap, Globe, Star } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { isNativeIOS } from '@/lib/platform';
 
 const PLANS = [
   {
@@ -30,6 +31,13 @@ const PLANS = [
 
 export default function Subscription() {
   const navigate = useNavigate();
+
+  // Apple App Store build: all subscription & payment screens are disabled.
+  useEffect(() => {
+    if (isNativeIOS()) navigate('/app/servers', { replace: true });
+  }, [navigate]);
+
+  if (isNativeIOS()) return null;
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden" style={bg}>

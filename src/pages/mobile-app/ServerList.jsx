@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { SERVER_CONFIG_MAP } from '@/lib/vpnNativePlugin';
 import { base44 } from '@/api/base44Client';
+import { isNativeIOS } from '@/lib/platform';
 
 const NAV_ITEMS = [
   { id: 'home', label: 'Dashboard', icon: Shield },
@@ -39,8 +40,10 @@ export default function ServerList() {
   const handleNav = (id) => {
     setActiveNav(id);
     if (id === 'settings') handleLogout();
-    if (id === 'subscription') navigate('/app/subscription');
+    if (id === 'subscription' && !isNativeIOS()) navigate('/app/subscription');
   };
+
+  const navItems = isNativeIOS() ? NAV_ITEMS.filter((n) => n.id !== 'subscription') : NAV_ITEMS;
 
   const handleDownloadConfig = async (server) => {
     setDownloadingConfig(server.name);
@@ -161,13 +164,15 @@ export default function ServerList() {
                   <p className="text-slate-500 text-xs">No active plan</p>
                 )}
               </div>
-              <button
-                onClick={() => navigate('/app/subscription')}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-[11px] font-semibold text-slate-300 transition-colors"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}
-              >
-                Plans <ChevronRight size={12} />
-              </button>
+              {!isNativeIOS() && (
+                <button
+                  onClick={() => navigate('/app/subscription')}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-[11px] font-semibold text-slate-300 transition-colors"
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}
+                >
+                  Plans <ChevronRight size={12} />
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -266,7 +271,7 @@ export default function ServerList() {
           borderTop: '1px solid rgba(255,255,255,0.07)',
         }}
       >
-        {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
+        {navItems.map(({ id, label, icon: Icon }) => {
           const active = activeNav === id;
           return (
             <button

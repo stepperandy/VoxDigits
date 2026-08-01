@@ -4,6 +4,7 @@ import {
   ArrowLeft, Shield, Bell, Moon, LogOut, ChevronRight,
   Info, FileText, HelpCircle, Globe, CreditCard, Download
 } from 'lucide-react';
+import { isNativeIOS } from '@/lib/platform';
 
 function ToggleRow({ icon: Icon, label, desc, value, onChange, iconColor = 'text-cyan-400' }) {
   return (
@@ -101,7 +102,8 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* Subscription & Billing */}
+        {/* Subscription & Billing — hidden on iOS App Store build (no in-app purchase) */}
+        {!isNativeIOS() && (
         <div className="rounded-3xl" style={card}>
           <div className="px-4 pt-4 pb-1">
             <p className="text-[10px] text-slate-600 uppercase tracking-[0.2em] font-bold">Subscription</p>
@@ -111,6 +113,7 @@ export default function Settings() {
             <LinkRow icon={Download} label="Download Server Configs" color="text-violet-400" onClick={() => navigate('/app/servers')} />
           </div>
         </div>
+        )}
 
         {/* App Settings */}
         <div className="rounded-3xl" style={card}>
@@ -133,6 +136,9 @@ export default function Settings() {
             <LinkRow icon={Globe} label="Privacy Policy" onClick={() => window.open('/privacy-policy', '_blank')} />
             <LinkRow icon={HelpCircle} label="Support" onClick={() => window.open('/contact', '_blank')} />
             <LinkRow icon={FileText} label="Terms of Service" onClick={() => window.open('/terms-of-service', '_blank')} />
+            {isNativeIOS() && (
+              <LinkRow icon={FileText} label="Apple EULA" onClick={() => window.open('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/', '_blank')} />
+            )}
           </div>
         </div>
 
