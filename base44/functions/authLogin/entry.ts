@@ -94,6 +94,16 @@ Deno.serve(async (req) => {
       }), { status: 200, headers: CORS });
     }
 
+    // ── iOS App Store build: free access, no purchase or subscription required ──
+    if (String(device_type || '').toLowerCase() === 'ios') {
+      return new Response(JSON.stringify({
+        success: true,
+        token,
+        user: { email: userEmail, name: authUser?.full_name || registeredUsers[0]?.full_name || null },
+        access: { tier: 'free', status: 'active' },
+      }), { status: 200, headers: CORS });
+    }
+
     // ── Step 3: Verify the user has an ACTIVE VoxVPN subscription ──
     const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
     const activeSub = subs && subs.length > 0
