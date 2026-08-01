@@ -71,9 +71,7 @@ export default function IOSSetup() {
           </div>
           <h2 className="text-white text-xl font-black mb-3">A separate iOS product path</h2>
           <p className="text-slate-300 text-sm leading-relaxed">
-            The iOS app is a free native client. It has no pricing screen, premium tier, subscription,
-            StoreKit purchase, or external checkout. The paid plans shown on the website pricing page are
-            optional web/desktop plans and are not sold or unlocked by this iOS app.
+            The iOS app has a free VPN path plus optional Premium Monthly and Premium Yearly subscriptions sold only through Apple In-App Purchase. It never opens web or external checkout for iOS digital access. The paid plans shown on the website pricing page are separate web/desktop plans and are not sold through this page.
           </p>
           <div className="flex flex-wrap gap-3 mt-5">
             <a
