@@ -34,6 +34,14 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'A valid WireGuard client public key is required' }, { status: 400, headers: CORS });
     }
 
+    const appleEntitlements = await base44.asServiceRole.entities.AppleSubscriptionEntitlement.filter({
+      user_email: user.email,
+      status: 'active',
+    });
+    const activeApple = (appleEntitlements || []).find(item =>
+      item.expires_at && new Date(item.expires_at).getTime() > Date.now()
+    );
+
     const online = await base44.asServiceRole.entities.VPNServer.filter({ status: 'online' });
     const eligible = (online || []).filter(s => s.api_token && s.ip_address && s.public_key);
     if (!eligible.length) {
@@ -83,7 +91,12 @@ Deno.serve(async (req) => {
 
     return Response.json({
       success: true,
-      access: { tier: 'free' },
+      access: {
+        tier: activeApple ? 'premium' : 'free',
+        status: 'active',
+        product_id: activeApple?.product_id || null,
+        expires_at: activeApple?.expires_at || null,
+      },
       server: {
         id: server.id,
         name: `VoxVPN ${server.city || server.region || server.country || 'Server'}`,
