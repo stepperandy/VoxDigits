@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 2.2 seconds
-Output:
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.41';
 
 const CORS = {
