@@ -64,6 +64,7 @@ export default function Navbar() {
     { label: 'eSIM', href: 'https://www.voxtelefony.com', external: true },
     { label: 'Virtual Numbers', href: 'https://www.voxtelefony.com', external: true },
     { label: t('support'), href: '/contact' },
+    { label: 'MCP', href: '/mcp' },
     { label: t('choosePlan'), href: '/pricing' },
   ];
 

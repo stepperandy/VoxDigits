@@ -135,6 +135,7 @@ const BusinessSignup = lazy(() => import('./pages/business/BusinessSignup.jsx'))
 const BusinessLogin = lazy(() => import('./pages/business/BusinessLogin.jsx'));
 const TeamDashboard = lazy(() => import('./pages/business/TeamDashboard.jsx'));
 const BusinessOnboarding = lazy(() => import('./pages/business/BusinessOnboarding.jsx'));
+const McpHub = lazy(() => import('./pages/McpHub.jsx'));
 
 const PageTransition = ({ children }) => (
   <motion.div
@@ -271,6 +272,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/business/login" element={<PageTransition><BusinessLogin /></PageTransition>} />
           <Route path="/business/setup" element={<BusinessOnboarding />} />
           <Route path="/business/dashboard" element={<TeamDashboard />} />
+          <Route path="/mcp" element={<PageTransition><McpHub /></PageTransition>} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Suspense>
