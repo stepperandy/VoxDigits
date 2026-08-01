@@ -34,7 +34,7 @@ function decodeJwsPayload<T>(signedJws: string): T {
 }
 
 function privateKeyBytes(pem: string): Uint8Array {
-  const body = pem
+  const body = pem.replace(/\\n/g, '\n')
     .replace('-----BEGIN PRIVATE KEY-----', '')
     .replace('-----END PRIVATE KEY-----', '')
     .replace(/\s/g, '');
