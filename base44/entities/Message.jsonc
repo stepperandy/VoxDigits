@@ -40,11 +40,24 @@
         "pending"
       ],
       "default": "pending",
-      "description": "Message status"
+      "description": "Message status (updated via Twilio status callbacks)"
     },
     "provider_message_id": {
       "type": "string",
-      "description": "Provider's message ID (e.g., Twilio SID)"
+      "description": "Provider's message ID (e.g., Twilio Message SID)"
+    },
+    "delivered_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When delivery was confirmed via Twilio status callback"
+    },
+    "error_code": {
+      "type": "string",
+      "description": "Twilio error code if delivery failed (e.g., 21612, 11200)"
+    },
+    "error_message": {
+      "type": "string",
+      "description": "Human-readable error message if delivery failed"
     }
   },
   "required": [

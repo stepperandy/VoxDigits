@@ -1,14 +1,13 @@
-import { useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Shield, CreditCard, Check, Zap, Globe, Star } from 'lucide-react';
-import { isNativeIOS } from '@/lib/platform';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Shield, CreditCard, Check, Zap, Lock, Globe, Wifi, Star } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const PLANS = [
   {
     name: 'Monthly',
     price: '$9.99',
     period: '/month',
-    features: ['4 Server Locations', '5 Devices', 'Unlimited Bandwidth', 'Priority Support'],
+    features: ['4 Server Locations', '5 Devices', 'Unlimited Bandwidth', 'Kill Switch', 'AES-256'],
     popular: false,
     glow: 'rgba(124,58,237,0.3)',
     accent: '#7c3aed',
@@ -20,7 +19,7 @@ const PLANS = [
     price: '$4.99',
     period: '/month',
     badge: 'Save 50%',
-    features: ['All Locations', '10 Devices', 'Unlimited Bandwidth', 'Priority Support', 'Dedicated IP'],
+    features: ['All Locations', '10 Devices', 'Unlimited Bandwidth', 'Kill Switch', 'Priority Support', 'Ad Blocker', 'Dedicated IP'],
     popular: true,
     glow: 'rgba(0,212,255,0.3)',
     accent: '#00d4ff',
@@ -31,13 +30,6 @@ const PLANS = [
 
 export default function Subscription() {
   const navigate = useNavigate();
-
-  // Apple App Store build: all subscription & payment screens are disabled.
-  useEffect(() => {
-    if (isNativeIOS()) navigate('/app/servers', { replace: true });
-  }, [navigate]);
-
-  if (isNativeIOS()) return null;
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden" style={bg}>
@@ -56,26 +48,18 @@ export default function Subscription() {
         </button>
         <div>
           <h1 className="text-white font-black text-xl leading-none">Choose a Plan</h1>
-          <p className="text-slate-500 text-xs mt-0.5">Manage your subscription</p>
+          <p className="text-slate-500 text-xs mt-0.5">Premium protection at any budget</p>
         </div>
       </div>
 
       <div className="flex-1 px-5 pb-8 flex flex-col gap-4 overflow-y-auto z-10 relative">
-
-        {/* Info banner */}
-        <div className="p-3 rounded-2xl" style={{ background: 'rgba(180,120,20,0.08)', border: '1px solid rgba(250,204,21,0.2)' }}>
-          <p className="text-slate-300 text-[11px] leading-relaxed">
-            Your subscription unlocks server configs and account features. VPN connections
-            require a compatible external client like OpenVPN Connect or WireGuard.
-          </p>
-        </div>
 
         {/* Trust badges */}
         <div className="grid grid-cols-3 gap-2">
           {[
             { icon: Shield, label: 'No Logs', color: 'text-cyan-400', glow: 'rgba(0,212,255,0.15)' },
             { icon: Zap, label: 'Ultra Fast', color: 'text-yellow-400', glow: 'rgba(250,204,21,0.15)' },
-            { icon: Globe, label: 'Global', color: 'text-violet-400', glow: 'rgba(124,58,237,0.15)' },
+            { icon: Lock, label: 'AES-256', color: 'text-violet-400', glow: 'rgba(124,58,237,0.15)' },
           ].map(({ icon: Icon, label, color, glow }) => (
             <div key={label} className="flex flex-col items-center gap-2 p-3 rounded-2xl"
               style={{ background: 'rgba(13,17,32,0.8)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(10px)', boxShadow: `0 0 20px ${glow}` }}>
@@ -154,7 +138,7 @@ export default function Subscription() {
         ))}
 
         <p className="text-center text-slate-600 text-xs pb-4">
-          Secure payment · Cancel anytime · 30-day money-back guarantee
+          🔒 Secure payment · Cancel anytime · 30-day money-back guarantee
         </p>
       </div>
     </div>
