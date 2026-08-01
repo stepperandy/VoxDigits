@@ -38,7 +38,7 @@ jobs:
       - name: Archive (unsigned, for inspection)
         run: |
           xcodebuild \
-            -workspace src/ios/App/App.xcworkspace \
+            -workspace ios/App/App.xcworkspace \
             -scheme App \
             -configuration Release \
             -destination 'generic/platform=iOS' \
@@ -46,7 +46,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            PRODUCT_BUNDLE_IDENTIFIER=com.voxvpn.mobile \
+            PRODUCT_BUNDLE_IDENTIFIER=com.base69c84f61d5543b54fe26e1e5.app \
             MARKETING_VERSION=2.0.1 \
             CURRENT_PROJECT_VERSION=4 \
             archive | xcpretty

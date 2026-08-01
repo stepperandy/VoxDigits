@@ -1,6 +1,6 @@
 # No-Mac IPA build via GitHub Actions
 
-This produces an **inspectable** VoxVPN IPA (`com.voxvpn.mobile`) on a
+This produces an **inspectable** VoxVPN IPA (`com.base69c84f61d5543b54fe26e1e5.app`) on a
 GitHub-hosted macOS runner. You download the artifact, unzip, and run the
 checks (Packet Tunnel `.appex`, entitlements, Info.plist metadata,
 Google Play / payment references).
@@ -37,7 +37,7 @@ Unzip and check:
 
 | Check | How |
 |------|-----|
-| Bundle ID | `plutil -p VoxVPN.app/Info.plist \| grep CFBundleIdentifier` → `com.voxvpn.mobile` |
+| Bundle ID | `plutil -p VoxVPN.app/Info.plist \| grep CFBundleIdentifier` → `com.base69c84f61d5543b54fe26e1e5.app` |
 | Version/build | `App-Info.plist.txt` → `CFBundleShortVersionString` / `CFBundleVersion` |
 | Entitlements | `VoxVPN.entitlements.txt` → `networkextension.packet-tunnel-provider`, `application-groups` |
 | Packet Tunnel `.appex` | `PlugIns.txt` — present only if the Tunnel target was added (step 3) |
@@ -53,7 +53,7 @@ once and commit the configured `ios/` folder:
 2. `open src/ios/App/App.xcworkspace`
 3. File → New → Target → **Network Extension → Packet Tunnel**
    - Product name: `VoxVPNTunnel`
-   - Bundle ID: `com.voxvpn.mobile.tunnel`
+   - Bundle ID: `com.base69c84f61d5543b54fe26e1e5.app.tunnel`
    - Replace its `PacketTunnelProvider.swift` with `src/ios/Tunnel/PacketTunnelProvider.swift`
    - Use `src/ios/Tunnel/Info.plist` + `src/ios/Tunnel/Tunnel.entitlements`
 4. Commit the whole `src/ios/` folder (including the new target in the `.pbxproj`)

@@ -9,7 +9,7 @@
 # Prereqs (one-time):
 #   1. npx cap add ios && npx cap sync ios
 #   2. Import your "Apple Distribution" .p12 certificate into Keychain Access.
-#   3. Download the App Store provisioning profile for com.voxvpn.mobile from
+#   3. Download the App Store provisioning profile for com.base69c84f61d5543b54fe26e1e5.app from
 #      https://developer.apple.com/account/resources/profiles/list and install
 #      it (double-click the .mobileprovision file).
 #   4. Find the profile UUID:
@@ -22,7 +22,7 @@
 #   bash scripts/build-ipa.sh
 set -euo pipefail
 
-BUNDLE_ID="com.voxvpn.mobile"
+BUNDLE_ID="com.base69c84f61d5543b54fe26e1e5.app"
 APP_VERSION="2.0.1"
 BUILD_NUMBER="4"
 

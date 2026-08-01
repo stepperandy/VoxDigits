@@ -12,11 +12,11 @@
     </array>
     <key>com.apple.security.application-groups</key>
     <array>
-        <string>group.com.voxvpn.mobile</string>
+        <string>group.com.base69c84f61d5543b54fe26e1e5.app</string>
     </array>
     <key>keychain-access-groups</key>
     <array>
-        <string>$(AppIdentifierPrefix)com.voxvpn.mobile</string>
+        <string>$(AppIdentifierPrefix)com.base69c84f61d5543b54fe26e1e5.app</string>
     </array>
 </dict>
 </plist>
