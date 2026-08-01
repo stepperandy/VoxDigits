@@ -9,8 +9,8 @@ const CORS = {
 
 const BUNDLE_ID = 'com.base69c84f61d5543b54fe26e1e5.app';
 const PRODUCT_IDS = new Set([
-  'com.voxvpn.mobile.premium.monthly',
-  'com.voxvpn.mobile.premium.yearly',
+  'com.voxvpn.premium.monthly',
+  'com.voxvpn.premium.yearly',
 ]);
 
 function base64Url(value: Uint8Array | string): string {
