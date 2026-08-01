@@ -94,13 +94,25 @@ Deno.serve(async (req) => {
       }), { status: 200, headers: CORS });
     }
 
-    // ── iOS App Store build: free access, no purchase or subscription required ──
+    // ── iOS App Store build: free access plus optional Apple Premium ──
     if (String(device_type || '').toLowerCase() === 'ios') {
+      const appleEntitlements = await base44.asServiceRole.entities.AppleSubscriptionEntitlement.filter({
+        user_email: userEmail,
+        status: 'active',
+      });
+      const activeApple = (appleEntitlements || []).find(item =>
+        item.expires_at && new Date(item.expires_at).getTime() > Date.now()
+      );
       return new Response(JSON.stringify({
         success: true,
         token,
         user: { email: userEmail, name: authUser?.full_name || registeredUsers[0]?.full_name || null },
-        access: { tier: 'free', status: 'active' },
+        access: {
+          tier: activeApple ? 'premium' : 'free',
+          status: activeApple ? 'active' : 'free',
+          product_id: activeApple?.product_id || null,
+          expires_at: activeApple?.expires_at || null,
+        },
       }), { status: 200, headers: CORS });
     }
 
