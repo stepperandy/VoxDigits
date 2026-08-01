@@ -13,6 +13,22 @@ const PRODUCT_IDS = new Set([
   'com.voxvpn.premium.yearly',
 ]);
 
+// Maps App Store product IDs to VoxVPN subscription plans (aligned with web pricing)
+const PLAN_MAP = {
+  'com.voxvpn.premium.monthly': {
+    plan: 'Pro Monthly',
+    billing_cycle: 'monthly',
+    price: 9.99,
+    max_devices: 5,
+  },
+  'com.voxvpn.premium.yearly': {
+    plan: 'Pro Annual',
+    billing_cycle: 'yearly',
+    price: 59.88,
+    max_devices: 10,
+  },
+} as const;
+
 function base64Url(value: Uint8Array | string): string {
   const bytes = typeof value === 'string' ? new TextEncoder().encode(value) : value;
   let binary = '';
@@ -162,10 +178,39 @@ Deno.serve(async (req) => {
       await base44.asServiceRole.entities.AppleSubscriptionEntitlement.create(entitlementData);
     }
 
+    // Grant / refresh the VoxVPN subscription so validateSubscription recognises Apple patrons
+    const planConfig = PLAN_MAP[productID as keyof typeof PLAN_MAP];
+    if (planConfig) {
+      const renewalDate = (expiresAt && expiresAt.getTime() > 0) ? expiresAt.toISOString() : null;
+      const subscriptionData = {
+        user_email: user.email,
+        plan: planConfig.plan,
+        status: active ? 'active' : 'expired',
+        billing_cycle: planConfig.billing_cycle,
+        price: planConfig.price,
+        max_devices: planConfig.max_devices,
+        start_date: new Date().toISOString(),
+        renewal_date: renewalDate,
+        stripe_subscription_id: `apple_${originalTransactionID}`,
+        notes: `Apple App Store · ${productID} · ${entitlementData.environment}`,
+      };
+
+      const existingSubs = await base44.asServiceRole.entities.VPNSubscription.filter({
+        user_email: user.email,
+        stripe_subscription_id: `apple_${originalTransactionID}`,
+      });
+      if (existingSubs?.[0]?.id) {
+        await base44.asServiceRole.entities.VPNSubscription.update(existingSubs[0].id, subscriptionData);
+      } else {
+        await base44.asServiceRole.entities.VPNSubscription.create(subscriptionData);
+      }
+    }
+
     return new Response(JSON.stringify({
       success: true,
       active,
       product_id: productID,
+      plan: planConfig?.plan || null,
       expires_date: entitlementData.expires_at,
     }), { status: 200, headers: CORS });
   } catch (error) {
@@ -173,4 +218,3 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: error?.message || 'Apple purchase verification failed.' }), { status: 502, headers: CORS });
   }
 });
-
