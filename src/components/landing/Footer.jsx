@@ -3,18 +3,6 @@ import SocialIcons from '@/components/landing/SocialIcons';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/lib/LanguageContext';
 
-const PAYMENT_METHODS = [
-  { label: 'Visa', src: 'https://assets.braintreegateway.com/payment_method_logo/visa.png', href: 'https://www.visa.com' },
-  { label: 'Mastercard', src: 'https://assets.braintreegateway.com/payment_method_logo/mastercard.png', href: 'https://www.mastercard.com' },
-  { label: 'American Express', src: 'https://assets.braintreegateway.com/payment_method_logo/american_express.png', href: 'https://www.americanexpress.com' },
-  { label: 'Apple Pay', src: 'https://assets.braintreegateway.com/payment_method_logo/apple_pay.png', href: 'https://www.apple.com/apple-pay' },
-  { label: 'Google Pay', src: 'https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/2142d11b1_generated_image.png', href: 'https://pay.google.com' },
-  { label: 'Alipay', src: 'https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/47ee39eed_generated_image.png', href: 'https://www.alipay.com' },
-  { label: 'WeChat Pay', src: 'https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/62e615592_generated_image.png', href: 'https://pay.weixin.qq.com' },
-  { label: 'Hubtel', src: 'https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/63028a295_generated_image.png', href: 'https://hubtel.com' },
-  { label: 'MTN MoMo', src: 'https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/532e40325_generated_image.png', href: 'https://www.mtn.com/mtn-momo/' },
-];
-
 const footerSections = [
   {
     title: 'VPN for Countries',
@@ -182,18 +170,14 @@ export default function Footer() {
 
         {/* Trust & Distribution — payment, app stores, social */}
         <div className="border-t border-white/5 pt-10 pb-8 space-y-8">
-          {/* Payment methods — individual linked icons */}
+          {/* Payment methods — full width row */}
           <div className="flex flex-col items-center gap-3">
             <span className="text-slate-600 text-[10px] font-bold uppercase tracking-widest">{t('weAccept')}</span>
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              {PAYMENT_METHODS.map((m) => (
-                <a key={m.label} href={m.href} target="_blank" rel="noopener noreferrer"
-                  title={m.label} aria-label={m.label}
-                  className="bg-white rounded-lg px-2 py-1.5 border border-white/10 hover:opacity-80 transition-opacity">
-                  <img src={m.src} alt={m.label} className="h-8 w-auto object-contain" />
-                </a>
-              ))}
-            </div>
+            <img
+              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/182a72da5_FINALPAYICON.png"
+              alt="Payment Methods: Visa, Mastercard, Amex, Apple Pay, Google Pay, Hubtel, Alipay, WeChat Pay, MTN MoMo"
+              className="h-[54px] w-auto object-contain mix-blend-screen"
+            />
           </div>
 
           {/* App stores + Social — two columns */}
