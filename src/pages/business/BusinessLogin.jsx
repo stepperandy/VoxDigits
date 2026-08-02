@@ -9,6 +9,7 @@ import {
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import ChinaAccessNotice from '@/components/auth/ChinaAccessNotice';
+import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 import { LanguageContext } from '@/lib/LanguageContext';
 
 const LOGO_URL = 'https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/9d3567c74_image.png';
@@ -284,6 +285,7 @@ export default function BusinessLogin() {
                   </div>
                 </form>
               ) : (
+                <>
                 <form onSubmit={isSignup ? handleSignup : handleLogin} className="space-y-4">
                   {isSignup && (
                     <>
@@ -389,6 +391,17 @@ export default function BusinessLogin() {
                     )
                   )}
                 </form>
+
+                {/* Social login — lands on the business dashboard */}
+                <div className="mt-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex-1 h-px bg-white/10" />
+                    <span className="text-slate-600 text-xs font-medium">or continue with</span>
+                    <div className="flex-1 h-px bg-white/10" />
+                  </div>
+                  <SocialLoginButtons redirectUrl="/business/dashboard" />
+                </div>
+                </>
               )}
 
               <div className="flex items-center justify-center gap-2 mt-6 text-slate-600 text-xs">
