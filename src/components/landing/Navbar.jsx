@@ -71,7 +71,6 @@ export default function Navbar() {
       { label: 'Contact Us', href: '/contact' },
       { label: 'AI Assistant', action: 'assistant' },
     ]},
-    { label: t('choosePlan'), href: '/pricing' },
   ];
 
   const openAssistant = () => window.dispatchEvent(new CustomEvent('open-voxvpn-assistant'));
@@ -238,13 +237,7 @@ export default function Navbar() {
                 to="/business/login"
                 className="px-3 py-1.5 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 text-xs font-semibold rounded-full transition-all whitespace-nowrap"
               >
-                Business Login
-              </Link>
-              <Link
-                to="/business"
-                className="px-3 py-1.5 bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-bold rounded-full transition-all shadow-lg shadow-cyan-500/20 whitespace-nowrap"
-              >
-                Business Sign Up
+                Business
               </Link>
               <Link
                 to="/pricing"
@@ -346,10 +339,7 @@ export default function Navbar() {
                 )}
               </div>
               <Link to="/business/login" onClick={() => setMobileOpen(false)} className="block py-2 text-center border border-cyan-500/30 text-cyan-400 text-sm font-semibold rounded-full">
-                Business Login
-              </Link>
-              <Link to="/business" onClick={() => setMobileOpen(false)} className="block py-2 text-center bg-cyan-400 text-black text-sm font-bold rounded-full">
-                Business Sign Up
+                Business
               </Link>
               <Link to="/pricing" onClick={() => setMobileOpen(false)} className="block mt-1 py-2 text-center bg-white/10 text-white text-sm font-semibold rounded-full border border-white/10">
                 {t('choosePlan')}
