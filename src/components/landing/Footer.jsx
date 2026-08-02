@@ -60,6 +60,18 @@ const footerSections = [
     ],
   },
   {
+    title: 'Company',
+    links: [
+      { label: 'About Us', to: '/about' },
+      { label: 'Help Center', to: '/help-center' },
+      { label: 'Contact Us', to: '/contact' },
+      { label: 'Server Status', to: '/status' },
+      { label: 'Bug Bounty', to: '/bug-bounty' },
+      { label: 'Careers', to: '/careers' },
+      { label: 'Media Kit', to: '/media-kit' },
+    ],
+  },
+  {
     title: 'Resources',
     links: [
       { label: 'Blog & Guides', to: '/blog' },
@@ -69,54 +81,16 @@ const footerSections = [
     ],
   },
   {
-    title: 'eSIM Providers',
-    links: [
-      { label: 'VoxGO', external: 'https://www.voxtelefony.com' },
-      { label: 'VoxAIR', external: 'https://www.voxtelefony.com' },
-      { label: 'VoxZen', external: 'https://www.voxtelefony.com' },
-    ],
-  },
-  {
-    title: 'Payment',
-    links: [
-      { label: 'Credit Card', to: '/', hash: 'pricing' },
-      { label: 'PayPal', to: '/', hash: 'pricing' },
-      { label: 'Crypto', to: '/', hash: 'pricing' },
-      { label: 'Bank Transfer', to: '/', hash: 'pricing' },
-    ],
-  },
-  {
-    title: 'Company',
-    links: [
-      { label: 'About Us', to: '/about' },
-      { label: 'Help Center', to: '/help-center' },
-      { label: 'Contact Us', to: '/contact' },
-      { label: 'Server Status', to: '/status' },
-      { label: 'Bug Bounty', to: '/bug-bounty' },
-      { label: 'Careers', to: '/careers' },
-      { label: 'Press Page', to: '/press' },
-      { label: 'Media Kit', to: '/media-kit' },
-    ],
-  },
-  {
-    title: 'Trust & Transparency',
-    links: [
-      { label: 'Security', to: '/security' },
-      { label: 'Security Audit', to: '/security-audit' },
-      { label: 'Transparency Report', to: '/transparency-report' },
-      { label: 'Server Status', to: '/status' },
-      { label: 'No-Logs Policy', to: '/no-logs-policy' },
-      { label: 'Acceptable Use Policy', to: '/acceptable-use-policy' },
-    ],
-  },
-  {
-    title: 'Legal',
+    title: 'Legal & Trust',
     links: [
       { label: 'Privacy Policy', to: '/privacy-policy' },
       { label: 'Terms of Service', to: '/terms-of-service' },
       { label: 'Acceptable Use Policy', to: '/acceptable-use-policy' },
       { label: 'Cookie Policy', to: '/cookie-policy' },
       { label: 'Refund Policy', to: '/refund-policy' },
+      { label: 'Security', to: '/security' },
+      { label: 'Security Audit', to: '/security-audit' },
+      { label: 'Transparency Report', to: '/transparency-report' },
     ],
   },
 ];
@@ -178,7 +152,7 @@ export default function Footer() {
           </div>
 
           {/* All link columns — responsive grid */}
-          <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-8">
+          <div className="flex-1 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-x-6 gap-y-8">
             {footerSections.map((section) => (
               <div key={section.title}>
                 <h4 className="text-white text-xs font-bold mb-3 uppercase tracking-wider">{section.title}</h4>
