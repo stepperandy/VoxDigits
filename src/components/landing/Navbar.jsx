@@ -1,4 +1,4 @@
-import { Menu, X, LogOut, Shield, Globe, MessageCircle } from 'lucide-react';
+import { Menu, X, LogOut, Shield, Globe, MessageCircle, ChevronDown } from 'lucide-react';
 import { useState, useEffect, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -22,6 +22,7 @@ export default function Navbar() {
   const [activeHash, setActiveHash] = useState('');
   const [announcementVisible, setAnnouncementVisible] = useState(true);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -59,14 +60,21 @@ export default function Navbar() {
   const navLinks = [
     { label: t('home'), href: '/' },
     { label: t('features'), href: '#features' },
-    { label: t('servers'), href: '#servers' },
+    { label: t('servers'), children: [
+      { label: 'VPN Servers', href: '#servers' },
+      { label: 'MCP Hub', href: '/mcp' },
+    ]},
     { label: t('pricing'), href: '/pricing' },
     { label: 'eSIM', href: 'https://www.voxtelefony.com', external: true },
     { label: 'Virtual Numbers', href: 'https://www.voxtelefony.com', external: true },
-    { label: t('support'), href: '/contact' },
-    { label: 'MCP', href: '/mcp' },
+    { label: t('support'), children: [
+      { label: 'Contact Us', href: '/contact' },
+      { label: 'AI Assistant', action: 'assistant' },
+    ]},
     { label: t('choosePlan'), href: '/pricing' },
   ];
+
+  const openAssistant = () => window.dispatchEvent(new CustomEvent('open-voxvpn-assistant'));
 
   return (
     <header className="fixed top-0 w-full z-50">
@@ -86,10 +94,56 @@ export default function Navbar() {
             {/* Desktop nav — centered */}
             <div className="hidden md:flex items-center justify-center gap-1 flex-1">
               {navLinks.map((link) => {
-                const active = isActive(link.href);
+                const active = link.href ? isActive(link.href) : false;
                 const cls = `px-2.5 py-1.5 text-xs font-medium transition-all whitespace-nowrap ${
                   active ? 'text-white' : 'text-slate-400 hover:text-white'
                 }`;
+                if (link.children) {
+                  const isOpen = openDropdown === link.label;
+                  return (
+                    <div key={link.label} className="relative"
+                      onMouseEnter={() => setOpenDropdown(link.label)}
+                      onMouseLeave={() => setOpenDropdown(null)}>
+                      <button
+                        onClick={() => setOpenDropdown(isOpen ? null : link.label)}
+                        className={`flex items-center gap-1 ${cls}`}
+                      >
+                        {link.label} <ChevronDown size={12} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                      {isOpen && (
+                        <div className="absolute top-full left-0 mt-1 bg-[#0d1120] border border-white/10 rounded-lg shadow-lg z-50 min-w-44">
+                          {link.children.map((child) => {
+                            if (child.action === 'assistant') {
+                              return (
+                                <button
+                                  key={child.label}
+                                  onClick={() => { openAssistant(); setOpenDropdown(null); }}
+                                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-400 hover:bg-white/5 hover:text-cyan-400 transition-colors text-left"
+                                >
+                                  <MessageCircle size={14} /> {child.label}
+                                </button>
+                              );
+                            }
+                            if (child.href.startsWith('#')) {
+                              return (
+                                <a key={child.label} href={child.href} onClick={() => { handleNavClick(child.href); setOpenDropdown(null); }}
+                                  className="block px-4 py-2 text-sm text-slate-400 hover:bg-white/5 hover:text-white transition-colors">
+                                  {child.label}
+                                </a>
+                              );
+                            }
+                            return (
+                              <Link key={child.label} to={child.href} onClick={() => setOpenDropdown(null)}
+                                className="block px-4 py-2 text-sm text-slate-400 hover:bg-white/5 hover:text-white transition-colors">
+                                {child.label}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
                 if (link.external) {
                   return (
                     <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className={cls}>
@@ -112,15 +166,6 @@ export default function Navbar() {
                   Admin
                 </Link>
               )}
-
-              {/* AI Assistant */}
-              <button
-                onClick={() => window.dispatchEvent(new CustomEvent('open-voxvpn-assistant'))}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-cyan-400 hover:text-cyan-300 transition-all"
-                title={t('aiAssistant')}
-              >
-                <MessageCircle size={14} /> {t('aiAssistant')}
-              </button>
 
               {/* Language dropdown */}
               <div className="relative">
@@ -219,8 +264,31 @@ export default function Navbar() {
           {mobileOpen && (
             <div className="md:hidden pb-4 space-y-1 pt-2 border-t border-white/10">
               {navLinks.map((link) => {
-                const active = isActive(link.href);
+                const active = link.href ? isActive(link.href) : false;
                 const cls = `block px-3 py-2 rounded text-sm font-medium transition-colors ${active ? 'text-cyan-400' : 'text-slate-300 hover:text-white'}`;
+                if (link.children) {
+                  return (
+                    <div key={link.label}>
+                      <p className="px-3 pt-2 pb-1 text-slate-500 text-xs uppercase tracking-wider">{link.label}</p>
+                      <div className="space-y-0.5 pl-2">
+                        {link.children.map((child) => {
+                          if (child.action === 'assistant') {
+                            return (
+                              <button key={child.label} onClick={() => { openAssistant(); setMobileOpen(false); }}
+                                className="w-full flex items-center gap-2 px-3 py-2 rounded text-sm font-medium text-cyan-400 hover:bg-white/5 transition-colors text-left">
+                                <MessageCircle size={14} /> {child.label}
+                              </button>
+                            );
+                          }
+                          if (child.href.startsWith('#')) {
+                            return <a key={child.label} href={child.href} onClick={() => handleNavClick(child.href)} className="block px-3 py-2 rounded text-sm font-medium text-slate-300 hover:text-white transition-colors">{child.label}</a>;
+                          }
+                          return <Link key={child.label} to={child.href} onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded text-sm font-medium text-slate-300 hover:text-white transition-colors">{child.label}</Link>;
+                        })}
+                      </div>
+                    </div>
+                  );
+                }
                 if (link.external) {
                   return <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className={cls}>{link.label}</a>;
                 }
