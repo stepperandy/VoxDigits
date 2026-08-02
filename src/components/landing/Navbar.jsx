@@ -110,34 +110,36 @@ export default function Navbar() {
                         {link.label} <ChevronDown size={12} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                       </button>
                       {isOpen && (
-                        <div className="absolute top-full left-0 mt-1 bg-[#0d1120] border border-white/10 rounded-lg shadow-lg z-50 min-w-44">
-                          {link.children.map((child) => {
-                            if (child.action === 'assistant') {
+                        <div className="absolute top-full left-0 pt-1 z-50 min-w-44">
+                          <div className="bg-[#0d1120] border border-white/10 rounded-lg shadow-lg">
+                            {link.children.map((child) => {
+                              if (child.action === 'assistant') {
+                                return (
+                                  <button
+                                    key={child.label}
+                                    onClick={() => { openAssistant(); setOpenDropdown(null); }}
+                                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-400 hover:bg-white/5 hover:text-cyan-400 transition-colors text-left"
+                                  >
+                                    <MessageCircle size={14} /> {child.label}
+                                  </button>
+                                );
+                              }
+                              if (child.href.startsWith('#')) {
+                                return (
+                                  <a key={child.label} href={child.href} onClick={() => { handleNavClick(child.href); setOpenDropdown(null); }}
+                                    className="block px-4 py-2 text-sm text-slate-400 hover:bg-white/5 hover:text-white transition-colors">
+                                    {child.label}
+                                  </a>
+                                );
+                              }
                               return (
-                                <button
-                                  key={child.label}
-                                  onClick={() => { openAssistant(); setOpenDropdown(null); }}
-                                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-400 hover:bg-white/5 hover:text-cyan-400 transition-colors text-left"
-                                >
-                                  <MessageCircle size={14} /> {child.label}
-                                </button>
-                              );
-                            }
-                            if (child.href.startsWith('#')) {
-                              return (
-                                <a key={child.label} href={child.href} onClick={() => { handleNavClick(child.href); setOpenDropdown(null); }}
+                                <Link key={child.label} to={child.href} onClick={() => setOpenDropdown(null)}
                                   className="block px-4 py-2 text-sm text-slate-400 hover:bg-white/5 hover:text-white transition-colors">
                                   {child.label}
-                                </a>
+                                </Link>
                               );
-                            }
-                            return (
-                              <Link key={child.label} to={child.href} onClick={() => setOpenDropdown(null)}
-                                className="block px-4 py-2 text-sm text-slate-400 hover:bg-white/5 hover:text-white transition-colors">
-                                {child.label}
-                              </Link>
-                            );
-                          })}
+                            })}
+                          </div>
                         </div>
                       )}
                     </div>
