@@ -3,6 +3,19 @@ import SocialIcons from '@/components/landing/SocialIcons';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/lib/LanguageContext';
 
+const PAYMENT_PROVIDERS = [
+  { name: 'Visa', url: 'https://www.visa.com' },
+  { name: 'Mastercard', url: 'https://www.mastercard.com' },
+  { name: 'Amex', url: 'https://www.americanexpress.com' },
+  { name: 'PayPal', url: 'https://www.paypal.com' },
+  { name: 'Apple Pay', url: 'https://www.apple.com/apple-pay' },
+  { name: 'Google Pay', url: 'https://pay.google.com' },
+  { name: 'Hubtel', url: 'https://hubtel.com' },
+  { name: 'Alipay', url: 'https://www.alipay.com' },
+  { name: 'WeChat Pay', url: 'https://pay.weixin.qq.com' },
+  { name: 'MTN MoMo', url: 'https://www.mtn.com/mtn-mobile-money' },
+];
+
 const footerSections = [
   {
     title: 'VPN for Countries',
@@ -170,14 +183,18 @@ export default function Footer() {
 
         {/* Trust & Distribution — payment, app stores, social */}
         <div className="border-t border-white/5 pt-10 pb-8 space-y-8">
-          {/* Payment methods — full width row */}
+          {/* Payment methods — individual provider links */}
           <div className="flex flex-col items-center gap-3">
             <span className="text-slate-600 text-[10px] font-bold uppercase tracking-widest">{t('weAccept')}</span>
-            <img
-              src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/182a72da5_FINALPAYICON.png"
-              alt="Payment Methods: Visa, Mastercard, Amex, Apple Pay, Google Pay, Hubtel, Alipay, WeChat Pay, MTN MoMo"
-              className="h-[54px] w-auto object-contain mix-blend-screen"
-            />
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {PAYMENT_PROVIDERS.map((p) => (
+                <a key={p.name} href={p.url} target="_blank" rel="noopener noreferrer"
+                  title={p.name}
+                  className="flex items-center justify-center h-11 w-16 px-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-cyan-500/30 transition-all">
+                  <span className="text-white/80 text-[10px] font-bold leading-tight text-center">{p.name}</span>
+                </a>
+              ))}
+            </div>
           </div>
 
           {/* App stores + Social — two columns */}
