@@ -60,7 +60,7 @@ export default function BusinessLogin() {
 
   const goToDashboard = (next) => {
     const params = new URLSearchParams(window.location.search);
-    window.location.href = params.get('next') || next || '/business/dashboard';
+    window.location.href = params.get('next') || next || '/dashboard';
   };
 
   // ---- LOGIN ----
@@ -399,7 +399,7 @@ export default function BusinessLogin() {
                     <span className="text-slate-600 text-xs font-medium">or continue with</span>
                     <div className="flex-1 h-px bg-white/10" />
                   </div>
-                  <SocialLoginButtons redirectUrl="/business/dashboard" />
+                  <SocialLoginButtons redirectUrl="/dashboard" />
                 </div>
                 </>
               )}
