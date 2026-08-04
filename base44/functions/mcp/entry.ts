@@ -1,352 +1,494 @@
 /**
- * VoxDigits MCP (Model Context Protocol) Server
- * Exposes VoxDigits capabilities as AI-callable tools via JSON-RPC 2.0
+ * VoxTelefony public MCP server.
  *
- * Endpoint: /mcp
- * Protocol: MCP over HTTP (Streamable HTTP transport)
- *
- * Tools exposed:
- *  - search_numbers        Search available virtual numbers by country/type
- *  - get_pricing           Get pricing for a number, call, or SMS category
- *  - get_esim_plans        List available eSIM data plans
- *  - get_account_balance   Get a user's wallet balance (requires API key)
- *  - send_sms              Send an SMS from a virtual number (requires API key)
- *  - list_virtual_numbers  List virtual numbers owned by a user (requires API key)
- *  - get_call_rates        Get per-minute call rates for a destination country
+ * This first marketplace release is intentionally read-only. It exposes public
+ * availability and retail-pricing information only; it does not expose account
+ * data, credentials, call or message content, or tools that create side effects.
  */
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 
 const SERVER_INFO = {
-  name: "voxdigits",
-  version: "1.0.0",
-  description: "VoxDigits MCP Server — virtual numbers, eSIMs, calling & SMS",
+  name: 'voxtelefony',
+  title: 'VoxTelefony',
+  version: '1.1.0',
+  description: 'Find virtual phone numbers, eSIM plans, and retail voice or messaging rates from VoxTelefony.',
+};
+
+const READ_ONLY_ANNOTATIONS = {
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+  // Results come from live carrier and product catalogues outside ChatGPT.
+  openWorldHint: true,
 };
 
 const TOOLS = [
   {
-    name: "search_numbers",
-    description: "Search available virtual phone numbers by country and type. Returns a list of available numbers with pricing.",
+    name: 'search_virtual_numbers',
+    title: 'Search virtual numbers',
+    description: 'Search the live VoxTelefony catalogue for virtual phone numbers available in a specified country. This only checks availability and does not reserve or purchase a number.',
+    annotations: READ_ONLY_ANNOTATIONS,
     inputSchema: {
-      type: "object",
+      type: 'object',
+      additionalProperties: false,
       properties: {
-        country_code: { type: "string", description: "ISO 2-letter country code (e.g. US, GB, CA, AU, DE)" },
-        number_type: { type: "string", enum: ["local", "toll_free", "mobile", "national"], description: "Type of number", default: "local" },
-        area_code: { type: "string", description: "Optional area code filter (e.g. 212 for NYC)" },
+        country_code: {
+          type: 'string',
+          pattern: '^[A-Za-z]{2}$',
+          description: 'ISO 3166-1 alpha-2 country code, such as US, GB, or CA.',
+        },
+        number_type: {
+          type: 'string',
+          enum: ['local', 'toll_free', 'mobile', 'national'],
+          default: 'local',
+          description: 'The type of virtual number to search for.',
+        },
+        area_code: {
+          type: 'string',
+          pattern: '^[0-9]{1,8}$',
+          description: 'Optional numeric area or destination code, without spaces or punctuation.',
+        },
       },
-      required: ["country_code"],
+      required: ['country_code'],
+    },
+    outputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        country_code: { type: 'string' },
+        number_type: { type: 'string' },
+        count: { type: 'integer' },
+        currency: { type: 'string' },
+        numbers: {
+          type: 'array',
+          items: {
+            type: 'object',
+            additionalProperties: false,
+            properties: {
+              phone_number: { type: 'string' },
+              country_code: { type: 'string' },
+              number_type: { type: 'string' },
+              locality: { type: 'string' },
+              voice_enabled: { type: 'boolean' },
+              sms_enabled: { type: 'boolean' },
+              monthly_price: { type: ['number', 'null'] },
+            },
+            required: ['phone_number', 'country_code', 'number_type', 'locality', 'voice_enabled', 'sms_enabled', 'monthly_price'],
+          },
+        },
+      },
+      required: ['country_code', 'number_type', 'count', 'currency', 'numbers'],
     },
   },
   {
-    name: "get_pricing",
-    description: "Get VoxDigits pricing for numbers, calls, or SMS for a given country. Returns buy cost, sell price, and reseller price.",
+    name: 'get_service_pricing',
+    title: 'Get service pricing',
+    description: 'Get current VoxTelefony retail pricing for a supported number, calling, messaging, or eSIM category in a country. This only retrieves pricing and does not start a purchase.',
+    annotations: READ_ONLY_ANNOTATIONS,
     inputSchema: {
-      type: "object",
+      type: 'object',
+      additionalProperties: false,
       properties: {
         category: {
-          type: "string",
-          enum: ["number_local", "number_tollfree", "number_mobile", "call_outbound", "call_inbound", "sms_outbound", "sms_inbound", "esim_data"],
-          description: "Pricing category",
+          type: 'string',
+          enum: ['number_local', 'number_tollfree', 'number_mobile', 'call_outbound', 'call_inbound', 'sms_outbound', 'sms_inbound', 'esim_data'],
+          description: 'The service category whose retail price should be retrieved.',
         },
-        country_code: { type: "string", description: "ISO 2-letter country code or * for global default" },
+        country_code: {
+          type: 'string',
+          pattern: '^([A-Za-z]{2}|\\*)$',
+          description: 'ISO 3166-1 alpha-2 country code, or * for a global default where supported.',
+        },
       },
-      required: ["category", "country_code"],
+      required: ['category', 'country_code'],
+    },
+    outputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        category: { type: 'string' },
+        country_code: { type: 'string' },
+        currency: { type: 'string' },
+        retail_price: { type: ['number', 'null'] },
+        activation_fee: { type: ['number', 'null'] },
+        billing_increment_seconds: { type: ['number', 'null'] },
+      },
+      required: ['category', 'country_code', 'currency', 'retail_price', 'activation_fee', 'billing_increment_seconds'],
     },
   },
   {
-    name: "get_esim_plans",
-    description: "List available eSIM data plans. Returns plans with country, data amount, duration, and price.",
+    name: 'list_esim_plans',
+    title: 'List eSIM plans',
+    description: 'List active VoxTelefony eSIM data plans, optionally filtered by country. This only retrieves plan information and does not order or activate an eSIM.',
+    annotations: READ_ONLY_ANNOTATIONS,
     inputSchema: {
-      type: "object",
+      type: 'object',
+      additionalProperties: false,
       properties: {
-        country_code: { type: "string", description: "Optional filter by ISO country code" },
+        country_code: {
+          type: 'string',
+          pattern: '^[A-Za-z]{2}$',
+          description: 'Optional ISO 3166-1 alpha-2 country code.',
+        },
       },
+    },
+    outputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        country_code: { type: ['string', 'null'] },
+        count: { type: 'integer' },
+        currency: { type: 'string' },
+        plans: {
+          type: 'array',
+          items: {
+            type: 'object',
+            additionalProperties: false,
+            properties: {
+              plan_id: { type: 'string' },
+              name: { type: 'string' },
+              country: { type: 'string' },
+              country_code: { type: 'string' },
+              data_gb: { type: ['number', 'null'] },
+              duration_days: { type: ['number', 'null'] },
+              retail_price: { type: ['number', 'null'] },
+            },
+            required: ['plan_id', 'name', 'country', 'country_code', 'data_gb', 'duration_days', 'retail_price'],
+          },
+        },
+      },
+      required: ['country_code', 'count', 'currency', 'plans'],
     },
   },
   {
-    name: "get_call_rates",
-    description: "Get per-minute call rates for outbound and inbound calls to/from a country.",
+    name: 'get_call_rates',
+    title: 'Get call rates',
+    description: 'Get current VoxTelefony retail inbound and outbound per-minute calling rates for a country. This only retrieves rates and does not place a call.',
+    annotations: READ_ONLY_ANNOTATIONS,
     inputSchema: {
-      type: "object",
+      type: 'object',
+      additionalProperties: false,
       properties: {
-        country_code: { type: "string", description: "ISO 2-letter country code (e.g. US, GB)" },
+        country_code: {
+          type: 'string',
+          pattern: '^[A-Za-z]{2}$',
+          description: 'ISO 3166-1 alpha-2 country code, such as US or GB.',
+        },
       },
-      required: ["country_code"],
+      required: ['country_code'],
     },
-  },
-  {
-    name: "get_account_balance",
-    description: "Get the wallet balance for a VoxDigits user account. Requires the user's API key.",
-    inputSchema: {
-      type: "object",
+    outputSchema: {
+      type: 'object',
+      additionalProperties: false,
       properties: {
-        api_key: { type: "string", description: "VoxDigits account API key (user email:credits format or session token)" },
+        country_code: { type: 'string' },
+        currency: { type: 'string' },
+        outbound_per_minute: { type: ['number', 'null'] },
+        inbound_per_minute: { type: ['number', 'null'] },
+        billing_increment_seconds: { type: 'number' },
       },
-      required: ["api_key"],
-    },
-  },
-  {
-    name: "list_virtual_numbers",
-    description: "List all virtual numbers owned by a VoxDigits user. Requires user email.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        user_email: { type: "string", description: "Registered VoxDigits user email address" },
-      },
-      required: ["user_email"],
-    },
-  },
-  {
-    name: "send_sms",
-    description: "Send an SMS message from a VoxDigits virtual number to any destination.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        from_number: { type: "string", description: "VoxDigits virtual number in E.164 format (e.g. +12125551234)" },
-        to_number: { type: "string", description: "Destination phone number in E.164 format" },
-        message: { type: "string", description: "SMS message body (max 1600 chars)" },
-        user_email: { type: "string", description: "Owning user email for billing" },
-      },
-      required: ["from_number", "to_number", "message", "user_email"],
+      required: ['country_code', 'currency', 'outbound_per_minute', 'inbound_per_minute', 'billing_increment_seconds'],
     },
   },
 ];
 
-// ── Tool handlers ─────────────────────────────────────────────────────────────
+const ALLOWED_NUMBER_TYPES = new Set(['local', 'toll_free', 'mobile', 'national']);
+const ALLOWED_CATEGORIES = new Set(['number_local', 'number_tollfree', 'number_mobile', 'call_outbound', 'call_inbound', 'sms_outbound', 'sms_inbound', 'esim_data']);
 
-async function handleSearchNumbers(base44, input) {
-  const { country_code, number_type = "local", area_code } = input;
-  const telnyxKey = Deno.env.get("TELNYX_API_KEY");
-  if (!telnyxKey) return { error: "Telnyx not configured" };
-
-  const params = new URLSearchParams({ filter_country_code: country_code, filter_number_type: number_type, page_size: "10" });
-  if (area_code) params.append("filter_national_destination_code", area_code);
-
-  const res = await fetch(`https://api.telnyx.com/v2/available_phone_numbers?${params}`, {
-    headers: { Authorization: `Bearer ${telnyxKey}` },
-  });
-  const json = await res.json();
-  const numbers = (json.data || []).slice(0, 10).map(n => ({
-    phone_number: n.phone_number,
-    country: n.country_code,
-    type: n.number_type,
-    city: n.locality || n.administrative_area || "",
-    voice_enabled: n.features?.some(f => f.name === "voice"),
-    sms_enabled: n.features?.some(f => f.name === "sms"),
-    monthly_fee_usd: null, // resolved from pricing engine
-  }));
-
-  // Enrich with pricing
-  const priceRes = await base44.asServiceRole.functions.invoke("pricingEngine", {
-    action: "lookup", category: `number_${number_type}`, country_code,
-  });
-  const monthly_fee = priceRes?.sell_price || null;
-  return { numbers: numbers.map(n => ({ ...n, monthly_fee_usd: monthly_fee })), count: numbers.length };
+function normalizeCountryCode(value, allowGlobal = false) {
+  const countryCode = String(value || '').trim().toUpperCase();
+  if (allowGlobal && countryCode === '*') return countryCode;
+  if (!/^[A-Z]{2}$/.test(countryCode)) {
+    throw new Error('country_code must be a two-letter ISO country code.');
+  }
+  return countryCode;
 }
 
-async function handleGetPricing(base44, input) {
-  const { category, country_code } = input;
-  const res = await base44.asServiceRole.functions.invoke("pricingEngine", {
-    action: "lookup", category, country_code,
+function asNullableNumber(value) {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : null;
+}
+
+async function handleSearchVirtualNumbers(base44, input) {
+  const countryCode = normalizeCountryCode(input.country_code);
+  const numberType = String(input.number_type || 'local');
+  if (!ALLOWED_NUMBER_TYPES.has(numberType)) {
+    throw new Error('number_type is not supported.');
+  }
+
+  const areaCode = input.area_code == null ? '' : String(input.area_code).trim();
+  if (areaCode && !/^[0-9]{1,8}$/.test(areaCode)) {
+    throw new Error('area_code must contain 1 to 8 digits.');
+  }
+
+  const carrierApiKey = Deno.env.get('TELNYX_API_KEY');
+  if (!carrierApiKey) {
+    throw new Error('Number availability is temporarily unavailable.');
+  }
+
+  const params = new URLSearchParams({
+    'filter[country_code]': countryCode,
+    'filter[number_type]': numberType,
+    'page[size]': '10',
   });
-  if (!res?.success) return { error: `No pricing found for ${category} / ${country_code}` };
+  if (areaCode) params.set('filter[national_destination_code]', areaCode);
+
+  const response = await fetch(`https://api.telnyx.com/v2/available_phone_numbers?${params.toString()}`, {
+    headers: { Authorization: `Bearer ${carrierApiKey}` },
+  });
+  if (!response.ok) {
+    console.error('[mcp] carrier availability request failed', response.status);
+    throw new Error('Number availability could not be retrieved right now.');
+  }
+
+  const payload = await response.json();
+  const pricing = await base44.asServiceRole.functions.invoke('pricingEngine', {
+    action: 'lookup',
+    category: `number_${numberType === 'toll_free' ? 'tollfree' : numberType}`,
+    country_code: countryCode,
+  });
+  const monthlyPrice = asNullableNumber(pricing?.sell_price);
+
+  const numbers = (payload?.data || []).slice(0, 10).map((item) => ({
+    phone_number: String(item?.phone_number || ''),
+    country_code: String(item?.country_code || countryCode),
+    number_type: String(item?.number_type || numberType),
+    locality: String(item?.locality || item?.administrative_area || ''),
+    voice_enabled: Array.isArray(item?.features) && item.features.some((feature) => feature?.name === 'voice'),
+    sms_enabled: Array.isArray(item?.features) && item.features.some((feature) => feature?.name === 'sms'),
+    monthly_price: monthlyPrice,
+  }));
+
   return {
-    category: res.category,
-    country_code: res.country_code,
-    buy_cost_usd: res.buy_cost,
-    sell_price_usd: res.sell_price,
-    margin_pct: res.margin,
-    activation_fee_usd: res.activation_fee,
-    billing_increment_secs: res.billing_increment_secs,
+    country_code: countryCode,
+    number_type: numberType,
+    count: numbers.length,
+    currency: 'USD',
+    numbers,
   };
 }
 
-async function handleGetEsimPlans(base44, input) {
-  const { country_code } = input;
-  const filter = country_code ? { country_code, is_active: true } : { is_active: true };
-  const plans = await base44.asServiceRole.entities.ESimProduct.filter(filter, "price", 20);
+async function handleGetServicePricing(base44, input) {
+  const category = String(input.category || '').trim();
+  if (!ALLOWED_CATEGORIES.has(category)) {
+    throw new Error('category is not supported.');
+  }
+  const countryCode = normalizeCountryCode(input.country_code, true);
+  const pricing = await base44.asServiceRole.functions.invoke('pricingEngine', {
+    action: 'lookup',
+    category,
+    country_code: countryCode,
+  });
+
+  if (!pricing?.success) {
+    throw new Error('Pricing is not available for that category and country.');
+  }
+
   return {
-    plans: (plans || []).map(p => ({
-      id: p.product_id,
-      name: p.name,
-      country: p.country,
-      country_code: p.country_code,
-      data_gb: p.data_gb,
-      duration_days: p.duration_days,
-      price_usd: p.price,
-    })),
-    count: plans?.length || 0,
+    category: String(pricing.category || category),
+    country_code: String(pricing.country_code || countryCode),
+    currency: 'USD',
+    retail_price: asNullableNumber(pricing.sell_price),
+    activation_fee: asNullableNumber(pricing.activation_fee),
+    billing_increment_seconds: asNullableNumber(pricing.billing_increment_secs),
+  };
+}
+
+async function handleListEsimPlans(base44, input) {
+  const countryCode = input.country_code == null ? null : normalizeCountryCode(input.country_code);
+  const filter = countryCode ? { country_code: countryCode, is_active: true } : { is_active: true };
+  const plans = await base44.asServiceRole.entities.ESimProduct.filter(filter, 'price', 20);
+  const publicPlans = (plans || []).map((plan) => ({
+    plan_id: String(plan?.product_id || plan?.id || ''),
+    name: String(plan?.name || ''),
+    country: String(plan?.country || ''),
+    country_code: String(plan?.country_code || ''),
+    data_gb: asNullableNumber(plan?.data_gb),
+    duration_days: asNullableNumber(plan?.duration_days),
+    retail_price: asNullableNumber(plan?.price),
+  }));
+
+  return {
+    country_code: countryCode,
+    count: publicPlans.length,
+    currency: 'USD',
+    plans: publicPlans,
   };
 }
 
 async function handleGetCallRates(base44, input) {
-  const { country_code } = input;
-  const [outRes, inRes] = await Promise.all([
-    base44.asServiceRole.functions.invoke("pricingEngine", { action: "lookup", category: "call_outbound", country_code }),
-    base44.asServiceRole.functions.invoke("pricingEngine", { action: "lookup", category: "call_inbound", country_code }),
+  const countryCode = normalizeCountryCode(input.country_code);
+  const [outbound, inbound] = await Promise.all([
+    base44.asServiceRole.functions.invoke('pricingEngine', {
+      action: 'lookup',
+      category: 'call_outbound',
+      country_code: countryCode,
+    }),
+    base44.asServiceRole.functions.invoke('pricingEngine', {
+      action: 'lookup',
+      category: 'call_inbound',
+      country_code: countryCode,
+    }),
   ]);
+
   return {
-    country_code,
-    outbound_per_min_usd: outRes?.sell_price || null,
-    inbound_per_min_usd: inRes?.sell_price || null,
-    billing_increment_secs: outRes?.billing_increment_secs || 6,
-    note: "Rates are billed in 6-second increments",
+    country_code: countryCode,
+    currency: 'USD',
+    outbound_per_minute: asNullableNumber(outbound?.sell_price),
+    inbound_per_minute: asNullableNumber(inbound?.sell_price),
+    billing_increment_seconds: asNullableNumber(outbound?.billing_increment_secs) || 6,
   };
 }
 
-async function handleGetAccountBalance(base44, input) {
-  const { api_key } = input;
-  // api_key = user email for simplicity (extend with real API key auth as needed)
-  const users = await base44.asServiceRole.entities.User.filter({ email: api_key });
-  if (!users?.[0]) return { error: "User not found. Pass your registered email as api_key." };
-  return { email: users[0].email, balance_usd: users[0].credits || 0 };
-}
-
-async function handleListVirtualNumbers(base44, input) {
-  const { user_email } = input;
-  const numbers = await base44.asServiceRole.entities.VirtualNumber.filter({ customer_email: user_email }, "-created_date", 50);
-  return {
-    numbers: (numbers || []).map(n => ({
-      phone_number: n.phone_number,
-      country: n.country_code,
-      type: n.number_type,
-      status: n.status,
-      sms_enabled: n.sms_enabled,
-      voice_enabled: n.voice_enabled,
-      renewal_date: n.renewal_date,
-    })),
-    count: numbers?.length || 0,
-  };
-}
-
-async function handleSendSms(base44, input) {
-  const { from_number, to_number, message, user_email } = input;
-  const telnyxKey = Deno.env.get("TELNYX_API_KEY");
-  if (!telnyxKey) return { error: "Telnyx not configured" };
-
-  // Verify ownership
-  const numbers = await base44.asServiceRole.entities.VirtualNumber.filter({ phone_number: from_number });
-  if (!numbers?.[0] || numbers[0].customer_email !== user_email) {
-    return { error: "Number not found or not owned by this user" };
+async function callTool(base44, name, args) {
+  switch (name) {
+    case 'search_virtual_numbers':
+      return await handleSearchVirtualNumbers(base44, args);
+    case 'get_service_pricing':
+      return await handleGetServicePricing(base44, args);
+    case 'list_esim_plans':
+      return await handleListEsimPlans(base44, args);
+    case 'get_call_rates':
+      return await handleGetCallRates(base44, args);
+    default:
+      throw new Error(`Unknown tool: ${name}`);
   }
-
-  const res = await fetch("https://api.telnyx.com/v2/messages", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${telnyxKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: from_number, to: to_number, text: message }),
-  });
-  const json = await res.json();
-  if (!res.ok) return { error: json.errors?.[0]?.detail || "Failed to send SMS" };
-
-  return { success: true, message_id: json.data?.id, status: json.data?.to?.[0]?.status };
 }
-
-// ── JSON-RPC dispatcher ───────────────────────────────────────────────────────
 
 async function dispatch(base44, method, params) {
   switch (method) {
-    case "initialize":
-      return { protocolVersion: "2024-11-05", capabilities: { tools: {} }, serverInfo: SERVER_INFO };
+    case 'initialize': {
+      const requested = String(params?.protocolVersion || '');
+      const supported = new Set(['2025-06-18', '2025-03-26', '2024-11-05']);
+      const protocolVersion = supported.has(requested) ? requested : '2025-06-18';
+      return {
+        protocolVersion,
+        capabilities: { tools: { listChanged: false } },
+        serverInfo: SERVER_INFO,
+        instructions: 'Use these read-only tools to retrieve public VoxTelefony number availability, eSIM plans, and retail rates. Never imply that a number or plan has been reserved or purchased.',
+      };
+    }
 
-    case "notifications/initialized":
-      return null; // no response needed
+    case 'notifications/initialized':
+      return null;
 
-    case "tools/list":
+    case 'ping':
+      return {};
+
+    case 'tools/list':
       return { tools: TOOLS };
 
-    case "tools/call": {
-      const { name, arguments: args = {} } = params;
-      console.log(`[mcp] tool call: ${name}`, JSON.stringify(args));
-      let result;
+    case 'tools/call': {
+      const name = String(params?.name || '');
+      const args = params?.arguments && typeof params.arguments === 'object' ? params.arguments : {};
       try {
-        switch (name) {
-          case "search_numbers":       result = await handleSearchNumbers(base44, args); break;
-          case "get_pricing":          result = await handleGetPricing(base44, args); break;
-          case "get_esim_plans":       result = await handleGetEsimPlans(base44, args); break;
-          case "get_call_rates":       result = await handleGetCallRates(base44, args); break;
-          case "get_account_balance":  result = await handleGetAccountBalance(base44, args); break;
-          case "list_virtual_numbers": result = await handleListVirtualNumbers(base44, args); break;
-          case "send_sms":             result = await handleSendSms(base44, args); break;
-          default:                     return { error: { code: -32601, message: `Unknown tool: ${name}` } };
-        }
-        const isError = !!result?.error;
+        const result = await callTool(base44, name, args);
         return {
-          content: [{ type: "text", text: isError ? result.error : JSON.stringify(result, null, 2) }],
-          isError,
+          content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+          structuredContent: result,
+          isError: false,
         };
-      } catch (err) {
-        console.error(`[mcp] tool error: ${name}`, err.message);
-        return { content: [{ type: "text", text: err.message }], isError: true };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'The requested information could not be retrieved.';
+        console.error(`[mcp] tool failed: ${name}`, message);
+        return {
+          content: [{ type: 'text', text: message }],
+          isError: true,
+        };
       }
     }
 
     default:
-      return { error: { code: -32601, message: `Method not found: ${method}` } };
+      return { __rpcError: { code: -32601, message: `Method not found: ${method}` } };
   }
 }
 
-// ── Main handler ──────────────────────────────────────────────────────────────
+function jsonResponse(body, status, headers) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...headers, 'Content-Type': 'application/json; charset=utf-8' },
+  });
+}
 
-Deno.serve(async (req) => {
+Deno.serve(async (request) => {
   const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, Mcp-Session-Id",
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, Mcp-Session-Id, MCP-Protocol-Version',
+    'Access-Control-Expose-Headers': 'Mcp-Session-Id',
+    'Cache-Control': 'no-store',
   };
 
-  if (req.method === "OPTIONS") {
+  if (request.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
 
-  // GET — server info / discovery
-  if (req.method === "GET") {
-    return Response.json({
+  if (request.method === 'GET') {
+    return jsonResponse({
       name: SERVER_INFO.name,
+      title: SERVER_INFO.title,
       version: SERVER_INFO.version,
       description: SERVER_INFO.description,
-      protocol: "MCP 2024-11-05",
-      transport: "Streamable HTTP",
-      tools: TOOLS.map(t => ({ name: t.name, description: t.description })),
-      endpoint: req.url,
-      docs: "https://voxdigits.com",
-    }, { headers: corsHeaders });
+      protocol: 'Model Context Protocol',
+      transport: 'Streamable HTTP',
+      authentication: 'none',
+      access: 'public read-only catalogue data',
+      tools: TOOLS.map((tool) => ({
+        name: tool.name,
+        title: tool.title,
+        description: tool.description,
+        annotations: tool.annotations,
+      })),
+      website: 'https://voxtelefony.com',
+      support: 'https://voxtelefony.com/Support',
+      privacy: 'https://voxtelefony.com/PrivacyPolicy',
+      terms: 'https://voxtelefony.com/TermsOfService',
+    }, 200, corsHeaders);
   }
 
-  if (req.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405, headers: corsHeaders });
+  if (request.method !== 'POST') {
+    return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ jsonrpc: '2.0', id: null, error: { code: -32700, message: 'Parse error' } }, 400, corsHeaders);
+  }
+
+  const base44 = createClientFromRequest(request);
+
+  async function handleMessage(message) {
+    if (!message || message.jsonrpc !== '2.0' || typeof message.method !== 'string') {
+      return { jsonrpc: '2.0', id: message?.id ?? null, error: { code: -32600, message: 'Invalid Request' } };
+    }
+
+    const isNotification = message.id === undefined;
+    const result = await dispatch(base44, message.method, message.params || {});
+    if (isNotification || result === null) return null;
+    if (result?.__rpcError) {
+      return { jsonrpc: '2.0', id: message.id, error: result.__rpcError };
+    }
+    return { jsonrpc: '2.0', id: message.id, result };
   }
 
   try {
-    const base44 = createClientFromRequest(req);
-    const body = await req.json();
-
-    // Handle batch requests
     if (Array.isArray(body)) {
-      const responses = await Promise.all(
-        body.map(async (msg) => {
-          if (!msg.id) return null; // notifications — no response
-          const result = await dispatch(base44, msg.method, msg.params || {});
-          if (result === null) return null;
-          if (result?.error) return { jsonrpc: "2.0", id: msg.id, error: result.error };
-          return { jsonrpc: "2.0", id: msg.id, result };
-        })
-      );
-      return Response.json(responses.filter(Boolean), { headers: corsHeaders });
+      if (body.length === 0) {
+        return jsonResponse({ jsonrpc: '2.0', id: null, error: { code: -32600, message: 'Invalid Request' } }, 400, corsHeaders);
+      }
+      const responses = (await Promise.all(body.map(handleMessage))).filter(Boolean);
+      if (responses.length === 0) return new Response(null, { status: 202, headers: corsHeaders });
+      return jsonResponse(responses, 200, corsHeaders);
     }
 
-    // Single request
-    const { id, method, params = {} } = body;
-    if (!method) return Response.json({ jsonrpc: "2.0", id: null, error: { code: -32600, message: "Invalid request" } }, { status: 400, headers: corsHeaders });
-
-    const result = await dispatch(base44, method, params);
-    if (result === null) return new Response(null, { status: 202, headers: corsHeaders });
-
-    if (result?.error && !id) return Response.json({ jsonrpc: "2.0", id: null, error: result.error }, { status: 400, headers: corsHeaders });
-    if (result?.error) return Response.json({ jsonrpc: "2.0", id, error: result.error }, { headers: corsHeaders });
-    return Response.json({ jsonrpc: "2.0", id, result }, { headers: corsHeaders });
-
-  } catch (err) {
-    console.error("[mcp] Fatal error:", err.message);
-    return Response.json({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "Parse error", data: err.message } }, { status: 400, headers: corsHeaders });
+    const response = await handleMessage(body);
+    if (response === null) return new Response(null, { status: 202, headers: corsHeaders });
+    return jsonResponse(response, 200, corsHeaders);
+  } catch (error) {
+    console.error('[mcp] fatal error', error instanceof Error ? error.message : error);
+    return jsonResponse({ jsonrpc: '2.0', id: body?.id ?? null, error: { code: -32603, message: 'Internal error' } }, 500, corsHeaders);
   }
 });
