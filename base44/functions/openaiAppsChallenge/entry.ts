@@ -24,8 +24,10 @@ Deno.serve(async (req) => {
     return new Response("Method Not Allowed", { status: 405, headers: corsHeaders });
   }
 
-  // Retrieve the challenge token from environment secrets
-  const token = Deno.env.get("OPENAI_CHALLENGE_TOKEN");
+  // Retrieve the challenge token from environment secrets, with the current
+  // OpenAI submission token as a deployment fallback.
+  const token = Deno.env.get("OPENAI_CHALLENGE_TOKEN") ||
+    "Tj6dnQiTopJ7w4bbWa6uPvTni9z0sEG5kRUdoevx1vE";
 
   if (!token) {
     console.warn("[openai-challenge] OPENAI_CHALLENGE_TOKEN secret is not set");
