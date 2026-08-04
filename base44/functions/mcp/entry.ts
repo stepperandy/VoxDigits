@@ -60,6 +60,8 @@ const TOOLS = [
         number_type: { type: 'string' },
         count: { type: 'integer' },
         currency: { type: 'string' },
+        availability_status: { type: 'string', enum: ['live', 'unavailable'] },
+        message: { type: 'string' },
         numbers: {
           type: 'array',
           items: {
@@ -78,7 +80,7 @@ const TOOLS = [
           },
         },
       },
-      required: ['country_code', 'number_type', 'count', 'currency', 'numbers'],
+      required: ['country_code', 'number_type', 'count', 'currency', 'availability_status', 'message', 'numbers'],
     },
   },
   {
@@ -226,16 +228,48 @@ async function handleSearchVirtualNumbers(base44, input) {
     throw new Error('area_code must contain 1 to 8 digits.');
   }
 
-  const availabilityResponse = await base44.asServiceRole.functions.invoke('searchNumbers', {
-    country_code: countryCode,
-    area_code: areaCode || undefined,
-    number_type: numberType,
-    limit: 10,
-  });
-  const availability = unwrapFunctionResponse(availabilityResponse);
+  const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
+  const authToken = Deno.env.get('TWILIO_AUTH_TOKEN');
+  const twilioType = numberType === 'toll_free'
+    ? 'TollFree'
+    : numberType === 'mobile'
+      ? 'Mobile'
+      : 'Local';
 
-  if (!availability?.success || !Array.isArray(availability?.data)) {
-    throw new Error('Number availability could not be retrieved right now.');
+  let availabilityStatus = 'unavailable';
+  let message = 'Live carrier availability is temporarily unavailable.';
+  let carrierNumbers = [];
+
+  if (accountSid && authToken) {
+    const params = new URLSearchParams({ PageSize: '10' });
+    if (areaCode) params.set('AreaCode', areaCode);
+    const url = `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(accountSid)}/AvailablePhoneNumbers/${countryCode}/${twilioType}.json?${params.toString()}`;
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
+          Accept: 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const payload = await response.json();
+        carrierNumbers = Array.isArray(payload?.available_phone_numbers)
+          ? payload.available_phone_numbers
+          : [];
+        availabilityStatus = 'live';
+        message = carrierNumbers.length > 0
+          ? 'Live matching numbers were returned by the carrier.'
+          : 'The carrier currently has no matching numbers in this search.';
+      } else {
+        console.error('[mcp] Twilio availability request failed', response.status);
+      }
+    } catch (error) {
+      console.error('[mcp] Twilio availability request failed', error instanceof Error ? error.message : error);
+    }
+  } else {
+    console.error('[mcp] Twilio availability credentials are not configured');
   }
 
   const pricingResponse = await base44.asServiceRole.functions.invoke('pricingEngine', {
@@ -246,14 +280,14 @@ async function handleSearchVirtualNumbers(base44, input) {
   const pricing = unwrapFunctionResponse(pricingResponse);
   const fallbackMonthlyPrice = asNullableNumber(pricing?.sell_price);
 
-  const numbers = availability.data.slice(0, 10).map((item) => ({
+  const numbers = carrierNumbers.slice(0, 10).map((item) => ({
     phone_number: String(item?.phone_number || ''),
-    country_code: String(item?.country_iso || countryCode),
-    number_type: String(item?.type || numberType),
-    locality: String(item?.city || ''),
-    voice_enabled: Boolean(item?.voice_enabled),
-    sms_enabled: Boolean(item?.sms_enabled),
-    monthly_price: asNullableNumber(item?.monthly_fee) ?? fallbackMonthlyPrice,
+    country_code: countryCode,
+    number_type: numberType,
+    locality: String(item?.locality || item?.region || ''),
+    voice_enabled: Boolean(item?.capabilities?.voice),
+    sms_enabled: Boolean(item?.capabilities?.SMS || item?.capabilities?.sms),
+    monthly_price: fallbackMonthlyPrice,
   }));
 
   return {
@@ -261,6 +295,8 @@ async function handleSearchVirtualNumbers(base44, input) {
     number_type: numberType,
     count: numbers.length,
     currency: 'USD',
+    availability_status: availabilityStatus,
+    message,
     numbers,
   };
 }
