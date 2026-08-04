@@ -151,6 +151,7 @@ import USVirtualNumber from './pages/countries/USVirtualNumber';
 import CanadaVirtualNumber from './pages/countries/CanadaVirtualNumber';
 import UKVirtualNumber from './pages/countries/UKVirtualNumber';
 import AustraliaVirtualNumber from './pages/countries/AustraliaVirtualNumber';
+import Connect from './pages/Connect';
 
 
 
@@ -276,6 +277,7 @@ const AnimatedRoutes = () => {
       <Route path="/sms-consent" element={<SmsConsentOptIn />} />
       <Route path="/secure" element={<RequireAuth><LayoutWrapper currentPageName="SecurePortal"><SecurePortal /></LayoutWrapper></RequireAuth>} />
       <Route path="/secure/" element={<RequireAuth><LayoutWrapper currentPageName="SecurePortal"><SecurePortal /></LayoutWrapper></RequireAuth>} />
+      <Route path="/connect" element={<Connect />} />
       <Route path="*" element={<PageNotFound />} />
         </Routes>
       </motion.div>

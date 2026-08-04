@@ -28,6 +28,7 @@ const navigationLinks = {
     { label: "Server Status", href: "/ServerStatus", internal: true },
     { label: "Security", href: "/Security", internal: true },
     { label: "Transparency Report", href: "/TransparencyReport", internal: true },
+    { label: "Connect AI Assistant", href: "/connect", internal: true },
   ],
 };
 
