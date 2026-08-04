@@ -441,9 +441,9 @@ Deno.serve(async (request) => {
         annotations: tool.annotations,
       })),
       website: 'https://voxtelefony.com',
-      support: 'https://voxtelefony.com/Support',
-      privacy: 'https://voxtelefony.com/PrivacyPolicy',
-      terms: 'https://voxtelefony.com/TermsOfService',
+      support: 'https://voxtelefony.com/support',
+      privacy: 'https://voxtelefony.com/privacypolicy',
+      terms: 'https://voxtelefony.com/termsofservice',
     }, 200, corsHeaders);
   }
 
