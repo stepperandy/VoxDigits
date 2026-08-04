@@ -210,6 +210,10 @@ function asNullableNumber(value) {
   return Number.isFinite(numberValue) ? numberValue : null;
 }
 
+function unwrapFunctionResponse(response) {
+  return response?.data && typeof response.data === 'object' ? response.data : response;
+}
+
 async function handleSearchVirtualNumbers(base44, input) {
   const countryCode = normalizeCountryCode(input.country_code);
   const numberType = String(input.number_type || 'local');
@@ -222,22 +226,24 @@ async function handleSearchVirtualNumbers(base44, input) {
     throw new Error('area_code must contain 1 to 8 digits.');
   }
 
-  const availability = await base44.asServiceRole.functions.invoke('searchNumbers', {
+  const availabilityResponse = await base44.asServiceRole.functions.invoke('searchNumbers', {
     country_code: countryCode,
     area_code: areaCode || undefined,
     number_type: numberType,
     limit: 10,
   });
+  const availability = unwrapFunctionResponse(availabilityResponse);
 
   if (!availability?.success || !Array.isArray(availability?.data)) {
     throw new Error('Number availability could not be retrieved right now.');
   }
 
-  const pricing = await base44.asServiceRole.functions.invoke('pricingEngine', {
+  const pricingResponse = await base44.asServiceRole.functions.invoke('pricingEngine', {
     action: 'lookup',
     category: `number_${numberType === 'toll_free' ? 'tollfree' : numberType}`,
     country_code: countryCode,
   });
+  const pricing = unwrapFunctionResponse(pricingResponse);
   const fallbackMonthlyPrice = asNullableNumber(pricing?.sell_price);
 
   const numbers = availability.data.slice(0, 10).map((item) => ({
@@ -265,11 +271,12 @@ async function handleGetServicePricing(base44, input) {
     throw new Error('category is not supported.');
   }
   const countryCode = normalizeCountryCode(input.country_code, true);
-  const pricing = await base44.asServiceRole.functions.invoke('pricingEngine', {
+  const pricingResponse = await base44.asServiceRole.functions.invoke('pricingEngine', {
     action: 'lookup',
     category,
     country_code: countryCode,
   });
+  const pricing = unwrapFunctionResponse(pricingResponse);
 
   if (!pricing?.success) {
     throw new Error('Pricing is not available for that category and country.');
@@ -309,7 +316,7 @@ async function handleListEsimPlans(base44, input) {
 
 async function handleGetCallRates(base44, input) {
   const countryCode = normalizeCountryCode(input.country_code);
-  const [outbound, inbound] = await Promise.all([
+  const [outboundResponse, inboundResponse] = await Promise.all([
     base44.asServiceRole.functions.invoke('pricingEngine', {
       action: 'lookup',
       category: 'call_outbound',
@@ -321,6 +328,8 @@ async function handleGetCallRates(base44, input) {
       country_code: countryCode,
     }),
   ]);
+  const outbound = unwrapFunctionResponse(outboundResponse);
+  const inbound = unwrapFunctionResponse(inboundResponse);
 
   return {
     country_code: countryCode,
