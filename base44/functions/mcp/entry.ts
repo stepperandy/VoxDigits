@@ -1,17 +1,15 @@
 /**
- * VoxTelefony public MCP server.
+ * VoxTelefony public MCP server v1.2.0.
  *
- * This first marketplace release is intentionally read-only. It exposes public
- * availability and retail-pricing information only; it does not expose account
- * data, credentials, call or message content, or tools that create side effects.
+ * This endpoint is deliberately self-contained. It does not import the Base44
+ * SDK, so public plugin availability does not depend on npm package resolution
+ * or access to private Base44 entities. All tools are read-only.
  */
-
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 
 const SERVER_INFO = {
   name: 'voxtelefony',
   title: 'VoxTelefony',
-  version: '1.1.0',
+  version: '1.2.0',
   description: 'Find virtual phone numbers, eSIM plans, and retail voice or messaging rates from VoxTelefony.',
 };
 
@@ -19,15 +17,81 @@ const READ_ONLY_ANNOTATIONS = {
   readOnlyHint: true,
   destructiveHint: false,
   idempotentHint: true,
-  // Results come from live carrier and product catalogues outside ChatGPT.
   openWorldHint: true,
 };
+
+const PUBLIC_PRICING = {
+  number_local: {
+    US: 4.99,
+    CA: 5.99,
+    GB: 6.99,
+    AU: 7.99,
+    DE: 5.99,
+    FR: 5.99,
+    NL: 5.99,
+    SE: 5.99,
+    ES: 6.99,
+    IT: 6.99,
+    '*': 6.99,
+  },
+  number_tollfree: {
+    US: 9.99,
+    '*': 12.99,
+  },
+  number_mobile: {
+    US: 6.99,
+    '*': 8.99,
+  },
+  call_outbound: {
+    US: 0.03,
+    CA: 0.04,
+    GB: 0.05,
+    AU: 0.06,
+    DE: 0.05,
+    '*': 0.014,
+  },
+  call_inbound: {
+    US: 0.008,
+    '*': 0.01,
+  },
+  sms_outbound: {
+    US: 0.03,
+    CA: 0.04,
+    GB: 0.05,
+    AU: 0.06,
+    '*': 0.007,
+  },
+  sms_inbound: {
+    US: 0.005,
+    '*': 0.005,
+  },
+  esim_data: {
+    '*': null,
+  },
+};
+
+const ESIM_PLANS = [
+  { plan_id: 'esim_us_1gb', name: 'USA 1GB', country: 'United States', country_code: 'US', data_gb: 1, duration_days: 7, retail_price: 4.99 },
+  { plan_id: 'esim_us_5gb', name: 'USA 5GB', country: 'United States', country_code: 'US', data_gb: 5, duration_days: 30, retail_price: 14.99 },
+  { plan_id: 'esim_us_10gb', name: 'USA 10GB', country: 'United States', country_code: 'US', data_gb: 10, duration_days: 30, retail_price: 19.99 },
+  { plan_id: 'esim_ca_1gb', name: 'Canada 1GB', country: 'Canada', country_code: 'CA', data_gb: 1, duration_days: 7, retail_price: 4.99 },
+  { plan_id: 'esim_ca_5gb', name: 'Canada 5GB', country: 'Canada', country_code: 'CA', data_gb: 5, duration_days: 30, retail_price: 14.99 },
+  { plan_id: 'esim_uk_1gb', name: 'UK 1GB', country: 'United Kingdom', country_code: 'GB', data_gb: 1, duration_days: 7, retail_price: 4.99 },
+  { plan_id: 'esim_uk_5gb', name: 'UK 5GB', country: 'United Kingdom', country_code: 'GB', data_gb: 5, duration_days: 30, retail_price: 14.99 },
+  { plan_id: 'esim_au_1gb', name: 'Australia 1GB', country: 'Australia', country_code: 'AU', data_gb: 1, duration_days: 7, retail_price: 5.99 },
+  { plan_id: 'esim_au_5gb', name: 'Australia 5GB', country: 'Australia', country_code: 'AU', data_gb: 5, duration_days: 30, retail_price: 15.99 },
+  { plan_id: 'europe_3gb', name: 'Europe 3GB', country: 'Europe', country_code: 'EU', data_gb: 3, duration_days: 15, retail_price: 9.99 },
+  { plan_id: 'europe_10gb', name: 'Europe 10GB', country: 'Europe', country_code: 'EU', data_gb: 10, duration_days: 30, retail_price: 24.99 },
+  { plan_id: 'global_1gb', name: 'Global 1GB', country: 'Global', country_code: 'GL', data_gb: 1, duration_days: 30, retail_price: 12 },
+  { plan_id: 'global_2gb', name: 'Global 2GB', country: 'Global', country_code: 'GL', data_gb: 2, duration_days: 30, retail_price: 16.99 },
+  { plan_id: 'africa_5gb', name: 'Africa 5GB', country: 'Africa', country_code: 'AF', data_gb: 5, duration_days: 30, retail_price: 20 },
+];
 
 const TOOLS = [
   {
     name: 'search_virtual_numbers',
     title: 'Search virtual numbers',
-    description: 'Search the live VoxTelefony catalogue for virtual phone numbers available in a specified country. This only checks availability and does not reserve or purchase a number.',
+    description: 'Use this when a user wants to check live VoxTelefony virtual-number availability by country, number type, or area code. It does not reserve or purchase a number.',
     annotations: READ_ONLY_ANNOTATIONS,
     inputSchema: {
       type: 'object',
@@ -86,7 +150,7 @@ const TOOLS = [
   {
     name: 'get_service_pricing',
     title: 'Get service pricing',
-    description: 'Get current VoxTelefony retail pricing for a supported number, calling, messaging, or eSIM category in a country. This only retrieves pricing and does not start a purchase.',
+    description: 'Use this when a user wants current VoxTelefony retail pricing for a supported number, calling, messaging, or eSIM category. It does not start a purchase.',
     annotations: READ_ONLY_ANNOTATIONS,
     inputSchema: {
       type: 'object',
@@ -100,7 +164,7 @@ const TOOLS = [
         country_code: {
           type: 'string',
           pattern: '^([A-Za-z]{2}|\\*)$',
-          description: 'ISO 3166-1 alpha-2 country code, or * for a global default where supported.',
+          description: 'ISO 3166-1 alpha-2 country code, or * for the global default.',
         },
       },
       required: ['category', 'country_code'],
@@ -122,7 +186,7 @@ const TOOLS = [
   {
     name: 'list_esim_plans',
     title: 'List eSIM plans',
-    description: 'List active VoxTelefony eSIM data plans, optionally filtered by country. This only retrieves plan information and does not order or activate an eSIM.',
+    description: 'Use this when a user wants to browse active VoxTelefony eSIM data plans, optionally filtered by country or region. It does not order or activate an eSIM.',
     annotations: READ_ONLY_ANNOTATIONS,
     inputSchema: {
       type: 'object',
@@ -131,7 +195,7 @@ const TOOLS = [
         country_code: {
           type: 'string',
           pattern: '^[A-Za-z]{2}$',
-          description: 'Optional ISO 3166-1 alpha-2 country code.',
+          description: 'Optional two-letter country or regional catalogue code, such as US, CA, GB, EU, GL, or AF.',
         },
       },
     },
@@ -166,7 +230,7 @@ const TOOLS = [
   {
     name: 'get_call_rates',
     title: 'Get call rates',
-    description: 'Get current VoxTelefony retail inbound and outbound per-minute calling rates for a country. This only retrieves rates and does not place a call.',
+    description: 'Use this when a user wants current VoxTelefony retail inbound and outbound per-minute calling rates for a country. It does not place a call.',
     annotations: READ_ONLY_ANNOTATIONS,
     inputSchema: {
       type: 'object',
@@ -196,7 +260,7 @@ const TOOLS = [
 ];
 
 const ALLOWED_NUMBER_TYPES = new Set(['local', 'toll_free', 'mobile', 'national']);
-const ALLOWED_CATEGORIES = new Set(['number_local', 'number_tollfree', 'number_mobile', 'call_outbound', 'call_inbound', 'sms_outbound', 'sms_inbound', 'esim_data']);
+const ALLOWED_CATEGORIES = new Set(Object.keys(PUBLIC_PRICING));
 
 function normalizeCountryCode(value, allowGlobal = false) {
   const countryCode = String(value || '').trim().toUpperCase();
@@ -208,17 +272,29 @@ function normalizeCountryCode(value, allowGlobal = false) {
 }
 
 function asNullableNumber(value) {
+  if (value === null || value === undefined || value === '') return null;
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : null;
 }
 
-function unwrapFunctionResponse(response) {
-  return response?.data && typeof response.data === 'object' ? response.data : response;
+function lookupRetailPrice(category, countryCode) {
+  const table = PUBLIC_PRICING[category];
+  if (!table) return null;
+  if (Object.prototype.hasOwnProperty.call(table, countryCode)) {
+    return asNullableNumber(table[countryCode]);
+  }
+  return asNullableNumber(table['*']);
 }
 
-async function handleSearchVirtualNumbers(base44, input) {
+function numberPricingCategory(numberType) {
+  if (numberType === 'toll_free') return 'number_tollfree';
+  if (numberType === 'mobile') return 'number_mobile';
+  return 'number_local';
+}
+
+async function handleSearchVirtualNumbers(input) {
   const countryCode = normalizeCountryCode(input.country_code);
-  const numberType = String(input.number_type || 'local');
+  const numberType = String(input.number_type || 'local').trim();
   if (!ALLOWED_NUMBER_TYPES.has(numberType)) {
     throw new Error('number_type is not supported.');
   }
@@ -230,11 +306,12 @@ async function handleSearchVirtualNumbers(base44, input) {
 
   const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
   const authToken = Deno.env.get('TWILIO_AUTH_TOKEN');
-  const twilioType = numberType === 'toll_free'
-    ? 'TollFree'
-    : numberType === 'mobile'
-      ? 'Mobile'
-      : 'Local';
+  const typeMap = {
+    local: 'Local',
+    toll_free: 'TollFree',
+    mobile: 'Mobile',
+    national: 'National',
+  };
 
   let availabilityStatus = 'unavailable';
   let message = 'Live carrier availability is temporarily unavailable.';
@@ -243,10 +320,11 @@ async function handleSearchVirtualNumbers(base44, input) {
   if (accountSid && authToken) {
     const params = new URLSearchParams({ PageSize: '10' });
     if (areaCode) params.set('AreaCode', areaCode);
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(accountSid)}/AvailablePhoneNumbers/${countryCode}/${twilioType}.json?${params.toString()}`;
+
+    const endpoint = `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(accountSid)}/AvailablePhoneNumbers/${countryCode}/${typeMap[numberType]}.json?${params.toString()}`;
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(endpoint, {
         headers: {
           Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
           Accept: 'application/json',
@@ -263,23 +341,16 @@ async function handleSearchVirtualNumbers(base44, input) {
           ? 'Live matching numbers were returned by the carrier.'
           : 'The carrier currently has no matching numbers in this search.';
       } else {
-        console.error('[mcp] Twilio availability request failed', response.status);
+        console.error('[mcp] carrier availability request failed', response.status);
       }
     } catch (error) {
-      console.error('[mcp] Twilio availability request failed', error instanceof Error ? error.message : error);
+      console.error('[mcp] carrier availability request failed', error instanceof Error ? error.message : error);
     }
   } else {
-    console.error('[mcp] Twilio availability credentials are not configured');
+    console.error('[mcp] carrier credentials are not configured');
   }
 
-  const pricingResponse = await base44.asServiceRole.functions.invoke('pricingEngine', {
-    action: 'lookup',
-    category: `number_${numberType === 'toll_free' ? 'tollfree' : numberType}`,
-    country_code: countryCode,
-  });
-  const pricing = unwrapFunctionResponse(pricingResponse);
-  const fallbackMonthlyPrice = asNullableNumber(pricing?.sell_price);
-
+  const monthlyPrice = lookupRetailPrice(numberPricingCategory(numberType), countryCode);
   const numbers = carrierNumbers.slice(0, 10).map((item) => ({
     phone_number: String(item?.phone_number || ''),
     country_code: countryCode,
@@ -287,7 +358,7 @@ async function handleSearchVirtualNumbers(base44, input) {
     locality: String(item?.locality || item?.region || ''),
     voice_enabled: Boolean(item?.capabilities?.voice),
     sms_enabled: Boolean(item?.capabilities?.SMS || item?.capabilities?.sms),
-    monthly_price: fallbackMonthlyPrice,
+    monthly_price: monthlyPrice,
   }));
 
   return {
@@ -301,97 +372,71 @@ async function handleSearchVirtualNumbers(base44, input) {
   };
 }
 
-async function handleGetServicePricing(base44, input) {
+function handleGetServicePricing(input) {
   const category = String(input.category || '').trim();
   if (!ALLOWED_CATEGORIES.has(category)) {
     throw new Error('category is not supported.');
   }
+
   const countryCode = normalizeCountryCode(input.country_code, true);
-  const pricingResponse = await base44.asServiceRole.functions.invoke('pricingEngine', {
-    action: 'lookup',
+  const retailPrice = lookupRetailPrice(category, countryCode);
+  const isNumberCategory = category.startsWith('number_');
+  const isCallCategory = category.startsWith('call_');
+
+  return {
     category,
     country_code: countryCode,
-  });
-  const pricing = unwrapFunctionResponse(pricingResponse);
-
-  if (!pricing?.success) {
-    throw new Error('Pricing is not available for that category and country.');
-  }
-
-  return {
-    category: String(pricing.category || category),
-    country_code: String(pricing.country_code || countryCode),
     currency: 'USD',
-    retail_price: asNullableNumber(pricing.sell_price),
-    activation_fee: asNullableNumber(pricing.activation_fee),
-    billing_increment_seconds: asNullableNumber(pricing.billing_increment_secs),
+    retail_price: retailPrice,
+    activation_fee: isNumberCategory ? 0 : null,
+    billing_increment_seconds: isCallCategory ? 60 : null,
   };
 }
 
-async function handleListEsimPlans(base44, input) {
-  const countryCode = input.country_code == null ? null : normalizeCountryCode(input.country_code);
-  const filter = countryCode ? { country_code: countryCode, is_active: true } : { is_active: true };
-  const plans = await base44.asServiceRole.entities.ESimProduct.filter(filter, 'price', 20);
-  const publicPlans = (plans || []).map((plan) => ({
-    plan_id: String(plan?.product_id || plan?.id || ''),
-    name: String(plan?.name || ''),
-    country: String(plan?.country || ''),
-    country_code: String(plan?.country_code || ''),
-    data_gb: asNullableNumber(plan?.data_gb),
-    duration_days: asNullableNumber(plan?.duration_days),
-    retail_price: asNullableNumber(plan?.price),
-  }));
+function handleListEsimPlans(input) {
+  const countryCode = input.country_code == null
+    ? null
+    : normalizeCountryCode(input.country_code);
+
+  const plans = countryCode
+    ? ESIM_PLANS.filter((plan) => plan.country_code === countryCode)
+    : ESIM_PLANS;
 
   return {
     country_code: countryCode,
-    count: publicPlans.length,
+    count: plans.length,
     currency: 'USD',
-    plans: publicPlans,
+    plans,
   };
 }
 
-async function handleGetCallRates(base44, input) {
+function handleGetCallRates(input) {
   const countryCode = normalizeCountryCode(input.country_code);
-  const [outboundResponse, inboundResponse] = await Promise.all([
-    base44.asServiceRole.functions.invoke('pricingEngine', {
-      action: 'lookup',
-      category: 'call_outbound',
-      country_code: countryCode,
-    }),
-    base44.asServiceRole.functions.invoke('pricingEngine', {
-      action: 'lookup',
-      category: 'call_inbound',
-      country_code: countryCode,
-    }),
-  ]);
-  const outbound = unwrapFunctionResponse(outboundResponse);
-  const inbound = unwrapFunctionResponse(inboundResponse);
-
   return {
     country_code: countryCode,
     currency: 'USD',
-    outbound_per_minute: asNullableNumber(outbound?.sell_price),
-    inbound_per_minute: asNullableNumber(inbound?.sell_price),
-    billing_increment_seconds: asNullableNumber(outbound?.billing_increment_secs) || 6,
+    outbound_per_minute: lookupRetailPrice('call_outbound', countryCode),
+    inbound_per_minute: lookupRetailPrice('call_inbound', countryCode),
+    billing_increment_seconds: 60,
   };
 }
 
-async function callTool(base44, name, args) {
+async function callTool(name, args) {
   switch (name) {
     case 'search_virtual_numbers':
-      return await handleSearchVirtualNumbers(base44, args);
+      return await handleSearchVirtualNumbers(args);
     case 'get_service_pricing':
-      return await handleGetServicePricing(base44, args);
+      return handleGetServicePricing(args);
     case 'list_esim_plans':
-      return await handleListEsimPlans(base44, args);
+      return handleListEsimPlans(args);
     case 'get_call_rates':
-      return await handleGetCallRates(base44, args);
+      return handleGetCallRates(args);
     default:
       throw new Error(`Unknown tool: ${name}`);
   }
 }
 
-async function dispatch(base44, method, params) {
+async function dispatch(method, params) {
   switch (method) {
     case 'initialize': {
       const requested = String(params?.protocolVersion || '');
@@ -416,16 +461,21 @@ async function dispatch(base44, method, params) {
 
     case 'tools/call': {
       const name = String(params?.name || '');
-      const args = params?.arguments && typeof params.arguments === 'object' ? params.arguments : {};
+      const args = params?.arguments && typeof params.arguments === 'object'
+        ? params.arguments
+        : {};
+
       try {
-        const result = await callTool(base44, name, args);
+        const result = await callTool(name, args);
         return {
           content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
           structuredContent: result,
           isError: false,
         };
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'The requested information could not be retrieved.';
+        const message = error instanceof Error
+          ? error.message
+          : 'The requested information could not be retrieved.';
         console.error(`[mcp] tool failed: ${name}`, message);
         return {
           content: [{ type: 'text', text: message }],
@@ -442,7 +492,10 @@ async function dispatch(base44, method, params) {
 function jsonResponse(body, status, headers) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...headers, 'Content-Type': 'application/json; charset=utf-8' },
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json; charset=utf-8',
+    },
   });
 }
 
@@ -490,40 +543,61 @@ Deno.serve(async (request) => {
   try {
     body = await request.json();
   } catch {
-    return jsonResponse({ jsonrpc: '2.0', id: null, error: { code: -32700, message: 'Parse error' } }, 400, corsHeaders);
+    return jsonResponse({
+      jsonrpc: '2.0',
+      id: null,
+      error: { code: -32700, message: 'Parse error' },
+    }, 400, corsHeaders);
   }
-
-  const base44 = createClientFromRequest(request);
 
   async function handleMessage(message) {
     if (!message || message.jsonrpc !== '2.0' || typeof message.method !== 'string') {
-      return { jsonrpc: '2.0', id: message?.id ?? null, error: { code: -32600, message: 'Invalid Request' } };
+      return {
+        jsonrpc: '2.0',
+        id: message?.id ?? null,
+        error: { code: -32600, message: 'Invalid Request' },
+      };
     }
 
     const isNotification = message.id === undefined;
-    const result = await dispatch(base44, message.method, message.params || {});
+    const result = await dispatch(message.method, message.params || {});
     if (isNotification || result === null) return null;
+
     if (result?.__rpcError) {
       return { jsonrpc: '2.0', id: message.id, error: result.__rpcError };
     }
+
     return { jsonrpc: '2.0', id: message.id, result };
   }
 
   try {
     if (Array.isArray(body)) {
       if (body.length === 0) {
-        return jsonResponse({ jsonrpc: '2.0', id: null, error: { code: -32600, message: 'Invalid Request' } }, 400, corsHeaders);
+        return jsonResponse({
+          jsonrpc: '2.0',
+          id: null,
+          error: { code: -32600, message: 'Invalid Request' },
+        }, 400, corsHeaders);
       }
+
       const responses = (await Promise.all(body.map(handleMessage))).filter(Boolean);
-      if (responses.length === 0) return new Response(null, { status: 202, headers: corsHeaders });
+      if (responses.length === 0) {
+        return new Response(null, { status: 202, headers: corsHeaders });
+      }
       return jsonResponse(responses, 200, corsHeaders);
     }
 
     const response = await handleMessage(body);
-    if (response === null) return new Response(null, { status: 202, headers: corsHeaders });
+    if (response === null) {
+      return new Response(null, { status: 202, headers: corsHeaders });
+    }
     return jsonResponse(response, 200, corsHeaders);
   } catch (error) {
     console.error('[mcp] fatal error', error instanceof Error ? error.message : error);
-    return jsonResponse({ jsonrpc: '2.0', id: body?.id ?? null, error: { code: -32603, message: 'Internal error' } }, 500, corsHeaders);
+    return jsonResponse({
+      jsonrpc: '2.0',
+      id: body?.id ?? null,
+      error: { code: -32603, message: 'Internal error' },
+    }, 500, corsHeaders);
   }
 });
