@@ -354,7 +354,7 @@ export default function OsSetupGuide() {
               >
                 View Plans <ExternalLink size={14} />
               </a>
-              <p className="text-slate-600 text-xs mt-1">Secure, private VPN by VoxDigits</p>
+              <p className="text-slate-600 text-xs mt-1">Secure, private VPN by VoxTelefony</p>
             </div>
 
             {/* Support */}

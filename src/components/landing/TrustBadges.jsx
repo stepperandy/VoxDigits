@@ -1,5 +1,4 @@
 import { ShieldCheck, Lock, Globe, Eye, Award, Server, CreditCard, Headphones, Bug, Lock as LockIcon, BadgeCheck } from 'lucide-react';
-import { useLanguage } from '@/lib/LanguageContext';
 
 const badges = [
   { icon: ShieldCheck, label: 'AES-256 Encryption', sub: 'Military-grade security' },
@@ -17,13 +16,12 @@ const badges = [
 ];
 
 export default function TrustBadges() {
-  const { t } = useLanguage();
   return (
     <section className="bg-[#080c18] border-t border-white/5 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
-          <h2 className="text-white text-lg font-bold tracking-tight">{t('trustedSecure')}</h2>
-          <p className="text-slate-500 text-sm mt-1">{t('trustedSubtitle')}</p>
+          <h2 className="text-white text-lg font-bold tracking-tight">Trusted &amp; Secure</h2>
+          <p className="text-slate-500 text-sm mt-1">Privacy-first infrastructure, built to keep you protected</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           {badges.map(({ icon: Icon, label, sub }) => (
