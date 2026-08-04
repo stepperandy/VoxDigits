@@ -222,42 +222,32 @@ async function handleSearchVirtualNumbers(base44, input) {
     throw new Error('area_code must contain 1 to 8 digits.');
   }
 
-  const carrierApiKey = Deno.env.get('TELNYX_API_KEY');
-  if (!carrierApiKey) {
-    throw new Error('Number availability is temporarily unavailable.');
-  }
-
-  const params = new URLSearchParams({
-    'filter[country_code]': countryCode,
-    'filter[number_type]': numberType,
-    'page[size]': '10',
+  const availability = await base44.asServiceRole.functions.invoke('searchNumbers', {
+    country_code: countryCode,
+    area_code: areaCode || undefined,
+    number_type: numberType,
+    limit: 10,
   });
-  if (areaCode) params.set('filter[national_destination_code]', areaCode);
 
-  const response = await fetch(`https://api.telnyx.com/v2/available_phone_numbers?${params.toString()}`, {
-    headers: { Authorization: `Bearer ${carrierApiKey}` },
-  });
-  if (!response.ok) {
-    console.error('[mcp] carrier availability request failed', response.status);
+  if (!availability?.success || !Array.isArray(availability?.data)) {
     throw new Error('Number availability could not be retrieved right now.');
   }
 
-  const payload = await response.json();
   const pricing = await base44.asServiceRole.functions.invoke('pricingEngine', {
     action: 'lookup',
     category: `number_${numberType === 'toll_free' ? 'tollfree' : numberType}`,
     country_code: countryCode,
   });
-  const monthlyPrice = asNullableNumber(pricing?.sell_price);
+  const fallbackMonthlyPrice = asNullableNumber(pricing?.sell_price);
 
-  const numbers = (payload?.data || []).slice(0, 10).map((item) => ({
+  const numbers = availability.data.slice(0, 10).map((item) => ({
     phone_number: String(item?.phone_number || ''),
-    country_code: String(item?.country_code || countryCode),
-    number_type: String(item?.number_type || numberType),
-    locality: String(item?.locality || item?.administrative_area || ''),
-    voice_enabled: Array.isArray(item?.features) && item.features.some((feature) => feature?.name === 'voice'),
-    sms_enabled: Array.isArray(item?.features) && item.features.some((feature) => feature?.name === 'sms'),
-    monthly_price: monthlyPrice,
+    country_code: String(item?.country_iso || countryCode),
+    number_type: String(item?.type || numberType),
+    locality: String(item?.city || ''),
+    voice_enabled: Boolean(item?.voice_enabled),
+    sms_enabled: Boolean(item?.sms_enabled),
+    monthly_price: asNullableNumber(item?.monthly_fee) ?? fallbackMonthlyPrice,
   }));
 
   return {
