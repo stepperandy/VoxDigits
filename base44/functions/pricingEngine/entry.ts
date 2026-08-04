@@ -120,7 +120,7 @@ Deno.serve(async (req) => {
       if (!category) return Response.json({ error: 'Missing category' }, { status: 400 });
 
       const rules = await base44.asServiceRole.entities.PricingRule.list('-created_date', 500);
-      // Use the checked-in retail defaults when the database has not yet been
+      // Use the built-in retail defaults when the database has not yet been
       // seeded or an individual public rule is missing. This keeps read-only
       // catalogue clients reliable without exposing provider costs.
       const rule = resolveRule(rules, category, country_code)
