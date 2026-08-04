@@ -38,8 +38,8 @@ export default function LegalPolicy() {
   const POLICY_CONTENT = {
     privacy: `VOXTELEFONY PRIVACY POLICY
 
-Effective Date: 04/01/2026
-Last Updated: 03/01/2026
+Effective Date: April 1, 2026
+Last Updated: August 4, 2026
 
 1. INTRODUCTION
 
@@ -166,16 +166,23 @@ Support: support@voxdigits.com or +1 207 387 1513.
 
 Data Privacy: Your mobile opt-in and consent data is not sold or shared with third parties for their marketing purposes.
 
-13. CONTACT US
+13. CHATGPT AND AI APP INTEGRATION
+
+VoxTelefony provides a public, read-only integration for ChatGPT and other compatible AI clients. This integration may retrieve public virtual-number availability, eSIM plan information, and retail service rates. It does not provide access to private account data, contact lists, call recordings, message content, wallet balances, or account credentials, and it cannot purchase a service, send a message, or place a call.
+
+Questions and prompts submitted within ChatGPT are processed by OpenAI under OpenAI's applicable terms and privacy policies. VoxTelefony receives only the tool parameters needed to answer a requested catalogue or pricing query and the resulting technical service logs used for reliability, security, and abuse prevention.
+
+14. CONTACT US
 
 If you have any questions or concerns, contact us:
 
 VoxDigits Communications LLC
-Email: support@voxdigits.com
+Email: privacy@voxtelefony.com
+Support: support@voxdigits.com
 Phone: +1 207 387 1513
 Website: https://voxtelefony.com
 
-13. COMPLIANCE STATEMENT
+15. COMPLIANCE STATEMENT
 
 This Privacy Policy is designed to comply with:
 
@@ -238,9 +245,15 @@ VoxTelefony offers an optional SMS messaging program. By opting in, you agree to
 
 Your mobile opt-in and consent data is not sold or shared with third parties for their marketing purposes.
 
-11. Contact
+11. ChatGPT and AI App Integration
 
-For service and legal inquiries, contact: support@voxdigits.com`,
+The VoxTelefony ChatGPT app provides informational, read-only access to public number availability, eSIM plans, and retail rates. Results do not constitute a reservation, purchase, activation, or guarantee of availability or price. Users must complete any transaction directly through VoxTelefony and review the final price and service terms before purchase.
+
+The ChatGPT integration cannot access private account information or perform communications actions such as sending messages or placing calls. Use of ChatGPT is also subject to OpenAI's applicable terms and policies.
+
+12. Contact
+
+For service and legal inquiries, contact: legal@voxtelefony.com or support@voxdigits.com`,
 
     aup: `VoxDigits Communications LLC — Acceptable Use Policy
 
@@ -464,7 +477,7 @@ Address: 16809 Capon Tree Ln, Woodbridge, VA 22191, USA`
         </div>
 
         <h1 className="text-3xl font-bold mb-2">{POLICY_TYPES[activeType].label}</h1>
-        <p className="text-gray-400 text-sm mb-8">Last updated: March 2026</p>
+        <p className="text-gray-400 text-sm mb-8">Last updated: August 4, 2026</p>
 
         <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
            {loading ? (
