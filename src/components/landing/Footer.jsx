@@ -78,6 +78,7 @@ const footerSections = [
       { label: 'Press & Backlinks', to: '/press' },
       { label: 'Affiliate Program', to: '/affiliate-register' },
       { label: 'VPN Setup Guide', to: '/setup-guide' },
+      { label: 'MCP for ChatGPT', to: '/connect' },
     ],
   },
   {
