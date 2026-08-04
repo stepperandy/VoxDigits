@@ -26,7 +26,7 @@
   },
   {
     "tool": "query_androidsettings",
-    "count": 1,
+    "count": 0,
     "error": null
   },
   {
@@ -41,7 +41,7 @@
   },
   {
     "tool": "query_appstorelisting",
-    "count": 1,
+    "count": 0,
     "error": null
   },
   {
@@ -66,7 +66,7 @@
   },
   {
     "tool": "query_callforwardingrule",
-    "count": 1,
+    "count": 0,
     "error": null
   },
   {
@@ -76,12 +76,12 @@
   },
   {
     "tool": "query_campaignenrollment",
-    "count": 1,
+    "count": 0,
     "error": null
   },
   {
     "tool": "query_chatmessage",
-    "count": 1,
+    "count": 0,
     "error": null
   },
   {
@@ -116,7 +116,7 @@
   },
   {
     "tool": "query_esim",
-    "count": 1,
+    "count": 0,
     "error": null
   },
   {
@@ -131,7 +131,7 @@
   },
   {
     "tool": "query_iossettings",
-    "count": 1,
+    "count": 0,
     "error": null
   },
   {
@@ -166,12 +166,12 @@
   },
   {
     "tool": "query_numberorder",
-    "count": 1,
+    "count": 0,
     "error": null
   },
   {
     "tool": "query_ppccampaign",
-    "count": 1,
+    "count": 0,
     "error": null
   },
   {
@@ -181,7 +181,7 @@
   },
   {
     "tool": "query_pricingrule",
-    "count": 1,
+    "count": 0,
     "error": null
   },
   {
@@ -206,12 +206,12 @@
   },
   {
     "tool": "query_seocampaign",
-    "count": 1,
+    "count": 0,
     "error": null
   },
   {
     "tool": "query_smocampaign",
-    "count": 1,
+    "count": 0,
     "error": null
   },
   {
@@ -246,12 +246,12 @@
   },
   {
     "tool": "query_subscription",
-    "count": 1,
+    "count": 0,
     "error": null
   },
   {
     "tool": "query_supportticket",
-    "count": 1,
+    "count": 0,
     "error": null
   },
   {
@@ -271,7 +271,7 @@
   },
   {
     "tool": "query_userpreference",
-    "count": 1,
+    "count": 0,
     "error": null
   },
   {
@@ -301,7 +301,7 @@
   },
   {
     "tool": "query_voicemail",
-    "count": 1,
+    "count": 0,
     "error": null
   },
   {
