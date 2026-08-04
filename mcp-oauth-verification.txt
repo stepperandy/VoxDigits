@@ -1,0 +1,35 @@
+--- INITIALIZE WITHOUT AUTH ---
+HTTP/2 200 
+date: Tue, 04 Aug 2026 15:26:59 GMT
+content-type: text/event-stream
+cache-control: no-cache, no-transform
+x-render-origin-server: uvicorn
+referrer-policy: strict-origin-when-cross-origin
+rndr-id: 6095317c-4d24-4d22
+server: cloudflare
+strict-transport-security: max-age=31536000
+cf-cache-status: DYNAMIC
+cf-ray: a25e9560e86157d4-EWR
+alt-svc: h3=":443"; ma=86400
+
+event: message
+data: {"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2025-06-18","capabilities":{"experimental":{},"prompts":{"listChanged":false},"resources":{"subscribe":false,"listChanged":false},"tools":{"listChanged":false}},"serverInfo":{"name":"Base44 App","version":"1.26.0"},"instructions":"This public MCP server exposes only the app's configured public, read-only tools. The app's public permissions and row-level security are always enforced. Call tools/list to see what this app exposes."}}
+
+
+--- SENSITIVE CALL WITHOUT AUTH ---
+HTTP/2 200 
+date: Tue, 04 Aug 2026 15:26:59 GMT
+content-type: text/event-stream
+cache-control: no-cache, no-transform
+referrer-policy: strict-origin-when-cross-origin
+rndr-id: 4323512d-83ed-4600
+server: cloudflare
+strict-transport-security: max-age=31536000
+x-render-origin-server: uvicorn
+cf-cache-status: DYNAMIC
+cf-ray: a25e9563afce3e9d-EWR
+alt-svc: h3=":443"; ma=86400
+
+event: message
+data: {"jsonrpc":"2.0","id":2,"result":{"content":[{"type":"text","text":"{\"records\": [{\"to_number\": \"+19804791288\", \"error_message\": null, \"our_number\": \"+19804791288\", \"user_email\": \"aagble@gmail.com\", \"from_number\": \"+233551442248\", \"provider_message_id\": \"SMbcc1610be768b5c0394034a9b4e8b7b4\", \"error_code\": null, \"body\": \"How are you my friend\", \"delivered_at\": null, \"direction\": \"inbound\", \"status\": \"delivered\", \"id\": \"6a70e9606557d94add962f18\", \"created_date\": \"2026-08-03T19:17:52.580000\", \"updated_date\": \"2026-08-03T19:17:52.580000\", \"created_by_id\": \"service_596c8bdb-e158-448c-94ac-f92119a7f065\", \"is_sample\": false}], \"count\": 1, \"entity_name\": \"Message\"}"}],"structuredContent":{"records":[{"to_number":"+19804791288","error_message":null,"our_number":"+19804791288","user_email":"aagble@gmail.com","from_number":"+233551442248","provider_message_id":"SMbcc1610be768b5c0394034a9b4e8b7b4","error_code":null,"body":"How are you my friend","delivered_at":null,"direction":"inbound","status":"delivered","id":"6a70e9606557d94add962f18","created_date":"2026-08-03T19:17:52.580000","updated_date":"2026-08-03T19:17:52.580000","created_by_id":"service_596c8bdb-e158-448c-94ac-f92119a7f065","is_sample":false}],"count":1,"entity_name":"Message"},"isError":false}}
+
