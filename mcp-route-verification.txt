@@ -1,0 +1,95 @@
+--- https://voxtelefony.com/api/functions/mcp ---
+HTTP/2 200 
+date: Tue, 04 Aug 2026 15:24:24 GMT
+content-type: application/json; charset=utf-8
+access-control-allow-headers: Content-Type, Authorization, Mcp-Session-Id, MCP-Protocol-Version
+access-control-allow-methods: GET, POST, OPTIONS
+access-control-allow-origin: *
+access-control-expose-headers: Mcp-Session-Id
+alt-svc: h3=":443"; ma=86400
+cache-control: no-store
+x-render-origin-server: uvicorn
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+referrer-policy: strict-origin-when-cross-origin
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=UhB9MtHOliLCSfzOyFH0dTmHpdA%2FMO6ZsX4HmK64PSPimly%2BDvSP66U%2BGH6mpQha25kn7yQuCNvEN%2Bvniw6yEswN3DrR7UemUTMeBNT%2FrbAPXWnO4aGXmzgi%2FFSMeghNiCR5%2FYiIzOm%2FtHSX5USJeuDEROnih52w0wn9NLJgVWlw1A%3D%3D"}]}
+rndr-id: af0b3e3c-0aee-4057
+server: cloudflare
+strict-transport-security: max-age=31536000
+vary: Accept-Encoding
+cf-cache-status: DYNAMIC
+cf-ray: a25e919d6a253869-EWR
+
+{"name":"voxtelefony","title":"VoxTelefony","version":"1.1.0","description":"Find virtual phone numbers, eSIM plans, and retail voice or messaging rates from VoxTelefony.","protocol":"Model Context Protocol","transport":"Streamable HTTP","authentication":"none","access":"public read-only catalogue data","tools":[{"name":"search_virtual_numbers","title":"Search virtual numbers","description":"Search the live VoxTelefony catalogue for virtual phone numbers available in a specified country. This only checks availability and does not reserve or purchase a number.","annotations":{"readOnlyHint":true,"destructiveHint":false,"idempotentHint":true,"openWorldHint":true}},{"name":"get_service_pricing","title":"Get service pricing","description":"Get current VoxTelefony retail pricing for a supported number, calling, messaging, or eSIM category in a country. This only retrieves pricing and does not start a purchase.","annotations":{"readOnlyHint":true,"destructiveHint":false,"idempotentHint":true,"openWorldHint":true}},{"name":"list_esim_plans","title":"List eSIM plans","description":"List active VoxTelefony eSIM data plans, optionally filtered by country. This only retrieves plan information
+
+--- https://voxtelefony.com/functions/mcp ---
+HTTP/2 200 
+date: Tue, 04 Aug 2026 15:24:25 GMT
+content-type: application/json; charset=utf-8
+access-control-allow-headers: Content-Type, Authorization, Mcp-Session-Id, MCP-Protocol-Version
+access-control-allow-methods: GET, POST, OPTIONS
+access-control-allow-origin: *
+access-control-expose-headers: Mcp-Session-Id
+alt-svc: h3=":443"; ma=86400
+cache-control: no-store
+x-render-origin-server: uvicorn
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+referrer-policy: strict-origin-when-cross-origin
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=C1zCP%2BWB2VfM011sVBY7lLnYXTiTv0ot8Lqas7FUZfjiH4j7mR0Pzdz861vOEQtzVyNHqJFNo%2F6fyEQa8zPMDlJqOowQo7SeKKGY1%2FRKSw9VEYgb6r9rdsmVdrhAvJo4i8PHXLQG2VOUv7kVsOh9j9CgTSd8AorseoTpgoqCaOW4Qw%3D%3D"}]}
+rndr-id: 9c8cb663-0b9f-42a3
+server: cloudflare
+strict-transport-security: max-age=31536000
+vary: Accept-Encoding
+cf-cache-status: DYNAMIC
+cf-ray: a25e91a05ff67c8d-EWR
+
+{"name":"voxtelefony","title":"VoxTelefony","version":"1.1.0","description":"Find virtual phone numbers, eSIM plans, and retail voice or messaging rates from VoxTelefony.","protocol":"Model Context Protocol","transport":"Streamable HTTP","authentication":"none","access":"public read-only catalogue data","tools":[{"name":"search_virtual_numbers","title":"Search virtual numbers","description":"Search the live VoxTelefony catalogue for virtual phone numbers available in a specified country. This only checks availability and does not reserve or purchase a number.","annotations":{"readOnlyHint":true,"destructiveHint":false,"idempotentHint":true,"openWorldHint":true}},{"name":"get_service_pricing","title":"Get service pricing","description":"Get current VoxTelefony retail pricing for a supported number, calling, messaging, or eSIM category in a country. This only retrieves pricing and does not start a purchase.","annotations":{"readOnlyHint":true,"destructiveHint":false,"idempotentHint":true,"openWorldHint":true}},{"name":"list_esim_plans","title":"List eSIM plans","description":"List active VoxTelefony eSIM data plans, optionally filtered by country. This only retrieves plan information
+
+--- https://voxtelefony.com/api/mcp/ ---
+HTTP/2 406 
+date: Tue, 04 Aug 2026 15:24:25 GMT
+content-type: application/json
+referrer-policy: strict-origin-when-cross-origin
+rndr-id: 472ac289-d347-4ff6
+server: cloudflare
+strict-transport-security: max-age=31536000
+vary: Accept-Encoding
+x-render-origin-server: uvicorn
+cf-cache-status: DYNAMIC
+cf-ray: a25e91a4eafada06-EWR
+alt-svc: h3=":443"; ma=86400
+
+{"jsonrpc":"2.0","id":"server-error","error":{"code":-32600,"message":"Not Acceptable: Client must accept text/event-stream"}}
+
+--- https://voxtelefony.com/api/mcp?source=custom ---
+HTTP/2 406 
+date: Tue, 04 Aug 2026 15:24:26 GMT
+content-type: application/json
+referrer-policy: strict-origin-when-cross-origin
+rndr-id: 9c23db76-756f-4a39
+server: cloudflare
+strict-transport-security: max-age=31536000
+vary: Accept-Encoding
+x-render-origin-server: uvicorn
+cf-cache-status: DYNAMIC
+cf-ray: a25e91a67df5f834-EWR
+alt-svc: h3=":443"; ma=86400
+
+{"jsonrpc":"2.0","id":"server-error","error":{"code":-32600,"message":"Not Acceptable: Client must accept text/event-stream"}}
+
+--- https://69b202c06dc5b1988efe9645.base44.app/api/functions/mcp ---
+HTTP/2 404 
+date: Tue, 04 Aug 2026 15:24:26 GMT
+content-type: application/json
+access-control-allow-origin: *
+cf-cache-status: DYNAMIC
+referrer-policy: strict-origin-when-cross-origin
+rndr-id: ab8a1c06-7469-4198
+server: cloudflare
+strict-transport-security: max-age=31536000
+vary: Accept-Encoding
+x-render-origin-server: uvicorn
+cf-ray: a25e91a9cae5de92-EWR
+alt-svc: h3=":443"; ma=86400
+
+{"error_type":"HTTPException","message":"App not found","detail":"App not found","traceback":"","request_id":null}
+
