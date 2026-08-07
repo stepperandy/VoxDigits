@@ -33,7 +33,7 @@ const socials = [
     ),
   },
   {
-    href: 'https://instagram.com',
+    href: 'https://instagram.com/voxdigits',
     label: 'Instagram',
     glow: 'rgba(220,39,67,0.5)',
     gradient: 'linear-gradient(160deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
