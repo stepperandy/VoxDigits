@@ -1,4 +1,4 @@
-import { Menu, X, LogOut, Shield, Globe, MessageCircle } from 'lucide-react';
+import { Menu, X, LogOut, Shield, Globe } from 'lucide-react';
 import { useState, useEffect, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -22,6 +22,8 @@ export default function Navbar() {
   const [activeHash, setActiveHash] = useState('');
   const [announcementVisible, setAnnouncementVisible] = useState(true);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
+  const [mobileAccountOpen, setMobileAccountOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -64,8 +66,6 @@ export default function Navbar() {
     { label: 'eSIM', href: 'https://www.voxtelefony.com', external: true },
     { label: 'Virtual Numbers', href: 'https://www.voxtelefony.com', external: true },
     { label: t('support'), href: '/contact' },
-    { label: 'MCP', href: '/mcp' },
-    { label: t('choosePlan'), href: '/pricing' },
   ];
 
   return (
@@ -113,15 +113,6 @@ export default function Navbar() {
                 </Link>
               )}
 
-              {/* AI Assistant */}
-              <button
-                onClick={() => window.dispatchEvent(new CustomEvent('open-voxvpn-assistant'))}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-cyan-400 hover:text-cyan-300 transition-all"
-                title={t('aiAssistant')}
-              >
-                <MessageCircle size={14} /> {t('aiAssistant')}
-              </button>
-
               {/* Language dropdown */}
               <div className="relative">
                 <button
@@ -164,15 +155,7 @@ export default function Navbar() {
                 </Link>
               )}
               {user ? (
-                <>
-                  <span className="text-slate-400 text-xs hidden lg:block">{user.full_name}</span>
-                  <button
-                    onClick={() => base44.auth.logout('/')}
-                    className="flex items-center gap-1.5 px-2 py-1.5 text-slate-400 hover:text-white text-xs transition-colors"
-                  >
-                    <LogOut size={14} /> Log Out
-                  </button>
-                </>
+                <span className="text-slate-400 text-xs hidden lg:block">{user.full_name}</span>
               ) : (
                 <>
                   <Link
@@ -189,12 +172,34 @@ export default function Navbar() {
                   </Link>
                 </>
               )}
-              <Link
-                to="/business/login"
-                className="px-3 py-1.5 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 text-xs font-semibold rounded-full transition-all whitespace-nowrap"
-              >
-                Business Login
-              </Link>
+              {/* Account — Business Login + Log Out merged */}
+              <div className="relative">
+                <button
+                  onClick={() => setAccountDropdownOpen(!accountDropdownOpen)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 text-xs font-semibold rounded-full transition-all whitespace-nowrap"
+                >
+                  <Shield size={14} /> Account
+                </button>
+                {accountDropdownOpen && (
+                  <div className="absolute top-full right-0 mt-1 bg-[#0d1120] border border-white/10 rounded-lg shadow-lg z-50 min-w-40">
+                    <Link
+                      to="/business/login"
+                      onClick={() => setAccountDropdownOpen(false)}
+                      className="block px-4 py-2 text-sm text-cyan-400 hover:bg-white/5 transition-colors"
+                    >
+                      Business Login
+                    </Link>
+                    {user && (
+                      <button
+                        onClick={() => base44.auth.logout('/')}
+                        className="w-full text-left flex items-center gap-1.5 px-4 py-2 text-sm text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
+                      >
+                        <LogOut size={14} /> Log Out
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
               <Link
                 to="/business"
                 className="px-3 py-1.5 bg-cyan-400 hover:bg-cyan-300 text-black text-xs font-bold rounded-full transition-all shadow-lg shadow-cyan-500/20 whitespace-nowrap"
@@ -267,19 +272,29 @@ export default function Navbar() {
                   <Shield size={15} /> My Dashboard
                 </Link>
               )}
-              <div className="flex gap-2 pt-2">
-                {user ? (
-                  <button onClick={() => base44.auth.logout('/')} className="flex-1 py-2 border border-white/10 text-slate-300 text-sm font-medium rounded-full">Log Out</button>
-                ) : (
-                  <>
-                    <Link to="/vpn-login" onClick={() => setMobileOpen(false)} className="flex-1 py-2 text-center border border-white/10 text-slate-300 text-sm font-medium rounded-full">{t('logIn')}</Link>
-                    <Link to="/vpn-signup" onClick={() => setMobileOpen(false)} className="flex-1 py-2 text-center bg-white/10 text-white text-sm font-semibold rounded-full">{t('signUp')}</Link>
-                  </>
+              {!user && (
+                <div className="flex gap-2 pt-2">
+                  <Link to="/vpn-login" onClick={() => setMobileOpen(false)} className="flex-1 py-2 text-center border border-white/10 text-slate-300 text-sm font-medium rounded-full">{t('logIn')}</Link>
+                  <Link to="/vpn-signup" onClick={() => setMobileOpen(false)} className="flex-1 py-2 text-center bg-white/10 text-white text-sm font-semibold rounded-full">{t('signUp')}</Link>
+                </div>
+              )}
+              {/* Account — Business Login + Log Out merged */}
+              <div className="pt-2">
+                <button
+                  onClick={() => setMobileAccountOpen(!mobileAccountOpen)}
+                  className="w-full flex items-center justify-center gap-1.5 py-2 border border-cyan-500/30 text-cyan-400 text-sm font-semibold rounded-full"
+                >
+                  <Shield size={14} /> Account
+                </button>
+                {mobileAccountOpen && (
+                  <div className="mt-2 space-y-2">
+                    <Link to="/business/login" onClick={() => setMobileOpen(false)} className="block py-2 text-center text-cyan-400 text-sm font-medium">Business Login</Link>
+                    {user && (
+                      <button onClick={() => base44.auth.logout('/')} className="w-full py-2 text-center border border-white/10 text-slate-300 text-sm font-medium rounded-full">Log Out</button>
+                    )}
+                  </div>
                 )}
               </div>
-              <Link to="/business/login" onClick={() => setMobileOpen(false)} className="block py-2 text-center border border-cyan-500/30 text-cyan-400 text-sm font-semibold rounded-full">
-                Business Login
-              </Link>
               <Link to="/business" onClick={() => setMobileOpen(false)} className="block py-2 text-center bg-cyan-400 text-black text-sm font-bold rounded-full">
                 Business Sign Up
               </Link>
