@@ -44,7 +44,7 @@ const socials = [
     ),
   },
   {
-    href: 'https://youtube.com',
+    href: 'https://www.youtube.com/@voxdigitsofficial',
     label: 'YouTube',
     glow: 'rgba(204,0,0,0.45)',
     gradient: 'linear-gradient(160deg, #FF3030 0%, #CC0000 55%, #990000 100%)',
