@@ -11,7 +11,7 @@ const socials = [
     ),
   },
   {
-    href: 'https://x.com',
+    href: 'https://x.com/voxdigits',
     label: 'X',
     glow: 'rgba(120,120,120,0.4)',
     gradient: 'linear-gradient(160deg, #333333 0%, #1a1a1a 55%, #000000 100%)',
@@ -22,7 +22,7 @@ const socials = [
     ),
   },
   {
-    href: 'https://pinterest.com',
+    href: 'https://pinterest.com/voxdigits',
     label: 'Pinterest',
     glow: 'rgba(255,0,0,0.45)',
     gradient: 'linear-gradient(160deg, #FF0000 0%, #CC0000 55%, #990000 100%)',
