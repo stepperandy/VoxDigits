@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { SERVER_CONFIG_MAP } from '@/lib/vpnNativePlugin';
 import { base44 } from '@/api/base44Client';
+import TrialCounter from '@/components/mobile/TrialCounter';
 
 const NAV_ITEMS = [
   { id: 'home', label: 'Dashboard', icon: Shield },
@@ -151,10 +152,13 @@ export default function ServerList() {
                     <p className="text-cyan-400 text-xs font-semibold uppercase tracking-wider">
                       {subscription.plan} · {subscription.status}
                     </p>
-                    {subscription.renewal_date && (
+                    {subscription.renewal_date && subscription.plan !== 'Free Trial' && (
                       <p className="text-slate-600 text-[10px] mt-0.5">
                         Renews: {new Date(subscription.renewal_date).toLocaleDateString()}
                       </p>
+                    )}
+                    {subscription.plan === 'Free Trial' && subscription.renewal_date && (
+                      <TrialCounter renewalDate={subscription.renewal_date} />
                     )}
                   </>
                 ) : (
