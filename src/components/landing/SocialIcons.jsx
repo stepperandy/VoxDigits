@@ -1,6 +1,6 @@
 const socials = [
   {
-    href: 'https://web.facebook.com/profile.php?id=61593082887720',
+    href: 'https://www.facebook.com/voxdigits',
     label: 'Facebook',
     glow: 'rgba(0,102,255,0.45)',
     gradient: 'linear-gradient(160deg, #0066FF 0%, #0044CC 55%, #003399 100%)',
