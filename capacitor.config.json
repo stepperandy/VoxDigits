@@ -1,6 +1,6 @@
 {
   "appId": "com.voxvpn.app",
-  "appName": "VoxVPN",
+  "appName": "VoxTelefony",
   "webDir": "dist",
   "plugins": {
     "SplashScreen": {

@@ -1,6 +1,6 @@
 {
   "appId": "com.voxvpn.mobile",
-  "appName": "VoxVPN",
+  "appName": "VoxTelefony",
   "webDir": "dist",
   "server": {
     "androidScheme": "https"
