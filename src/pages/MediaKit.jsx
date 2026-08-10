@@ -32,7 +32,7 @@ export default function MediaKit() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
               { label: 'Company Name', value: 'VoxVPN' },
-              { label: 'Legal Entity', value: 'VoxDigits Communications LLC' },
+              { label: 'Legal Entity', value: 'VoxTelefony Communications LLC' },
               { label: 'Founded', value: '2020' },
               { label: 'Industry', value: 'Cybersecurity / VPN' },
               { label: 'Users', value: '10M+ worldwide' },
@@ -88,7 +88,7 @@ export default function MediaKit() {
             </button>
           </div>
           <p className="text-slate-400 text-sm leading-relaxed">
-            VoxVPN is a privacy-first VPN service providing military-grade AES-256 encryption, a strict no-logs policy, and high-speed servers across 60+ countries. Founded in 2020 by cybersecurity engineers and digital rights advocates, VoxVPN is operated by VoxDigits Communications LLC and serves over 10 million users worldwide. VoxVPN is available on Windows, macOS, Linux, iOS, Android, and routers, supporting both OpenVPN and WireGuard protocols. Learn more at voxvpn.net.
+            VoxVPN is a privacy-first VPN service providing military-grade AES-256 encryption, a strict no-logs policy, and high-speed servers across 60+ countries. Founded in 2020 by cybersecurity engineers and digital rights advocates, VoxVPN is operated by VoxTelefony Communications LLC and serves over 10 million users worldwide. VoxVPN is available on Windows, macOS, Linux, iOS, Android, and routers, supporting both OpenVPN and WireGuard protocols. Learn more at voxvpn.net.
           </p>
         </div>
 
@@ -113,7 +113,7 @@ export default function MediaKit() {
             <li className="flex items-start gap-2"><Globe size={14} className="text-cyan-400 mt-1 flex-shrink-0" /> Always use the official VoxVPN logo without modification.</li>
             <li className="flex items-start gap-2"><Globe size={14} className="text-cyan-400 mt-1 flex-shrink-0" /> Do not stretch, distort, or recolor the logo.</li>
             <li className="flex items-start gap-2"><Globe size={14} className="text-cyan-400 mt-1 flex-shrink-0" /> Maintain clear space around the logo equal to the height of the icon.</li>
-            <li className="flex items-start gap-2"><Globe size={14} className="text-cyan-400 mt-1 flex-shrink-0" /> Refer to the company as "VoxVPN" or "VoxDigits Communications LLC" for legal contexts.</li>
+            <li className="flex items-start gap-2"><Globe size={14} className="text-cyan-400 mt-1 flex-shrink-0" /> Refer to the company as "VoxVPN" or "VoxTelefony Communications LLC" for legal contexts.</li>
           </ul>
         </div>
       </div>
@@ -122,4 +122,4 @@ export default function MediaKit() {
   );
 }
 
-const BOILERPLATE = `VoxVPN is a privacy-first VPN service providing military-grade AES-256 encryption, a strict no-logs policy, and high-speed servers across 60+ countries. Founded in 2020 by cybersecurity engineers and digital rights advocates, VoxVPN is operated by VoxDigits Communications LLC and serves over 10 million users worldwide. VoxVPN is available on Windows, macOS, Linux, iOS, Android, and routers, supporting both OpenVPN and WireGuard protocols. Learn more at voxvpn.net.`;
+const BOILERPLATE = `VoxVPN is a privacy-first VPN service providing military-grade AES-256 encryption, a strict no-logs policy, and high-speed servers across 60+ countries. Founded in 2020 by cybersecurity engineers and digital rights advocates, VoxVPN is operated by VoxTelefony Communications LLC and serves over 10 million users worldwide. VoxVPN is available on Windows, macOS, Linux, iOS, Android, and routers, supporting both OpenVPN and WireGuard protocols. Learn more at voxvpn.net.`;

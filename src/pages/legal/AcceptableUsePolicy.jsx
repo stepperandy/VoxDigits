@@ -5,7 +5,7 @@ import { FileText, CheckCircle2, XCircle, ShieldCheck } from 'lucide-react';
 const sections = [
   {
     title: '1. Acceptable Use Overview',
-    text: 'This Acceptable Use Policy ("AUP") governs the use of VoxVPN services provided by VoxDigits Communications LLC. By using VoxVPN, you agree to comply with this policy. Violations may result in service suspension or account termination.',
+    text: 'This Acceptable Use Policy ("AUP") governs the use of VoxVPN services provided by VoxTelefony Communications LLC. By using VoxVPN, you agree to comply with this policy. Violations may result in service suspension or account termination.',
   },
   {
     title: '2. Permitted Use',
@@ -111,7 +111,7 @@ export default function AcceptableUsePolicy() {
           <div className="rounded-2xl p-8 mt-8 text-center"
             style={{ background: 'linear-gradient(135deg, rgba(0,212,255,0.08), rgba(0,212,255,0.02))', border: '1px solid rgba(0,212,255,0.2)' }}>
             <h2 className="text-white text-lg font-bold mb-2">Contact</h2>
-            <p className="text-slate-300 text-sm font-semibold mb-4">VoxDigits Communications LLC</p>
+            <p className="text-slate-300 text-sm font-semibold mb-4">VoxTelefony Communications LLC</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a href="mailto:abuse@voxvpn.net" className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors">abuse@voxvpn.net</a>
               <a href="mailto:admin@voxdigits.com" className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors">admin@voxdigits.com</a>

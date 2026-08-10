@@ -1,0 +1,57 @@
+[
+  {
+    "name": "US local-number availability",
+    "prompt": "Find up to three available local US phone numbers in area code 212.",
+    "expected_tool": "search_virtual_numbers",
+    "expected_arguments": {
+      "country_code": "US",
+      "area_code": "212",
+      "number_type": "local"
+    },
+    "success_criteria": "The plugin returns live matching inventory or a truthful empty/unavailable status without inventing numbers."
+  },
+  {
+    "name": "US local-number retail price",
+    "prompt": "What is VoxTelefony's monthly retail price for a US local virtual number?",
+    "expected_tool": "get_service_pricing",
+    "expected_arguments": {
+      "category": "number_local",
+      "country_code": "US"
+    },
+    "success_criteria": "The plugin returns the published retail amount, currency, billing unit, and source status."
+  },
+  {
+    "name": "Canada eSIM plans",
+    "prompt": "Show me VoxTelefony eSIM plans available for Canada.",
+    "expected_tool": "list_esim_plans",
+    "expected_arguments": {
+      "country_code": "CA"
+    },
+    "success_criteria": "The plugin returns public Canada plans with data allowance, duration, and retail price."
+  },
+  {
+    "name": "United States call rates",
+    "prompt": "What are VoxTelefony's inbound and outbound calling rates for the United States?",
+    "expected_tool": "get_call_rates",
+    "expected_arguments": {
+      "country_code": "US"
+    },
+    "success_criteria": "The plugin returns published inbound and outbound voice rates or clearly states which rate is unavailable."
+  },
+  {
+    "name": "Country pricing comparison",
+    "prompt": "Compare VoxTelefony's monthly local-number pricing for the United States and the United Kingdom.",
+    "expected_tool": "get_service_pricing",
+    "expected_calls": [
+      {
+        "category": "number_local",
+        "country_code": "US"
+      },
+      {
+        "category": "number_local",
+        "country_code": "GB"
+      }
+    ],
+    "success_criteria": "The assistant calls the pricing tool for both countries and presents a faithful comparison."
+  }
+]

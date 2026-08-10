@@ -76,83 +76,18 @@ Deno.serve(async (req) => {
 
     const userEmail = authUser?.email || email;
 
-    // ── Admin bypass: admins have no device limits, no subscription required ──
-    // Admins can log in on any device system without credits or expiry.
-    const isAdmin = registeredUsers[0]?.role === 'admin' || authUser?.role === 'admin';
-    if (isAdmin) {
-      return new Response(JSON.stringify({
-        success: true,
-        token,
-        user: { email: userEmail, name: authUser?.full_name || null },
-        subscription: {
-          plan: 'Admin',
-          status: 'active',
-          renewal_date: null,
-          max_devices: 999,
-          plan_tier: 5,
-        },
-      }), { status: 200, headers: CORS });
-    }
-
-    // ── iOS App Store build: free access plus optional Apple Premium ──
-    if (String(device_type || '').toLowerCase() === 'ios') {
-      const appleEntitlements = await base44.asServiceRole.entities.AppleSubscriptionEntitlement.filter({
-        user_email: userEmail,
-        status: 'active',
-      });
-      const activeApple = (appleEntitlements || []).find(item =>
-        item.expires_at && new Date(item.expires_at).getTime() > Date.now()
-      );
-      return new Response(JSON.stringify({
-        success: true,
-        token,
-        user: { email: userEmail, name: authUser?.full_name || registeredUsers[0]?.full_name || null },
-        access: {
-          tier: activeApple ? 'premium' : 'free',
-          status: activeApple ? 'active' : 'free',
-          product_id: activeApple?.product_id || null,
-          expires_at: activeApple?.expires_at || null,
-        },
-      }), { status: 200, headers: CORS });
-    }
-
     // ── Step 3: Verify the user has an ACTIVE VoxVPN subscription ──
+    // Applies to ALL users — no admin bypass, no exceptions.
     const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
-    let activeSub = subs && subs.length > 0
+    const activeSub = subs && subs.length > 0
       ? subs.find(s => s.status === 'active' || s.status === 'trial')
       : null;
 
-    // ── Free trial: first 20 users get 15 days free, then blocked ──
-    if (!activeSub) {
-      const alreadyHadTrial = (subs || []).some(s => s.plan === 'Free Trial');
-
-      if (!alreadyHadTrial) {
-        const allTrials = await base44.asServiceRole.entities.VPNSubscription.filter({ plan: 'Free Trial' });
-        if ((allTrials || []).length < 20) {
-          const now = new Date();
-          activeSub = await base44.asServiceRole.entities.VPNSubscription.create({
-            user_email: userEmail,
-            plan: 'Free Trial',
-            status: 'trial',
-            billing_cycle: 'trial',
-            price: 0,
-            start_date: now.toISOString(),
-            renewal_date: new Date(now.getTime() + 15 * 86400000).toISOString(),
-            max_devices: 1,
-          });
-          console.log(`[authLogin] granted 15-day free trial to ${userEmail} (slot ${(allTrials || []).length + 1}/20)`);
-        }
-      }
-    }
-
     if (!activeSub) {
       const hasSubRecords = subs && subs.length > 0;
-      const hadTrial = (subs || []).some(s => s.plan === 'Free Trial');
-      const subMsg = hadTrial
-        ? 'Your 15-day free trial has ended. Please choose a plan to continue using VoxVPN.'
-        : hasSubRecords
-          ? 'Your subscription has expired or is not active. Please renew or choose a new plan.'
-          : 'Free trial slots are full. Please choose a plan to activate your VPN access.';
+      const subMsg = hasSubRecords
+        ? 'Your subscription has expired or is not active. Please renew or choose a new plan.'
+        : 'No active subscription found. Please choose a plan to activate your VPN access.';
       return new Response(JSON.stringify({
         success: false,
         message: subMsg,
