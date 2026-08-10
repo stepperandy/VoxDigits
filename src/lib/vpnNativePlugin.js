@@ -7,15 +7,38 @@
  * Native plugin source: android/app/src/main/java/net/voxvpn/mobile/VoxVpnPlugin.kt
  */
 
-import { registerPlugin } from '@capacitor/core';
+// Lazy-load @capacitor/core so it is only resolved when actually needed on a
+// native device. A static top-level import breaks the web/Vite build because
+// @capacitor/core cannot be resolved in the browser bundle context.
+const isNative = typeof window !== 'undefined' &&
+  window.Capacitor &&
+  (window.Capacitor.isNative === true || window.Capacitor.platform !== 'web');
 
-// Register the native plugin — Capacitor will find VoxVpnPlugin on Android
-const VoxVpnNative = registerPlugin('VoxVpnPlugin', {
-  // Web fallback: used in browser/Vite preview — simulates the native API
-  web: () => import('./vpnNativePluginWebFallback').then(m => new m.VoxVpnPluginWeb()),
-});
+let _instance = null;
 
-export default VoxVpnNative;
+/**
+ * Returns the native VoxVpnPlugin on Android, or the web mock in the browser.
+ * Call this before invoking plugin methods (connect/disconnect/getStatus/addListener).
+ */
+export async function getVpnPlugin() {
+  if (_instance) return _instance;
+  if (isNative) {
+    // Use @vite-ignore + variable so Vite does not try to resolve @capacitor/core
+    // during the web build (the package is injected by the Capacitor runtime on
+    // native devices, not available in the browser bundle context).
+    const capMod = '@capacitor/core';
+    const { registerPlugin } = await import(/* @vite-ignore */ capMod);
+    _instance = registerPlugin('VoxVpnPlugin', {
+      web: () => import('./vpnNativePluginWebFallback').then(m => new m.VoxVpnPluginWeb()),
+    });
+  } else {
+    const { VoxVpnPluginWeb } = await import('./vpnNativePluginWebFallback');
+    _instance = new VoxVpnPluginWeb();
+  }
+  return _instance;
+}
+
+export default { getVpnPlugin };
 
 /**
  * SERVER CONFIG MAP
