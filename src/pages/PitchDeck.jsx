@@ -40,9 +40,9 @@ const traction = [
 ];
 
 const projections = [
-  { year: '2024', arr: '$2.4M', margin: '81%', headcount: '34' },
-  { year: '2025', arr: '$6.1M', margin: '83%', headcount: '58' },
   { year: '2026', arr: '$13.8M', margin: '85%', headcount: '92' },
+  { year: '2027', arr: '$28.4M', margin: '87%', headcount: '134' },
+  { year: '2028', arr: '$52.1M', margin: '88%', headcount: '186' },
 ];
 
 const team = [
