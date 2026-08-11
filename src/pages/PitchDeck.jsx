@@ -102,8 +102,8 @@ export default function PitchDeck() {
             ))}
           </div>
           <div className="mt-6 p-5 rounded-2xl border border-white/8 bg-white/3 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center text-xs text-slate-500">
-            <div><span className="block text-white font-semibold">2022</span>Founded</div>
-            <div><span className="block text-white font-semibold">Austin, TX</span>Remote-first · 34 employees</div>
+            <div><span className="block text-white font-semibold">2026</span>Founded</div>
+            <div><span className="block text-white font-semibold">Woodbridge, VA</span>Remote-first · 34 employees</div>
             <div><span className="block text-white font-semibold">Series A</span>Stage</div>
             <div><span className="block text-white font-semibold">$6,000,000</span>Ask</div>
           </div>
