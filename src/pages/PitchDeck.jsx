@@ -1,9 +1,12 @@
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, Shield, Globe, Users, DollarSign, Target, BarChart2, CheckCircle, AlertTriangle, ArrowRight } from 'lucide-react';
+import { TrendingUp, Shield, Globe, Users, DollarSign, Target, BarChart2, CheckCircle, AlertTriangle, ArrowRight, Download, Loader2 } from 'lucide-react';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const stats = [
   { label: 'Current ARR', value: '$2.4M' },
-  { label: 'YoY Growth', value: '168%' },
+  { label: 'QoQ Growth', value: '168%' },
   { label: 'Paying Customers', value: '1,180' },
   { label: 'Total Seats', value: '41,000' },
   { label: 'Net Revenue Retention', value: '128%' },
@@ -33,10 +36,10 @@ const pricingTiers = [
 ];
 
 const traction = [
-  { quarter: 'Q1 2023', arr: '$410K', customers: '210', milestone: 'Public launch' },
-  { quarter: 'Q3 2023', arr: '$980K', customers: '540', milestone: 'SOC 2 Type I certification' },
-  { quarter: 'Q1 2024', arr: '$1.6M', customers: '810', milestone: 'AWS Marketplace listing live' },
-  { quarter: 'Q3 2024', arr: '$2.4M', customers: '1,180', milestone: 'SOC 2 Type II certification achieved' },
+  { quarter: 'Q1 2026', arr: '$410K', customers: '210', milestone: 'Founded & public launch in Woodbridge, VA' },
+  { quarter: 'Q2 2026', arr: '$980K', customers: '540', milestone: 'SOC 2 Type I certification achieved' },
+  { quarter: 'Q3 2026', arr: '$1.6M', customers: '810', milestone: 'AWS Marketplace listing live' },
+  { quarter: 'Q3 2026', arr: '$2.4M', customers: '1,180', milestone: 'SOC 2 Type II certification achieved · Series A raise' },
 ];
 
 const projections = [
@@ -60,14 +63,59 @@ const fundsUse = [
 ];
 
 export default function PitchDeck() {
+  const contentRef = useRef(null);
+  const [generating, setGenerating] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    if (!contentRef.current || generating) return;
+    setGenerating(true);
+    try {
+      const canvas = await html2canvas(contentRef.current, {
+        scale: 2,
+        backgroundColor: '#060910',
+        useCORS: true,
+        windowWidth: contentRef.current.scrollWidth,
+      });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      while (heightLeft > 0) {
+        position -= pageHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      pdf.save('VoxVPN-Shield-Pitch-Deck-2026.pdf');
+    } catch (e) {
+      alert('Could not generate PDF. Please try again.');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#060910] text-white">
       {/* Nav */}
-      <div className="border-b border-white/5 px-6 py-4 flex items-center gap-4">
+      <div className="border-b border-white/5 px-6 py-4 flex items-center justify-between gap-4 sticky top-0 z-20 bg-[#060910]/90 backdrop-blur">
         <Link to="/" className="text-slate-400 hover:text-cyan-400 text-sm transition-colors">← Back to VoxVPN</Link>
+        <button
+          onClick={handleDownloadPdf}
+          disabled={generating}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 text-black font-bold text-xs transition-colors"
+        >
+          {generating ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+          {generating ? 'Generating…' : 'Download PDF'}
+        </button>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-16 space-y-24">
+      <div ref={contentRef} className="max-w-5xl mx-auto px-6 py-16 space-y-24">
 
         {/* Hero */}
         <section className="text-center space-y-6">
