@@ -96,6 +96,7 @@ const footerSections = [
       { label: 'Careers', to: '/careers' },
       { label: 'Press Page', to: '/press' },
       { label: 'Media Kit', to: '/media-kit' },
+      { label: 'Investor Pitch', to: '/pitch' },
     ],
   },
   {
