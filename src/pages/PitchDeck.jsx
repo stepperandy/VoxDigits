@@ -120,7 +120,7 @@ export default function PitchDeck() {
         {/* Hero */}
         <section className="text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold text-cyan-400 border border-cyan-400/30 bg-cyan-400/5">
-            Series A · $6M Raise
+            Series A · $500K Raise
           </div>
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-tight">
             VoxVPN<span className="text-cyan-400">/</span>Shield
@@ -153,7 +153,7 @@ export default function PitchDeck() {
             <div><span className="block text-white font-semibold">2026</span>Founded</div>
             <div><span className="block text-white font-semibold">Woodbridge, VA</span>Remote-first · 34 employees</div>
             <div><span className="block text-white font-semibold">Series A</span>Stage</div>
-            <div><span className="block text-white font-semibold">$6,000,000</span>Ask</div>
+            <div><span className="block text-white font-semibold">$500,000</span>Ask</div>
           </div>
         </section>
 
@@ -372,7 +372,7 @@ export default function PitchDeck() {
             <h2 className="text-2xl font-bold">The Ask</h2>
           </div>
           <div className="p-8 rounded-2xl border border-amber-400/20 bg-amber-400/5 text-center mb-8">
-            <p className="text-5xl font-black text-amber-400">$6,000,000</p>
+            <p className="text-5xl font-black text-amber-400">$500,000</p>
             <p className="text-slate-400 mt-2 text-sm">Series A Funding Round</p>
           </div>
           <div className="space-y-3">
