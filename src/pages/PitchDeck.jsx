@@ -49,7 +49,7 @@ const projections = [
 ];
 
 const team = [
-  { name: 'Maria Ellison', role: 'CEO & Co-Founder', bg: 'Former VP Product, network security startup (acquired 2021)' },
+  { name: 'Andre Amenuku-Agble', role: 'CEO & Founder', bg: 'Founder of VoxDigits Communications LLC (est. 2026, Woodbridge, VA); leads product vision and go-to-market strategy' },
   { name: 'Devon Okafor', role: 'CTO & Co-Founder', bg: 'Ex-senior engineer, WireGuard contributor community' },
   { name: 'Priya Nandakumar', role: 'Head of Sales', bg: '12 years B2B SaaS sales leadership' },
   { name: 'James Alcott', role: 'Head of Compliance', bg: 'Former GDPR compliance consultant, EU regulatory advisory' },
