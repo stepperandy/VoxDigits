@@ -1,5 +1,6 @@
 {
   "type": "object",
+  "name": "AppleSubscriptionEntitlement",
   "properties": {
     "user_email": {
       "type": "string"
@@ -56,6 +57,5 @@
         "role": "admin"
       }
     }
-  },
-  "name": "AppleSubscriptionEntitlement"
+  }
 }

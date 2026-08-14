@@ -1,633 +1,270 @@
 import { createContext, useState, useEffect, useContext } from 'react';
-import { base44 } from '@/api/base44Client';
 
 export const LanguageContext = createContext();
 
-export const translations = {
-  en: {
-    home: 'Home', features: 'Features', servers: 'Servers', pricing: 'Pricing',
-    support: 'Support', logIn: 'Log In', signUp: 'Sign Up', choosePlan: 'Choose a Plan',
-    heroTitle: 'Your Privacy. Fully Protected.',
-    heroSubtitle: 'VoxVPN shields your identity with military-grade encryption, a strict no-logs policy, and blazing-fast servers in 60+ countries.',
-    getVoxvpn: 'Get VoxVPN Now', seeHowItWorks: 'See How It Works',
-    questionsContact: 'Questions? Contact us →',
-    trustNoLogs: 'No-Logs Policy', trustAES: 'AES-256 Encryption', trustLocations: '60+ Locations',
-    trustKillSwitch: 'Kill Switch', trustMoneyBack: '30-Day Money-Back', trustSupport: '24/7 Support',
-    vpnStatusCard: 'VPN Status Card', protected: 'Protected', disconnect: 'Disconnect', founded: 'Founded 2020',
-    footerTagline: 'Your privacy is our priority. Stay protected, stay unrestricted.',
-    weAccept: 'We Accept', followUs: 'Follow Us',
-    footerRights: '© 2026 VoxDigits Communications LLC. All rights reserved. www.voxvpn.net',
-    footerAbout: 'About', footerContact: 'Contact', footerPrivacy: 'Privacy Policy',
-    footerTerms: 'Terms', footerRefund: 'Refund Policy', footerCookie: 'Cookie Policy',
-    aiAssistant: 'AI Assistant',
-    whyVoxvpn: 'Why VoxVPN', featuresTitle1: 'Everything you need.', featuresTitle2: "Nothing you don't.",
-    featuresSubtitle: 'Every feature is designed with one goal: keeping you private, safe, and unrestricted online.',
-    readyProtected: 'Ready to get protected?', joinUsers: 'Join 2,500+ users who trust VoxVPN. Plans start at $2.49/mo.', viewPlans: 'View Plans →',
-    statServers: 'VPN Servers', statServersSub: 'across the globe', statCountries: 'Countries', statCountriesSub: 'server locations worldwide',
-    statCustomers: 'Active Customers', statCustomersSub: 'protected worldwide', statUptime: 'Uptime SLA', statUptimeSub: 'guaranteed reliability',
-    globalNetwork: 'Global Network', serversTitle1: 'Servers on Every', serversTitle2: ' Continent',
-    serversSubtitle: 'Connect through our high-speed infrastructure in 20 locations across 4 continents. Every server runs VoxVPN with AES-256 encryption.',
-    totalServers: 'Total Servers', onlineNow: 'Online Now', locationsLabel: 'Locations', uptimeLabel: 'Uptime',
-    loadingNetwork: 'Loading live server network…', loadingMap: 'Loading map…', regionLocations: 'locations', moreLabel: 'more',
-    pricingLabel: 'Pricing', pricingTitle: 'Simple, Transparent Pricing',
-    pricingSubtitle: 'All plans include AES-256 encryption and a strict no-logs policy. Cancel anytime.',
-    pricesIn: 'Prices shown in', detectedLabel: 'Detected:',
-    liveSupport: 'Live, 24-hour customer support',
-    liveSupportDesc: "Real support from real people. We're available through instant live chat and email to help you set up and troubleshoot.",
-    contactSupport: 'Contact Support →', moneyBackTitle: '30-day money-back guarantee',
-    moneyBackDesc: "Our VPN is easy to use. So is our guarantee. If you're not satisfied, just ask Support for a full refund. No hassle, no risk.",
-    getVoxvpnCta: 'Get VoxVPN →', securePayment: 'Secure Payment by Stripe', pciCompliant: 'PCI-DSS Compliant',
-    pricingFooter: 'All prices auto-converted to your local currency ({code}). 30-day money-back guarantee. Secure payment via Stripe · Hubtel · Alipay · WeChat Pay.',
-    reviewsBadge: '4.9 / 5 — 12,000+ REVIEWS', testimonialsTitle: 'Loved by Users Worldwide',
-    testimonialsSubtitle: 'Join thousands of satisfied customers who trust VoxVPN to protect their privacy every day.',
-    trustedSecure: 'Trusted & Secure', trustedSubtitle: 'Privacy-first infrastructure, built to keep you protected',
-    featNoLogs: 'No-Logs Policy', featNoLogsDesc: 'We never record your browsing activity, IP address, or DNS queries.',
-    featFast: 'Lightning Fast', featFastDesc: 'Optimized VoxVPN routing ensures minimal speed loss globally.',
-    featAes: 'AES-256 Encryption', featAesDesc: 'Military-grade encryption protects every byte of your data in transit.',
-    featGeo: 'Bypass Geo-Blocks', featGeoDesc: 'Access Netflix, BBC iPlayer, Hulu and any geo-restricted content from 20 locations.',
-    featKill: 'Kill Switch', featKillDesc: 'If your VPN drops, our kill switch instantly cuts your internet.',
-    featDevices: 'All Your Devices', featDevicesDesc: 'Windows, macOS, iOS, Android, Linux — connect from 20 global locations.',
-    featWifi: 'Public WiFi Protection', featWifiDesc: 'Stay safe on coffee shop and airport WiFi automatically.',
-    featSplit: 'Split Tunneling', featSplitDesc: 'Choose which apps use the VPN and which use your normal connection.',
-    plan1Month: '1 Month', plan3Months: '3 Months', plan6Months: '6 Months', plan1Year: '1 Year', plan2Years: '2 Years',
-    days30: '30 Days Unlimited', days90: '90 Days Unlimited', days180: '180 Days Unlimited', days365: '365 Days Unlimited', days730: '730 Days Unlimited',
-    featUnlimitedBandwidth: 'Unlimited Bandwidth', featAllServers: 'All Server Locations', featDnsLeak: 'DNS Leak Protection', featPrioritySupport: 'Priority Support',
-    featDnsIpv6: 'DNS & IPv6 Leak Protection', featDedicatedIp: 'Dedicated IP Address', feat247Priority: '24/7 Priority Support', featStaticIp: 'Static Dedicated IP',
-    featDoubleVpn: 'Double VPN (Multi-hop)', featAccountManager: 'Dedicated Account Manager',
-    badgeMostPopular: 'Most Popular', badgeBestValue: 'Best Value',
-    btnGet: 'Get {period}', btnProcessing: 'Processing...', saveVsMonthly: 'Save {percent}% vs monthly', perMonth: '/mo',
-    payProcessor: 'Payment Processor', payProcessorVal: 'Stripe (PCI-DSS Level 1)',
-    payCards: 'Accepted Cards', payCardsVal: 'Visa, Mastercard, Amex, Discover',
-    payAltMethods: 'Alternative Methods', payAltVal: 'Apple Pay, Google Pay, Hubtel, Alipay',
-    payBillingCycle: 'Billing Cycle', payBillingVal: 'One-time per period (1mo–2yr)',
-    payAutoRenewal: 'Auto-Renewal', payAutoVal: 'Optional — cancel anytime',
-    payCancellation: 'Cancellation Policy', payCancelVal: 'Cancel anytime, no fees',
-    payMoneyBack: 'Money-Back Guarantee', payMoneyBackVal: '30-day full refund',
-    payCurrency: 'Currency', payCurrencyVal: '{code} (auto-converted from USD)',
-    payDisclaimerPre: 'Payments are processed securely by Stripe. VoxVPN never stores your full card details. Subscriptions can be cancelled at any time from your account dashboard. See our ',
-    refundPolicyLink: 'Refund Policy',
-    payDisclaimerPost: ' for full details. Taxes may apply based on your jurisdiction and are calculated at checkout. Invoices are available for download from your account dashboard after purchase.',
-    roleSoftwareEngineer: 'Software Engineer', roleDigitalNomad: 'Digital Nomad', roleBusinessOwner: 'Small Business Owner',
-    roleContentCreator: 'Content Creator', roleItConsultant: 'IT Consultant', roleFreelanceDesigner: 'Freelance Designer',
-    testimonial1: 'VoxVPN is the fastest VPN I have used. Streaming is buffer-free and the kill switch gives me peace of mind on public Wi-Fi.',
-    testimonial2: 'I travel full-time and VoxVPN keeps me connected everywhere. The global server coverage is incredible and setup took two minutes.',
-    testimonial3: 'Running a remote team means security is non-negotiable. The no-logs policy and AES-256 encryption checked every box for us.',
-    testimonial4: 'I access geo-restricted content daily for my work. VoxVPN unblocks everything seamlessly with zero speed loss. Highly recommend.',
-    testimonial5: 'The customer support team resolved my issue in minutes. Professional, fast, and reliable — exactly what I need from a VPN provider.',
-    testimonial6: 'Affordable, secure, and easy to use. The split tunneling feature is a game-changer for managing work and personal traffic.',
-  },
-  es: {
-    home: 'Inicio', features: 'Características', servers: 'Servidores', pricing: 'Precios',
-    support: 'Soporte', logIn: 'Iniciar sesión', signUp: 'Registrarse', choosePlan: 'Elegir un plan',
-    heroTitle: 'Tu Privacidad. Totalmente Protegida.',
-    heroSubtitle: 'VoxVPN protege tu identidad con cifrado de grado militar, una estricta política de no registro y servidores ultrarrápidos en más de 60 países.',
-    getVoxvpn: 'Obtén VoxVPN Ahora', seeHowItWorks: 'Ver Cómo Funciona',
-    questionsContact: '¿Preguntas? Contáctanos →',
-    trustNoLogs: 'Sin Registros', trustAES: 'Cifrado AES-256', trustLocations: '60+ Ubicaciones',
-    trustKillSwitch: 'Interruptor de Apagado', trustMoneyBack: '30 Días de Garantía', trustSupport: 'Soporte 24/7',
-    vpnStatusCard: 'Tarjeta de Estado VPN', protected: 'Protegido', disconnect: 'Desconectar', founded: 'Fundada 2020',
-    footerTagline: 'Tu privacidad es nuestra prioridad. Mantente protegido, mantente sin restricciones.',
-    weAccept: 'Aceptamos', followUs: 'Síguenos',
-    footerRights: '© 2026 VoxDigits Communications LLC. Todos los derechos reservados. www.voxvpn.net',
-    footerAbout: 'Acerca de', footerContact: 'Contacto', footerPrivacy: 'Política de Privacidad',
-    footerTerms: 'Términos', footerRefund: 'Política de Reembolso', footerCookie: 'Política de Cookies',
-    aiAssistant: 'Asistente IA',
-    whyVoxvpn: 'Por qué VoxVPN', featuresTitle1: 'Todo lo que necesitas.', featuresTitle2: 'Nada que no necesites.',
-    featuresSubtitle: 'Cada función está diseñada con un objetivo: mantenerte privado, seguro y sin restricciones en línea.',
-    readyProtected: '¿Listo para estar protegido?', joinUsers: 'Únete a más de 2.500 usuarios que confían en VoxVPN. Planes desde $2.49/mes.', viewPlans: 'Ver Planes →',
-    statServers: 'Servidores VPN', statServersSub: 'en todo el mundo', statCountries: 'Países', statCountriesSub: 'ubicaciones de servidores en todo el mundo',
-    statCustomers: 'Clientes Activos', statCustomersSub: 'protegidos en todo el mundo', statUptime: 'SLA de Disponibilidad', statUptimeSub: 'fiabilidad garantizada',
-    globalNetwork: 'Red Global', serversTitle1: 'Servidores en Cada', serversTitle2: ' Continente',
-    serversSubtitle: 'Conéctate a través de nuestra infraestructura de alta velocidad en 20 ubicaciones en 4 continentes. Cada servidor ejecuta VoxVPN con cifrado AES-256.',
-    totalServers: 'Servidores Totales', onlineNow: 'En Línea Ahora', locationsLabel: 'Ubicaciones', uptimeLabel: 'Disponibilidad',
-    loadingNetwork: 'Cargando red de servidores en vivo…', loadingMap: 'Cargando mapa…', regionLocations: 'ubicaciones', moreLabel: 'más',
-    pricingLabel: 'Precios', pricingTitle: 'Precios Simples y Transparentes',
-    pricingSubtitle: 'Todos los planes incluyen cifrado AES-256 y una estricta política de no registro. Cancela cuando quieras.',
-    pricesIn: 'Precios en', detectedLabel: 'Detectado:',
-    liveSupport: 'Soporte al cliente en vivo, 24 horas',
-    liveSupportDesc: 'Soporte real de personas reales. Estamos disponibles por chat en vivo y correo electrónico para ayudarte a configurar y solucionar problemas.',
-    contactSupport: 'Contactar Soporte →', moneyBackTitle: 'Garantía de devolución de 30 días',
-    moneyBackDesc: 'Nuestro VPN es fácil de usar. Al igual que nuestra garantía. Si no estás satisfecho, solo pide a Soporte un reembolso completo. Sin complicaciones, sin riesgo.',
-    getVoxvpnCta: 'Obtener VoxVPN →', securePayment: 'Pago Seguro por Stripe', pciCompliant: 'Cumple con PCI-DSS',
-    pricingFooter: 'Todos los precios se convierten a tu moneda local ({code}). Garantía de devolución de 30 días. Pago seguro vía Stripe · Hubtel · Alipay · WeChat Pay.',
-    reviewsBadge: '4.9 / 5 — +12.000 RESEÑAS', testimonialsTitle: 'Amado por Usuarios de Todo el Mundo',
-    testimonialsSubtitle: 'Únete a miles de clientes satisfechos que confían en VoxVPN para proteger su privacidad cada día.',
-    trustedSecure: 'Confiable y Seguro', trustedSubtitle: 'Infraestructura centrada en la privacidad, diseñada para mantenerte protegido',
-    featNoLogs: 'Sin Registros', featNoLogsDesc: 'Nunca registramos tu actividad de navegación, dirección IP ni consultas DNS.',
-    featFast: 'Ultrarrápido', featFastDesc: 'El enrutamiento optimizado de VoxVPN garantiza mínima pérdida de velocidad a nivel global.',
-    featAes: 'Cifrado AES-256', featAesDesc: 'Cifrado de grado militar protege cada byte de tus datos en tránsito.',
-    featGeo: 'Evitar Bloqueos Geo', featGeoDesc: 'Accede a Netflix, BBC iPlayer, Hulu y cualquier contenido geo-restringido desde 20 ubicaciones.',
-    featKill: 'Interruptor de Apagado', featKillDesc: 'Si tu VPN se desconecta, nuestro interruptor corta tu internet al instante.',
-    featDevices: 'Todos Tus Dispositivos', featDevicesDesc: 'Windows, macOS, iOS, Android, Linux — conéctate desde 20 ubicaciones globales.',
-    featWifi: 'Protección WiFi Pública', featWifiDesc: 'Mantente seguro en WiFi de cafeterías y aeropuertos automáticamente.',
-    featSplit: 'Túnel Dividido', featSplitDesc: 'Elige qué aplicaciones usan la VPN y cuáles usan tu conexión normal.',
-    plan1Month: '1 Mes', plan3Months: '3 Meses', plan6Months: '6 Meses', plan1Year: '1 Año', plan2Years: '2 Años',
-    days30: '30 Días Ilimitados', days90: '90 Días Ilimitados', days180: '180 Días Ilimitados', days365: '365 Días Ilimitados', days730: '730 Días Ilimitados',
-    featUnlimitedBandwidth: 'Ancho de Banda Ilimitado', featAllServers: 'Todas las Ubicaciones de Servidores', featDnsLeak: 'Protección contra Fugas DNS', featPrioritySupport: 'Soporte Prioritario',
-    featDnsIpv6: 'Protección contra Fugas DNS e IPv6', featDedicatedIp: 'Dirección IP Dedicada', feat247Priority: 'Soporte Prioritario 24/7', featStaticIp: 'IP Dedicada Estática',
-    featDoubleVpn: 'Doble VPN (Multi-salto)', featAccountManager: 'Gerente de Cuenta Dedicado',
-    badgeMostPopular: 'Más Popular', badgeBestValue: 'Mejor Valor',
-    btnGet: 'Obtener {period}', btnProcessing: 'Procesando...', saveVsMonthly: 'Ahorra {percent}% vs mensual', perMonth: '/mes',
-    payProcessor: 'Procesador de Pagos', payProcessorVal: 'Stripe (PCI-DSS Nivel 1)',
-    payCards: 'Tarjetas Aceptadas', payCardsVal: 'Visa, Mastercard, Amex, Discover',
-    payAltMethods: 'Métodos Alternativos', payAltVal: 'Apple Pay, Google Pay, Hubtel, Alipay',
-    payBillingCycle: 'Ciclo de Facturación', payBillingVal: 'Pago único por periodo (1mes–2años)',
-    payAutoRenewal: 'Renovación Automática', payAutoVal: 'Opcional — cancela cuando quieras',
-    payCancellation: 'Política de Cancelación', payCancelVal: 'Cancela cuando quieras, sin cargos',
-    payMoneyBack: 'Garantía de Devolución', payMoneyBackVal: 'Reembolso total de 30 días',
-    payCurrency: 'Moneda', payCurrencyVal: '{code} (convertido automáticamente desde USD)',
-    payDisclaimerPre: 'Los pagos son procesados de forma segura por Stripe. VoxVPN nunca almacena los detalles completos de tu tarjeta. Las suscripciones se pueden cancelar en cualquier momento desde tu panel de cuenta. Consulta nuestra ',
-    refundPolicyLink: 'Política de Reembolso',
-    payDisclaimerPost: ' para más detalles. Los impuestos pueden aplicar según tu jurisdicción y se calculan en el pago. Las facturas están disponibles para descargar desde tu panel de cuenta después de la compra.',
-    roleSoftwareEngineer: 'Ingeniero de Software', roleDigitalNomad: 'Nómada Digital', roleBusinessOwner: 'Propietario de Pequeña Empresa',
-    roleContentCreator: 'Creador de Contenido', roleItConsultant: 'Consultor de TI', roleFreelanceDesigner: 'Diseñador Freelance',
-    testimonial1: 'VoxVPN es el VPN más rápido que he usado. El streaming es sin búfer y el interruptor de apagado me da tranquilidad en Wi-Fi público.',
-    testimonial2: 'Viajo a tiempo completo y VoxVPN me mantiene conectado en todas partes. La cobertura global de servidores es increíble y la configuración tomó dos minutos.',
-    testimonial3: 'Dirigir un equipo remoto significa que la seguridad no es negociable. La política de no registros y el cifrado AES-256 cumplieron todos nuestros requisitos.',
-    testimonial4: 'Accedo a contenido geo-restringido diariamente para mi trabajo. VoxVPN desbloquea todo sin problemas y sin pérdida de velocidad. Muy recomendable.',
-    testimonial5: 'El equipo de soporte al cliente resolvió mi problema en minutos. Profesional, rápido y confiable — exactamente lo que necesito de un proveedor de VPN.',
-    testimonial6: 'Asequible, seguro y fácil de usar. La función de túnel dividido es un cambio radical para gestionar el tráfico de trabajo y personal.',
-  },
-  fr: {
-    home: 'Accueil', features: 'Caractéristiques', servers: 'Serveurs', pricing: 'Tarification',
-    support: 'Support', logIn: 'Connexion', signUp: "S'inscrire", choosePlan: 'Choisir un forfait',
-    heroTitle: 'Votre Confidentialité. Totalement Protégée.',
-    heroSubtitle: "VoxVPN protège votre identité avec un chiffrement de qualité militaire, une politique stricte de non-journalisation et des serveurs ultra-rapides dans plus de 60 pays.",
-    getVoxvpn: 'Obtenez VoxVPN Maintenant', seeHowItWorks: "Voir Comment Ça Marche",
-    questionsContact: 'Des questions ? Contactez-nous →',
-    trustNoLogs: 'Sans Journal', trustAES: 'Chiffrement AES-256', trustLocations: '60+ Emplacements',
-    trustKillSwitch: "Coupure d'Urgence", trustMoneyBack: '30 Jours Garantis', trustSupport: 'Support 24/7',
-    vpnStatusCard: "Carte d'État VPN", protected: 'Protégé', disconnect: 'Déconnecter', founded: 'Fondée en 2020',
-    footerTagline: 'Votre confidentialité est notre priorité. Restez protégé, restez sans restriction.',
-    weAccept: 'Nous Acceptons', followUs: 'Suivez-nous',
-    footerRights: '© 2026 VoxDigits Communications LLC. Tous droits réservés. www.voxvpn.net',
-    footerAbout: 'À Propos', footerContact: 'Contact', footerPrivacy: 'Politique de Confidentialité',
-    footerTerms: 'Conditions', footerRefund: 'Politique de Remboursement', footerCookie: 'Politique de Cookies',
-    aiAssistant: 'Assistant IA',
-    whyVoxvpn: 'Pourquoi VoxVPN', featuresTitle1: 'Tout ce dont vous avez besoin.', featuresTitle2: "Rien que vous n'avez pas.",
-    featuresSubtitle: 'Chaque fonctionnalité est conçue dans un seul but : vous garder privé, en sécurité et sans restriction en ligne.',
-    readyProtected: 'Prêt à être protégé ?', joinUsers: 'Rejoignez plus de 2 500 utilisateurs qui font confiance à VoxVPN. Plans à partir de 2,49 $/mois.', viewPlans: 'Voir les Forfaits →',
-    statServers: 'Serveurs VPN', statServersSub: 'à travers le monde', statCountries: 'Pays', statCountriesSub: 'emplacements de serveurs dans le monde',
-    statCustomers: 'Clients Actifs', statCustomersSub: 'protégés dans le monde', statUptime: 'SLA de Disponibilité', statUptimeSub: 'fiabilité garantie',
-    globalNetwork: 'Réseau Global', serversTitle1: 'Des Serveurs sur Chaque', serversTitle2: ' Continent',
-    serversSubtitle: "Connectez-vous via notre infrastructure haute vitesse dans 20 emplacements sur 4 continents. Chaque serveur exécute VoxVPN avec chiffrement AES-256.",
-    totalServers: 'Serveurs Totaux', onlineNow: 'En Ligne', locationsLabel: 'Emplacements', uptimeLabel: 'Disponibilité',
-    loadingNetwork: 'Chargement du réseau de serveurs en direct…', loadingMap: 'Chargement de la carte…', regionLocations: 'emplacements', moreLabel: 'plus',
-    pricingLabel: 'Tarification', pricingTitle: 'Tarification Simple et Transparente',
-    pricingSubtitle: 'Tous les forfaits incluent le chiffrement AES-256 et une stricte politique de non-journalisation. Annulez à tout moment.',
-    pricesIn: 'Prix en', detectedLabel: 'Détecté :',
-    liveSupport: 'Support client en direct, 24 heures',
-    liveSupportDesc: "Un vrai support par de vraies personnes. Nous sommes disponibles par chat en direct et e-mail pour vous aider à configurer et dépanner.",
-    contactSupport: 'Contacter le Support →', moneyBackTitle: 'Garantie de remboursement de 30 jours',
-    moneyBackDesc: "Notre VPN est facile à utiliser. Notre garantie aussi. Si vous n'êtes pas satisfait, demandez simplement au Support un remboursement complet. Sans tracas, sans risque.",
-    getVoxvpnCta: 'Obtenir VoxVPN →', securePayment: 'Paiement Sécurisé par Stripe', pciCompliant: 'Conforme PCI-DSS',
-    pricingFooter: 'Tous les prix sont convertis dans votre devise locale ({code}). Garantie de remboursement de 30 jours. Paiement sécurisé via Stripe · Hubtel · Alipay · WeChat Pay.',
-    reviewsBadge: '4,9 / 5 — +12 000 AVIS', testimonialsTitle: 'Adoré par les Utilisateurs du Monde Entier',
-    testimonialsSubtitle: 'Rejoignez des milliers de clients satisfaits qui font confiance à VoxVPN pour protéger leur vie privée chaque jour.',
-    trustedSecure: 'Fiable et Sécurisé', trustedSubtitle: 'Infrastructure axée sur la confidentialité, conçue pour vous garder protégé',
-    featNoLogs: 'Sans Journal', featNoLogsDesc: "Nous n'enregistrons jamais votre activité de navigation, votre adresse IP ni vos requêtes DNS.",
-    featFast: 'Ultra Rapide', featFastDesc: 'Le routage optimisé VoxVPN garantit une perte de vitesse minimale à travers le monde.',
-    featAes: 'Chiffrement AES-256', featAesDesc: 'Un chiffrement de qualité militaire protège chaque octet de vos données en transit.',
-    featGeo: 'Contourner les Blocages Géo', featGeoDesc: "Accédez à Netflix, BBC iPlayer, Hulu et tout contenu géo-restreint depuis 20 emplacements.",
-    featKill: "Coupure d'Urgence", featKillDesc: 'Si votre VPN se déconnecte, notre coupure coupe votre internet instantanément.',
-    featDevices: 'Tous Vos Appareils', featDevicesDesc: 'Windows, macOS, iOS, Android, Linux — connectez-vous depuis 20 emplacements globaux.',
-    featWifi: 'Protection WiFi Public', featWifiDesc: 'Restez en sécurité sur le WiFi des cafés et aéroports automatiquement.',
-    featSplit: 'Tunneling Fractionné', featSplitDesc: 'Choisissez quelles applications utilisent le VPN et lesquelles utilisent votre connexion normale.',
-    plan1Month: '1 Mois', plan3Months: '3 Mois', plan6Months: '6 Mois', plan1Year: '1 An', plan2Years: '2 Ans',
-    days30: '30 Jours Illimités', days90: '90 Jours Illimités', days180: '180 Jours Illimités', days365: '365 Jours Illimités', days730: '730 Jours Illimités',
-    featUnlimitedBandwidth: 'Bande Passante Illimitée', featAllServers: 'Tous les Emplacements de Serveurs', featDnsLeak: 'Protection contre Fuite DNS', featPrioritySupport: 'Support Prioritaire',
-    featDnsIpv6: 'Protection contre Fuite DNS et IPv6', featDedicatedIp: 'Adresse IP Dédiée', feat247Priority: 'Support Prioritaire 24/7', featStaticIp: 'IP Dédiée Statique',
-    featDoubleVpn: 'Double VPN (Multi-saut)', featAccountManager: 'Gestionnaire de Compte Dédié',
-    badgeMostPopular: 'Le Plus Populaire', badgeBestValue: 'Meilleure Valeur',
-    btnGet: 'Obtenir {period}', btnProcessing: 'Traitement...', saveVsMonthly: 'Économisez {percent}% vs mensuel', perMonth: '/mois',
-    payProcessor: 'Processeur de Paiement', payProcessorVal: 'Stripe (PCI-DSS Niveau 1)',
-    payCards: 'Cartes Acceptées', payCardsVal: 'Visa, Mastercard, Amex, Discover',
-    payAltMethods: 'Méthodes Alternatives', payAltVal: 'Apple Pay, Google Pay, Hubtel, Alipay',
-    payBillingCycle: 'Cycle de Facturation', payBillingVal: 'Paiement unique par période (1mo–2ans)',
-    payAutoRenewal: 'Renouvellement Auto', payAutoVal: 'Optionnel — annulez à tout moment',
-    payCancellation: "Politique d'Annulation", payCancelVal: 'Annulez à tout moment, sans frais',
-    payMoneyBack: 'Garantie de Remboursement', payMoneyBackVal: 'Remboursement total de 30 jours',
-    payCurrency: 'Monnaie', payCurrencyVal: '{code} (converti automatiquement depuis USD)',
-    payDisclaimerPre: "Les paiements sont traités de manière sécurisée par Stripe. VoxVPN ne stocke jamais les détails complets de votre carte. Les abonnements peuvent être annulés à tout moment depuis votre tableau de bord. Consultez notre ",
-    refundPolicyLink: 'Politique de Remboursement',
-    payDisclaimerPost: " pour plus de détails. Les taxes peuvent s'appliquer selon votre juridiction et sont calculées au paiement. Les factures sont téléchargeables depuis votre tableau de bord après l'achat.",
-    roleSoftwareEngineer: 'Ingénieur Logiciel', roleDigitalNomad: 'Nomade Digital', roleBusinessOwner: 'Propriétaire de PME',
-    roleContentCreator: 'Créateur de Contenu', roleItConsultant: 'Consultant IT', roleFreelanceDesigner: 'Designer Freelance',
-    testimonial1: "VoxVPN est le VPN le plus rapide que j'aie utilisé. Le streaming est sans buffering et la coupure d'urgence me rassure sur le Wi-Fi public.",
-    testimonial2: "Je voyage à temps plein et VoxVPN me garde connecté partout. La couverture globale des serveurs est incroyable et l'installation a pris deux minutes.",
-    testimonial3: "Diriger une équipe à distance signifie que la sécurité n'est pas négociable. La politique sans journal et le chiffrement AES-256 ont coché toutes nos cases.",
-    testimonial4: "J'accède quotidiennement à du contenu géo-restreint pour mon travail. VoxVPN débloque tout sans problème et sans perte de vitesse. Recommandé.",
-    testimonial5: "L'équipe de support a résolu mon problème en quelques minutes. Professionnel, rapide et fiable — exactement ce que j'attends d'un fournisseur VPN.",
-    testimonial6: 'Abordable, sécurisé et facile à utiliser. Le tunneling fractionné est une révolution pour gérer le trafic professionnel et personnel.',
-  },
-  de: {
-    home: 'Startseite', features: 'Funktionen', servers: 'Server', pricing: 'Preisgestaltung',
-    support: 'Unterstützung', logIn: 'Anmelden', signUp: 'Registrieren', choosePlan: 'Plan wählen',
-    heroTitle: 'Ihre Privatsphäre. Vollständig Geschützt.',
-    heroSubtitle: 'VoxVPN schützt Ihre Identität mit militärischer Verschlüsselung, einer strengen No-Logs-Richtlinie und blitzschnellen Servern in über 60 Ländern.',
-    getVoxvpn: 'VoxVPN Jetzt Holen', seeHowItWorks: "So Funktioniert's",
-    questionsContact: 'Fragen? Kontaktieren Sie uns →',
-    trustNoLogs: 'Keine Protokolle', trustAES: 'AES-256-Verschlüsselung', trustLocations: '60+ Standorte',
-    trustKillSwitch: 'Kill-Switch', trustMoneyBack: '30 Tage Geld-zurück', trustSupport: '24/7 Support',
-    vpnStatusCard: 'VPN-Statuskarte', protected: 'Geschützt', disconnect: 'Trennen', founded: 'Gegründet 2020',
-    footerTagline: 'Ihre Privatsphäre ist unsere Priorität. Bleiben Sie geschützt, bleiben Sie unbeschränkt.',
-    weAccept: 'Wir Akzeptieren', followUs: 'Folgen Sie Uns',
-    footerRights: '© 2026 VoxDigits Communications LLC. Alle Rechte vorbehalten. www.voxvpn.net',
-    footerAbout: 'Über Uns', footerContact: 'Kontakt', footerPrivacy: 'Datenschutzrichtlinie',
-    footerTerms: 'AGB', footerRefund: 'Rückerstattungsrichtlinie', footerCookie: 'Cookie-Richtlinie',
-    aiAssistant: 'KI-Assistent',
-    whyVoxvpn: 'Warum VoxVPN', featuresTitle1: 'Alles, was Sie brauchen.', featuresTitle2: 'Nichts, was Sie nicht brauchen.',
-    featuresSubtitle: 'Jede Funktion ist auf ein Ziel ausgerichtet: Sie privat, sicher und uneingeschränkt online zu halten.',
-    readyProtected: 'Bereit, geschützt zu werden?', joinUsers: 'Treten Sie 2.500+ Nutzern bei, die VoxVPN vertrauen. Pläne ab 2,49 $/Monat.', viewPlans: 'Pläne Ansehen →',
-    statServers: 'VPN-Server', statServersSub: 'weltweit', statCountries: 'Länder', statCountriesSub: 'Server-Standorte weltweit',
-    statCustomers: 'Aktive Kunden', statCustomersSub: 'weltweit geschützt', statUptime: 'Verfügbarkeits-SLA', statUptimeSub: 'garantierte Zuverlässigkeit',
-    globalNetwork: 'Globales Netzwerk', serversTitle1: 'Server auf Jedem', serversTitle2: ' Kontinent',
-    serversSubtitle: 'Verbinden Sie sich über unsere Hochgeschwindigkeitsinfrastruktur an 20 Standorten auf 4 Kontinenten. Jeder Server läuft mit VoxVPN und AES-256-Verschlüsselung.',
-    totalServers: 'Server Gesamt', onlineNow: 'Jetzt Online', locationsLabel: 'Standorte', uptimeLabel: 'Verfügbarkeit',
-    loadingNetwork: 'Live-Servernetzwerk wird geladen…', loadingMap: 'Karte wird geladen…', regionLocations: 'Standorte', moreLabel: 'weitere',
-    pricingLabel: 'Preisgestaltung', pricingTitle: 'Einfache, Transparente Preisgestaltung',
-    pricingSubtitle: 'Alle Pläne enthalten AES-256-Verschlüsselung und eine strenge No-Logs-Richtlinie. Jederzeit kündbar.',
-    pricesIn: 'Preise in', detectedLabel: 'Erkannt:',
-    liveSupport: 'Live-Kundensupport, 24 Stunden',
-    liveSupportDesc: 'Echter Support von echten Menschen. Wir sind per Live-Chat und E-Mail verfügbar, um Ihnen bei Einrichtung und Fehlerbehebung zu helfen.',
-    contactSupport: 'Support Kontaktieren →', moneyBackTitle: '30-Tage-Geld-zurück-Garantie',
-    moneyBackDesc: 'Unser VPN ist einfach zu bedienen. Unsere Garantie auch. Wenn Sie nicht zufrieden sind, fordern Sie einfach beim Support eine volle Rückerstattung an. Keine Umstände, kein Risiko.',
-    getVoxvpnCta: 'VoxVPN Holen →', securePayment: 'Sichere Zahlung durch Stripe', pciCompliant: 'PCI-DSS-konform',
-    pricingFooter: 'Alle Preise werden in Ihre Landeswährung umgerechnet ({code}). 30-Tage-Geld-zurück-Garantie. Sichere Zahlung via Stripe · Hubtel · Alipay · WeChat Pay.',
-    reviewsBadge: '4,9 / 5 — 12.000+ BEWERTUNGEN', testimonialsTitle: 'Von Nutzern Weltweit Geliebt',
-    testimonialsSubtitle: 'Treten Sie Tausenden zufriedener Kunden bei, die VoxVPN vertrauen, um ihre Privatsphäre täglich zu schützen.',
-    trustedSecure: 'Vertrauenswürdig & Sicher', trustedSubtitle: 'Datenschutz-first Infrastruktur, gebaut um Sie zu schützen',
-    featNoLogs: 'Keine Protokolle', featNoLogsDesc: 'Wir zeichnen Ihre Surfaktivität, IP-Adresse oder DNS-Anfragen nie auf.',
-    featFast: 'Blitzschnell', featFastDesc: 'Optimiertes VoxVPN-Routing sorgt für minimalen Geschwindigkeitsverlust weltweit.',
-    featAes: 'AES-256-Verschlüsselung', featAesDesc: 'Militärische Verschlüsselung schützt jedes Byte Ihrer Daten bei der Übertragung.',
-    featGeo: 'Geo-Sperren Umgehen', featGeoDesc: 'Greifen Sie aus 20 Standorten auf Netflix, BBC iPlayer, Hulu und jede geografisch gesperrte Inhalte zu.',
-    featKill: 'Kill-Switch', featKillDesc: 'Wenn Ihre VPN-Verbindung abbricht, unterbricht unser Kill-Switch sofort Ihr Internet.',
-    featDevices: 'Alle Ihre Geräte', featDevicesDesc: 'Windows, macOS, iOS, Android, Linux — verbinden Sie sich aus 20 globalen Standorten.',
-    featWifi: 'Öffentliches WLAN-Schutz', featWifiDesc: 'Bleiben Sie in Cafés und an Flughäfen automatisch sicher.',
-    featSplit: 'Split-Tunneling', featSplitDesc: 'Wählen Sie, welche Apps das VPN nutzen und welche Ihre normale Verbindung verwenden.',
-    plan1Month: '1 Monat', plan3Months: '3 Monate', plan6Months: '6 Monate', plan1Year: '1 Jahr', plan2Years: '2 Jahre',
-    days30: '30 Tage Unbegrenzt', days90: '90 Tage Unbegrenzt', days180: '180 Tage Unbegrenzt', days365: '365 Tage Unbegrenzt', days730: '730 Tage Unbegrenzt',
-    featUnlimitedBandwidth: 'Unbegrenzte Bandbreite', featAllServers: 'Alle Server-Standorte', featDnsLeak: 'DNS-Leak-Schutz', featPrioritySupport: 'Priority-Support',
-    featDnsIpv6: 'DNS- & IPv6-Leak-Schutz', featDedicatedIp: 'Dedizierte IP-Adresse', feat247Priority: '24/7 Priority-Support', featStaticIp: 'Statische dedizierte IP',
-    featDoubleVpn: 'Double VPN (Multi-Hop)', featAccountManager: 'Dedizierter Account-Manager',
-    badgeMostPopular: 'Beliebteste', badgeBestValue: 'Bestes Angebot',
-    btnGet: '{period} wählen', btnProcessing: 'Wird verarbeitet...', saveVsMonthly: '{percent}% vs. monatlich sparen', perMonth: '/Monat',
-    payProcessor: 'Zahlungsprozessor', payProcessorVal: 'Stripe (PCI-DSS Level 1)',
-    payCards: 'Akzeptierte Karten', payCardsVal: 'Visa, Mastercard, Amex, Discover',
-    payAltMethods: 'Alternative Methoden', payAltVal: 'Apple Pay, Google Pay, Hubtel, Alipay',
-    payBillingCycle: 'Abrechnungszyklus', payBillingVal: 'Einmalig pro Zeitraum (1Mo–2Jr)',
-    payAutoRenewal: 'Auto-Verlängerung', payAutoVal: 'Optional — jederzeit kündbar',
-    payCancellation: 'Kündigungsrichtlinie', payCancelVal: 'Jederzeit kündbar, keine Gebühren',
-    payMoneyBack: 'Geld-zurück-Garantie', payMoneyBackVal: '30 Tage volle Rückerstattung',
-    payCurrency: 'Währung', payCurrencyVal: '{code} (automatisch aus USD umgerechnet)',
-    payDisclaimerPre: 'Zahlungen werden sicher von Stripe verarbeitet. VoxVPN speichert nie Ihre vollständigen Kartendaten. Abonnements können jederzeit in Ihrem Konto-Dashboard gekündigt werden. Siehe unsere ',
-    refundPolicyLink: 'Rückerstattungsrichtlinie',
-    payDisclaimerPost: ' für volle Details. Steuern können je nach Rechtsgebiet anfallen und werden an der Kasse berechnet. Rechnungen können nach dem Kauf aus Ihrem Konto-Dashboard heruntergeladen werden.',
-    roleSoftwareEngineer: 'Softwareingenieur', roleDigitalNomad: 'Digitaler Nomade', roleBusinessOwner: 'Kleinunternehmer',
-    roleContentCreator: 'Content-Ersteller', roleItConsultant: 'IT-Berater', roleFreelanceDesigner: 'Freelance-Designer',
-    testimonial1: 'VoxVPN ist das schnellste VPN, das ich je verwendet habe. Streaming ist pufferfrei und der Kill-Switch gibt mir Sicherheit im öffentlichen WLAN.',
-    testimonial2: 'Ich reise Vollzeit und VoxVPN hält mich überall verbunden. Die globale Serverabdeckung ist unglaublich und die Einrichtung dauerte zwei Minuten.',
-    testimonial3: 'Ein Remote-Team zu leiten bedeutet, dass Sicherheit nicht verhandelbar ist. Die No-Logs-Richtlinie und die AES-256-Verschlüsselung erfüllten alle unsere Anforderungen.',
-    testimonial4: 'Ich greife täglich für meine Arbeit auf geografisch gesperrte Inhalte zu. VoxVPN entsperrt alles nahtlos ohne Geschwindigkeitsverlust. Sehr empfehlenswert.',
-    testimonial5: 'Der Kundensupport hat mein Problem in Minuten gelöst. Professionell, schnell und zuverlässig — genau das, was ich von einem VPN-Anbieter erwarte.',
-    testimonial6: 'Erschwinglich, sicher und einfach zu bedienen. Split-Tunneling ist ein echter Gamechanger für die Verwaltung von Arbeits- und Privatverkehr.',
-  },
-  zh: {
-    home: '首页', features: '功能', servers: '服务器', pricing: '定价',
-    support: '支持', logIn: '登录', signUp: '注册', choosePlan: '选择计划',
-    heroTitle: '您的隐私。全面保护。',
-    heroSubtitle: 'VoxVPN 以军用级加密、严格的无日志策略和覆盖60+国家的超快服务器保护您的身份。',
-    getVoxvpn: '立即获取 VoxVPN', seeHowItWorks: '查看工作原理',
-    questionsContact: '有疑问？联系我们 →',
-    trustNoLogs: '无日志政策', trustAES: 'AES-256 加密', trustLocations: '60+ 地区',
-    trustKillSwitch: '终止开关', trustMoneyBack: '30天退款保证', trustSupport: '24/7 支持',
-    vpnStatusCard: 'VPN 状态卡', protected: '已保护', disconnect: '断开连接', founded: '成立于2020年',
-    footerTagline: '您的隐私是我们的首要任务。保持受保护，保持无限制。',
-    weAccept: '我们接受', followUs: '关注我们',
-    footerRights: '© 2026 VoxDigits Communications LLC. 版权所有. www.voxvpn.net',
-    footerAbout: '关于', footerContact: '联系', footerPrivacy: '隐私政策',
-    footerTerms: '条款', footerRefund: '退款政策', footerCookie: 'Cookie政策',
-    aiAssistant: 'AI助手',
-    whyVoxvpn: '为什么选择 VoxVPN', featuresTitle1: '您所需的一切。', featuresTitle2: '无需多余。',
-    featuresSubtitle: '每项功能都围绕一个目标设计：让您在线保持隐私、安全和无限制。',
-    readyProtected: '准备好获得保护了吗？', joinUsers: '加入2,500+信任VoxVPN的用户。套餐低至$2.49/月。', viewPlans: '查看套餐 →',
-    statServers: 'VPN服务器', statServersSub: '遍布全球', statCountries: '国家', statCountriesSub: '全球服务器位置',
-    statCustomers: '活跃客户', statCustomersSub: '全球受保护', statUptime: '正常运行SLA', statUptimeSub: '可靠保障',
-    globalNetwork: '全球网络', serversTitle1: '覆盖每个', serversTitle2: '大洲的服务器',
-    serversSubtitle: '通过我们位于4大洲20个位置的高速基础设施连接。每台服务器均运行VoxVPN并采用AES-256加密。',
-    totalServers: '服务器总数', onlineNow: '当前在线', locationsLabel: '位置', uptimeLabel: '正常运行',
-    loadingNetwork: '正在加载实时服务器网络…', loadingMap: '正在加载地图…', regionLocations: '个位置', moreLabel: '更多',
-    pricingLabel: '定价', pricingTitle: '简单透明的定价',
-    pricingSubtitle: '所有套餐均包含AES-256加密和严格的无日志政策。可随时取消。',
-    pricesIn: '价格以', detectedLabel: '检测到：',
-    liveSupport: '24小时实时客户支持',
-    liveSupportDesc: '真人提供真实支持。我们通过实时聊天和电子邮件提供帮助，协助您设置和排查问题。',
-    contactSupport: '联系支持 →', moneyBackTitle: '30天退款保证',
-    moneyBackDesc: '我们的VPN易于使用，我们的保证同样简单。如果您不满意，只需向支持团队申请全额退款。无麻烦，无风险。',
-    getVoxvpnCta: '获取 VoxVPN →', securePayment: 'Stripe安全支付', pciCompliant: '符合PCI-DSS',
-    pricingFooter: '所有价格自动换算为您的本地货币（{code}）。30天退款保证。通过Stripe · Hubtel · Alipay · WeChat Pay安全支付。',
-    reviewsBadge: '4.9 / 5 — 12,000+ 评价', testimonialsTitle: '深受全球用户喜爱',
-    testimonialsSubtitle: '加入数千名满意客户的行列，他们信任VoxVPN每天保护他们的隐私。',
-    trustedSecure: '可信与安全', trustedSubtitle: '隐私优先的基础设施，旨在保护您',
-    featNoLogs: '无日志政策', featNoLogsDesc: '我们绝不记录您的浏览活动、IP地址或DNS查询。',
-    featFast: '极速连接', featFastDesc: '优化的VoxVPN路由确保全球范围内的速度损失最小。',
-    featAes: 'AES-256加密', featAesDesc: '军用级加密保护您传输中的每一字节数据。',
-    featGeo: '突破地理限制', featGeoDesc: '从20个位置访问Netflix、BBC iPlayer、Hulu及任何地理限制内容。',
-    featKill: '终止开关', featKillDesc: '如果您的VPN断开，我们的终止开关会立即切断网络。',
-    featDevices: '所有设备', featDevicesDesc: 'Windows、macOS、iOS、Android、Linux — 从20个全球位置连接。',
-    featWifi: '公共WiFi保护', featWifiDesc: '在咖啡厅和机场WiFi上自动保持安全。',
-    featSplit: '拆分隧道', featSplitDesc: '选择哪些应用使用VPN，哪些使用普通连接。',
-    plan1Month: '1个月', plan3Months: '3个月', plan6Months: '6个月', plan1Year: '1年', plan2Years: '2年',
-    days30: '30天不限量', days90: '90天不限量', days180: '180天不限量', days365: '365天不限量', days730: '730天不限量',
-    featUnlimitedBandwidth: '无限带宽', featAllServers: '所有服务器位置', featDnsLeak: 'DNS泄漏保护', featPrioritySupport: '优先支持',
-    featDnsIpv6: 'DNS和IPv6泄漏保护', featDedicatedIp: '专用IP地址', feat247Priority: '24/7优先支持', featStaticIp: '静态专用IP',
-    featDoubleVpn: '双重VPN(多跳)', featAccountManager: '专属客户经理',
-    badgeMostPopular: '最受欢迎', badgeBestValue: '超值之选',
-    btnGet: '获取{period}', btnProcessing: '处理中...', saveVsMonthly: '比月付节省{percent}%', perMonth: '/月',
-    payProcessor: '支付处理器', payProcessorVal: 'Stripe (PCI-DSS 1级)',
-    payCards: '接受的卡片', payCardsVal: 'Visa, Mastercard, Amex, Discover',
-    payAltMethods: '其他支付方式', payAltVal: 'Apple Pay, Google Pay, Hubtel, Alipay',
-    payBillingCycle: '计费周期', payBillingVal: '按周期一次性付费(1月–2年)',
-    payAutoRenewal: '自动续费', payAutoVal: '可选 — 随时取消',
-    payCancellation: '取消政策', payCancelVal: '随时取消，无费用',
-    payMoneyBack: '退款保证', payMoneyBackVal: '30天全额退款',
-    payCurrency: '货币', payCurrencyVal: '{code}（自动从USD转换）',
-    payDisclaimerPre: '付款由Stripe安全处理。VoxVPN绝不存储您的完整卡信息。订阅可随时在账户仪表板中取消。请参阅我们的',
-    refundPolicyLink: '退款政策',
-    payDisclaimerPost: '了解详情。税费可能根据您的管辖区适用，并在结账时计算。购买后可从账户仪表板下载发票。',
-    roleSoftwareEngineer: '软件工程师', roleDigitalNomad: '数字游民', roleBusinessOwner: '小企业主',
-    roleContentCreator: '内容创作者', roleItConsultant: 'IT顾问', roleFreelanceDesigner: '自由设计师',
-    testimonial1: 'VoxVPN是我用过的最快的VPN。流媒体无缓冲，终止开关让我在公共Wi-Fi上倍感安心。',
-    testimonial2: '我全职旅行，VoxVPN让我在任何地方都能保持连接。全球服务器覆盖令人惊叹，设置只需两分钟。',
-    testimonial3: '管理远程团队意味着安全不可妥协。无日志政策和AES-256加密满足了我们的所有要求。',
-    testimonial4: '我每天为工作访问地理限制内容。VoxVPN无缝解锁一切，零速度损失。强烈推荐。',
-    testimonial5: '客户支持团队几分钟内解决了我的问题。专业、快速、可靠 — 正是我对VPN提供商的期望。',
-    testimonial6: '实惠、安全、易用。拆分隧道功能是管理工作和个人流量的颠覆性工具。',
-  },
-  ja: {
-    home: 'ホーム', features: '機能', servers: 'サーバー', pricing: '料金',
-    support: 'サポート', logIn: 'ログイン', signUp: '登録', choosePlan: 'プランを選択',
-    heroTitle: 'あなたのプライバシー。完全に保護。',
-    heroSubtitle: 'VoxVPNは軍事級暗号化、厳格なノーログポリシー、60カ国以上の超高速サーバーであなたの身元を保護します。',
-    getVoxvpn: '今すぐVoxVPNを入手', seeHowItWorks: '仕組みを見る',
-    questionsContact: 'ご質問は？お問い合わせ →',
-    trustNoLogs: 'ノーログポリシー', trustAES: 'AES-256暗号化', trustLocations: '60以上のロケーション',
-    trustKillSwitch: 'キルスイッチ', trustMoneyBack: '30日返金保証', trustSupport: '24/7サポート',
-    vpnStatusCard: 'VPNステータスカード', protected: '保護中', disconnect: '切断', founded: '2020年創業',
-    footerTagline: 'あなたのプライバシーが私たちの最優先事項です。保護され、制限なく。',
-    weAccept: '対応決済', followUs: 'フォローする',
-    footerRights: '© 2026 VoxDigits Communications LLC. All rights reserved. www.voxvpn.net',
-    footerAbout: '会社情報', footerContact: 'お問い合わせ', footerPrivacy: 'プライバシーポリシー',
-    footerTerms: '利用規約', footerRefund: '返金ポリシー', footerCookie: 'Cookieポリシー',
-    aiAssistant: 'AIアシスタント',
-    whyVoxvpn: 'VoxVPNが選ばれる理由', featuresTitle1: '必要なすべてを。', featuresTitle2: '不要なものはなし。',
-    featuresSubtitle: 'すべての機能は一つの目標で設計されています：あなたをプライベートに、安全に、制限なくオンラインに保つこと。',
-    readyProtected: '保護の準備はできましたか？', joinUsers: 'VoxVPNを信頼する2,500以上のユーザーに加わりましょう。プランは$2.49/月から。', viewPlans: 'プランを見る →',
-    statServers: 'VPNサーバー', statServersSub: '世界中に', statCountries: 'カ国', statCountriesSub: '世界中のサーバーロケーション',
-    statCustomers: 'アクティブユーザー', statCustomersSub: '世界中で保護', statUptime: '稼働率SLA', statUptimeSub: '保証された信頼性',
-    globalNetwork: 'グローバルネットワーク', serversTitle1: 'すべての', serversTitle2: '大陸にサーバー',
-    serversSubtitle: '4大陸20カ所の高速インフラに接続。全サーバーはAES-256暗号化でVoxVPNを実行。',
-    totalServers: 'サーバー総数', onlineNow: '現在オンライン', locationsLabel: 'ロケーション', uptimeLabel: '稼働率',
-    loadingNetwork: 'ライブサーバーネットワークを読み込み中…', loadingMap: 'マップを読み込み中…', regionLocations: 'カ所', moreLabel: 'その他',
-    pricingLabel: '料金', pricingTitle: 'シンプルで透明な料金',
-    pricingSubtitle: 'すべてのプランにAES-256暗号化と厳格なノーログポリシーが含まれます。いつでも解約可能。',
-    pricesIn: '表示通貨：', detectedLabel: '検出：',
-    liveSupport: '24時間ライブカスタマーサポート',
-    liveSupportDesc: '本当のスタッフによる本当のサポート。ライブチャットとメールで設定やトラブルシューティングをサポートします。',
-    contactSupport: 'サポートに連絡 →', moneyBackTitle: '30日間返金保証',
-    moneyBackDesc: '当社のVPNは使いやすい。保証も同様です。満足できない場合は、サポートに全額返金をリクエストするだけ。面倒なし、リスクなし。',
-    getVoxvpnCta: 'VoxVPNを入手 →', securePayment: 'Stripeによる安全な決済', pciCompliant: 'PCI-DSS準拠',
-    pricingFooter: 'すべての価格は現地通貨に自動換算されます（{code}）。30日間返金保証。Stripe・Hubtel・Alipay・WeChat Payによる安全な決済。',
-    reviewsBadge: '4.9 / 5 — 12,000以上のレビュー', testimonialsTitle: '世界中のユーザーに愛されています',
-    testimonialsSubtitle: '毎日プライバシーを守るためVoxVPNを信頼する数千の満足したお客様に加わりましょう。',
-    trustedSecure: '信頼と安全', trustedSubtitle: 'プライバシー優先のインフラ、あなたを保護するために構築',
-    featNoLogs: 'ノーログポリシー', featNoLogsDesc: 'お客様のブラウジング活動、IPアドレス、DNSクエリを記録しません。',
-    featFast: '超高速', featFastDesc: '最適化されたVoxVPNルーティングで世界中で最小限の速度低下を実現。',
-    featAes: 'AES-256暗号化', featAesDesc: '軍事級暗号化が転送中のすべてのデータを保護します。',
-    featGeo: 'ジオブロック解除', featGeoDesc: '20のロケーションからNetflix、BBC iPlayer、Huluなどあらゆる地域制限コンテンツにアクセス。',
-    featKill: 'キルスイッチ', featKillDesc: 'VPNが切断されると、キルスイッチが即座にインターネットを遮断します。',
-    featDevices: 'すべてのデバイス', featDevicesDesc: 'Windows、macOS、iOS、Android、Linux — 20のグローバルロケーションから接続。',
-    featWifi: '公共WiFi保護', featWifiDesc: 'カフェや空港のWiFiで自動的に安全を確保。',
-    featSplit: 'スプリットトンネリング', featSplitDesc: 'どのアプリをVPNにするか、通常接続にするかを選択。',
-    plan1Month: '1ヶ月', plan3Months: '3ヶ月', plan6Months: '6ヶ月', plan1Year: '1年', plan2Years: '2年',
-    days30: '30日間無制限', days90: '90日間無制限', days180: '180日間無制限', days365: '365日間無制限', days730: '730日間無制限',
-    featUnlimitedBandwidth: '無制限帯域幅', featAllServers: 'すべてのサーバーロケーション', featDnsLeak: 'DNS漏洩保護', featPrioritySupport: '優先サポート',
-    featDnsIpv6: 'DNS・IPv6漏洩保護', featDedicatedIp: '専用IPアドレス', feat247Priority: '24/7優先サポート', featStaticIp: '静的専用IP',
-    featDoubleVpn: 'ダブルVPN(マルチホップ)', featAccountManager: '専任アカウントマネージャー',
-    badgeMostPopular: '人気No.1', badgeBestValue: 'お買い得',
-    btnGet: '{period}を取得', btnProcessing: '処理中...', saveVsMonthly: '月額比{percent}%お得', perMonth: '/月',
-    payProcessor: '決済処理業者', payProcessorVal: 'Stripe (PCI-DSS レベル1)',
-    payCards: '対応カード', payCardsVal: 'Visa, Mastercard, Amex, Discover',
-    payAltMethods: 'その他の決済方法', payAltVal: 'Apple Pay, Google Pay, Hubtel, Alipay',
-    payBillingCycle: '請求サイクル', payBillingVal: '期間ごと一括支払い(1ヶ月～2年)',
-    payAutoRenewal: '自動更新', payAutoVal: 'オプション — いつでも解約可',
-    payCancellation: '解約ポリシー', payCancelVal: 'いつでも解約可、費用なし',
-    payMoneyBack: '返金保証', payMoneyBackVal: '30日間全額返金',
-    payCurrency: '通貨', payCurrencyVal: '{code}（USDから自動換算）',
-    payDisclaimerPre: '支払いはStripeによって安全に処理されます。VoxVPNは完全なカード情報を保存しません。サブスクリプションはアカウントダッシュボードからいつでもキャンセルできます。詳しくは',
-    refundPolicyLink: '返金ポリシー',
-    payDisclaimerPost: 'をご確認ください。お客様の管轄区域に基づく税金が適用される場合があり、購入時に計算されます。請求書は購入後にアカウントダッシュボードからダウンロードできます。',
-    roleSoftwareEngineer: 'ソフトウェアエンジニア', roleDigitalNomad: 'デジタルノマド', roleBusinessOwner: '中小企業オーナー',
-    roleContentCreator: 'コンテンツクリエイター', roleItConsultant: 'ITコンサルタント', roleFreelanceDesigner: 'フリーランスデザイナー',
-    testimonial1: 'VoxVPNは今まで使った中で最速のVPNです。ストリーミングはバッファーフリーで、キルスイッチが公共Wi-Fiでの安心感を与えてくれます。',
-    testimonial2: 'フルタイムで旅行していますが、VoxVPNがどこでも接続を維持してくれます。グローバルなサーバーカバー範囲は素晴らしく、セットアップは2分で完了しました。',
-    testimonial3: 'リモートチームを運営する上でセキュリティは妥協できません。ノーログポリシーとAES-256暗号化がすべての要件を満たしました。',
-    testimonial4: '仕事で毎日地域制限コンテンツにアクセスします。VoxVPNはすべてをシームレスに解除し、速度低下ゼロ。強くお勧めします。',
-    testimonial5: 'カスタマーサポートが数分で問題を解決してくれました。プロフェッショナル、高速、信頼性 — VPNプロバイダーに求めるすべてです。',
-    testimonial6: '手頃で、安全で、使いやすい。スプリットトンネリングは仕事と個人のトラフィック管理に革命をもたらします。',
-  },
-  ru: {
-    home: 'Главная', features: 'Возможности', servers: 'Серверы', pricing: 'Цены',
-    support: 'Поддержка', logIn: 'Вход', signUp: 'Зарегистрироваться', choosePlan: 'Выбрать план',
-    heroTitle: 'Ваша конфиденциальность. Полная защита.',
-    heroSubtitle: 'VoxVPN защищает вашу личность с помощью военного шифрования, строгой политики отсутствия журналов и молниеносных серверов в 60+ странах.',
-    getVoxvpn: 'Получить VoxVPN Сейчас', seeHowItWorks: 'Как Это Работает',
-    questionsContact: 'Вопросы? Свяжитесь с нами →',
-    trustNoLogs: 'Без логов', trustAES: 'Шифрование AES-256', trustLocations: '60+ локаций',
-    trustKillSwitch: 'Kill Switch', trustMoneyBack: 'Возврат 30 дней', trustSupport: 'Поддержка 24/7',
-    vpnStatusCard: 'Карта статуса VPN', protected: 'Защищено', disconnect: 'Отключить', founded: 'Основано в 2020',
-    footerTagline: 'Ваша конфиденциальность — наш приоритет. Оставайтесь защищёнными, оставайтесь свободными.',
-    weAccept: 'Мы принимаем', followUs: 'Подписывайтесь',
-    footerRights: '© 2026 VoxDigits Communications LLC. Все права защищены. www.voxvpn.net',
-    footerAbout: 'О нас', footerContact: 'Контакты', footerPrivacy: 'Политика конфиденциальности',
-    footerTerms: 'Условия', footerRefund: 'Политика возврата', footerCookie: 'Политика Cookie',
-    aiAssistant: 'ИИ-ассистент',
-    whyVoxvpn: 'Почему VoxVPN', featuresTitle1: 'Всё, что вам нужно.', featuresTitle2: 'Ничего лишнего.',
-    featuresSubtitle: 'Каждая функция создана с одной целью: сохранить вашу конфиденциальность, безопасность и свободу в сети.',
-    readyProtected: 'Готовы к защите?', joinUsers: 'Присоединяйтесь к 2 500+ пользователям, доверяющим VoxVPN. Планы от $2.49/мес.', viewPlans: 'Посмотреть Планы →',
-    statServers: 'VPN-серверы', statServersSub: 'по всему миру', statCountries: 'Страны', statCountriesSub: 'серверные локации по всему миру',
-    statCustomers: 'Активные клиенты', statCustomersSub: 'под защитой по всему миру', statUptime: 'SLA аптайма', statUptimeSub: 'гарантированная надёжность',
-    globalNetwork: 'Глобальная сеть', serversTitle1: 'Серверы на каждом', serversTitle2: ' континенте',
-    serversSubtitle: 'Подключайтесь через нашу высокоскоростную инфраструктуру в 20 локациях на 4 континентах. Каждый сервер работает на VoxVPN с шифрованием AES-256.',
-    totalServers: 'Всего серверов', onlineNow: 'Сейчас онлайн', locationsLabel: 'Локации', uptimeLabel: 'Аптайм',
-    loadingNetwork: 'Загрузка сети серверов в реальном времени…', loadingMap: 'Загрузка карты…', regionLocations: 'локаций', moreLabel: 'ещё',
-    pricingLabel: 'Цены', pricingTitle: 'Простые и прозрачные цены',
-    pricingSubtitle: 'Все планы включают шифрование AES-256 и строгую политику отсутствия журналов. Отмена в любое время.',
-    pricesIn: 'Цены в', detectedLabel: 'Определено:',
-    liveSupport: 'Живая поддержка клиентов 24 часа',
-    liveSupportDesc: 'Настоящая поддержка от настоящих людей. Мы доступны через живой чат и электронную почту, чтобы помочь с настройкой и решением проблем.',
-    contactSupport: 'Связаться с поддержкой →', moneyBackTitle: 'Гарантия возврата 30 дней',
-    moneyBackDesc: 'Наш VPN прост в использовании. Как и наша гарантия. Если вы не удовлетворены, просто попросите поддержку о полном возврате. Без хлопот, без риска.',
-    getVoxvpnCta: 'Получить VoxVPN →', securePayment: 'Безопасная оплата через Stripe', pciCompliant: 'Соответствие PCI-DSS',
-    pricingFooter: 'Все цены автоматически конвертируются в вашу валюту ({code}). Гарантия возврата 30 дней. Безопасная оплата через Stripe · Hubtel · Alipay · WeChat Pay.',
-    reviewsBadge: '4,9 / 5 — 12 000+ ОТЗЫВОВ', testimonialsTitle: 'Любим пользователями по всему миру',
-    testimonialsSubtitle: 'Присоединяйтесь к тысячам довольных клиентов, которые доверяют VoxVPN защищать их конфиденциальность каждый день.',
-    trustedSecure: 'Надёжно и безопасно', trustedSubtitle: 'Инфраструктура с приоритетом конфиденциальности, созданная для вашей защиты',
-    featNoLogs: 'Без логов', featNoLogsDesc: 'Мы никогда не записываем вашу активность в браузере, IP-адрес или DNS-запросы.',
-    featFast: 'Молниеносный', featFastDesc: 'Оптимизированная маршрутизация VoxVPN обеспечивает минимальную потерю скорости по всему миру.',
-    featAes: 'Шифрование AES-256', featAesDesc: 'Военное шифрование защищает каждый байт ваших данных при передаче.',
-    featGeo: 'Обход гео-блокировок', featGeoDesc: 'Получайте доступ к Netflix, BBC iPlayer, Hulu и любому гео-ограниченному контенту из 20 локаций.',
-    featKill: 'Kill Switch', featKillDesc: 'Если VPN отключается, наш kill switch мгновенно обрывает интернет.',
-    featDevices: 'Все ваши устройства', featDevicesDesc: 'Windows, macOS, iOS, Android, Linux — подключайтесь из 20 глобальных локаций.',
-    featWifi: 'Защита публичного WiFi', featWifiDesc: 'Оставайтесь в безопасности в кафе и аэропортах автоматически.',
-    featSplit: 'Раздельное туннелирование', featSplitDesc: 'Выбирайте, какие приложения используют VPN, а какие — обычное соединение.',
-    plan1Month: '1 месяц', plan3Months: '3 месяца', plan6Months: '6 месяцев', plan1Year: '1 год', plan2Years: '2 года',
-    days30: '30 дней безлимита', days90: '90 дней безлимита', days180: '180 дней безлимита', days365: '365 дней безлимита', days730: '730 дней безлимита',
-    featUnlimitedBandwidth: 'Безлимитный трафик', featAllServers: 'Все серверные локации', featDnsLeak: 'Защита от утечки DNS', featPrioritySupport: 'Приоритетная поддержка',
-    featDnsIpv6: 'Защита от утечки DNS и IPv6', featDedicatedIp: 'Выделенный IP-адрес', feat247Priority: '24/7 приоритетная поддержка', featStaticIp: 'Статический выделенный IP',
-    featDoubleVpn: 'Двойной VPN (мульти-хоп)', featAccountManager: 'Персональный менеджер',
-    badgeMostPopular: 'Популярный', badgeBestValue: 'Лучшая цена',
-    btnGet: 'Получить {period}', btnProcessing: 'Обработка...', saveVsMonthly: 'Скидка {percent}% от месячной', perMonth: '/мес',
-    payProcessor: 'Платёжный процессор', payProcessorVal: 'Stripe (PCI-DSS уровень 1)',
-    payCards: 'Принимаемые карты', payCardsVal: 'Visa, Mastercard, Amex, Discover',
-    payAltMethods: 'Альтернативные методы', payAltVal: 'Apple Pay, Google Pay, Hubtel, Alipay',
-    payBillingCycle: 'Цикл оплаты', payBillingVal: 'Разовый платёж за период (1мес–2года)',
-    payAutoRenewal: 'Авто-продление', payAutoVal: 'Опционально — отмена в любое время',
-    payCancellation: 'Политика отмены', payCancelVal: 'Отмена в любое время, без комиссий',
-    payMoneyBack: 'Гарантия возврата', payMoneyBackVal: 'Полный возврат в течение 30 дней',
-    payCurrency: 'Валюта', payCurrencyVal: '{code} (автоконвертация из USD)',
-    payDisclaimerPre: 'Платежи обрабатываются безопасно через Stripe. VoxVPN никогда не хранит полные данные вашей карты. Подписки можно отменить в любое время из панели управления аккаунтом. См. нашу ',
-    refundPolicyLink: 'Политику возврата',
-    payDisclaimerPost: ' для полной информации. Налоги могут применяться в зависимости от вашей юрисдикции и рассчитываются при оплате. Счета доступны для скачивания из панели управления после покупки.',
-    roleSoftwareEngineer: 'Программист', roleDigitalNomad: 'Цифровой кочевник', roleBusinessOwner: 'Владелец малого бизнеса',
-    roleContentCreator: 'Контент-мейкер', roleItConsultant: 'ИТ-консультант', roleFreelanceDesigner: 'Фриланс-дизайнер',
-    testimonial1: 'VoxVPN — самый быстрый VPN, которым я пользовался. Стриминг без буферизации, а kill switch даёт спокойствие в публичном Wi-Fi.',
-    testimonial2: 'Я путешествую постоянно, и VoxVPN держит меня на связи везде. Глобальное покрытие серверов потрясающее, а настройка заняла две минуты.',
-    testimonial3: 'Управление удалённой командой означает, что безопасность не обсуждается. Политика без логов и шифрование AES-256 удовлетворили все наши требования.',
-    testimonial4: 'Я ежедневно получаю доступ к гео-ограниченному контенту для работы. VoxVPN разблокирует всё без проблем и без потери скорости. Очень рекомендую.',
-    testimonial5: 'Служба поддержки решила мою проблему за минуты. Профессионально, быстро и надёжно — именно то, что я жду от VPN-провайдера.',
-    testimonial6: 'Доступно, безопасно и просто в использовании. Раздельное туннелирование — настоящий прорыв для управления рабочим и личным трафиком.',
-  },
-  ar: {
-    home: 'الرئيسية', features: 'الميزات', servers: 'الخوادم', pricing: 'التسعير',
-    support: 'الدعم', logIn: 'تسجيل الدخول', signUp: 'التسجيل', choosePlan: 'اختر خطة',
-    heroTitle: 'خصوصيتك. محمية بالكامل.',
-    heroSubtitle: 'يحمي VoxVPN هويتك بتشفير عسكري، وسياسة صارمة لعدم حفظ السجلات، وخوادم فائقة السرعة في أكثر من 60 دولة.',
-    getVoxvpn: 'احصل على VoxVPN الآن', seeHowItWorks: 'شاهد كيف يعمل',
-    questionsContact: 'أسئلة؟ تواصل معنا ←',
-    trustNoLogs: 'بدون سجلات', trustAES: 'تشفير AES-256', trustLocations: '+60 موقعًا',
-    trustKillSwitch: 'مفتاح الإيقاف', trustMoneyBack: 'استرداد خلال 30 يومًا', trustSupport: 'دعم 24/7',
-    vpnStatusCard: 'بطاقة حالة VPN', protected: 'محمي', disconnect: 'قطع الاتصال', founded: 'تأسس 2020',
-    footerTagline: 'خصوصيتك هي أولويتنا. ابقَ محميًا، ابقَ بلا قيود.',
-    weAccept: 'نقبل', followUs: 'تابعنا',
-    footerRights: '© 2026 VoxDigits Communications LLC. جميع الحقوق محفوظة. www.voxvpn.net',
-    footerAbout: 'من نحن', footerContact: 'اتصل بنا', footerPrivacy: 'سياسة الخصوصية',
-    footerTerms: 'الشروط', footerRefund: 'سياسة الاسترداد', footerCookie: 'سياسة ملفات تعريف الارتباط',
-    aiAssistant: 'مساعد الذكاء الاصطناعي',
-    whyVoxvpn: 'لماذا VoxVPN', featuresTitle1: 'كل ما تحتاجه.', featuresTitle2: 'لا شيء لا تحتاجه.',
-    featuresSubtitle: 'كل ميزة مصممة لهدف واحد: إبقائك خاصًا وآمنًا وغير مقيد عبر الإنترنت.',
-    readyProtected: 'هل أنت مستعد للحماية؟', joinUsers: 'انضم إلى أكثر من 2,500 مستخدم يثقون بـ VoxVPN. الخطط تبدأ من $2.49/شهر.', viewPlans: 'عرض الخطط ←',
-    statServers: 'خوادم VPN', statServersSub: 'حول العالم', statCountries: 'دولة', statCountriesSub: 'مواقع الخوادم حول العالم',
-    statCustomers: 'عملاء نشطون', statCustomersSub: 'محميون حول العالم', statUptime: 'اتفاقية تشغيل', statUptimeSub: 'موثوقية مضمونة',
-    globalNetwork: 'شبكة عالمية', serversTitle1: 'خوادم في كل', serversTitle2: ' قارة',
-    serversSubtitle: 'اتصل عبر بنيتنا التحتية عالية السرعة في 20 موقعًا عبر 4 قارات. كل خادم يعمل بـ VoxVPN مع تشفير AES-256.',
-    totalServers: 'إجمالي الخوادم', onlineNow: 'متصل الآن', locationsLabel: 'المواقع', uptimeLabel: 'التشغيل',
-    loadingNetwork: 'جارٍ تحميل شبكة الخوادم المباشرة…', loadingMap: 'جارٍ تحميل الخريطة…', regionLocations: 'مواقع', moreLabel: 'المزيد',
-    pricingLabel: 'التسعير', pricingTitle: 'تسعير بسيط وشفاف',
-    pricingSubtitle: 'جميع الخطط تشمل تشفير AES-256 وسياسة صارمة لعدم حفظ السجلات. ألغِ في أي وقت.',
-    pricesIn: 'الأسعار بـ', detectedLabel: 'تم اكتشاف:',
-    liveSupport: 'دعم عملاء مباشر على مدار الساعة',
-    liveSupportDesc: 'دعم حقيقي من أشخاص حقيقيين. نحن متاحون عبر الدردشة المباشرة والبريد الإلكتروني لمساعدتك في الإعداد وحل المشكلات.',
-    contactSupport: 'تواصل مع الدعم ←', moneyBackTitle: 'ضمان استرداد لمدة 30 يومًا',
-    moneyBackDesc: 'خدمة VPN لدينا سهلة الاستخدام. وضماننا كذلك أيضًا. إذا لم تكن راضيًا، فقط اطلب من الدعم استردادًا كاملاً. بلا متاعب، بلا مخاطر.',
-    getVoxvpnCta: 'احصل على VoxVPN ←', securePayment: 'دفع آمن عبر Stripe', pciCompliant: 'متوافق مع PCI-DSS',
-    pricingFooter: 'جميع الأسعار تُحوَّل تلقائيًا إلى عملتك المحلية ({code}). ضمان استرداد لمدة 30 يومًا. دفع آمن عبر Stripe · Hubtel · Alipay · WeChat Pay.',
-    reviewsBadge: '4.9 / 5 — +12,000 تقييم', testimonialsTitle: 'محبوب من المستخدمين حول العالم',
-    testimonialsSubtitle: 'انضم إلى آلاف العملاء الراضين الذين يثقون بـ VoxVPN لحماية خصوصيتهم كل يوم.',
-    trustedSecure: 'موثوق وآمن', trustedSubtitle: 'بنية تحتية تركز على الخصوصية، مصممة لحمايتك',
-    featNoLogs: 'بدون سجلات', featNoLogsDesc: 'لا نسجل أبداً نشاط التصفح أو عنوان IP أو استعلامات DNS الخاصة بك.',
-    featFast: 'فائق السرعة', featFastDesc: 'توجيه VoxVPN المحسّن يضمن أدنى فقدان للسرعة عالمياً.',
-    featAes: 'تشفير AES-256', featAesDesc: 'تشفير عسكري يحمي كل بايت من بياناتك أثناء النقل.',
-    featGeo: 'تجاوز الحجب الجغرافي', featGeoDesc: 'الوصول إلى Netflix وBBC iPlayer وHulu وأي محتوى مقيد جغرافياً من 20 موقعاً.',
-    featKill: 'مفتاح الإيقاف', featKillDesc: 'إذا انقطع VPN الخاص بك، يقطع مفتاح الإيقاف الإنترنت فوراً.',
-    featDevices: 'كل أجهزتك', featDevicesDesc: 'Windows وmacOS وiOS وAndroid وLinux — اتصل من 20 موقعاً عالمياً.',
-    featWifi: 'حماية WiFi العام', featWifiDesc: 'ابقَ آمناً على WiFi في المقاهي والمطارات تلقائياً.',
-    featSplit: 'تقسيم النفق', featSplitDesc: 'اختر التطبيقات التي تستخدم VPN والتي تستخدم اتصالك العادي.',
-    plan1Month: 'شهر واحد', plan3Months: '3 أشهر', plan6Months: '6 أشهر', plan1Year: 'سنة واحدة', plan2Years: 'سنتان',
-    days30: '30 يوماً غير محدود', days90: '90 يوماً غير محدود', days180: '180 يوماً غير محدود', days365: '365 يوماً غير محدود', days730: '730 يوماً غير محدود',
-    featUnlimitedBandwidth: 'نطاق ترددي غير محدود', featAllServers: 'جميع مواقع الخوادم', featDnsLeak: 'حماية تسرب DNS', featPrioritySupport: 'دعم ذو أولوية',
-    featDnsIpv6: 'حماية تسرب DNS وIPv6', featDedicatedIp: 'عنوان IP مخصص', feat247Priority: 'دعم ذو أولوية 24/7', featStaticIp: 'IP مخصص ثابت',
-    featDoubleVpn: 'VPN مزدوج (متعدد القفزات)', featAccountManager: 'مدير حساب مخصص',
-    badgeMostPopular: 'الأكثر شعبية', badgeBestValue: 'أفضل قيمة',
-    btnGet: 'احصل على {period}', btnProcessing: 'جارٍ المعالجة...', saveVsMonthly: 'وفّر {percent}% مقارنة بالشهرية', perMonth: '/شهر',
-    payProcessor: 'معالج المدفوعات', payProcessorVal: 'Stripe (PCI-DSS المستوى 1)',
-    payCards: 'البطاقات المقبولة', payCardsVal: 'Visa, Mastercard, Amex, Discover',
-    payAltMethods: 'طرق بديلة', payAltVal: 'Apple Pay, Google Pay, Hubtel, Alipay',
-    payBillingCycle: 'دورة الفوترة', payBillingVal: 'دفعة واحدة لكل فترة (1شهر–2سنة)',
-    payAutoRenewal: 'التجديد التلقائي', payAutoVal: 'اختياري — ألغِ في أي وقت',
-    payCancellation: 'سياسة الإلغاء', payCancelVal: 'ألغِ في أي وقت، بدون رسوم',
-    payMoneyBack: 'ضمان استرداد الأموال', payMoneyBackVal: 'استرداد كامل لمدة 30 يوماً',
-    payCurrency: 'العملة', payCurrencyVal: '{code} (محوّل تلقائياً من USD)',
-    payDisclaimerPre: 'تتم معالجة المدفوعات بأمان عبر Stripe. لا يقوم VoxVPN بتخزين تفاصيل بطاقتك الكاملة أبداً. يمكن إلغاء الاشتراكات في أي وقت من لوحة تحكم حسابك. راجع ',
-    refundPolicyLink: 'سياسة الاسترداد',
-    payDisclaimerPost: ' للاطلاع على التفاصيل الكاملة. قد تُطبق الضرائب حسب ولايتك القضائية وتُحسب عند الدفع. الفواتير متاحة للتنزيل من لوحة تحكم حسابك بعد الشراء.',
-    roleSoftwareEngineer: 'مهندس برمجيات', roleDigitalNomad: 'بدوّال رقمي', roleBusinessOwner: 'صاحب عمل صغير',
-    roleContentCreator: 'صانع محتوى', roleItConsultant: 'مستشار تقنية معلومات', roleFreelanceDesigner: 'مصمم مستقل',
-    testimonial1: 'VoxVPN هو أسرع VPN استخدمته. البث بدون تخزين مؤقت ومفتاح الإيقاف يمنحني راحة البال على Wi-Fi العام.',
-    testimonial2: 'أسافر بدوام كامل ويبقي VoxVPN على اتصالي في كل مكان. تغطية الخوادم العالمية مذهلة والإعداد استغرق دقيقتين.',
-    testimonial3: 'إدارة فريق عن بُعد تعني أن الأمن غير قابل للتفاوض. سياسة عدم التسجيل وتشفير AES-256 لبّت كل متطلباتنا.',
-    testimonial4: 'أصل يومياً إلى محتوى مقيد جغرافياً لعملي. يفتح VoxVPN كل شيء بسلاسة وبدون فقدان السرعة. أوصي به بشدة.',
-    testimonial5: 'حلّ فريق الدعم مشكلتي في دقائق. احترافي وسريع وموثوق — بالضبط ما أحتاجه من مزود VPN.',
-    testimonial6: 'ميسور التكلفة وآمن وسهل الاستخدام. ميزة تقسيم النفق تغيّر قواعد اللعبة لإدارة حركة المرور العملية والشخصية.',
-  },
+/**
+ * Country (ISO 3166-1 alpha-2) → language code.
+ * Covers every recognised country; unmapped ones fall back to English.
+ */
+export const COUNTRY_LANGUAGE = {
+  // English
+  US: 'en', GB: 'en', AU: 'en', NZ: 'en', IE: 'en', ZA: 'en', NG: 'en', GH: 'en',
+  KE: 'en', UG: 'en', TZ: 'en', JM: 'en', TT: 'en', BZ: 'en', GY: 'en', BW: 'en',
+  ZW: 'en', ZM: 'en', MW: 'en', GM: 'en', SL: 'en', LR: 'en', BB: 'en', BS: 'en',
+  AG: 'en', DM: 'en', GD: 'en', KN: 'en', LC: 'en', VC: 'en', FJ: 'en', PG: 'en',
+  SB: 'en', VU: 'en', NA: 'en', LS: 'en', SZ: 'en', MT: 'en', PH: 'en', SG: 'en',
+  MY: 'en', IN: 'hi', CM: 'en', RW: 'en', BI: 'en', SO: 'en', SS: 'en', CA: 'en',
+  // Spanish
+  ES: 'es', MX: 'es', AR: 'es', CO: 'es', CL: 'es', PE: 'es', VE: 'es', EC: 'es',
+  GT: 'es', CU: 'es', DO: 'es', UY: 'es', PY: 'es', BO: 'es', CR: 'es', PA: 'es',
+  HN: 'es', SV: 'es', NI: 'es', PR: 'es', GQ: 'es',
+  // French
+  FR: 'fr', BE: 'fr', LU: 'fr', MC: 'fr', CD: 'fr', CI: 'fr', SN: 'fr', ML: 'fr',
+  BF: 'fr', NE: 'fr', GN: 'fr', BJ: 'fr', TG: 'fr', CF: 'fr', GA: 'fr', CG: 'fr',
+  TD: 'fr', KM: 'fr', DJ: 'fr', RE: 'fr', MQ: 'fr', GF: 'fr', HT: 'fr', MA: 'fr',
+  DZ: 'fr', TN: 'fr',
+  // German
+  DE: 'de', AT: 'de', LI: 'de', CH: 'de',
+  // Chinese
+  CN: 'zh', TW: 'zh', HK: 'zh',
+  // Japanese
+  JP: 'ja',
+  // Russian
+  RU: 'ru', BY: 'ru', KZ: 'ru', KG: 'ru',
+  // Arabic
+  SA: 'ar', AE: 'ar', EG: 'ar', IQ: 'ar', JO: 'ar', KW: 'ar', LB: 'ar', OM: 'ar',
+  QA: 'ar', YE: 'ar', PS: 'ar', SY: 'ar', SD: 'ar', LY: 'ar', MR: 'ar', EH: 'ar',
+  BH: 'ar',
+  // Portuguese
+  PT: 'pt', BR: 'pt', AO: 'pt', MZ: 'pt', CV: 'pt', GW: 'pt', TL: 'pt', ST: 'pt',
+  // Italian
+  IT: 'it', SM: 'it', VA: 'it',
+  // Dutch
+  NL: 'nl', SR: 'nl',
+  // Polish
+  PL: 'pl',
+  // Turkish
+  TR: 'tr', AZ: 'tr', TM: 'tr', UZ: 'tr',
+  // Korean
+  KR: 'ko', KP: 'ko',
+  // Indonesian
+  ID: 'id',
+  // Thai
+  TH: 'th',
+  // Vietnamese
+  VN: 'vi',
+  // Swedish
+  SE: 'sv',
+  // Norwegian
+  NO: 'no',
+  // Danish
+  DK: 'da',
+  // Finnish
+  FI: 'fi',
+  // Hebrew
+  IL: 'he',
+  // Greek
+  GR: 'el',
+  // Czech
+  CZ: 'cs',
+  // Romanian
+  RO: 'ro',
+  // Hungarian
+  HU: 'hu',
+  // Ukrainian
+  UA: 'uk',
+  // Persian
+  IR: 'fa', AF: 'fa',
+  // Hindi / Bengali / Urdu
+  LK: 'hi', PK: 'ur', BD: 'bn',
 };
 
+/** Languages that render right-to-left. */
+export const RTL_LANGUAGES = new Set(['ar', 'he', 'fa', 'ur']);
+
+/** Human-friendly labels + flag for each supported language. */
+export const LANGUAGES = {
+  en: { label: 'English',    flag: '🇬🇧' },
+  es: { label: 'Español',    flag: '🇪🇸' },
+  fr: { label: 'Français',   flag: '🇫🇷' },
+  de: { label: 'Deutsch',    flag: '🇩🇪' },
+  zh: { label: '中文',        flag: '🇨🇳' },
+  ja: { label: '日本語',      flag: '🇯🇵' },
+  ru: { label: 'Русский',    flag: '🇷🇺' },
+  ar: { label: 'العربية',     flag: '🇸🇦' },
+  pt: { label: 'Português',  flag: '🇵🇹' },
+  it: { label: 'Italiano',   flag: '🇮🇹' },
+  nl: { label: 'Nederlands', flag: '🇳🇱' },
+  pl: { label: 'Polski',     flag: '🇵🇱' },
+  tr: { label: 'Türkçe',     flag: '🇹🇷' },
+  ko: { label: '한국어',      flag: '🇰🇷' },
+  id: { label: 'Indonesia',  flag: '🇮🇩' },
+  th: { label: 'ไทย',         flag: '🇹🇭' },
+  vi: { label: 'Tiếng Việt', flag: '🇻🇳' },
+  sv: { label: 'Svenska',    flag: '🇸🇪' },
+  no: { label: 'Norsk',      flag: '🇳🇴' },
+  da: { label: 'Dansk',      flag: '🇩🇰' },
+  fi: { label: 'Suomi',      flag: '🇫🇮' },
+  he: { label: 'עברית',       flag: '🇮🇱' },
+  el: { label: 'Ελληνικά',    flag: '🇬🇷' },
+  cs: { label: 'Čeština',    flag: '🇨🇿' },
+  ro: { label: 'Română',     flag: '🇷🇴' },
+  hu: { label: 'Magyar',     flag: '🇭🇺' },
+  uk: { label: 'Українська', flag: '🇺🇦' },
+  fa: { label: 'فارسی',        flag: '🇮🇷' },
+  hi: { label: 'हिन्दी',       flag: '🇮🇳' },
+  ur: { label: 'اردو',        flag: '🇵🇰' },
+  bn: { label: 'বাংলা',       flag: '🇧🇩' },
+};
+
+const translations = {
+  en: { home: 'Home', features: 'Features', servers: 'Servers', pricing: 'Pricing', support: 'Support', logIn: 'Log In', signUp: 'Sign Up', choosePlan: 'Choose a Plan' },
+  es: { home: 'Inicio', features: 'Características', servers: 'Servidores', pricing: 'Precios', support: 'Soporte', logIn: 'Iniciar sesión', signUp: 'Registrarse', choosePlan: 'Elegir un plan' },
+  fr: { home: 'Accueil', features: 'Caractéristiques', servers: 'Serveurs', pricing: 'Tarification', support: 'Support', logIn: 'Connexion', signUp: "S'inscrire", choosePlan: 'Choisir un forfait' },
+  de: { home: 'Startseite', features: 'Funktionen', servers: 'Server', pricing: 'Preisgestaltung', support: 'Unterstützung', logIn: 'Anmelden', signUp: 'Registrieren', choosePlan: 'Plan wählen' },
+  zh: { home: '首页', features: '功能', servers: '服务器', pricing: '定价', support: '支持', logIn: '登录', signUp: '注册', choosePlan: '选择计划' },
+  ja: { home: 'ホーム', features: '機能', servers: 'サーバー', pricing: '料金', support: 'サポート', logIn: 'ログイン', signUp: '登録', choosePlan: 'プランを選択' },
+  ru: { home: 'Главная', features: 'Возможности', servers: 'Серверы', pricing: 'Цены', support: 'Поддержка', logIn: 'Вход', signUp: 'Зарегистрироваться', choosePlan: 'Выбрать план' },
+  ar: { home: 'الرئيسية', features: 'الميزات', servers: 'الخوادم', pricing: 'التسعير', support: 'الدعم', logIn: 'تسجيل الدخول', signUp: 'التسجيل', choosePlan: 'اختر خطة' },
+  pt: { home: 'Início', features: 'Recursos', servers: 'Servidores', pricing: 'Preços', support: 'Suporte', logIn: 'Entrar', signUp: 'Registrar', choosePlan: 'Escolher um plano' },
+  it: { home: 'Home', features: 'Funzioni', servers: 'Server', pricing: 'Prezzi', support: 'Supporto', logIn: 'Accedi', signUp: 'Registrati', choosePlan: 'Scegli un piano' },
+  nl: { home: 'Home', features: 'Functies', servers: 'Servers', pricing: 'Prijzen', support: 'Ondersteuning', logIn: 'Inloggen', signUp: 'Registreren', choosePlan: 'Kies een abonnement' },
+  pl: { home: 'Strona główna', features: 'Funkcje', servers: 'Serwery', pricing: 'Cennik', support: 'Wsparcie', logIn: 'Zaloguj', signUp: 'Zarejestruj', choosePlan: 'Wybierz plan' },
+  tr: { home: 'Ana Sayfa', features: 'Özellikler', servers: 'Sunucular', pricing: 'Fiyatlandırma', support: 'Destek', logIn: 'Giriş', signUp: 'Kayıt Ol', choosePlan: 'Plan Seç' },
+  ko: { home: '홈', features: '기능', servers: '서버', pricing: '가격', support: '지원', logIn: '로그인', signUp: '가입', choosePlan: '플랜 선택' },
+  id: { home: 'Beranda', features: 'Fitur', servers: 'Server', pricing: 'Harga', support: 'Dukungan', logIn: 'Masuk', signUp: 'Daftar', choosePlan: 'Pilih Paket' },
+  th: { home: 'หน้าแรก', features: 'คุณสมบัติ', servers: 'เซิร์ฟเวอร์', pricing: 'ราคา', support: 'สนับสนุน', logIn: 'เข้าสู่ระบบ', signUp: 'สมัคร', choosePlan: 'เลือกแผน' },
+  vi: { home: 'Trang chủ', features: 'Tính năng', servers: 'Máy chủ', pricing: 'Giá', support: 'Hỗ trợ', logIn: 'Đăng nhập', signUp: 'Đăng ký', choosePlan: 'Chọn gói' },
+  sv: { home: 'Hem', features: 'Funktioner', servers: 'Servrar', pricing: 'Priser', support: 'Support', logIn: 'Logga in', signUp: 'Registrera', choosePlan: 'Välj ett abonnemang' },
+  he: { home: 'בית', features: 'תכונות', servers: 'שרתים', pricing: 'תמחור', support: 'תמיכה', logIn: 'התחבר', signUp: 'הרשמה', choosePlan: 'בחר תוכנית' },
+  hi: { home: 'होम', features: 'विशेषताएँ', servers: 'सर्वर', pricing: 'मूल्य', support: 'सहायता', logIn: 'लॉग इन', signUp: 'साइन अप', choosePlan: 'योजना चुनें' },
+  fa: { home: 'خانه', features: 'ویژگی‌ها', servers: 'سرورها', pricing: 'قیمت', support: 'پشتیبانی', logIn: 'ورود', signUp: 'ثبت‌نام', choosePlan: 'یک طرح انتخاب کنید' },
+  no: { home: 'Hjem', features: 'Funksjoner', servers: 'Servere', pricing: 'Priser', support: 'Støtte', logIn: 'Logg inn', signUp: 'Registrer', choosePlan: 'Velg et abonnement' },
+  da: { home: 'Hjem', features: 'Funktioner', servers: 'Servere', pricing: 'Priser', support: 'Support', logIn: 'Log ind', signUp: 'Tilmeld', choosePlan: 'Vælg et abonnement' },
+  fi: { home: 'Etusivu', features: 'Ominaisuudet', servers: 'Palvelimet', pricing: 'Hinnat', support: 'Tuki', logIn: 'Kirjaudu', signUp: 'Rekisteröidy', choosePlan: 'Valitse suunnitelma' },
+  el: { home: 'Αρχική', features: 'Χαρακτηριστικά', servers: 'Διακομιστές', pricing: 'Τιμές', support: 'Υποστήριξη', logIn: 'Σύνδεση', signUp: 'Εγγραφή', choosePlan: 'Επιλογή πακέτου' },
+  cs: { home: 'Domů', features: 'Funkce', servers: 'Servery', pricing: 'Ceny', support: 'Podpora', logIn: 'Přihlášení', signUp: 'Registrace', choosePlan: 'Vybrat plán' },
+  ro: { home: 'Acasă', features: 'Funcții', servers: 'Servere', pricing: 'Prețuri', support: 'Suport', logIn: 'Conectare', signUp: 'Înregistrare', choosePlan: 'Alege un plan' },
+  hu: { home: 'Főoldal', features: 'Funkciók', servers: 'Szerverek', pricing: 'Árak', support: 'Támogatás', logIn: 'Bejelentkezés', signUp: 'Regisztráció', choosePlan: 'Válasszon csomagot' },
+  uk: { home: 'Головна', features: 'Можливості', servers: 'Сервери', pricing: 'Ціни', support: 'Підтримка', logIn: 'Увійти', signUp: 'Реєстрація', choosePlan: 'Обрати план' },
+  ur: { home: 'ہوم', features: 'خصوصیات', servers: 'سرورز', pricing: 'قیمتیں', support: 'معاونت', logIn: 'لاگ اِن', signUp: 'سائن اپ', choosePlan: 'پلان منتخب کریں' },
+  bn: { home: 'হোম', features: 'বৈশিষ্ট্য', servers: 'সার্ভার', pricing: 'মূল্য', support: 'সহায়তা', logIn: 'লগ ইন', signUp: 'সাইন আপ', choosePlan: 'প্ল্যান বেছে নিন' },
+};
+
+export function languageForCountry(countryCode) {
+  if (!countryCode) return 'en';
+  return COUNTRY_LANGUAGE[countryCode.toUpperCase()] || 'en';
+}
+
+/** Derive a country flag emoji from an ISO 3166-1 alpha-2 code (e.g. "GH" → 🇬🇭). */
+export function countryFlag(countryCode) {
+  if (!countryCode || countryCode.length !== 2) return '🏳️';
+  return String.fromCodePoint(
+    ...[...countryCode.toUpperCase()].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65)
+  );
+}
+
 export function LanguageProvider({ children }) {
-  // Start from any cached language to avoid a flash on first paint,
-  // then auto-detect from the visitor's IP and switch immediately.
-  const [language, setLanguage] = useState(() => {
-    const saved = localStorage.getItem('voxvpn_language');
-    if (saved && translations[saved]) return saved;
-    return 'en';
-  });
+  const [language, setLanguage] = useState('en');
+  const [country, setCountry] = useState(null);
+  const [detected, setDetected] = useState(false);
 
+  // Apply RTL direction whenever language changes
   useEffect(() => {
-    // Only skip auto-detection if the user explicitly chose a language
-    const manual = localStorage.getItem('voxvpn_language_manual') === '1';
-    if (manual) return;
-
-    let cancelled = false;
-    base44.functions.invoke('detectLanguageByIp', {})
-      .then((res) => {
-        const data = res?.data || res;
-        const detected = data?.language;
-        if (!cancelled && detected && translations[detected]) {
-          setLanguage(detected);
-          localStorage.setItem('voxvpn_language', detected);
-        }
-      })
-      .catch(() => { /* fall back to current language silently */ });
-    return () => { cancelled = true; };
-  }, []);
-
-  // Sync <html lang> and text direction (RTL for Arabic) whenever language changes
-  useEffect(() => {
-    document.documentElement.lang = language;
-    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+    if (typeof document === 'undefined') return;
+    const isRtl = RTL_LANGUAGES.has(language);
+    document.documentElement.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
+    document.documentElement.setAttribute('lang', language);
   }, [language]);
+
+  useEffect(() => {
+    // Restore a manually-chosen language immediately so the UI never flashes
+    // the wrong language before detection finishes.
+    const savedManual = localStorage.getItem('voxvpn_language_manual');
+    if (savedManual) setLanguage(savedManual);
+
+    let done = false;
+
+    const finish = (cc) => {
+      if (done) return;
+      done = true;
+      // Re-read the manual flag at resolution time so a manual change made
+      // while detection was in-flight is never overwritten.
+      const manualNow = localStorage.getItem('voxvpn_language_manual');
+      if (cc) {
+        const code = cc.toUpperCase();
+        setCountry(code);
+        localStorage.setItem('voxvpn_country', code);
+        if (!manualNow) {
+          const lang = languageForCountry(code);
+          setLanguage(lang);
+          localStorage.setItem('voxvpn_language', lang);
+        }
+      }
+      setDetected(true);
+    };
+
+    const fetchWithTimeout = (url, ms, isText = false) =>
+      Promise.race([
+        fetch(url, { cache: 'no-store' }).then((r) => (isText ? r.text() : r.json())),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
+      ]).catch(() => null);
+
+    const cfTrace = () =>
+      fetchWithTimeout('https://www.cloudflare.com/cdn-cgi/trace', 3000, true)
+        .then((text) => {
+          const m = text && text.match(/^loc=(\w{2})$/m);
+          return m && m[1] ? m[1] : null;
+        });
+
+    const jsonProvider = (url, parse) =>
+      fetchWithTimeout(url, 3500).then((d) => (d && parse(d)) || null);
+
+    const safety = setTimeout(() => finish(null), 5000);
+
+    Promise.any([
+      cfTrace(),
+      jsonProvider('https://ipwho.is/?fields=country_code,success', (d) => d && d.success !== false && d.country_code),
+      jsonProvider('https://ipapi.co/json/', (d) => d && d.country_code),
+      jsonProvider('https://get.geojs.io/v1/ip/country.json', (d) => d && d.country),
+      jsonProvider('https://api.db-ip.com/v2/free/self', (d) => d && d.country_code),
+      jsonProvider('https://ipinfo.io/json', (d) => d && d.country),
+    ])
+      .then((cc) => { clearTimeout(safety); finish(cc); })
+      .catch(() => { clearTimeout(safety); finish(null); });
+  }, []);
 
   const changeLanguage = (lang) => {
     setLanguage(lang);
     localStorage.setItem('voxvpn_language', lang);
-    localStorage.setItem('voxvpn_language_manual', '1');
+    localStorage.setItem('voxvpn_language_manual', lang); // mark as a deliberate user choice
   };
 
-  const t = (key) => {
-    return translations[language]?.[key] || translations.en[key] || key;
+  // Revert to the language that matches the detected country, clearing any
+  // manual override so future re-detection can adjust automatically.
+  const resetToAuto = () => {
+    localStorage.removeItem('voxvpn_language_manual');
+    const auto = country ? languageForCountry(country) : 'en';
+    setLanguage(auto);
+    localStorage.setItem('voxvpn_language', auto);
   };
+
+  const t = (key) => translations[language]?.[key] || translations.en[key] || key;
 
   return (
-    <LanguageContext.Provider value={{ language, changeLanguage, t }}>
+    <LanguageContext.Provider
+      value={{
+        language,
+        country,
+        detected,
+        changeLanguage,
+        resetToAuto,
+        t,
+        languages: LANGUAGES,
+        countryFlag,
+        rtl: RTL_LANGUAGES.has(language),
+      }}
+    >
       {children}
     </LanguageContext.Provider>
   );

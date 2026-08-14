@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Plus, Pencil, Trash2, Download, DollarSign, Check, X, ExternalLink, Loader2, Monitor, Apple, Terminal, Smartphone, Wifi, Router, Link, Upload, CheckCircle2 } from 'lucide-react';
+import { FaAndroid, FaWindows } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const platformIcons = {
-  Windows: Monitor, macOS: Apple, Linux: Terminal,
-  iOS: Smartphone, Android: Smartphone, Router: Router,
+  Windows: FaWindows, macOS: Apple, Linux: Terminal,
+  iOS: Smartphone, Android: FaAndroid, Router: Router,
 };
 
 const platformColors = {
