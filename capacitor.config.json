@@ -1,13 +1,13 @@
 {
   "appId": "com.base69c84f61d5543b54fe26e1e5.app",
-  "appName": "VoxVPN",
+  "appName": "VoxVPN Security",
   "webDir": "dist",
   "server": {
     "androidScheme": "https"
   },
   "ios": {
-    "version": "2.124641.4",
-    "buildNumber": "4",
+    "version": "2.130297.11",
+    "buildNumber": "11",
     "scheme": "App"
   },
   "plugins": {
