@@ -41,19 +41,26 @@ export default function Login() {
       });
       const data = response?.data || response;
 
-      if (data?.success === true && data?.subscription) {
-        const subStatus = data.subscription.status;
-        if (subStatus !== 'active' && subStatus !== 'trial') {
+      if (data?.success === true && (data?.subscription || data?.access)) {
+        const subStatus = data.subscription?.status;
+        const iOSAccess = data.access?.status;
+        if (data.subscription && subStatus !== 'active' && subStatus !== 'trial') {
           setError('Your subscription is not active. Please choose a plan at voxvpn.net to access VoxVPN.');
+          return;
+        }
+        if (data.access && iOSAccess !== 'active' && iOSAccess !== 'free') {
+          setError('Your iOS access is not active. Please try again.');
           return;
         }
         await base44.auth.loginViaEmailPassword(email, password);
         if (data.token) localStorage.setItem('vpn_token', data.token);
-        localStorage.setItem('subscription', JSON.stringify(data.subscription));
+        localStorage.setItem('subscription', JSON.stringify(
+          data.subscription || { plan: 'Free iOS', status: 'active', access_tier: data.access?.tier || 'free' }
+        ));
         localStorage.setItem('vpn_email', email);
         navigate('/app/servers');
       } else {
-        setError(data?.message || 'Access denied. No active subscription found.');
+        setError(data?.message || 'Access denied. Please try again.');
       }
     } catch (err) {
       const backendMsg = err?.response?.data?.message || err?.message || 'Login failed.';
