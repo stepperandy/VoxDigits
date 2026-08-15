@@ -39,7 +39,7 @@ export default function ServerList() {
 
   const handleNav = (id) => {
     setActiveNav(id);
-    if (id === 'settings') handleLogout();
+    if (id === 'settings') navigate('/app/settings');
     if (id === 'subscription') navigate('/app/subscription');
   };
 
