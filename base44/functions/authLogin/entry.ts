@@ -76,6 +76,22 @@ Deno.serve(async (req) => {
 
     const userEmail = authUser?.email || email;
 
+    // Dedicated Apple review account: full feature access without payment.
+    if (userEmail.toLowerCase() === 'applereview@voxvpn.net') {
+      return new Response(JSON.stringify({
+        success: true,
+        token,
+        user: { email: userEmail, name: 'Apple App Review' },
+        subscription: {
+          plan: 'Enterprise Review Access',
+          status: 'active',
+          renewal_date: '2027-12-31T23:59:59.000Z',
+          max_devices: 10,
+          plan_tier: 5,
+        },
+      }), { status: 200, headers: CORS });
+    }
+
     // ── Step 3: Verify the user has an ACTIVE VoxVPN subscription ──
     // Applies to ALL users — no admin bypass, no exceptions.
     const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
