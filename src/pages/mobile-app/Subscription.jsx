@@ -16,9 +16,9 @@ const PLANS = [
   },
   {
     name: 'Yearly',
-    price: '$4.99',
+    price: '$6.49',
     period: '/month',
-    badge: 'Save 50%',
+    badge: 'Save 35%',
     features: ['All Locations', '10 Devices', 'Unlimited Bandwidth', 'Priority Support', 'Dedicated IP'],
     popular: true,
     glow: 'rgba(0,212,255,0.3)',
@@ -115,7 +115,7 @@ export default function Subscription() {
                   <span className="font-black text-3xl" style={{ color: plan.accent, textShadow: `0 0 20px ${plan.glow}` }}>{plan.price}</span>
                   <span className="text-slate-500 text-sm">{plan.period}</span>
                 </div>
-                {plan.name === 'Yearly' && <p className="text-[10px] text-emerald-400 font-bold mt-0.5">$59.88/yr · Save $60</p>}
+                {plan.name === 'Yearly' && <p className="text-[10px] text-emerald-400 font-bold mt-0.5">$77.88/yr · Save 35%</p>}
               </div>
             </div>
 
@@ -132,14 +132,14 @@ export default function Subscription() {
               ))}
             </ul>
 
-            <Link to="/pricing">
+            <Link to="/ios-setup">
               <button className="w-full py-4 font-black rounded-2xl text-sm transition-all active:scale-[0.97] flex items-center justify-center gap-2"
                 style={plan.popular
                   ? { background: 'linear-gradient(135deg, #00d4ff, #0066cc)', color: '#000', boxShadow: '0 8px 32px rgba(0,212,255,0.35)' }
                   : { background: plan.accentBg, border: `1px solid ${plan.accentBorder}`, color: plan.accent, boxShadow: `0 4px 16px ${plan.glow}` }
                 }>
                 <CreditCard size={16} />
-                Get {plan.name} Plan
+                View {plan.name} Plan
               </button>
             </Link>
           </div>
