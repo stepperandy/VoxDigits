@@ -47,8 +47,8 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             PRODUCT_BUNDLE_IDENTIFIER=com.base69c84f61d5543b54fe26e1e5.app \
-            MARKETING_VERSION=2.0.1 \
-            CURRENT_PROJECT_VERSION=4 \
+            MARKETING_VERSION=2.130297.11 \
+            CURRENT_PROJECT_VERSION=11 \
             archive | xcpretty
 
       - name: Package .app for inspection
