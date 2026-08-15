@@ -38,6 +38,7 @@ function normalizeServers(raw) {
 }
 
 export default function VpnDashboard() {
+  const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
   const isNewUser = urlParams.get('is_new_user') === 'true';
 
@@ -63,7 +64,7 @@ export default function VpnDashboard() {
     try {
       const me = await base44.auth.me();
       if (!me) {
-        base44.auth.redirectToLogin('/vpn-dashboard');
+        navigate('/auth-login?next=%2Fvpn-dashboard', { replace: true });
         return;
       }
       setUser(me);
