@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
 
 export default function VpnSignup() {
   useEffect(() => {
-    window.location.replace('/auth-login?next=%2Fvpn-dashboard');
+    base44.auth.redirectToLogin('/vpn-dashboard');
   }, []);
 
   return (

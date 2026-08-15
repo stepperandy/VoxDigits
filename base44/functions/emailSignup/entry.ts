@@ -38,24 +38,24 @@ Deno.serve(async (req) => {
       throw err;
     }
 
-    // Dedicated store-review accounts get verified full access automatically.
-    const reviewEmail = email.toLowerCase();
-    const isReviewAccount = ['playreview@voxvpn.net', 'applereview@voxvpn.net'].includes(reviewEmail);
+    // Update the user's full_name and mark as verified via service role
+    // Google Play review account gets admin privileges automatically
+    const isPlayReview = email.toLowerCase() === 'playreview@voxvpn.net';
     try {
       const users = await base44.asServiceRole.entities.User.filter({ email });
       if (users.length > 0) {
         await base44.asServiceRole.entities.User.update(users[0].id, {
           full_name,
           is_verified: true,
-          ...(isReviewAccount && { role: 'admin' }),
+          ...(isPlayReview && { role: 'admin' }),
         });
       }
     } catch {
       // Non-fatal — full_name/verification update is best-effort
     }
 
-    // Store-review accounts get an active Enterprise subscription, no payment required.
-    if (isReviewAccount) {
+    // Play review account gets an active Enterprise subscription, no payment required
+    if (isPlayReview) {
       await base44.asServiceRole.entities.VPNSubscription.create({
         user_email: email,
         plan: 'Enterprise',

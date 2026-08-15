@@ -3,6 +3,7 @@ import { Check, Zap } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PaymentMethodModal from '../PaymentMethodModal';
 import { useCurrencyDetection } from '@/hooks/useCurrencyDetection';
+import { useLanguage } from '@/lib/LanguageContext';
 
 const PLANS = [
   {
@@ -122,8 +123,35 @@ const PLANS = [
   },
 ];
 
+const PLAN_KEYS = {
+  '1 Month': { nameKey: 'plan1Month', periodKey: 'plan1Month', daysKey: 'days30', badgeKey: null },
+  '3 Months': { nameKey: 'plan3Months', periodKey: 'plan3Months', daysKey: 'days90', badgeKey: null },
+  '6 Months': { nameKey: 'plan6Months', periodKey: 'plan6Months', daysKey: 'days180', badgeKey: 'badgeMostPopular' },
+  '1 Year': { nameKey: 'plan1Year', periodKey: 'plan1Year', daysKey: 'days365', badgeKey: 'badgeBestValue' },
+  '2 Years': { nameKey: 'plan2Years', periodKey: 'plan2Years', daysKey: 'days730', badgeKey: null },
+};
+
+const FEATURE_KEYS = {
+  'Unlimited Bandwidth': 'featUnlimitedBandwidth',
+  'AES-256 Encryption': 'featAes',
+  'No-Logs Policy': 'featNoLogs',
+  'All Server Locations': 'featAllServers',
+  'Kill Switch': 'featKillSwitch',
+  'Split Tunneling': 'featSplit',
+  'DNS Leak Protection': 'featDnsLeak',
+  'Priority Support': 'featPrioritySupport',
+  'DNS & IPv6 Leak Protection': 'featDnsIpv6',
+  'Dedicated IP Address': 'featDedicatedIp',
+  '24/7 Priority Support': 'feat247Priority',
+  'Static Dedicated IP': 'featStaticIp',
+  'Double VPN (Multi-hop)': 'featDoubleVpn',
+  'Dedicated Account Manager': 'featAccountManager',
+};
+
 function PlanCard({ plan, isAdmin, onPaymentMethodSelect, currency, convertPrice }) {
   const [loading, setLoading] = useState(false);
+  const { t } = useLanguage();
+  const planKeys = PLAN_KEYS[plan.name];
 
   const handleCheckout = () => {
     onPaymentMethodSelect(plan, plan.priceId, false);
@@ -131,23 +159,23 @@ function PlanCard({ plan, isAdmin, onPaymentMethodSelect, currency, convertPrice
 
   return (
     <div className={`relative rounded-xl p-6 flex flex-col ${plan.color}`}>
-      {plan.badge && (
+      {planKeys.badgeKey && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className={`px-3 py-1 text-xs font-bold rounded-full ${plan.badgeColor}`}>{plan.badge}</span>
+          <span className={`px-3 py-1 text-xs font-bold rounded-full ${plan.badgeColor}`}>{t(planKeys.badgeKey)}</span>
         </div>
       )}
 
       <div className="mb-4">
-        <h3 className="text-white font-bold text-base mb-0.5">{plan.name}</h3>
-        <p className="text-slate-600 text-xs">{plan.days}</p>
+        <h3 className="text-white font-bold text-base mb-0.5">{t(planKeys.nameKey)}</h3>
+        <p className="text-slate-600 text-xs">{t(planKeys.daysKey)}</p>
       </div>
 
       <div className="flex items-baseline gap-1 mb-1">
         <span className="text-3xl font-extrabold text-white">{currency.symbol}{convertPrice(plan.price)}</span>
       </div>
       <p className="text-slate-600 text-xs mb-5">
-        {currency.symbol}{convertPrice(plan.pricePerMonth)}/mo
-        {plan.savingsPercent > 0 && <span className="ml-2 text-cyan-400 font-semibold">Save {plan.savingsPercent}% vs monthly</span>}
+        {currency.symbol}{convertPrice(plan.pricePerMonth)}{t('perMonth')}
+        {plan.savingsPercent > 0 && <span className="ml-2 text-cyan-400 font-semibold">{t('saveVsMonthly').replace('{percent}', plan.savingsPercent)}</span>}
       </p>
 
       <button
@@ -155,14 +183,14 @@ function PlanCard({ plan, isAdmin, onPaymentMethodSelect, currency, convertPrice
         disabled={loading}
         className={`w-full py-2.5 rounded-lg text-sm font-bold mb-5 transition-all disabled:opacity-50 ${plan.btnClass}`}
       >
-        {loading ? 'Processing...' : `Get ${plan.period}`}
+        {loading ? t('btnProcessing') : t('btnGet').replace('{period}', t(planKeys.periodKey))}
       </button>
 
       <ul className="space-y-2.5 flex-1">
         {plan.features.map((f, fi) => (
           <li key={fi} className="flex items-center gap-2">
             <Check size={13} className="text-cyan-400 flex-shrink-0" />
-            <span className="text-slate-400 text-xs">{f}</span>
+            <span className="text-slate-400 text-xs">{t(FEATURE_KEYS[f] || f)}</span>
           </li>
         ))}
       </ul>
@@ -177,6 +205,7 @@ export default function Pricing() {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [selectedPriceId, setSelectedPriceId] = useState(null);
   const { currency, countryCode } = useCurrencyDetection();
+  const { t } = useLanguage();
   const convertPrice = (usdPrice) => (usdPrice * currency.rate).toFixed(currency.rate >= 100 ? 0 : 2);
 
   useEffect(() => {
@@ -227,14 +256,14 @@ export default function Pricing() {
       />
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10">
-          <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-3">Pricing</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Simple, Transparent Pricing</h2>
-          <p className="text-slate-400 text-sm">All plans include AES-256 encryption and a strict no-logs policy. Cancel anytime.</p>
+          <p className="text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-3">{t('pricingLabel')}</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">{t('pricingTitle')}</h2>
+          <p className="text-slate-400 text-sm">{t('pricingSubtitle')}</p>
         </div>
 
         {/* Pricing info */}
         <div className="text-center mb-10">
-          <p className="text-slate-400 text-sm">Prices shown in <span className="font-semibold text-white">{currency.code}</span> · Detected: <span className="text-cyan-400 font-semibold">{countryCode}</span></p>
+          <p className="text-slate-400 text-sm">{t('pricesIn')} <span className="font-semibold text-white">{currency.code}</span> · {t('detectedLabel')} <span className="text-cyan-400 font-semibold">{countryCode}</span></p>
         </div>
 
         {/* Plans grid */}
@@ -271,10 +300,10 @@ export default function Pricing() {
           <div className="flex items-start gap-4 p-6 rounded-2xl border border-white/5 bg-[#0d1120]">
             <div className="text-3xl flex-shrink-0">💬</div>
             <div className="flex-1">
-              <h3 className="text-white font-bold text-base mb-1">Live, 24-hour customer support</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mb-4">Real support from real people. We're available through instant live chat and email to help you set up and troubleshoot.</p>
+              <h3 className="text-white font-bold text-base mb-1">{t('liveSupport')}</h3>
+              <p className="text-slate-400 text-sm leading-relaxed mb-4">{t('liveSupportDesc')}</p>
               <a href="/contact" className="inline-flex items-center gap-1.5 px-4 py-2 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-sm font-semibold rounded-lg transition-all">
-                Contact Support →
+                {t('contactSupport')}
               </a>
             </div>
           </div>
@@ -285,10 +314,10 @@ export default function Pricing() {
               <span className="text-cyan-400 font-black text-sm">30</span>
             </div>
             <div className="flex-1">
-              <h3 className="text-white font-bold text-base mb-1">30-day money-back guarantee</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mb-4">Our VPN is easy to use. So is our guarantee. If you're not satisfied, just ask Support for a full refund. No hassle, no risk.</p>
+              <h3 className="text-white font-bold text-base mb-1">{t('moneyBackTitle')}</h3>
+              <p className="text-slate-400 text-sm leading-relaxed mb-4">{t('moneyBackDesc')}</p>
               <a href="#pricing" className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-sm font-semibold rounded-lg transition-all">
-                Get VoxVPN →
+                {t('getVoxvpnCta')}
               </a>
             </div>
           </div>
@@ -300,21 +329,21 @@ export default function Pricing() {
             <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
               <path d="M13.5 6H5.5C4.4 6 3.5 6.9 3.5 8v8c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2v-2h2v2c0 1.1.9 2 2 2s2-.9 2-2v-3c0-.55-.22-1.05-.59-1.41L18.5 10h-3c-1.1 0-2-.9-2-2V6z" fill="#635BFF"/>
             </svg>
-            <h3 className="text-white font-bold text-sm">Secure Payment by Stripe</h3>
+            <h3 className="text-white font-bold text-sm">{t('securePayment')}</h3>
             <span className="ml-auto px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider" style={{ background: 'rgba(99,91,255,0.15)', color: '#8b80ff', border: '1px solid rgba(99,91,255,0.3)' }}>
-              PCI-DSS Compliant
+              {t('pciCompliant')}
             </span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
             {[
-              { label: 'Payment Processor', value: 'Stripe (PCI-DSS Level 1)' },
-              { label: 'Accepted Cards', value: 'Visa, Mastercard, Amex, Discover' },
-              { label: 'Alternative Methods', value: 'Apple Pay, Google Pay, Hubtel, Alipay' },
-              { label: 'Billing Cycle', value: 'One-time per period (1mo–2yr)' },
-              { label: 'Auto-Renewal', value: 'Optional — cancel anytime' },
-              { label: 'Cancellation Policy', value: 'Cancel anytime, no fees' },
-              { label: 'Money-Back Guarantee', value: '30-day full refund' },
-              { label: 'Currency', value: `${currency.code} (auto-converted from USD)` },
+              { label: t('payProcessor'), value: t('payProcessorVal') },
+              { label: t('payCards'), value: t('payCardsVal') },
+              { label: t('payAltMethods'), value: t('payAltVal') },
+              { label: t('payBillingCycle'), value: t('payBillingVal') },
+              { label: t('payAutoRenewal'), value: t('payAutoVal') },
+              { label: t('payCancellation'), value: t('payCancelVal') },
+              { label: t('payMoneyBack'), value: t('payMoneyBackVal') },
+              { label: t('payCurrency'), value: t('payCurrencyVal').replace('{code}', currency.code) },
             ].map(item => (
               <div key={item.label} className="flex justify-between items-center py-1.5 border-b border-white/5 last:border-0">
                 <span className="text-slate-500 text-xs">{item.label}</span>
@@ -323,12 +352,12 @@ export default function Pricing() {
             ))}
           </div>
           <p className="text-slate-600 text-[10px] mt-4 leading-relaxed">
-            Payments are processed securely by Stripe. VoxVPN never stores your full card details. Subscriptions can be cancelled at any time from your account dashboard. See our <a href="/refund-policy" className="text-cyan-400 hover:underline">Refund Policy</a> for full details. Taxes may apply based on your jurisdiction and are calculated at checkout. Invoices are available for download from your account dashboard after purchase.
+            {t('payDisclaimerPre')}<a href="/refund-policy" className="text-cyan-400 hover:underline">{t('refundPolicyLink')}</a>{t('payDisclaimerPost')}
           </p>
         </div>
 
         <p className="text-center text-slate-600 text-xs mt-8">
-          All prices auto-converted to your local currency ({currency.code}). 30-day money-back guarantee. Secure payment via Stripe · Hubtel · Alipay · WeChat Pay.
+          {t('pricingFooter').replace('{code}', currency.code)}
         </p>
       </div>
     </section>

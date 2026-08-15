@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import MobileLayout from '@/mobile/MobileLayout';
 import PullToRefresh from '@/mobile/PullToRefresh';
 import { base44 } from '@/api/base44Client';
@@ -7,7 +6,6 @@ import { LogOut, Trash2, ChevronRight } from 'lucide-react';
 import ReferralWidget from '@/components/ReferralWidget';
 
 export default function AccountMobile() {
-  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -140,7 +138,7 @@ export default function AccountMobile() {
             <div className="text-center py-12">
               <p className="text-slate-400 mb-4">Please log in to view your account.</p>
               <button
-                 onClick={() => navigate('/auth-login?next=%2Faccount-mobile')}
+                 onClick={() => base44.auth.redirectToLogin()}
                  className="px-6 py-3 bg-cyan-400 text-black font-bold rounded-lg transition-colors select-none touch-target active:scale-95"
                >
                  Log In
