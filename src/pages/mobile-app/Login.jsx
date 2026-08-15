@@ -32,6 +32,8 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
+      // Establish a Base44 session before asking the server to validate iOS access.
+      await base44.auth.loginViaEmailPassword(email, password);
       const response = await base44.functions.invoke('authLogin', {
         email,
         password,
@@ -52,7 +54,6 @@ export default function Login() {
           setError('Your iOS access is not active. Please try again.');
           return;
         }
-        await base44.auth.loginViaEmailPassword(email, password);
         if (data.token) localStorage.setItem('vpn_token', data.token);
         localStorage.setItem('subscription', JSON.stringify(
           data.subscription || { plan: 'Free iOS', status: 'active', access_tier: data.access?.tier || 'free' }
