@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Shield, Bell, Moon, LogOut, ChevronRight,
-  Info, FileText, HelpCircle, Globe, CreditCard, Download
+  Info, FileText, HelpCircle, Globe, CreditCard, Download, Trash2
 } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 
 function ToggleRow({ icon: Icon, label, desc, value, onChange, iconColor = 'text-cyan-400' }) {
   return (
@@ -56,12 +57,29 @@ export default function Settings() {
   const email = localStorage.getItem('vpn_email') || 'Not signed in';
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(true);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('vpn_token');
     localStorage.removeItem('vpn_email');
     localStorage.removeItem('subscription');
     navigate('/app/login');
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      return;
+    }
+    setDeleting(true);
+    try {
+      await base44.functions.invoke('deleteUserAccount', {});
+      handleLogout();
+    } catch (error) {
+      setDeleting(false);
+      alert('We could not delete your account. Please contact support.');
+    }
   };
 
   return (
@@ -146,6 +164,28 @@ export default function Settings() {
               Connect or WireGuard.
             </p>
           </div>
+        </div>
+
+        {/* Account deletion — required in-app for accounts created here */}
+        <div className="rounded-3xl p-4" style={{ ...card, border: '1px solid rgba(239,68,68,0.25)' }}>
+          <div className="flex items-start gap-3">
+            <Trash2 size={17} className="text-red-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-white text-sm font-bold">Delete account</p>
+              <p className="text-slate-400 text-xs mt-1">Permanently delete your VoxVPN account and associated data.</p>
+            </div>
+          </div>
+          {confirmDelete ? (
+            <div className="mt-3">
+              <p className="text-red-300 text-xs mb-3">This cannot be undone.</p>
+              <div className="flex gap-2">
+                <button onClick={() => setConfirmDelete(false)} className="flex-1 py-2 rounded-xl text-sm font-semibold text-slate-200 bg-slate-700">Cancel</button>
+                <button onClick={handleDeleteAccount} disabled={deleting} className="flex-1 py-2 rounded-xl text-sm font-bold text-white bg-red-600 disabled:opacity-50">{deleting ? 'Deleting…' : 'Confirm Delete'}</button>
+              </div>
+            </div>
+          ) : (
+            <button onClick={handleDeleteAccount} className="mt-3 w-full py-2 rounded-xl text-sm font-bold text-red-300 bg-red-500/10 border border-red-500/25">Delete Account</button>
+          )}
         </div>
 
         {/* Sign out */}
