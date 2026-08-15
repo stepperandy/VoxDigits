@@ -41,6 +41,39 @@ Deno.serve(async (req) => {
 
     const base44 = createClientFromRequest(req);
 
+    // ── iOS: authenticate in the client first, then validate the signed-in session ──
+    // Base44 server functions do not support password login. The client sends its
+    // authenticated session with this request, which we validate here before
+    // allowing free iOS access.
+    if (String(device_type || '').toLowerCase() === 'ios') {
+      const signedInUser = await base44.auth.me().catch(() => null);
+      if (!signedInUser || signedInUser.email?.toLowerCase() !== String(email).toLowerCase()) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: 'Invalid email or password',
+        }), { status: 401, headers: CORS });
+      }
+
+      const appleEntitlements = await base44.asServiceRole.entities.AppleSubscriptionEntitlement.filter({
+        user_email: signedInUser.email,
+        status: 'active',
+      });
+      const activeApple = (appleEntitlements || []).find(item =>
+        item.expires_at && new Date(item.expires_at).getTime() > Date.now()
+      );
+
+      return new Response(JSON.stringify({
+        success: true,
+        user: { email: signedInUser.email, name: signedInUser.full_name || null },
+        access: {
+          tier: activeApple ? 'premium' : 'free',
+          status: activeApple ? 'active' : 'free',
+          product_id: activeApple?.product_id || null,
+          expires_at: activeApple?.expires_at || null,
+        },
+      }), { status: 200, headers: CORS });
+    }
+
     // ── Step 1: Verify the user exists in the registered User database ──
     // No auto-creation — if the email isn't in the User table, reject immediately.
     const registeredUsers = await base44.asServiceRole.entities.User.filter({ email });
@@ -90,28 +123,6 @@ Deno.serve(async (req) => {
           renewal_date: null,
           max_devices: 999,
           plan_tier: 5,
-        },
-      }), { status: 200, headers: CORS });
-    }
-
-    // ── iOS App Store build: free access plus optional Apple Premium ──
-    if (String(device_type || '').toLowerCase() === 'ios') {
-      const appleEntitlements = await base44.asServiceRole.entities.AppleSubscriptionEntitlement.filter({
-        user_email: userEmail,
-        status: 'active',
-      });
-      const activeApple = (appleEntitlements || []).find(item =>
-        item.expires_at && new Date(item.expires_at).getTime() > Date.now()
-      );
-      return new Response(JSON.stringify({
-        success: true,
-        token,
-        user: { email: userEmail, name: authUser?.full_name || registeredUsers[0]?.full_name || null },
-        access: {
-          tier: activeApple ? 'premium' : 'free',
-          status: activeApple ? 'active' : 'free',
-          product_id: activeApple?.product_id || null,
-          expires_at: activeApple?.expires_at || null,
         },
       }), { status: 200, headers: CORS });
     }
