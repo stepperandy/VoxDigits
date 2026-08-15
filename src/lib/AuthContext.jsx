@@ -131,14 +131,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const navigateToLogin = () => {
-    // Check if user has already agreed to terms; if not, route through terms page
-    const hasAgreed = localStorage.getItem("terms_agreed_v1");
-    const origin = window.location.origin;
-    if (hasAgreed) {
-      base44.auth.redirectToLogin(`${origin}/Dashboard`);
-    } else {
-      window.location.href = `/TermsAgreement?next=${encodeURIComponent(origin + "/Dashboard")}`;
-    }
+    // Keep authentication inside the native app WebView. Base44's hosted login
+    // opens an external browser, which is not appropriate for the iOS app.
+    const next = window.location.pathname + window.location.search;
+    window.location.assign(`/auth-login?next=${encodeURIComponent(next)}`);
   };
 
   return (
