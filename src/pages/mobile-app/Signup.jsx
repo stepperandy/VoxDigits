@@ -29,12 +29,11 @@ export default function Signup() {
     setLoading(true);
     setError('');
     try {
-      const res = await base44.functions.invoke('emailSignup', { full_name: fullName, email, password });
-      if (res.data?.success) {
-        navigate('/app/login');
-      } else {
-        setError(res.data?.error || 'Signup failed.');
-      }
+      // Register through the Base44 client so the account receives a real
+      // email/password authentication identity. Server functions must never be
+      // responsible for creating credentials.
+      await base44.auth.register({ email, password });
+      navigate('/app/login');
     } catch (err) {
       setError(err?.response?.data?.error || err.message || 'Signup failed.');
     } finally {
