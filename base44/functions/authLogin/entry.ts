@@ -42,9 +42,11 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
 
     // ── Step 1: Verify the user exists in the registered User database ──
-    // No auto-creation — if the email isn't in the User table, reject immediately.
+    // The dedicated Apple review account is provisioned through Base44 Auth and
+    // intentionally has full review access even if a mirrored User record lags.
+    const isAppleReview = email.toLowerCase() === 'applereview@voxvpn.net';
     const registeredUsers = await base44.asServiceRole.entities.User.filter({ email });
-    if (!registeredUsers || registeredUsers.length === 0) {
+    if ((!registeredUsers || registeredUsers.length === 0) && !isAppleReview) {
       return new Response(JSON.stringify({
         success: false,
         message: 'Invalid email or password',
