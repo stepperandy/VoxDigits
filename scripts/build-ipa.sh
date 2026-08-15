@@ -23,8 +23,8 @@
 set -euo pipefail
 
 BUNDLE_ID="com.base69c84f61d5543b54fe26e1e5.app"
-APP_VERSION="2.0.1"
-BUILD_NUMBER="4"
+APP_VERSION="2.130297.11"
+BUILD_NUMBER="11"
 
 SCHEME="App"
 CONFIG="Release"
