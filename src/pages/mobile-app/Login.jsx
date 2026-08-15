@@ -19,6 +19,8 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [needsVerification, setNeedsVerification] = useState(false);
 
   useEffect(() => {
     localStorage.removeItem('voxvpn_device_id');
@@ -66,6 +68,26 @@ export default function Login() {
     } catch (err) {
       const backendMsg = err?.response?.data?.message || err?.message || 'Login failed.';
       setError(backendMsg);
+      setNeedsVerification(/verify your email/i.test(backendMsg));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyEmail = async () => {
+    if (!verificationCode.trim()) {
+      setError('Enter the verification code sent to your email.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      await base44.auth.verifyOtp({ email, otpCode: verificationCode.trim() });
+      setNeedsVerification(false);
+      setVerificationCode('');
+      setError('Email verified. Tap Sign in to continue.');
+    } catch (err) {
+      setError(err?.response?.data?.message || err?.message || 'Invalid or expired verification code.');
     } finally {
       setLoading(false);
     }
@@ -154,6 +176,30 @@ export default function Login() {
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
+
+        {needsVerification && (
+          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-900 mb-2">Enter the verification code sent to {email}.</p>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                inputMode="numeric"
+                placeholder="Verification code"
+                value={verificationCode}
+                onChange={e => setVerificationCode(e.target.value)}
+                className="min-w-0 flex-1 px-3 py-2 border border-blue-300 rounded-lg text-sm"
+              />
+              <button
+                type="button"
+                onClick={handleVerifyEmail}
+                disabled={loading}
+                className="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold disabled:opacity-50"
+              >
+                Verify
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="mt-4 flex items-center justify-between text-sm">
           <button
