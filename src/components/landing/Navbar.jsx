@@ -63,8 +63,7 @@ export default function Navbar() {
     { label: t('features'), href: '#features' },
     { label: t('servers'), href: '#servers' },
     { label: t('pricing'), href: '/pricing' },
-    { label: 'eSIM', href: 'https://www.voxtelefony.com', external: true },
-    { label: 'Virtual Numbers', href: 'https://www.voxtelefony.com', external: true },
+    { label: 'Virtual Numbers', href: '/virtual-numbers' },
     { label: t('support'), href: '/contact' },
   ];
 
@@ -309,9 +308,9 @@ export default function Navbar() {
       {/* Announcement bar */}
       {announcementVisible && (
         <div className="bg-[#0a1a1f] border-b border-cyan-500/20 py-1.5 px-3 sm:px-4 flex items-center justify-center gap-1.5 text-[9px] sm:text-xs text-slate-300 relative text-center">
-          <span className="leading-tight">🌐 📱 <span className="text-white font-semibold">Global Communication, Simplified</span>{' '}·{' '}
-            <a href="https://www.voxtelefony.com" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline font-medium">Get eSIM</a>{' '}and{' '}
-            <a href="https://www.voxtelefony.com" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline font-medium">Virtual Numbers</a>
+          <span className="leading-tight">🌐 🔒 <span className="text-white font-semibold">Global Communication, Simplified</span>{' '}·{' '}
+            <Link to="/virtual-numbers" className="text-cyan-400 hover:underline font-medium">Virtual Numbers</Link>{' '}and{' '}
+            <Link to="/pricing" className="text-cyan-400 hover:underline font-medium">VPN Plans</Link>
           </span>
           <button
             onClick={() => setAnnouncementVisible(false)}
