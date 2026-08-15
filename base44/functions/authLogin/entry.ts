@@ -122,26 +122,23 @@ Deno.serve(async (req) => {
       ? subs.find(s => s.status === 'active' || s.status === 'trial')
       : null;
 
-    // ── Free trial: first 20 users get 15 days free, then blocked ──
+    // ── Free trial: every new user gets 3 days free ──
     if (!activeSub) {
       const alreadyHadTrial = (subs || []).some(s => s.plan === 'Free Trial');
 
       if (!alreadyHadTrial) {
-        const allTrials = await base44.asServiceRole.entities.VPNSubscription.filter({ plan: 'Free Trial' });
-        if ((allTrials || []).length < 20) {
-          const now = new Date();
-          activeSub = await base44.asServiceRole.entities.VPNSubscription.create({
-            user_email: userEmail,
-            plan: 'Free Trial',
-            status: 'trial',
-            billing_cycle: 'trial',
-            price: 0,
-            start_date: now.toISOString(),
-            renewal_date: new Date(now.getTime() + 15 * 86400000).toISOString(),
-            max_devices: 1,
-          });
-          console.log(`[authLogin] granted 15-day free trial to ${userEmail} (slot ${(allTrials || []).length + 1}/20)`);
-        }
+        const now = new Date();
+        activeSub = await base44.asServiceRole.entities.VPNSubscription.create({
+          user_email: userEmail,
+          plan: 'Free Trial',
+          status: 'trial',
+          billing_cycle: 'trial',
+          price: 0,
+          start_date: now.toISOString(),
+          renewal_date: new Date(now.getTime() + 3 * 86400000).toISOString(),
+          max_devices: 1,
+        });
+        console.log(`[authLogin] granted 3-day free trial to ${userEmail}`);
       }
     }
 
@@ -149,10 +146,10 @@ Deno.serve(async (req) => {
       const hasSubRecords = subs && subs.length > 0;
       const hadTrial = (subs || []).some(s => s.plan === 'Free Trial');
       const subMsg = hadTrial
-        ? 'Your 15-day free trial has ended. Please choose a plan to continue using VoxVPN.'
+        ? 'Your 3-day free trial has ended. Please choose a plan to continue using VoxVPN.'
         : hasSubRecords
           ? 'Your subscription has expired or is not active. Please renew or choose a new plan.'
-          : 'Free trial slots are full. Please choose a plan to activate your VPN access.';
+          : 'Please choose a plan to activate your VPN access.';
       return new Response(JSON.stringify({
         success: false,
         message: subMsg,

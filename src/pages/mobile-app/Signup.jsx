@@ -54,6 +54,7 @@ export default function Signup() {
           />
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Create your account</h1>
           <p className="text-gray-500 text-sm">Join VoxVPN today</p>
+          <p className="text-green-600 text-xs font-semibold mt-1.5">🎉 3-day free trial included — no card required</p>
         </div>
 
         <form onSubmit={handleSignup} className="space-y-4">

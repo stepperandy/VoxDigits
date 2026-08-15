@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { Clock, AlertTriangle } from 'lucide-react';
 
 /**
- * TrialCounter — shows remaining days for a 15-day free trial.
- * Props: renewalDate (ISO string), totalDays (default 15)
+ * TrialCounter — shows remaining days for a 3-day free trial.
+ * Props: renewalDate (ISO string), totalDays (default 3)
  */
-export default function TrialCounter({ renewalDate, totalDays = 15 }) {
+export default function TrialCounter({ renewalDate, totalDays = 3 }) {
   const [daysLeft, setDaysLeft] = useState(null);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export default function TrialCounter({ renewalDate, totalDays = 15 }) {
   if (daysLeft === null) return null;
 
   const pct = Math.min(100, (daysLeft / totalDays) * 100);
-  const urgent = daysLeft <= 3;
+  const urgent = daysLeft <= 1;
   const expired = daysLeft <= 0;
 
   if (expired) {

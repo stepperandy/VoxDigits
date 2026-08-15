@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
         valid: false,
         status: 'expired',
         error: isTrial
-          ? 'Your 15-day free trial has ended. Please choose a plan to continue using VoxVPN.'
+          ? 'Your 3-day free trial has ended. Please choose a plan to continue using VoxVPN.'
           : 'Your subscription has expired. Please renew at voxvpn.net.',
       }), { status: 403, headers: CORS });
     }
