@@ -31,9 +31,16 @@ export default function AuthLogin() {
         setError('Your subscription is not active. Please choose a plan to access VoxVPN.');
         return;
       }
-      await base44.auth.loginViaEmailPassword(email, password);
+      // authLogin has already verified the credentials and issued an access token.
+      // Reuse it so sign-in remains in the app instead of handing off to hosted auth.
+      if (!data.token) {
+        setError('Unable to start your session. Please try again.');
+        return;
+      }
+      localStorage.setItem('base44_access_token', data.token);
+      localStorage.setItem('token', data.token);
       const params = new URLSearchParams(window.location.search);
-      window.location.href = params.get('next') || params.get('from_url') || '/dashboard';
+      window.location.assign(params.get('next') || params.get('from_url') || '/dashboard');
     } catch (err) {
       const backendMsg = err?.response?.data?.message || err?.message || 'Invalid email or password.';
       setError(backendMsg);
