@@ -1,25 +1,37 @@
 workflows:
-  upload_voxvpn_ipa:
-    name: Upload VoxVPN IPA to App Store Connect
-    max_build_duration: 30
+  ios_companion_app_store:
+    name: Build VoxVPN iOS companion for App Store Connect
+    max_build_duration: 60
     integrations:
       app_store_connect: Codemagic VoxBrain 2026
     environment:
-      groups:
-        - voxvpn_ipa_delivery
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.base69c84f61d5543b54fe26e1e5.app
     scripts:
-      - name: Download the private staged IPA
+      - name: Install dependencies
+        script: npm ci
+      - name: Build web companion
+        script: npm run build
+      - name: Generate clean Capacitor iOS project and app icons
         script: |
           set -euo pipefail
-          mkdir -p staged
-          curl --fail --location --retry 3 --retry-all-errors \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -H "Accept: application/octet-stream" \
-            "https://api.github.com/repos/stepperandy/voxvpn-ipa-staging/releases/assets/516738659" \
-            -o staged/VoxVPN-Security-2.130297.13.ipa
-          shasum -a 256 staged/VoxVPN-Security-2.130297.13.ipa
+          rm -rf ios
+          npx cap add ios
+          mkdir -p resources
+          cp resources/VoxVPN-AppIcon.png resources/icon.png
+          npx --yes @capacitor/assets generate --ios
+          npx cap sync ios
+      - name: Set up App Store code signing
+        script: |
+          cd ios/App
+          xcode-project use-profiles
+      - name: Build signed IPA
+        script: |
+          cd ios/App
+          xcode-project build-ipa --workspace App.xcworkspace --scheme App
     artifacts:
-      - staged/*.ipa
+      - ios/App/build/ios/ipa/*.ipa
     publishing:
       app_store_connect:
         auth: integration
