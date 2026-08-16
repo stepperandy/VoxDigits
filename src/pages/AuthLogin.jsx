@@ -53,18 +53,30 @@ export default function AuthLogin() {
       const response = await base44.functions.invoke('authLogin', { email, password });
       const data = response?.data || response;
 
-      if (!data?.success || !data?.subscription) {
+      if (!data?.success) {
         setError(data?.message || 'Access denied. No active subscription found.');
         return;
       }
-      const subStatus = data.subscription.status;
-      if (subStatus !== 'active' && subStatus !== 'trial') {
-        setError('Your subscription is not active. Please choose a plan to access VoxVPN.');
-        return;
+
+      // Admins always get in — no active subscription required.
+      const isAdmin = data.subscription?.plan === 'Admin' || data.user?.role === 'admin';
+
+      if (!isAdmin) {
+        if (!data?.subscription) {
+          setError(data?.message || 'Access denied. No active subscription found.');
+          return;
+        }
+        const subStatus = data.subscription.status;
+        if (subStatus !== 'active' && subStatus !== 'trial') {
+          setError('Your subscription is not active. Please choose a plan to access VoxVPN.');
+          return;
+        }
       }
+
       await base44.auth.loginViaEmailPassword(email, password);
       const params = new URLSearchParams(window.location.search);
-      window.location.href = params.get('next') || params.get('from_url') || '/dashboard';
+      const next = params.get('next') || params.get('from_url');
+      window.location.href = next || (isAdmin ? '/admin' : '/dashboard');
     } catch (err) {
       const backendMsg = err?.response?.data?.message || err?.message || 'Invalid email or password.';
       setError(backendMsg);
