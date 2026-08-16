@@ -5,6 +5,7 @@ import {
   Info, FileText, HelpCircle, Globe, CreditCard, Download, Trash2
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import PullToRefresh from '@/mobile/PullToRefresh';
 
 function ToggleRow({ icon: Icon, label, desc, value, onChange, iconColor = 'text-cyan-400' }) {
   return (
@@ -60,6 +61,10 @@ export default function Settings() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  const handleRefresh = async () => {
+    await new Promise((r) => setTimeout(r, 600));
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('vpn_token');
     localStorage.removeItem('vpn_email');
@@ -103,7 +108,7 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className="flex-1 px-5 pb-8 flex flex-col gap-3 overflow-y-auto z-10 relative">
+      <PullToRefresh onRefresh={handleRefresh} className="flex-1 px-5 pb-8 flex flex-col gap-3 z-10 relative">
 
         {/* Account card */}
         <div className="p-4 rounded-3xl" style={card}>
@@ -196,7 +201,7 @@ export default function Settings() {
         </button>
 
         <p className="text-center text-slate-700 text-xs pb-4">VoxVPN v2.124641.4 · voxvpn.net</p>
-      </div>
+      </PullToRefresh>
     </div>
   );
 }

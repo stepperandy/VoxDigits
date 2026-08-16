@@ -8,6 +8,7 @@ import { SERVER_CONFIG_MAP } from '@/lib/vpnNativePlugin';
 import { base44 } from '@/api/base44Client';
 import TrialCounter from '@/components/mobile/TrialCounter';
 import OpenvpnHelpSheet from '@/components/mobile/OpenvpnHelpSheet';
+import PullToRefresh from '@/mobile/PullToRefresh';
 
 const NAV_ITEMS = [
   { id: 'home', label: 'Dashboard', icon: Shield },
@@ -43,6 +44,10 @@ export default function ServerList() {
     setActiveNav(id);
     if (id === 'settings') navigate('/app/settings');
     if (id === 'subscription') navigate('/app/subscription');
+  };
+
+  const handleRefresh = async () => {
+    await new Promise((r) => setTimeout(r, 600));
   };
 
   const handleDownloadConfig = async (server) => {
@@ -118,7 +123,7 @@ export default function ServerList() {
       </div>
 
       {/* ── Scrollable body ── */}
-      <div className="flex-1 overflow-y-auto pb-24 z-10 relative">
+      <PullToRefresh onRefresh={handleRefresh} className="flex-1 pb-24 z-10 relative">
 
         {/* Info banner — OpenVPN configuration */}
         <div className="mx-5 mb-4 p-4 rounded-2xl" style={S.infoBanner}>
@@ -267,7 +272,7 @@ export default function ServerList() {
             </button>
           </div>
         </div>
-      </div>
+      </PullToRefresh>
 
       <OpenvpnHelpSheet open={helpOpen} onClose={() => setHelpOpen(false)} />
 

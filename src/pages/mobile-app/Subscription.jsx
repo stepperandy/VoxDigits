@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Check, Shield, Globe, FileDown } from 'lucide-react';
+import PullToRefresh from '@/mobile/PullToRefresh';
 
 /**
  * Subscription (iOS companion) — informational page clarifying that the
@@ -8,6 +9,10 @@ import { ArrowLeft, Check, Shield, Globe, FileDown } from 'lucide-react';
  */
 export default function Subscription() {
   const navigate = useNavigate();
+
+  const handleRefresh = async () => {
+    await new Promise((r) => setTimeout(r, 600));
+  };
 
   const points = [
     'Free companion app — no in-app purchases or subscriptions',
@@ -34,7 +39,7 @@ export default function Subscription() {
         </div>
       </div>
 
-      <main className="flex-1 px-5 pb-8 flex flex-col gap-4 z-10 relative">
+      <PullToRefresh onRefresh={handleRefresh} className="flex-1 px-5 pb-8 flex flex-col gap-4 z-10 relative">
         <section className="rounded-3xl p-5" style={{ background: 'rgba(13,17,32,0.85)', border: '1px solid rgba(0,212,255,0.35)', boxShadow: '0 0 40px rgba(0,212,255,0.14)' }}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-11 h-11 rounded-2xl flex items-center justify-center bg-cyan-400/10 border border-cyan-400/30">
@@ -85,7 +90,7 @@ export default function Subscription() {
           style={{ boxShadow: '0 8px 32px rgba(0,212,255,0.35)' }}>
           Continue to OpenVPN Configurations
         </button>
-      </main>
+      </PullToRefresh>
     </div>
   );
 }
