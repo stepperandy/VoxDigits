@@ -50,7 +50,7 @@ export default function AuthSignup() {
 
       if (res.data?.success) {
         setAlreadyRegistered(false);
-        navigate('/pricing?new=1');
+        navigate(`/signup-confirmation?email=${encodeURIComponent(email)}`);
       } else {
         setError(res.data?.error || 'Signup failed');
       }

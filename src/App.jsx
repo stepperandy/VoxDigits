@@ -98,6 +98,7 @@ const VpnLogin = lazy(() => import('./pages/VpnLogin.jsx'));
 const VpnSignup = lazy(() => import('./pages/VpnSignup.jsx'));
 const AuthLogin = lazy(() => import('./pages/AuthLogin.jsx'));
 const AuthSignup = lazy(() => import('./pages/AuthSignup.jsx'));
+const SignupConfirmation = lazy(() => import('./pages/SignupConfirmation.jsx'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword.jsx'));
 const VpnDashboard = lazy(() => import('./pages/VpnDashboard.jsx'));
 const AppSplash = lazy(() => import('./pages/mobile-app/Splash.jsx'));
@@ -235,6 +236,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/auth-login" element={<PageTransition><AuthLogin /></PageTransition>} />
           <Route path="/login" element={<PageTransition><AuthLogin /></PageTransition>} />
           <Route path="/auth-signup" element={<PageTransition><AuthSignup /></PageTransition>} />
+          <Route path="/signup-confirmation" element={<PageTransition><SignupConfirmation /></PageTransition>} />
           <Route path="/signup" element={<PageTransition><AuthSignup /></PageTransition>} />
           <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
           <Route path="/vpn-dashboard" element={<PageTransition><VpnDashboard /></PageTransition>} />
