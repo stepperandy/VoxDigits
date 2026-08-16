@@ -125,7 +125,7 @@ export default function Settings() {
             <p className="text-[10px] text-slate-600 uppercase tracking-[0.2em] font-bold">Subscription</p>
           </div>
           <div className="px-4 pb-3 divide-y" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-            <LinkRow icon={CreditCard} label="View Plans &amp; Pricing" color="text-cyan-400" onClick={() => navigate('/app/subscription')} />
+            <LinkRow icon={CreditCard} label="About VoxVPN for iOS" color="text-cyan-400" onClick={() => navigate('/app/subscription')} />
             <LinkRow icon={Download} label="Download Server Configs" color="text-violet-400" onClick={() => navigate('/app/servers')} />
           </div>
         </div>
@@ -159,9 +159,9 @@ export default function Settings() {
           <div className="flex items-start gap-3">
             <Info size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
             <p className="text-slate-400 text-[11px] leading-relaxed">
-              VoxVPN is a companion app for managing your account and downloading server
-              configurations. VPN connections require a separate client such as OpenVPN
-              Connect or WireGuard.
+              VoxVPN is a companion app for managing your account and downloading OpenVPN
+              configurations. VPN connections require the separate OpenVPN Connect app
+              installed on your device. VoxVPN does not establish the connection itself.
             </p>
           </div>
         </div>

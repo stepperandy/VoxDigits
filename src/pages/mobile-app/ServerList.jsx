@@ -2,15 +2,16 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Shield, LogOut, Download, Server, CreditCard,
-  Check, ExternalLink, Info, Loader2, ChevronRight,
+  Check, ExternalLink, Info, Loader2, ChevronRight, HelpCircle,
 } from 'lucide-react';
 import { SERVER_CONFIG_MAP } from '@/lib/vpnNativePlugin';
 import { base44 } from '@/api/base44Client';
 import TrialCounter from '@/components/mobile/TrialCounter';
+import OpenvpnHelpSheet from '@/components/mobile/OpenvpnHelpSheet';
 
 const NAV_ITEMS = [
   { id: 'home', label: 'Dashboard', icon: Shield },
-  { id: 'subscription', label: 'Plans', icon: CreditCard },
+  { id: 'subscription', label: 'About', icon: CreditCard },
   { id: 'settings', label: 'Settings', icon: LogOut },
 ];
 
@@ -21,6 +22,7 @@ export default function ServerList() {
   const [downloadingConfig, setDownloadingConfig] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [loadingSub, setLoadingSub] = useState(true);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
     const raw = localStorage.getItem('subscription');
@@ -118,19 +120,25 @@ export default function ServerList() {
       {/* ── Scrollable body ── */}
       <div className="flex-1 overflow-y-auto pb-24 z-10 relative">
 
-        {/* Info banner — external client required */}
+        {/* Info banner — OpenVPN configuration */}
         <div className="mx-5 mb-4 p-4 rounded-2xl" style={S.infoBanner}>
           <div className="flex items-start gap-3">
             <Info size={18} className="text-amber-400 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-white text-sm font-bold leading-snug">Companion App</p>
+              <p className="text-white text-sm font-bold leading-snug">OpenVPN configuration</p>
               <p className="text-slate-400 text-[12px] mt-1 leading-relaxed">
-                This app manages your account and server configs. To connect, use a
-                compatible external client like{' '}
+                To connect, export or download this configuration and import it into the{' '}
                 <button onClick={handleOpenExternalClient} className="text-cyan-400 font-semibold underline">
                   OpenVPN Connect
-                </button>{' '}or WireGuard.
+                </button>{' '}app installed on your device. VoxVPN does not establish the VPN connection itself.
               </p>
+              <button
+                onClick={() => setHelpOpen(true)}
+                className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-amber-300"
+                style={{ background: 'rgba(250,204,21,0.08)', border: '1px solid rgba(250,204,21,0.25)' }}
+              >
+                <HelpCircle size={12} /> OpenVPN Connect Help
+              </button>
             </div>
           </div>
         </div>
@@ -170,7 +178,7 @@ export default function ServerList() {
                 className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-[11px] font-semibold text-slate-300 transition-colors"
                 style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}
               >
-                Plans <ChevronRight size={12} />
+                Info <ChevronRight size={12} />
               </button>
             </div>
           </div>
@@ -181,12 +189,12 @@ export default function ServerList() {
           <div className="flex items-center gap-2 mb-3 ml-1">
             <Server size={14} className="text-slate-600" />
             <p className="text-[10px] uppercase tracking-widest text-slate-600 font-semibold">
-              Server Configurations
+              OpenVPN Configurations
             </p>
           </div>
           <p className="text-slate-600 text-[11px] mb-3 ml-1 leading-relaxed">
-            Download a configuration file, then import it into OpenVPN Connect or WireGuard
-            on your device to connect.
+            Download an OpenVPN (.ovpn) configuration, then import it into the OpenVPN
+            Connect app on your device to connect. VoxVPN does not connect for you.
           </p>
 
           <div className="rounded-2xl overflow-hidden" style={S.card}>
@@ -229,10 +237,10 @@ export default function ServerList() {
           </div>
         </div>
 
-        {/* External client links */}
+        {/* External client + help */}
         <div className="px-5 mb-4">
           <p className="text-[10px] uppercase tracking-widest text-slate-600 font-semibold mb-2 ml-1">
-            Get a VPN Client
+            OpenVPN Connect
           </p>
           <div className="grid grid-cols-1 gap-2">
             <button
@@ -242,24 +250,26 @@ export default function ServerList() {
             >
               <div className="flex items-center gap-3">
                 <ExternalLink size={16} className="text-cyan-400" />
-                <span className="text-white text-sm font-semibold">OpenVPN Connect</span>
+                <span className="text-white text-sm font-semibold">Get OpenVPN Connect</span>
               </div>
               <ChevronRight size={14} className="text-slate-600" />
             </button>
             <button
-              onClick={() => window.open('https://apps.apple.com/us/app/wireguard/id1441195209', '_blank')}
+              onClick={() => setHelpOpen(true)}
               className="flex items-center justify-between p-3 rounded-xl transition-all active:scale-[0.98]"
               style={S.card}
             >
               <div className="flex items-center gap-3">
-                <ExternalLink size={16} className="text-cyan-400" />
-                <span className="text-white text-sm font-semibold">WireGuard</span>
+                <HelpCircle size={16} className="text-amber-400" />
+                <span className="text-white text-sm font-semibold">How to import a config</span>
               </div>
               <ChevronRight size={14} className="text-slate-600" />
             </button>
           </div>
         </div>
       </div>
+
+      <OpenvpnHelpSheet open={helpOpen} onClose={() => setHelpOpen(false)} />
 
       {/* ── Bottom nav ── */}
       <div

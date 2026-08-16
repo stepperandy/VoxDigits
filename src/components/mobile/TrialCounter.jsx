@@ -31,7 +31,7 @@ export default function TrialCounter({ renewalDate, totalDays = 3 }) {
         style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)' }}>
         <AlertTriangle size={15} className="text-red-400 flex-shrink-0 mt-0.5" />
         <p className="text-red-300 text-[11px] font-semibold leading-snug">
-          Your free trial has ended. Choose a plan to keep your VPN access.
+          Your free trial has ended. Subscribe at voxvpn.net to keep your access.
         </p>
       </div>
     );

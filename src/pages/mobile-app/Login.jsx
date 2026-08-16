@@ -49,7 +49,7 @@ export default function Login() {
         const subStatus = data.subscription?.status;
         const iOSAccess = data.access?.status;
         if (data.subscription && subStatus !== 'active' && subStatus !== 'trial') {
-          setError('Your subscription is not active. Please choose a plan at voxvpn.net to access VoxVPN.');
+          setError('Your subscription is not active. Please subscribe at voxvpn.net to access VoxVPN.');
           return;
         }
         if (data.access && iOSAccess !== 'active' && iOSAccess !== 'free') {

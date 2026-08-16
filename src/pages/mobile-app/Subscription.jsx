@@ -1,15 +1,20 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, Shield, Zap, Globe } from 'lucide-react';
+import { ArrowLeft, Check, Shield, Globe, FileDown } from 'lucide-react';
 
-const FEATURES = [
-  'Encrypted VPN access on supported servers',
-  'No payment or external checkout in the iOS app',
-  'Account and privacy controls in the app',
-  'Connect and disconnect from the Servers screen',
-];
-
+/**
+ * Subscription (iOS companion) — informational page clarifying that the
+ * iOS companion is free, has no in-app purchases, and requires the external
+ * OpenVPN Connect app to establish VPN connections.
+ */
 export default function Subscription() {
   const navigate = useNavigate();
+
+  const points = [
+    'Free companion app — no in-app purchases or subscriptions',
+    'Manage your VoxVPN account and server configurations',
+    'Download OpenVPN (.ovpn) configuration files for your servers',
+    'VPN connection is established by the separate OpenVPN Connect app',
+  ];
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden" style={bg}>
@@ -25,7 +30,7 @@ export default function Subscription() {
         </button>
         <div>
           <h1 className="text-white font-black text-xl leading-none">VoxVPN for iOS</h1>
-          <p className="text-slate-500 text-xs mt-0.5">Free encrypted VPN access</p>
+          <p className="text-slate-500 text-xs mt-0.5">Free companion app</p>
         </div>
       </div>
 
@@ -42,20 +47,31 @@ export default function Subscription() {
           </div>
 
           <ul className="space-y-3">
-            {FEATURES.map((feature) => (
-              <li key={feature} className="flex items-start gap-2.5 text-sm text-slate-300">
+            {points.map((point) => (
+              <li key={point} className="flex items-start gap-2.5 text-sm text-slate-300">
                 <Check size={16} className="text-cyan-300 shrink-0 mt-0.5" />
-                <span>{feature}</span>
+                <span>{point}</span>
               </li>
             ))}
           </ul>
         </section>
 
+        <div className="rounded-3xl p-4" style={{ background: 'rgba(13,17,32,0.8)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="flex items-start gap-3">
+            <FileDown size={18} className="text-amber-400 flex-shrink-0 mt-0.5" />
+            <p className="text-slate-400 text-[12px] leading-relaxed">
+              VoxVPN does not establish a VPN connection, encrypt traffic, or use a
+              native device tunnel. To connect, import an .ovpn configuration into the
+              OpenVPN Connect app installed on your device.
+            </p>
+          </div>
+        </div>
+
         <div className="grid grid-cols-3 gap-2">
           {[
             { icon: Shield, label: 'No Logs', color: 'text-cyan-400' },
-            { icon: Zap, label: 'Fast', color: 'text-yellow-400' },
             { icon: Globe, label: 'Global', color: 'text-violet-400' },
+            { icon: FileDown, label: '.ovpn Files', color: 'text-amber-400' },
           ].map(({ icon: Icon, label, color }) => (
             <div key={label} className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/[0.04] border border-white/[0.06]">
               <Icon size={18} className={color} />
@@ -67,7 +83,7 @@ export default function Subscription() {
         <button onClick={() => navigate('/app/servers')}
           className="w-full py-4 font-black rounded-2xl text-sm text-slate-950 bg-cyan-400"
           style={{ boxShadow: '0 8px 32px rgba(0,212,255,0.35)' }}>
-          Continue to Servers
+          Continue to OpenVPN Configurations
         </button>
       </main>
     </div>
