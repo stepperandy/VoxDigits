@@ -6,8 +6,8 @@
     "androidScheme": "https"
   },
   "ios": {
-    "version": "2.130297.11",
-    "buildNumber": "11",
+    "version": "2.130297.14",
+    "buildNumber": "14",
     "scheme": "App"
   },
   "plugins": {
