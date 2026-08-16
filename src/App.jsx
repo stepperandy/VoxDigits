@@ -22,6 +22,20 @@ function NativeAppRedirect() {
   }, [location.pathname, navigate]);
   return null;
 }
+
+// On phone-sized viewports (<=767px), send root '/' visitors straight to the in-app
+// sign-in flow so App Store reviewers see the compliant account flow first.
+// Desktop/tablet visitors are never redirected.
+function MobileRootRedirect() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  useEffect(() => {
+    if (location.pathname === '/' && window.innerWidth < 768) {
+      navigate('/app/login', { replace: true });
+    }
+  }, [location.pathname, navigate]);
+  return null;
+}
 import { motion, AnimatePresence } from 'framer-motion';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
@@ -304,6 +318,7 @@ function App() {
             <QueryClientProvider client={queryClientInstance}>
               <Router>
                 <NativeAppRedirect />
+                <MobileRootRedirect />
                 <AuthenticatedAppWrapper isMobileDevice={isMobileDevice} />
                 <FloatingAssistant />
               </Router>
