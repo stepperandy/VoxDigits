@@ -22,6 +22,10 @@ workflows:
           cp resources/VoxVPN-AppIcon.png resources/icon.png
           npx --yes @capacitor/assets generate --ios
           npx cap sync ios
+      - name: Set App Store version and build number
+        script: |
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString 2.124641.3" ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion 13" ios/App/App/Info.plist
       - name: Set up App Store code signing
         script: |
           cd ios/App
