@@ -64,7 +64,8 @@ export default function AuthLogin() {
       }
       await base44.auth.loginViaEmailPassword(email, password);
       const params = new URLSearchParams(window.location.search);
-      window.location.href = params.get('next') || params.get('from_url') || '/dashboard';
+      const fallback = data.subscription?.plan === 'Admin' ? '/admin' : '/dashboard';
+      window.location.href = params.get('next') || params.get('from_url') || fallback;
     } catch (err) {
       const backendMsg = err?.response?.data?.message || err?.message || 'Invalid email or password.';
       setError(backendMsg);
