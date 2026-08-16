@@ -43,6 +43,7 @@ import ThemeProvider from '@/lib/ThemeProvider';
 import { TabProvider } from '@/mobile/MobileTabContext';
 import FloatingAssistant from '@/components/FloatingAssistant';
 import { LanguageProvider } from '@/lib/LanguageContext';
+import iOSVPN from './pages/vpn-os/iOSVPN.jsx';
 
 // Lazy-loaded pages
 const Home = lazy(() => import('./pages/Home'));
@@ -58,7 +59,6 @@ const VpnJapan = lazy(() => import('./pages/vpn-countries/VpnJapan.jsx'));
 const WindowsVPN = lazy(() => import('./pages/vpn-os/WindowsVPN.jsx'));
 const MacVPN = lazy(() => import('./pages/vpn-os/MacVPN.jsx'));
 const LinuxVPN = lazy(() => import('./pages/vpn-os/LinuxVPN.jsx'));
-const iOSVPN = lazy(() => import('./pages/vpn-os/iOSVPN.jsx'));
 const AndroidVPN = lazy(() => import('./pages/vpn-os/AndroidVPN.jsx'));
 const RouterVPN = lazy(() => import('./pages/vpn-os/RouterVPN.jsx'));
 const ChromeExtension = lazy(() => import('./pages/vpn-os/ChromeExtension.jsx'));
