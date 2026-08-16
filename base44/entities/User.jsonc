@@ -36,11 +36,6 @@
       "default": true,
       "description": "Whether this user account is active"
     },
-    "is_verified": {
-      "type": "boolean",
-      "default": false,
-      "description": "Whether the user's email has been verified"
-    },
     "last_login": {
       "type": "string",
       "format": "date-time",
