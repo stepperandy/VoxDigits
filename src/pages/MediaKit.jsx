@@ -35,8 +35,8 @@ export default function MediaKit() {
               { label: 'Legal Entity', value: 'VoxDigits Communications LLC' },
               { label: 'Founded', value: '2020' },
               { label: 'Industry', value: 'Cybersecurity / VPN' },
-              { label: 'Users', value: '10M+ worldwide' },
-              { label: 'Server Locations', value: '60+ countries' },
+              { label: 'Community', value: 'Growing worldwide' },
+              { label: 'Server Locations', value: '20 locations, 4 continents' },
               { label: 'Encryption', value: 'AES-256' },
               { label: 'Protocols', value: 'OpenVPN, WireGuard' },
             ].map(item => (
@@ -88,7 +88,7 @@ export default function MediaKit() {
             </button>
           </div>
           <p className="text-slate-400 text-sm leading-relaxed">
-            VoxVPN is a privacy-first VPN service providing military-grade AES-256 encryption, a strict no-logs policy, and high-speed servers across 60+ countries. Founded in 2020 by cybersecurity engineers and digital rights advocates, VoxVPN is operated by VoxDigits Communications LLC and serves over 10 million users worldwide. VoxVPN is available on Windows, macOS, Linux, iOS, Android, and routers, supporting both OpenVPN and WireGuard protocols. Learn more at voxvpn.net.
+            VoxVPN is a privacy-first VPN service providing military-grade AES-256 encryption, a strict no-logs policy, and high-speed servers across 20 locations on 4 continents. Founded in 2020 by cybersecurity engineers and digital rights advocates, VoxVPN is operated by VoxDigits Communications LLC and serves users worldwide. VoxVPN is available on Windows, macOS, Linux, iOS, Android, and routers, supporting both OpenVPN and WireGuard protocols. Learn more at voxvpn.net.
           </p>
         </div>
 
@@ -122,4 +122,4 @@ export default function MediaKit() {
   );
 }
 
-const BOILERPLATE = `VoxVPN is a privacy-first VPN service providing military-grade AES-256 encryption, a strict no-logs policy, and high-speed servers across 60+ countries. Founded in 2020 by cybersecurity engineers and digital rights advocates, VoxVPN is operated by VoxDigits Communications LLC and serves over 10 million users worldwide. VoxVPN is available on Windows, macOS, Linux, iOS, Android, and routers, supporting both OpenVPN and WireGuard protocols. Learn more at voxvpn.net.`;
+const BOILERPLATE = `VoxVPN is a privacy-first VPN service providing military-grade AES-256 encryption, a strict no-logs policy, and high-speed servers across 20 locations on 4 continents. Founded in 2020 by cybersecurity engineers and digital rights advocates, VoxVPN is operated by VoxDigits Communications LLC and serves users worldwide. VoxVPN is available on Windows, macOS, Linux, iOS, Android, and routers, supporting both OpenVPN and WireGuard protocols. Learn more at voxvpn.net.`;

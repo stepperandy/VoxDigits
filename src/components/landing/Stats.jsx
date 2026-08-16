@@ -3,9 +3,9 @@ import { Users, Server, Activity, ShieldCheck, Globe } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 
 const stats = [
-  { icon: Server, number: '500+', label: 'statServers', sub: 'statServersSub', color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/20' },
-  { icon: Globe, number: '60+', label: 'statCountries', sub: 'statCountriesSub', color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/20' },
-  { icon: Users, number: '10M+', label: 'statCustomers', sub: 'statCustomersSub', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
+  { icon: Server, number: '20', label: 'statServers', sub: 'statServersSub', color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/20' },
+  { icon: Globe, number: '4', label: 'statCountries', sub: 'statCountriesSub', color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/20' },
+  { icon: Users, number: 'Trusted', label: 'statCustomers', sub: 'statCustomersSub', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
   { icon: Activity, number: '99.9%', label: 'statUptime', sub: 'statUptimeSub', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20' },
 ];
 

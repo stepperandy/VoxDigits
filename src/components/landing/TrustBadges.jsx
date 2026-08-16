@@ -10,8 +10,8 @@ const badges = [
   { icon: Bug, label: 'Malware Protection', sub: 'Blocks malicious sites' },
   { icon: CreditCard, label: 'Secure Payments', sub: 'Stripe-protected checkout' },
   { icon: Headphones, label: '24/7 Support', sub: 'Always here to help' },
-  { icon: Globe, label: '60+ Countries', sub: 'Global server network' },
-  { icon: BadgeCheck, label: 'Independently Audited', sub: 'Verified & certified' },
+  { icon: Globe, label: '20 Locations', sub: '4 continents' },
+  { icon: BadgeCheck, label: 'RAM-Only Servers', sub: 'Wiped on reboot' },
   { icon: LockIcon, label: 'SSL Secure', sub: 'HTTPS encrypted website' },
   { icon: Award, label: '30-Day Money-Back', sub: 'Risk-free guarantee' },
 ];

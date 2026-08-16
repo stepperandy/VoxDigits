@@ -29,8 +29,8 @@ export default function TransparencyReport() {
           {[
             { icon: Eye, value: '0', label: 'Data Requests Complied With' },
             { icon: FileText, value: '3', label: 'Government Requests Received' },
-            { icon: Server, value: '60+', label: 'Server Locations' },
-            { icon: Users, value: '10M+', label: 'Active Users' },
+            { icon: Server, value: '20', label: 'Server Locations' },
+            { icon: Users, value: 'Trusted', label: 'Users Worldwide' },
           ].map((stat, i) => {
             const Icon = stat.icon;
             return (
@@ -163,7 +163,7 @@ export default function TransparencyReport() {
           <h2 className="text-white font-bold text-lg mb-6">Infrastructure Disclosure</h2>
           <div className="space-y-4">
             {[
-              { icon: Server, label: 'Server Infrastructure', value: 'RAM-only servers across 60+ locations in privacy-friendly jurisdictions' },
+              { icon: Server, label: 'Server Infrastructure', value: 'RAM-only servers across 20 locations on 4 continents in privacy-friendly jurisdictions' },
               { icon: Lock, label: 'Encryption', value: 'AES-256 encryption on all connections; OpenVPN and WireGuard protocols supported' },
               { icon: Globe, label: 'Jurisdiction', value: 'Operated under privacy-friendly legal jurisdiction with strong data protection laws' },
               { icon: ShieldCheck, label: 'Third-Party Processors', value: 'Stripe (payments), cloud infrastructure providers — no data shared for advertising' },

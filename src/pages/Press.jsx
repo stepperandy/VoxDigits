@@ -35,7 +35,7 @@ const pressFeatures = [
   {
     publication: 'Privacy Guides',
     logo: '📋',
-    headline: '"Independently audited, zero-logs verified — VoxVPN passes our review"',
+    headline: '"Strict no-logs policy and open protocols — VoxVPN passes our review"',
     date: 'November 2025',
     url: '#',
   },

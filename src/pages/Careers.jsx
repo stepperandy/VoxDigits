@@ -15,7 +15,7 @@ const OPEN_ROLES = [
 const VALUES = [
   { icon: Shield, title: 'Privacy First', desc: 'We build everything with user privacy as the non-negotiable foundation.' },
   { icon: Zap, title: 'Move Fast', desc: 'We ship quickly, iterate based on user feedback, and never stop improving.' },
-  { icon: Globe, title: 'Global Impact', desc: 'Our work protects millions of users across 60+ countries every day.' },
+  { icon: Globe, title: 'Global Impact', desc: 'Our work protects users across 20 server locations on 4 continents every day.' },
   { icon: Heart, title: 'User Obsessed', desc: 'Every decision starts with what is best for the people who trust us.' },
 ];
 
