@@ -1,0 +1,25 @@
+workflows:
+  upload_voxvpn_ipa:
+    name: Upload VoxVPN IPA to App Store Connect
+    max_build_duration: 30
+    integrations:
+      app_store_connect: Codemagic VoxBrain 2026
+    environment:
+      groups:
+        - voxvpn_ipa_delivery
+    scripts:
+      - name: Download the private staged IPA
+        script: |
+          set -euo pipefail
+          mkdir -p staged
+          curl --fail --location --retry 3 --retry-all-errors \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/octet-stream" \
+            "https://api.github.com/repos/stepperandy/voxvpn-ipa-staging/releases/assets/516738659" \
+            -o staged/VoxVPN-Security-2.130297.13.ipa
+          shasum -a 256 staged/VoxVPN-Security-2.130297.13.ipa
+    artifacts:
+      - staged/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
