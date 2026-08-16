@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,36 @@ export default function AuthLogin() {
   const [magicEmail, setMagicEmail] = useState('');
   const [magicLoading, setMagicLoading] = useState(false);
   const [magicSent, setMagicSent] = useState(false);
+
+  // If an admin is already logged in, skip the login screen and go to the panel.
+  const [checking, setChecking] = useState(true);
+  useEffect(() => {
+    let done = false;
+    (async () => {
+      try {
+        const me = await base44.auth.me();
+        if (!done && (me?.role === 'admin' || me?.role === 'super_admin')) {
+          const params = new URLSearchParams(window.location.search);
+          const next = params.get('next') || params.get('from_url');
+          window.location.href = next || '/admin';
+          return;
+        }
+      } catch {
+        // not logged in — show the login form
+      } finally {
+        if (!done) setChecking(false);
+      }
+    })();
+    return () => { done = true; };
+  }, []);
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#080c18] to-[#0d1120] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-slate-700 border-t-cyan-400 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   const handleMagicLink = async (e) => {
     e.preventDefault();
