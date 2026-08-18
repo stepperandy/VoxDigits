@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { X, UserPlus, Loader2, Mail, Shield, Smartphone } from 'lucide-react';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 export default function AssignVpnModal({ clients, onClose, onAssigned }) {
   const [form, setForm] = useState({
@@ -89,28 +88,23 @@ export default function AssignVpnModal({ clients, onClose, onAssigned }) {
           </div>
           <div>
             <label className={labelCls}>Assign to Client</label>
-            <Select value={form.client_id} onValueChange={(v) => setForm({ ...form, client_id: v })}>
-              <SelectTrigger className={inputCls}><SelectValue placeholder="Select a client..." /></SelectTrigger>
-              <SelectContent>
-                {clients.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <select required value={form.client_id} onChange={(e) => setForm({ ...form, client_id: e.target.value })} className={inputCls}>
+              <option value="">Select a client...</option>
+              {clients.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label className={labelCls}>VPN Plan</label>
             <div className="relative">
               <Shield size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600" />
-              <Select value={form.vpn_plan} onValueChange={(v) => setForm({ ...form, vpn_plan: v })}>
-                <SelectTrigger className={inputCls + ' pl-9 text-left'}><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="basic">Basic</SelectItem>
-                  <SelectItem value="standard">Standard</SelectItem>
-                  <SelectItem value="premium">Premium</SelectItem>
-                  <SelectItem value="enterprise">Enterprise</SelectItem>
-                </SelectContent>
-              </Select>
+              <select value={form.vpn_plan} onChange={(e) => setForm({ ...form, vpn_plan: e.target.value })} className={inputCls + ' pl-9'}>
+                <option value="basic">Basic</option>
+                <option value="standard">Standard</option>
+                <option value="premium">Premium</option>
+                <option value="enterprise">Enterprise</option>
+              </select>
             </div>
           </div>
           <div>

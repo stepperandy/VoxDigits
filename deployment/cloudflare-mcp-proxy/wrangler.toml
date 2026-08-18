@@ -1,0 +1,9 @@
+name = "voxtelefony-mcp-router"
+main = "worker.js"
+compatibility_date = "2026-08-04"
+workers_dev = false
+
+routes = [
+  { pattern = "voxtelefony.com/api/mcp*", zone_name = "voxtelefony.com" },
+  { pattern = "voxtelefony.com/.well-known/openai-apps-challenge", zone_name = "voxtelefony.com" }
+]

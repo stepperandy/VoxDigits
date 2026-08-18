@@ -1,6 +1,6 @@
 const socials = [
   {
-    href: 'https://web.facebook.com/profile.php?id=61593082887720',
+    href: 'https://facebook.com',
     label: 'Facebook',
     glow: 'rgba(0,102,255,0.45)',
     gradient: 'linear-gradient(160deg, #0066FF 0%, #0044CC 55%, #003399 100%)',
@@ -33,7 +33,7 @@ const socials = [
     ),
   },
   {
-    href: 'https://instagram.com/voxdigits',
+    href: 'https://instagram.com',
     label: 'Instagram',
     glow: 'rgba(220,39,67,0.5)',
     gradient: 'linear-gradient(160deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
@@ -44,24 +44,13 @@ const socials = [
     ),
   },
   {
-    href: 'https://www.youtube.com/@voxdigitsofficial',
+    href: 'https://youtube.com',
     label: 'YouTube',
     glow: 'rgba(204,0,0,0.45)',
     gradient: 'linear-gradient(160deg, #FF3030 0%, #CC0000 55%, #990000 100%)',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
         <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-      </svg>
-    ),
-  },
-  {
-    href: 'https://www.tiktok.com/@user1524478173605',
-    label: 'TikTok',
-    glow: 'rgba(0,0,0,0.4)',
-    gradient: 'linear-gradient(160deg, #25F4EE 0%, #000000 45%, #FE2C55 100%)',
-    icon: (
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="white">
-        <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.94-.93 3.87-2.33 5.24-1.86 1.78-4.6 2.42-7.06 1.71-2.5-.71-4.55-2.76-5.26-5.26-.71-2.46-.07-5.2 1.71-7.06 1.37-1.4 3.3-2.25 5.24-2.33.08 1.42.05 2.84.05 4.27-.69-.23-1.5-.16-2.09.31-.7.45-1.14 1.23-1.1 2.07-.05 1.42 1.23 2.65 2.62 2.56 1.36-.02 2.55-1.27 2.55-2.62.03-3.55.01-7.1.02-10.65.01-1.01.01-2.02.01-3.04z"/>
       </svg>
     ),
   },

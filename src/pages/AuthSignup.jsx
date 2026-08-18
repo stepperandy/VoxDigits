@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
-import ChinaAccessNotice from '@/components/auth/ChinaAccessNotice';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function AuthSignup() {
@@ -50,7 +49,7 @@ export default function AuthSignup() {
 
       if (res.data?.success) {
         setAlreadyRegistered(false);
-        navigate(`/signup-confirmation?email=${encodeURIComponent(email)}`);
+        navigate('/pricing?new=1');
       } else {
         setError(res.data?.error || 'Signup failed');
       }
@@ -77,11 +76,6 @@ export default function AuthSignup() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">Create Account</h1>
           <p className="text-slate-400">Join VoxVPN and secure your connection</p>
-        </div>
-
-        {/* China access notice */}
-        <div className="mb-5">
-          <ChinaAccessNotice />
         </div>
 
         {/* Social Login */}

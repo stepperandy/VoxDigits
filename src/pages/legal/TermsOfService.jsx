@@ -9,7 +9,7 @@ const sections = [
   },
   {
     title: '2. Service Description',
-    text: 'VoxVPN provides VPN services designed to enhance privacy and security while using the internet. Our services include encrypted VPN tunnels, DNS leak protection, kill switch functionality, and access to servers across 20 locations on 4 continents.',
+    text: 'VoxVPN provides VPN services designed to enhance privacy and security while using the internet. Our services include encrypted VPN tunnels, DNS leak protection, kill switch functionality, and access to servers in 60+ countries.',
   },
   {
     title: '3. User Responsibilities',
