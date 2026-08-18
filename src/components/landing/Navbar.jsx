@@ -50,6 +50,7 @@ export default function Navbar() {
          <Link to="/Services" className="text-white/80 hover:text-white transition-colors">Services</Link>
          <Link to="/AboutUs" className="text-white/80 hover:text-white transition-colors">About</Link>
          <Link to="/Contact" className="text-white/80 hover:text-white transition-colors">Contact</Link>
+         <Link to="/connect" className="text-cyan-400 hover:text-cyan-300 transition-colors">Connect AI</Link>
          <a href="#pricing" className="text-white/80 hover:text-white transition-colors" onClick={(e) => { e.preventDefault(); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }}>Pricing</a>
          <a href="https://voxvpn.net" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300 transition-colors">VoxVPN</a>
        </div>
@@ -89,6 +90,7 @@ export default function Navbar() {
           <Link to="/Services" className="text-white/80 hover:text-white font-medium">Services</Link>
           <Link to="/AboutUs" className="text-white/80 hover:text-white font-medium">About Us</Link>
           <Link to="/Contact" className="text-white/80 hover:text-white font-medium">Contact</Link>
+          <Link to="/connect" className="text-cyan-400 hover:text-cyan-300 font-medium">Connect AI</Link>
           <a href="#pricing" className="text-white/80 hover:text-white font-medium" onClick={(e) => { e.preventDefault(); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }}>Pricing</a>
           <a href="#faq" className="text-white/80 hover:text-white font-medium" onClick={(e) => { e.preventDefault(); document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' }); }}>FAQ</a>
           <a href="https://voxvpn.net" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300 font-medium">VoxVPN</a>
