@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Wifi, Download, Eye, EyeOff, QrCode, AlertCircle, CheckCircle, BookOpen } from "lucide-react";
-import QRCode from "qrcode";
+import { loadQRCode } from "@/lib/qrCode";
 import ESIMInstallationGuide from "./ESIMInstallationGuide";
 
 const STATUS_COLORS = {
@@ -14,7 +14,18 @@ function QRCodeDisplay({ qrCode }) {
   const [qrDataUrl, setQrDataUrl] = useState(null);
 
   useEffect(() => {
-    QRCode.toDataURL(qrCode).then(setQrDataUrl);
+    let cancelled = false;
+    loadQRCode()
+      .then((QRCode) => {
+        if (cancelled) return;
+        return QRCode.toDataURL(qrCode);
+      })
+      .then((url) => {
+        if (cancelled) return;
+        setQrDataUrl(url);
+      })
+      .catch((err) => console.error("QR generation error:", err));
+    return () => { cancelled = true; };
   }, [qrCode]);
 
   const handleDownload = async () => {

@@ -1,8 +1,32 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { Device } from '@twilio/voice-sdk';
 import { base44 } from '@/api/base44Client';
 
 const TwilioDeviceContext = createContext(null);
+
+// Load the Twilio Voice SDK from the official UMD CDN at runtime so the bundle
+// doesn't need to resolve the npm package at build time. The UMD build exposes
+// `window.Twilio.Device`.
+const TWILIO_VOICE_SDK_URL = 'https://unpkg.com/@twilio/voice-sdk@2.18.3/dist/twilio.min.js';
+let twilioDevicePromise = null;
+function loadTwilioDevice() {
+  if (typeof window !== 'undefined' && window.Twilio?.Device) {
+    return Promise.resolve(window.Twilio.Device);
+  }
+  if (twilioDevicePromise) return twilioDevicePromise;
+  twilioDevicePromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = TWILIO_VOICE_SDK_URL;
+    script.async = true;
+    script.onload = () => {
+      const Device = window.Twilio?.Device;
+      if (Device) resolve(Device);
+      else reject(new Error('Twilio Voice SDK loaded but Device not found'));
+    };
+    script.onerror = () => reject(new Error('Failed to load Twilio Voice SDK'));
+    document.head.appendChild(script);
+  });
+  return twilioDevicePromise;
+}
 
 // Shared AudioContext
 let sharedAudioCtx = null;
@@ -140,6 +164,9 @@ export function TwilioDeviceProvider({ children }) {
         setDeviceReady(false);
         isDestroyingRef.current = false;
       }
+
+      // Load the SDK from CDN at runtime (avoids bundling the npm package)
+      const Device = await loadTwilioDevice();
 
       const device = new Device(res.data.token, {
         logLevel: 1,
