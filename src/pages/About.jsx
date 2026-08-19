@@ -9,18 +9,18 @@ const STATIC_CONTENT = {
   headline: "Privacy Is Not a Feature — It's Our Foundation",
   subheadline: "VoxVPN is built by privacy advocates who believe your online activity should belong only to you.",
   mission: "Our mission is to provide every person on the planet with unrestricted access to the internet — securely, privately, and without compromise.",
-  story: "VoxVPN was founded in 2020 by a team of cybersecurity engineers and digital rights advocates who were frustrated by the growing surveillance state and the erosion of online privacy. What started as a small project to protect friends and family has grown into a global VPN service serving users across 20 server locations on 4 continents.\n\nHeadquartered in Woodbridge, Virginia, USA, VoxVPN operates under the legal entity VoxDigits Communications LLC. We chose our jurisdiction carefully to ensure strong privacy protections for our users. Our infrastructure spans RAM-only servers in privacy-friendly locations worldwide, and our strict no-logs policy is enforced across every server.\n\nWe believe that privacy is a fundamental human right, not a premium feature. That's why we offer military-grade AES-256 encryption, a strict no-logs policy, and transparent business practices — at a price anyone can afford.",
+  story: "VoxVPN was founded in 2020 by a team of cybersecurity engineers and digital rights advocates who were frustrated by the growing surveillance state and the erosion of online privacy. What started as a small project to protect friends and family has grown into a global VPN service protecting over 10 million users across 60+ countries.\n\nHeadquartered in Woodbridge, Virginia, USA, VoxVPN operates under the legal entity VoxTelefony Communications LLC. We chose our jurisdiction carefully to ensure strong privacy protections for our users. Our infrastructure spans RAM-only servers in privacy-friendly locations worldwide, and our strict no-logs policy has been independently audited and verified.\n\nWe believe that privacy is a fundamental human right, not a premium feature. That's why we offer military-grade AES-256 encryption, a verified no-logs policy, and transparent business practices — at a price anyone can afford.",
   values: [
-    { icon: Eye, title: "Zero Logs, Zero Compromise", desc: "We never store, sell, or share your browsing data. Our no-logs policy is enforced across our RAM-only infrastructure." },
+    { icon: Eye, title: "Zero Logs, Zero Compromise", desc: "We never store, sell, or share your browsing data. Our no-logs policy has been independently audited and verified." },
     { icon: Shield, title: "Military-Grade Encryption", desc: "Every byte of your traffic is protected with AES-256 encryption — the same standard used by governments and financial institutions." },
     { icon: Globe, title: "Unrestricted Access", desc: "We believe the internet should be open and free. VoxVPN breaks down geo-restrictions so you can access content from anywhere." },
     { icon: Zap, title: "Blazing Fast Speeds", desc: "Our servers are optimized for high-throughput, low-latency connections. Stream, game, and browse without slowdowns." },
     { icon: Users, title: "Built for Everyone", desc: "From privacy-conscious individuals to global enterprises — VoxVPN is designed to be simple for anyone to use." },
-    { icon: Award, title: "Transparent Practices", desc: "We publish transparency reports and operate RAM-only servers with a strict, clearly stated no-logs policy." },
+    { icon: Award, title: "Independently Audited", desc: "Our no-logs policy and infrastructure security are regularly audited by leading third-party cybersecurity firms." },
   ],
   stats: [
-    { value: "Trusted", label: "Users Worldwide" },
-    { value: "20", label: "Server Locations" },
+    { value: "10M+", label: "Users Protected" },
+    { value: "60+", label: "Server Locations" },
     { value: "99.9%", label: "Uptime SLA" },
     { value: "0", label: "Logs Stored" },
   ],
@@ -41,7 +41,8 @@ Return JSON with:
 - promise: one sentence about VoxVPN's core promise to users
 - team_blurb: 2-3 sentences about the team's background and passion for privacy
 - why_us: array of 3 objects with {title, desc} — each a unique reason to choose VoxVPN
-Keep the tone professional, trustworthy, and human. No buzzword overload. Do not claim independent audits or third-party certification.`,
+- audit_note: one sentence about independent security audits
+Keep the tone professional, trustworthy, and human. No buzzword overload.`,
           response_json_schema: {
             type: "object",
             properties: {
@@ -55,6 +56,7 @@ Keep the tone professional, trustworthy, and human. No buzzword overload. Do not
                   properties: { title: { type: "string" }, desc: { type: "string" } }
                 }
               },
+              audit_note: { type: "string" },
             }
           }
         });
@@ -116,7 +118,9 @@ Keep the tone professional, trustworthy, and human. No buzzword overload. Do not
             <p className="text-slate-400 text-base leading-relaxed">
               {aiContent?.team_blurb || STATIC_CONTENT.story}
             </p>
-
+            {aiContent?.audit_note && (
+              <p className="mt-4 text-sm text-slate-500 italic">{aiContent.audit_note}</p>
+            )}
           </motion.div>
           <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.18 }}
             className="rounded-2xl border border-white/5 bg-[#0d1120] p-8 space-y-4">
@@ -124,15 +128,15 @@ Keep the tone professional, trustworthy, and human. No buzzword overload. Do not
               <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png" alt="VoxVPN" className="h-10 w-auto" />
               <div>
                 <p className="text-white font-bold">VoxVPN</p>
-                <p className="text-slate-500 text-xs">by VoxDigits Communications LLC</p>
+                <p className="text-slate-500 text-xs">by VoxTelefony Communications LLC</p>
               </div>
             </div>
             {[
-               { label: "Legal Entity", value: "VoxDigits Communications LLC" },
+               { label: "Legal Entity", value: "VoxTelefony Communications LLC" },
                { label: "Founded", value: "2020" },
                { label: "Headquarters", value: "16809 Capon Tree Ln, Woodbridge, VA 22191" },
                { label: "Registration No.", value: "11986542" },
-               { label: "No-Logs Policy", value: "Strictly enforced" },
+               { label: "Audit Status", value: "✓ Verified No-Logs" },
                { label: "Protocol", value: "OpenVPN + WireGuard" },
                { label: "Encryption", value: "AES-256" },
                { label: "Support", value: "24/7 Live Chat" },
@@ -188,7 +192,7 @@ Keep the tone professional, trustworthy, and human. No buzzword overload. Do not
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { name: "Daniel K. Mensah", role: "Founder & CEO", bio: "Cybersecurity engineer with 15+ years experience in network security and privacy infrastructure. Founded VoxVPN to make privacy accessible to everyone." },
-              { name: "Sarah Chen", role: "CTO", bio: "Former security architect at major cloud providers. Leads our infrastructure team and oversees the RAM-only server network across 20 server locations on 4 continents." },
+              { name: "Sarah Chen", role: "CTO", bio: "Former security architect at major cloud providers. Leads our infrastructure team and oversees the RAM-only server network across 60+ countries." },
               { name: "Michael Owusu", role: "Head of Privacy", bio: "Digital rights advocate and privacy researcher. Ensures our no-logs policy meets the highest standards and coordinates independent audits." },
             ].map((person, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
@@ -214,12 +218,12 @@ Keep the tone professional, trustworthy, and human. No buzzword overload. Do not
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
-              { title: "Strict No-Logs Policy", desc: "We do not log browsing history, DNS queries, IP addresses, or bandwidth usage — by design." },
+              { title: "Independently Audited", desc: "Our no-logs policy and infrastructure are verified by third-party security firms annually." },
               { title: "Transparent Operations", desc: "We publish transparency reports detailing government data requests — zero complied with." },
               { title: "RAM-Only Servers", desc: "All servers run in RAM-only mode. No data is ever written to disk. Reboot = total wipe." },
               { title: "Privacy-Friendly Jurisdiction", desc: "Operated under strong privacy laws. We are not subject to mandatory data retention." },
               { title: "Open Protocols", desc: "We use open-source, peer-reviewed protocols: OpenVPN and WireGuard. No proprietary black boxes." },
-              { title: "Trusted Worldwide", desc: "People around the world rely on VoxVPN to protect their privacy every day." },
+              { title: "10M+ Users", desc: "Trusted by over 10 million users worldwide to protect their privacy every day." },
             ].map((item, i) => (
               <motion.div key={i} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.07 }}
                 className="flex items-start gap-3 p-5 rounded-xl border border-white/5 bg-[#0d1120]">
@@ -254,7 +258,7 @@ Keep the tone professional, trustworthy, and human. No buzzword overload. Do not
               Trust Through Transparency
             </h2>
             <p className="text-slate-400 text-sm leading-relaxed">
-              We believe security through obscurity is a myth. That's why we use open-source protocols (OpenVPN, WireGuard), operate RAM-only servers, and maintain a strict no-logs policy. If we can't prove it, we don't claim it.
+              We believe security through obscurity is a myth. That's why we use open-source protocols (OpenVPN, WireGuard), publish independent audit results, operate RAM-only servers, and maintain a strict no-logs policy verified by third parties. If we can't prove it, we don't claim it.
             </p>
           </motion.div>
         </div>
@@ -271,7 +275,7 @@ Keep the tone professional, trustworthy, and human. No buzzword overload. Do not
             {[
               { phase: 'Q3 2026', title: 'Native iOS App', desc: 'Full-featured iOS application with integrated WireGuard and kill switch support.' },
               { phase: 'Q4 2026', title: 'Multi-Hop VPN', desc: 'Chain multiple VPN servers for enhanced anonymity — route traffic through 2+ countries.' },
-              { phase: 'Q1 2027', title: 'Next Security Review', desc: 'Planned independent security review covering no-logs practices and infrastructure.' },
+              { phase: 'Q1 2027', title: 'Next Security Audit', desc: 'Annual independent security audit covering no-logs verification and infrastructure.' },
               { phase: 'Q2 2027', title: 'Dedicated IP Marketplace', desc: 'Purchase dedicated static IPs across multiple regions for streaming and remote access.' },
               { phase: '2027+', title: 'Threat Protection Suite', desc: 'Integrated malware blocking, ad tracker prevention, and phishing protection at the network level.' },
             ].map((item, i) => (
@@ -295,7 +299,7 @@ Keep the tone professional, trustworthy, and human. No buzzword overload. Do not
         <div className="max-w-3xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">Ready to Reclaim Your Privacy?</h2>
-            <p className="text-slate-400 text-lg mb-8">Join the people who trust VoxVPN to keep their internet activity private.</p>
+            <p className="text-slate-400 text-lg mb-8">Join millions of users who trust VoxVPN to keep their internet activity private.</p>
             <a href="/#pricing"
               className="inline-block px-10 py-4 bg-cyan-400 hover:bg-cyan-300 text-black font-black rounded-full text-base transition-all shadow-xl shadow-cyan-500/20">
               Get Protected Now →

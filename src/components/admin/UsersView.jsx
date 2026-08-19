@@ -3,7 +3,6 @@ import { Loader2, Search, Shield, UserPlus, RefreshCw, Mail, Crown, User, Gift, 
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { format } from 'date-fns';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 export default function UsersView() {
   const [users, setUsers] = useState([]);
@@ -157,15 +156,14 @@ export default function UsersView() {
             onChange={(e) => setInviteEmail(e.target.value)}
             className="flex-1 px-4 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white placeholder-slate-600 text-sm focus:outline-none focus:border-cyan-500/50 transition-colors"
           />
-          <Select value={inviteRole} onValueChange={setInviteRole}>
-            <SelectTrigger className="px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50 transition-colors text-left">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="user">User</SelectItem>
-              <SelectItem value="admin">Admin</SelectItem>
-            </SelectContent>
-          </Select>
+          <select
+            value={inviteRole}
+            onChange={(e) => setInviteRole(e.target.value)}
+            className="px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50 transition-colors"
+          >
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
           <button
             type="submit"
             disabled={inviting || !inviteEmail}
@@ -368,16 +366,15 @@ export default function UsersView() {
               <div className="space-y-3">
                 <div>
                   <label className="text-slate-500 text-xs uppercase tracking-wider block mb-1">Plan</label>
-                  <Select value={grantPlan} onValueChange={setGrantPlan}>
-                    <SelectTrigger className="w-full px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50 text-left">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {['Basic', 'Standard', 'Premium', 'Advanced', 'Enterprise'].map(p => (
-                        <SelectItem key={p} value={p}>{p}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <select
+                    value={grantPlan}
+                    onChange={e => setGrantPlan(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#060910] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50"
+                  >
+                    {['Basic', 'Standard', 'Premium', 'Advanced', 'Enterprise'].map(p => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="text-slate-500 text-xs uppercase tracking-wider block mb-1">Duration (months)</label>

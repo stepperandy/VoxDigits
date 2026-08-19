@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Mail, ArrowLeft, CheckCircle2, Shield, Lock, Eye, EyeOff, Zap } from 'lucide-react';
+import { Mail, ArrowLeft, CheckCircle2, Shield, Lock, Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function ResetPassword() {
@@ -74,42 +74,6 @@ export default function ResetPassword() {
     }
   };
 
-  // Instant (magic-link) login: set a random throwaway password via the reset
-  // token, then immediately authenticate with it and bounce to the dashboard.
-  // The user never types or even sees a password.
-  const [instantLoading, setInstantLoading] = useState(false);
-  const [instantEmail, setInstantEmail] = useState(
-    () => localStorage.getItem('voxvpn_magic_email') || ''
-  );
-
-  const handleInstantLogin = async () => {
-    setError('');
-    if (!instantEmail || !instantEmail.includes('@')) {
-      setError('Enter the email you requested the login link for.');
-      return;
-    }
-    setInstantLoading(true);
-    try {
-      // Random password that satisfies the platform's complexity rules.
-      const randomPwd =
-        'Vx' + Math.random().toString(36).slice(2, 10) +
-        Math.random().toString(36).slice(2, 10).toUpperCase() + '9!';
-      await base44.auth.resetPassword({ resetToken, newPassword: randomPwd });
-      await base44.auth.loginViaEmailPassword(instantEmail.trim(), randomPwd);
-      localStorage.removeItem('voxvpn_magic_email');
-      const params = new URLSearchParams(window.location.search);
-      window.location.href = params.get('next') || '/dashboard';
-    } catch (err) {
-      setError(
-        err?.response?.data?.detail ||
-          err?.message ||
-          'Instant login failed. The link may have expired — request a new one.'
-      );
-    } finally {
-      setInstantLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
       style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)' }}>
@@ -141,60 +105,17 @@ export default function ResetPassword() {
             </p>
           </div>
 
-          {/* TOKEN MODE — instant login or set new password */}
+          {/* TOKEN MODE — set new password */}
           {isTokenMode && !done && (
-            <>
-              {/* Instant (magic-link) login card */}
-              <div className="mb-5 p-4 rounded-xl bg-cyan-50 border border-cyan-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <Zap size={18} className="text-cyan-600" />
-                  <p className="text-cyan-700 font-bold text-sm">Instant Login</p>
+            <form onSubmit={handleSetPassword} className="space-y-4">
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                  {error}
                 </div>
-                <p className="text-gray-600 text-xs leading-relaxed mb-3">
-                  No password needed — just enter your email and we'll sign you
-                  straight in.
-                </p>
-                {error && (
-                  <div className="mb-3 p-2.5 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs">
-                    {error}
-                  </div>
-                )}
-                <input
-                  type="email"
-                  placeholder="you@example.com"
-                  value={instantEmail}
-                  onChange={(e) => setInstantEmail(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all mb-2.5"
-                />
-                <button
-                  type="button"
-                  onClick={handleInstantLogin}
-                  disabled={instantLoading}
-                  className="w-full py-3 rounded-lg font-bold text-white text-sm transition-all disabled:opacity-50"
-                  style={{
-                    background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)',
-                    boxShadow: '0 4px 20px rgba(0,212,255,0.3)',
-                  }}
-                >
-                  {instantLoading ? 'Signing you in…' : '⚡ Sign In Instantly'}
-                </button>
-              </div>
+              )}
 
-              {/* Divider */}
-              <div className="relative mb-4">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200" />
-                </div>
-                <div className="relative flex justify-center text-xs">
-                  <span className="px-2 bg-white text-gray-400">
-                    or set a new password
-                  </span>
-                </div>
-              </div>
-
-              <form onSubmit={handleSetPassword} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">New Password</label>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">New Password</label>
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                     <Lock size={18} />
@@ -253,8 +174,7 @@ export default function ResetPassword() {
               >
                 {loading ? 'Updating...' : 'Set New Password'}
               </button>
-              </form>
-            </>
+            </form>
           )}
 
           {/* TOKEN MODE — success */}
