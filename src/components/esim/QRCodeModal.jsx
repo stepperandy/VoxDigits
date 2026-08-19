@@ -1,24 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { X, Download, Copy, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-
-// Load the `qrcode` library from CDN at runtime so the bundle doesn't need
-// to resolve the npm package at build time. UMD global: `window.QRCode`.
-const QRCODE_CDN_URL = "https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js";
-let qrcodePromise = null;
-function loadQRCode() {
-  if (typeof window !== "undefined" && window.QRCode) return Promise.resolve(window.QRCode);
-  if (qrcodePromise) return qrcodePromise;
-  qrcodePromise = new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = QRCODE_CDN_URL;
-    script.async = true;
-    script.onload = () => (window.QRCode ? resolve(window.QRCode) : reject(new Error("QRCode global not found")));
-    script.onerror = () => reject(new Error("Failed to load qrcode"));
-    document.head.appendChild(script);
-  });
-  return qrcodePromise;
-}
+import { loadQRCode } from "@/lib/qrCode";
 
 export default function QRCodeModal({ esim, onClose }) {
   const canvasRef = useRef(null);
@@ -58,20 +41,23 @@ export default function QRCodeModal({ esim, onClose }) {
   // Render QR once we have a valid LPA
   useEffect(() => {
     setQrError(false);
-    if (canvasRef.current && isValidLpa(lpaCode)) {
-      loadQRCode()
-        .then((QRCode) =>
-          QRCode.toCanvas(canvasRef.current, lpaCode, {
-            width: 240,
-            margin: 2,
-            color: { dark: "#000000", light: "#ffffff" },
-          })
-        )
-        .catch((err) => {
-          console.error("QR generation error:", err);
-          setQrError(true);
+    if (!canvasRef.current || !isValidLpa(lpaCode)) return;
+    let cancelled = false;
+    loadQRCode()
+      .then((QRCode) => {
+        if (cancelled || !canvasRef.current) return;
+        return QRCode.toCanvas(canvasRef.current, lpaCode, {
+          width: 240,
+          margin: 2,
+          color: { dark: "#000000", light: "#ffffff" },
         });
-    }
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error("QR generation error:", err);
+        setQrError(true);
+      });
+    return () => { cancelled = true; };
   }, [lpaCode]);
 
   const handleDownload = () => {

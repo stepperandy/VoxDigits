@@ -165,8 +165,16 @@ export function TwilioDeviceProvider({ children }) {
         isDestroyingRef.current = false;
       }
 
-      // Load the SDK from CDN at runtime (avoids bundling the npm package)
-      const Device = await loadTwilioDevice();
+      let Device;
+      try {
+        Device = await loadTwilioDevice();
+      } catch (loadErr) {
+        console.error('[GlobalTwilio] SDK load failed:', loadErr.message);
+        clearTimeout(demoFallbackTimer);
+        isRegisteringRef.current = false;
+        scheduleReconnect(15000);
+        return;
+      }
 
       const device = new Device(res.data.token, {
         logLevel: 1,
