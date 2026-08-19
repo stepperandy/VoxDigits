@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle, Loader2, MessageSquare, Headphones, Building } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { fireConversion } from "@/lib/gads";
 
 const CONTACT_CHANNELS = [
   {
@@ -57,6 +58,7 @@ export default function Contact() {
         from_name: "VoxDigits Support",
       });
       setSent(true);
+      fireConversion("CONTACT");
     } catch (err) {
       setError("Failed to send message. Please try again or email us directly.");
     }
@@ -93,10 +95,12 @@ export default function Contact() {
             const isChat = false;
             const El = "a";
             const props = { href: ch.href };
+            const handleCallClick = ch.href?.startsWith("tel:") ? () => fireConversion("PHONE_CALL_LEAD") : undefined;
             return (
               <El
                 key={ch.label}
                 {...props}
+                onClick={handleCallClick}
                 className={`p-6 rounded-2xl border text-left transition-all hover:scale-[1.02] cursor-pointer block ${colorMap[ch.color].split(" ").slice(1).join(" ")} border-white/10 hover:border-current/30`}
               >
                 <div className={`w-10 h-10 rounded-xl border flex items-center justify-center mb-4 ${colorMap[ch.color]}`}>
@@ -198,7 +202,7 @@ export default function Contact() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                  <a href="tel:+12073871513" className="text-blue-300 hover:text-blue-200 transition-colors">+1 207 387 1513</a>
+                  <a href="tel:+12073871513" onClick={() => fireConversion("PHONE_CALL_LEAD")} className="text-blue-300 hover:text-blue-200 transition-colors">+1 207 387 1513</a>
                 </div>
               </div>
             </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { fireConversion } from "@/lib/gads";
 import {
   Globe, Wifi, Phone, LayoutDashboard, MoreHorizontal,
   X, Settings, CreditCard, MessageSquare, Shield, Gift,
@@ -56,6 +57,20 @@ export default function Layout({ children, currentPageName }) {
         setUser(u);
         setIsAuthenticated(true);
         setCredits(u?.credits || 0);
+        // Fire Google Ads SIGNUP conversion once per freshly-created user.
+        // Base44 signup completes off-page, so we detect a brand-new account
+        // (created within the last 10 min) and guard with a per-user key.
+        if (u?.id) {
+          const key = `gads_signup_${u.id}`;
+          if (!localStorage.getItem(key)) {
+            const created = u.created_date ? new Date(u.created_date).getTime() : 0;
+            const isFresh = created > 0 && Date.now() - created < 10 * 60 * 1000;
+            if (isFresh) {
+              fireConversion("SIGNUP", { transaction_id: u.id });
+              localStorage.setItem(key, "1");
+            }
+          }
+        }
       })
       .catch(() => {
         setIsAuthenticated(false);
