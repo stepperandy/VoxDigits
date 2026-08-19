@@ -1,0 +1,41 @@
+workflows:
+  ios_companion_app_store:
+    name: Build VoxVPN iOS companion for App Store Connect
+    max_build_duration: 60
+    integrations:
+      app_store_connect: Codemagic VoxBrain 2026
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.base69c84f61d5543b54fe26e1e5.app
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+      - name: Build web companion
+        script: npm run build
+      - name: Generate clean Capacitor iOS project and app icons
+        script: |
+          set -euo pipefail
+          rm -rf ios
+          npx cap add ios
+          mkdir -p resources
+          cp resources/VoxVPN-AppIcon.png resources/icon.png
+          npx --yes @capacitor/assets generate --ios
+          npx cap sync ios
+      - name: Set App Store version and build number
+        script: |
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString 2.124641.3" ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion 13" ios/App/App/Info.plist
+      - name: Set up App Store code signing
+        script: |
+          cd ios/App
+          xcode-project use-profiles
+      - name: Build signed IPA
+        script: |
+          cd ios/App
+          xcode-project build-ipa --workspace App.xcworkspace --scheme App
+    artifacts:
+      - ios/App/build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration

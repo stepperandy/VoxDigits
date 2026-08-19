@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Trash2, Plus, Loader2, Upload, CheckCircle2 } from 'lucide-react';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 export default function DownloadsManager() {
   const [downloads, setDownloads] = useState([]);
@@ -95,18 +96,19 @@ export default function DownloadsManager() {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="w-full px-3 py-2 bg-[#0a0f1f] border border-white/10 rounded text-white placeholder-slate-500"
             />
-            <select
-              value={formData.platform}
-              onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
-              className="w-full px-3 py-2 bg-[#0a0f1f] border border-white/10 rounded text-white"
-            >
-              <option>Windows</option>
-              <option>macOS</option>
-              <option>Linux</option>
-              <option>iOS</option>
-              <option>Android</option>
-              <option>Router</option>
-            </select>
+            <Select value={formData.platform} onValueChange={(v) => setFormData({ ...formData, platform: v })}>
+              <SelectTrigger className="w-full px-3 py-2 bg-[#0a0f1f] border border-white/10 rounded text-white text-left">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Windows">Windows</SelectItem>
+                <SelectItem value="macOS">macOS</SelectItem>
+                <SelectItem value="Linux">Linux</SelectItem>
+                <SelectItem value="iOS">iOS</SelectItem>
+                <SelectItem value="Android">Android</SelectItem>
+                <SelectItem value="Router">Router</SelectItem>
+              </SelectContent>
+            </Select>
             <input
               type="text"
               placeholder="Version"

@@ -53,6 +53,23 @@ Deno.serve(async (req) => {
       }), { status: 403, headers: CORS });
     }
 
+    // Real-time expiry: block immediately if renewal_date has passed (don't wait for daily sweep)
+    if (active.renewal_date && new Date(active.renewal_date) < new Date()) {
+      await base44.asServiceRole.entities.VPNSubscription.update(active.id, { status: 'expired' });
+      const expDevices = await base44.asServiceRole.entities.LinkedDevice.filter({ subscription_id: active.id });
+      for (const d of expDevices) {
+        if (d.status === 'active') await base44.asServiceRole.entities.LinkedDevice.update(d.id, { status: 'inactive' });
+      }
+      const isTrial = active.plan === 'Free Trial';
+      return new Response(JSON.stringify({
+        valid: false,
+        status: 'expired',
+        error: isTrial
+          ? 'Your 3-day free trial has ended. Please choose a plan to continue using VoxVPN.'
+          : 'Your subscription has expired. Please renew at voxvpn.net.',
+      }), { status: 403, headers: CORS });
+    }
+
     // Count connected devices
     const devices = await base44.entities.LinkedDevice.filter({ subscription_id: active.id });
     const connectedCount = devices.filter(d => d.status === 'active').length;

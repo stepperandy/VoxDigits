@@ -77,6 +77,7 @@ export default function ServersPage() {
         const res = await base44.integrations.Core.InvokeLLM({
           prompt: `You are a copywriter for VoxVPN, a premium privacy-first VPN. 
 Generate compelling content for the VPN Servers page.
+Use only these facts: 20 server locations across 4 continents. Do not claim 60+ countries, 40+ countries, or specific server counts.
 Return JSON with:
 - headline: main page headline (max 10 words, punchy)
 - subheadline: supporting description (1-2 sentences)
@@ -171,7 +172,7 @@ Include diverse global locations across NA, Europe, APAC, MENA, LATAM.`,
               {aiContent?.headline || "Connect to the World's Fastest VPN Servers"}
             </h1>
             <p className="text-slate-400 text-lg max-w-2xl mx-auto leading-relaxed">
-              {aiContent?.subheadline || 'VoxVPN operates a global network of high-speed, zero-log servers across 60+ locations in 40+ countries.'}
+              {aiContent?.subheadline || 'VoxVPN operates a global network of high-speed, zero-log servers across 20 locations on 4 continents.'}
             </p>
           </motion.div>
         </div>
@@ -181,8 +182,8 @@ Include diverse global locations across NA, Europe, APAC, MENA, LATAM.`,
       <section className="py-10 px-4 sm:px-6 lg:px-8 border-y border-white/5">
         <div className="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
           {[
-            { icon: Server, value: '60+', label: 'Servers Worldwide' },
-            { icon: Globe, value: '40+', label: 'Countries' },
+            { icon: Server, value: '20', label: 'Server Locations' },
+            { icon: Globe, value: '4', label: 'Continents' },
             { icon: Zap, value: '10 Gbps', label: 'Network Capacity' },
             { icon: Shield, value: '0 Logs', label: 'Privacy Guaranteed' },
           ].map((stat, i) => {
