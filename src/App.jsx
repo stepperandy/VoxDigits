@@ -152,7 +152,6 @@ import CanadaVirtualNumber from './pages/countries/CanadaVirtualNumber';
 import UKVirtualNumber from './pages/countries/UKVirtualNumber';
 import AustraliaVirtualNumber from './pages/countries/AustraliaVirtualNumber';
 import Connect from './pages/Connect';
-import VoxVPNApp from './pages/VoxVPNApp';
 
 
 
@@ -177,7 +176,11 @@ const AnimatedRoutes = () => {
         transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
         <Routes location={location}>
-          <Route path="/" element={<VoxVPNApp />} />
+          <Route path="/" element={
+        <LayoutWrapper currentPageName={mainPageKey}>
+          <MainPage />
+        </LayoutWrapper>
+      } />
       {Object.entries(Pages).map(([path, Page]) => (
         <Route
           key={path}
