@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import QRCode from 'qrcode';
+import { loadQRCode } from '@/lib/qrCode';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,13 +19,23 @@ export default function ESIMInstallationGuide({ open, onOpenChange, esim }) {
   };
 
   React.useEffect(() => {
-    if (esim?.qr_code && open) {
-      QRCode.toDataURL(esim.qr_code, {
-        width: 300,
-        margin: 2,
-        color: { dark: '#000000', light: '#ffffff' }
-      }).then(setQrImageUrl);
-    }
+    if (!esim?.qr_code || !open) return;
+    let cancelled = false;
+    loadQRCode()
+      .then((QRCode) => {
+        if (cancelled) return;
+        return QRCode.toDataURL(esim.qr_code, {
+          width: 300,
+          margin: 2,
+          color: { dark: '#000000', light: '#ffffff' }
+        });
+      })
+      .then((url) => {
+        if (cancelled) return;
+        setQrImageUrl(url);
+      })
+      .catch((err) => console.error('QR generation error:', err));
+    return () => { cancelled = true; };
   }, [esim?.qr_code, open]);
 
   const iOSSteps = [
