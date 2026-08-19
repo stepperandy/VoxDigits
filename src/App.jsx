@@ -43,7 +43,7 @@ import ThemeProvider from '@/lib/ThemeProvider';
 import { TabProvider } from '@/mobile/MobileTabContext';
 import FloatingAssistant from '@/components/FloatingAssistant';
 import { LanguageProvider } from '@/lib/LanguageContext';
-import iOSVPN from './pages/vpn-os/iOSVPN.jsx';
+import IOSVPN from './pages/vpn-os/iOSVPN.jsx';
 
 // Lazy-loaded pages
 const Home = lazy(() => import('./pages/Home'));
@@ -194,7 +194,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/windows-vpn" element={<PageTransition><WindowsVPN /></PageTransition>} />
           <Route path="/mac-vpn" element={<PageTransition><MacVPN /></PageTransition>} />
           <Route path="/linux-vpn" element={<PageTransition><LinuxVPN /></PageTransition>} />
-          <Route path="/ios-vpn" element={<PageTransition><iOSVPN /></PageTransition>} />
+          <Route path="/ios-vpn" element={<PageTransition><IOSVPN /></PageTransition>} />
           <Route path="/android-vpn" element={<PageTransition><AndroidVPN /></PageTransition>} />
           <Route path="/router-vpn" element={<PageTransition><RouterVPN /></PageTransition>} />
           <Route path="/chrome-extension" element={<PageTransition><ChromeExtension /></PageTransition>} />
