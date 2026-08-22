@@ -135,9 +135,9 @@ export const AuthProvider = ({ children }) => {
     const hasAgreed = localStorage.getItem("terms_agreed_v1");
     const origin = window.location.origin;
     if (hasAgreed) {
-      base44.auth.redirectToLogin(`${origin}/Dashboard`);
+      base44.auth.redirectToLogin(`${origin}/dashboard`);
     } else {
-      window.location.href = `/TermsAgreement?next=${encodeURIComponent(origin + "/Dashboard")}`;
+      window.location.href = `/TermsAgreement?next=${encodeURIComponent(origin + "/dashboard")}`;
     }
   };
 

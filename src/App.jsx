@@ -188,6 +188,7 @@ import CanadaVirtualNumber from './pages/countries/CanadaVirtualNumber';
 import UKVirtualNumber from './pages/countries/UKVirtualNumber';
 import AustraliaVirtualNumber from './pages/countries/AustraliaVirtualNumber';
 import Connect from './pages/Connect';
+import UserDashboard from './pages/UserDashboard.jsx';
 
 
 
@@ -217,6 +218,7 @@ const AnimatedRoutes = () => {
           <MainPage />
         </LayoutWrapper>
       } />
+      <Route path="/Dashboard" element={<Navigate to="/dashboard" replace />} />
       {Object.entries(Pages).map(([path, Page]) => (
         <Route
           key={path}
@@ -232,6 +234,7 @@ const AnimatedRoutes = () => {
           }
         />
       ))}
+      <Route path="/dashboard" element={<RequireAuth><UserDashboard /></RequireAuth>} />
       <Route path="/Billing" element={<RequireAuth><LayoutWrapper currentPageName="Billing"><Billing /></LayoutWrapper></RequireAuth>} />
       <Route path="/LegalPolicy" element={<LegalPolicy />} />
       <Route path="/privacypolicy" element={<LegalPolicy />} />
