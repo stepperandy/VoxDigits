@@ -34,7 +34,7 @@ export default function AuthLogin() {
         if (!done && (me?.role === 'admin' || me?.role === 'super_admin')) {
           const params = new URLSearchParams(window.location.search);
           const next = params.get('next') || params.get('from_url');
-          window.location.href = next || '/admin';
+          window.location.href = next || '/dashboard';
           return;
         }
       } catch {
@@ -106,7 +106,7 @@ export default function AuthLogin() {
       await base44.auth.loginViaEmailPassword(email, password);
       const params = new URLSearchParams(window.location.search);
       const next = params.get('next') || params.get('from_url');
-      window.location.href = next || (isAdmin ? '/admin' : '/dashboard');
+      window.location.href = next || '/dashboard';
     } catch (err) {
       const backendMsg = err?.response?.data?.message || err?.message || 'Invalid email or password.';
       setError(backendMsg);
