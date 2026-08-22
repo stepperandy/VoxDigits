@@ -117,7 +117,7 @@ const sections = [
   },
   {
     title: '14. No-Log Policy',
-    text: 'VoxVPN operates under a strict, independently audited no-logs policy:',
+    text: 'VoxVPN operates under a strict no-logs policy:',
     list: [
       'We do not log browsing history, visited websites, or URLs.',
       'We do not log DNS queries or DNS resolution requests.',

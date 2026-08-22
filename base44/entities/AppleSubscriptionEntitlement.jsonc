@@ -1,6 +1,5 @@
 {
   "type": "object",
-  "name": "AppleSubscriptionEntitlement",
   "properties": {
     "user_email": {
       "type": "string"
@@ -39,7 +38,7 @@
     },
     "description": {
       "type": "string",
-      "description": "Optional notes or description for this entitlement (up to 1000 characters)",
+      "description": "Optional description (up to 1000 characters)",
       "maxLength": 1000
     }
   },
@@ -62,5 +61,6 @@
         "role": "admin"
       }
     }
-  }
+  },
+  "name": "AppleSubscriptionEntitlement"
 }

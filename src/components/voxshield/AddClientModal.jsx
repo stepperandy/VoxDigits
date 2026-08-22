@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { X, Plus, Loader2, Mail, Building2, Smartphone, Shield } from 'lucide-react';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 export default function AddClientModal({ agencyId, onClose, onCreated }) {
   const [form, setForm] = useState({
@@ -79,12 +80,15 @@ export default function AddClientModal({ agencyId, onClose, onCreated }) {
           </div>
           <div>
             <label className={labelCls}>VPN Plan</label>
-            <select value={form.vpn_plan} onChange={(e) => setForm({ ...form, vpn_plan: e.target.value })} className={inputCls}>
-              <option value="basic">Basic</option>
-              <option value="standard">Standard</option>
-              <option value="premium">Premium</option>
-              <option value="enterprise">Enterprise</option>
-            </select>
+            <Select value={form.vpn_plan} onValueChange={(v) => setForm({ ...form, vpn_plan: v })}>
+              <SelectTrigger className={inputCls + ' text-left'}><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="basic">Basic</SelectItem>
+                <SelectItem value="standard">Standard</SelectItem>
+                <SelectItem value="premium">Premium</SelectItem>
+                <SelectItem value="enterprise">Enterprise</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>

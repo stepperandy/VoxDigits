@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MessageCircle, Send, Loader2 } from 'lucide-react';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 export default function SupportWidget() {
   const [tickets, setTickets] = useState([]);
@@ -70,16 +71,17 @@ export default function SupportWidget() {
         </Button>
       ) : (
         <div className="space-y-3 p-3 rounded-lg bg-white/5">
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/10 text-white text-sm"
-          >
-            <option value="general">General</option>
-            <option value="billing">Billing</option>
-            <option value="technical">Technical</option>
-            <option value="account">Account</option>
-          </select>
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/10 text-white text-sm text-left">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="general">General</SelectItem>
+              <SelectItem value="billing">Billing</SelectItem>
+              <SelectItem value="technical">Technical</SelectItem>
+              <SelectItem value="account">Account</SelectItem>
+            </SelectContent>
+          </Select>
 
           <Input
             placeholder="Subject"

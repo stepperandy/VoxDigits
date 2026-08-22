@@ -61,6 +61,20 @@ Deno.serve(async (req) => {
     const userEmail = authUser?.email || email;
     console.log(`[vpnLogin] Auth success for ${userEmail}, token obtained`);
 
+    // Admin bypass — admins have no subscription, device, or expiry restrictions
+    const isAdmin = registeredUsers[0]?.role === 'admin' || authUser?.role === 'admin';
+    if (isAdmin) {
+      console.log(`[vpnLogin] Admin bypass for ${userEmail}`);
+      return new Response(JSON.stringify({
+        success: true,
+        token,
+        email: userEmail,
+        subscription_status: 'active',
+        plan: 'Admin',
+        expires_at: null,
+      }), { status: 200, headers: CORS });
+    }
+
     // Step 3: Check subscription — only registered users with an existing
     // active/trial subscription may log in. No auto-creation on login.
     const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });

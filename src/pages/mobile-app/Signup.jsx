@@ -29,12 +29,11 @@ export default function Signup() {
     setLoading(true);
     setError('');
     try {
-      const res = await base44.functions.invoke('emailSignup', { full_name: fullName, email, password });
-      if (res.data?.success) {
-        navigate('/app/login');
-      } else {
-        setError(res.data?.error || 'Signup failed.');
-      }
+      // Register through the Base44 client so the account receives a real
+      // email/password authentication identity. Server functions must never be
+      // responsible for creating credentials.
+      await base44.auth.register({ email, password });
+      navigate('/app/login');
     } catch (err) {
       setError(err?.response?.data?.error || err.message || 'Signup failed.');
     } finally {
@@ -54,6 +53,7 @@ export default function Signup() {
           />
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Create your account</h1>
           <p className="text-gray-500 text-sm">Join VoxVPN today</p>
+          <p className="text-green-600 text-xs font-semibold mt-1.5">🎉 3-day free trial included — no card required</p>
         </div>
 
         <form onSubmit={handleSignup} className="space-y-4">
