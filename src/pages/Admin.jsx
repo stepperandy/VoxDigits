@@ -22,6 +22,7 @@ import SubscriberStats from '@/components/admin/SubscriberStats';
 import GrantSubscriptionView from '@/components/admin/GrantSubscriptionView';
 import SecureFilesView from '@/components/admin/SecureFilesView';
 import LanguageTester from '@/components/admin/LanguageTester';
+import BroadcastEmailView from '@/components/admin/BroadcastEmailView';
 import AgencyDashboard from '@/pages/voxshield/AgencyDashboard';
 
 export default function Admin() {
@@ -40,6 +41,7 @@ export default function Admin() {
       case 'downloads': return <DownloadsView />;
       case 'analytics': return <AnalyticsDashboard />;
       case 'marketing': return <MarketingView />;
+      case 'broadcast': return <BroadcastEmailView />;
       case 'marketing-performance': return <MarketingPerformance />;
       case 'search-console': return <SearchConsoleDashboard />;
       case 'server-status': return <ServerStatusView />;
