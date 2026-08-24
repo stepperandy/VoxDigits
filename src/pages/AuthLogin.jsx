@@ -35,7 +35,9 @@ export default function AuthLogin() {
         if (!done && (me?.role === 'admin' || me?.role === 'super_admin')) {
           const params = new URLSearchParams(window.location.search);
           const next = params.get('next') || params.get('from_url');
-          window.location.href = next || '/dashboard';
+          // Authenticated admins skip the login screen and land in the admin
+          // panel automatically (unless an explicit redirect target was set).
+          window.location.href = next || '/admin';
           return;
         }
       } catch {
