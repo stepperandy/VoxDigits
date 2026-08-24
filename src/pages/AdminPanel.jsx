@@ -5,8 +5,9 @@ import {
   AlertCircle, Loader2, Users, Package, DollarSign, TrendingUp, MessageSquare,
   BarChart3, Phone, Share2, Zap, Settings, Wifi, Download, Shield,
   LayoutDashboard, ShieldCheck, Gift, Globe, Menu, X, LogOut, Search, Route,
-  ChevronDown, Bell, Store, Activity, Rocket, Archive
+  ChevronDown, Bell, Store, Activity, Rocket, Archive, Mail
 } from 'lucide-react';
+import AdminBroadcast from '@/components/admin/AdminBroadcast.jsx';
 import AdminResellers from '@/components/admin/AdminResellers.jsx';
 import AdminBundles from '@/components/admin/AdminBundles.jsx';
 import AdminPriceControl from '@/components/admin/AdminPriceControl.jsx';
@@ -51,6 +52,7 @@ const NAV_GROUPS = [
       { id: "tickets", label: "Support Tickets", icon: MessageSquare },
       { id: "kyc", label: "KYC Verification", icon: ShieldCheck },
       { id: "fraud", label: "Fraud Alerts", icon: AlertCircle },
+      { id: "broadcast", label: "Broadcast Email", icon: Mail },
     ],
   },
   {
@@ -98,6 +100,7 @@ const TAB_LABELS = {
   inventory: "Number Inventory",
   kyc: "KYC Verification",
   fraud: "Fraud Alerts",
+  broadcast: "Broadcast Email",
   pricing_rules: "Rate Rules",
   resellers: "Resellers",
   bundles: "Bundles",
@@ -124,6 +127,7 @@ function renderTabContent(activeTab) {
     case "bundles": return <AdminBundles />;
     case "kyc": return <AdminKYC />;
     case "fraud": return <AdminFraudAlerts />;
+    case "broadcast": return <AdminBroadcast />;
     case "pricing_rules": return <AdminPricingRules />;
     case "pricing": return <AdminPriceControl />;
     case "webhooks": return <AdminWebhookConfig />;
