@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Server, LogOut, Menu, X, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2, Handshake, Globe, Gift, ShieldCheck, Building2, Search, Briefcase, Languages } from 'lucide-react';
+import { LayoutDashboard, Users, Server, LogOut, Menu, X, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2, Handshake, Globe, Gift, ShieldCheck, Building2, Search, Briefcase, Languages, Mail } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
@@ -17,6 +17,7 @@ const navItems = [
   { icon: Handshake, label: 'Affiliates', id: 'affiliates', desc: 'Affiliates & partners' },
   { icon: Globe, label: 'Providers', id: 'providers', desc: 'Hybrid VPN provider APIs' },
   { icon: Users, label: 'Subscribers', id: 'subscribers', desc: 'Stats & download link' },
+  { icon: Mail, label: 'Broadcast Email', id: 'broadcast-email', desc: 'Email all users at once' },
   { icon: Gift, label: 'Grant Subscription', id: 'grant-subscription', desc: 'Manually activate plans' },
   { icon: ShieldCheck, label: 'Secure Files', id: 'secure-files', desc: 'Host installer files privately' },
   { icon: Languages, label: 'Language Tester', id: 'language-tester', desc: 'Test detection & translations' },
