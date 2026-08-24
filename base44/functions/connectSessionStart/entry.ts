@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { consumeCredit } from '../../shared/freeCredits.ts';
 
 /**
  * connectSessionStart — called when the Electron VPN client connects to a server.
@@ -43,22 +42,6 @@ Deno.serve(async (req) => {
       last_connected: connected_at,
       ip_address: server_id || device.ip_address,
     });
-
-    // Free trial: consume one of the 25 free credits on each connection. When
-    // the credits run out, the shared helper auto-charges the pre-authorized
-    // card for a paid subscription; if that fails the trial is parked as
-    // pending_payment and the next connection is blocked until payment.
-    if (activeSub.plan === 'Free Trial') {
-      try {
-        await consumeCredit(
-          base44.asServiceRole,
-          user.email,
-          activeSub.billing_cycle === 'yearly' ? 'yearly' : 'monthly',
-        );
-      } catch (e) {
-        console.error('[connectSessionStart] credit consume error:', e.message);
-      }
-    }
 
     // Increment server active_connections
     if (server_id) {

@@ -51,7 +51,7 @@ export default function ContactUs() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
             <div className="flex items-start gap-2 text-slate-400">
               <Building size={14} className="text-cyan-400 mt-0.5 flex-shrink-0" />
-              <div><span className="text-slate-500 text-xs">Legal Name:</span> <span className="text-white font-medium">VoxDigits Communications LLC</span></div>
+              <div><span className="text-slate-500 text-xs">Legal Name:</span> <span className="text-white font-medium">VoxTelefony Communications LLC</span></div>
             </div>
             <div className="flex items-start gap-2 text-slate-400">
               <Building size={14} className="text-cyan-400 mt-0.5 flex-shrink-0" />

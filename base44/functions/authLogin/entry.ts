@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const { email, password, device_id, device_name, device_type, device_fingerprint } = body;
+    const { email, password, device_id, device_name, device_type } = body;
 
     if (!email || !password) {
       return new Response(JSON.stringify({
@@ -40,39 +40,6 @@ Deno.serve(async (req) => {
     }
 
     const base44 = createClientFromRequest(req);
-
-    // ── iOS: authenticate in the client first, then validate the signed-in session ──
-    // Base44 server functions do not support password login. The client sends its
-    // authenticated session with this request, which we validate here before
-    // allowing free iOS access.
-    if (String(device_type || '').toLowerCase() === 'ios') {
-      const signedInUser = await base44.auth.me().catch(() => null);
-      if (!signedInUser || signedInUser.email?.toLowerCase() !== String(email).toLowerCase()) {
-        return new Response(JSON.stringify({
-          success: false,
-          message: 'Invalid email or password',
-        }), { status: 401, headers: CORS });
-      }
-
-      const appleEntitlements = await base44.asServiceRole.entities.AppleSubscriptionEntitlement.filter({
-        user_email: signedInUser.email,
-        status: 'active',
-      });
-      const activeApple = (appleEntitlements || []).find(item =>
-        item.expires_at && new Date(item.expires_at).getTime() > Date.now()
-      );
-
-      return new Response(JSON.stringify({
-        success: true,
-        user: { email: signedInUser.email, name: signedInUser.full_name || null },
-        access: {
-          tier: activeApple ? 'premium' : 'free',
-          status: activeApple ? 'active' : 'free',
-          product_id: activeApple?.product_id || null,
-          expires_at: activeApple?.expires_at || null,
-        },
-      }), { status: 200, headers: CORS });
-    }
 
     // ── Step 1: Verify the user exists in the registered User database ──
     // No auto-creation — if the email isn't in the User table, reject immediately.
@@ -109,52 +76,10 @@ Deno.serve(async (req) => {
 
     const userEmail = authUser?.email || email;
 
-    // ── Admin bypass: admins have no device limits, no subscription required ──
-    // Admins can log in on any device system without credits or expiry.
-    const isAdmin = registeredUsers[0]?.role === 'admin' || authUser?.role === 'admin';
-    if (isAdmin) {
-      return new Response(JSON.stringify({
-        success: true,
-        token,
-        user: { email: userEmail, name: authUser?.full_name || null },
-        subscription: {
-          plan: 'Admin',
-          status: 'active',
-          renewal_date: null,
-          max_devices: 999,
-          plan_tier: 5,
-        },
-      }), { status: 200, headers: CORS });
-    }
-
-    // ── Step 3: Device lock — one account per device, no re-registration after free use ──
-    // device_fingerprint is the stable browser/hardware hash from the client. The
-    // device tracker records the first account that claimed free credits on a device
-    // and blocks every other account from using it.
-    const fp = device_fingerprint || device_id;
-    if (fp) {
-      const fpDevices = await base44.asServiceRole.entities.DeviceFingerprint.filter({ fingerprint: fp });
-      const fpRecord = fpDevices && fpDevices[0];
-      if (fpRecord && fpRecord.status === 'blocked') {
-        return new Response(JSON.stringify({
-          success: false,
-          message: 'This device has been blocked. Please contact support.',
-        }), { status: 403, headers: CORS });
-      }
-      if (fpRecord && fpRecord.free_credits_claimed && fpRecord.user_email
-          && fpRecord.user_email.toLowerCase() !== userEmail.toLowerCase()) {
-        return new Response(JSON.stringify({
-          success: false,
-          message: 'This device is already linked to another account and cannot be used here.',
-        }), { status: 403, headers: CORS });
-      }
-    }
-
-    // ── Step 4: Verify the user has an ACTIVE VoxVPN subscription ──
-    // Free access is now a one-time 25-credit allowance, granted only after a $0 card
-    // authorization (setupPaymentAuth + deviceTracker). It is NOT auto-created here.
+    // ── Step 3: Verify the user has an ACTIVE VoxVPN subscription ──
+    // Applies to ALL users — no admin bypass, no exceptions.
     const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
-    let activeSub = subs && subs.length > 0
+    const activeSub = subs && subs.length > 0
       ? subs.find(s => s.status === 'active' || s.status === 'trial')
       : null;
 
@@ -162,12 +87,11 @@ Deno.serve(async (req) => {
       const hasSubRecords = subs && subs.length > 0;
       const subMsg = hasSubRecords
         ? 'Your subscription has expired or is not active. Please renew or choose a new plan.'
-        : 'Please add a payment method and activate your 25 free credits to start using VoxVPN.';
+        : 'No active subscription found. Please choose a plan to activate your VPN access.';
       return new Response(JSON.stringify({
         success: false,
         message: subMsg,
-        redirectToSetup: !hasSubRecords,
-        redirectToPricing: hasSubRecords,
+        redirectToPricing: true,
       }), { status: 403, headers: CORS });
     }
 

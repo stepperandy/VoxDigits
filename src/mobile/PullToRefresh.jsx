@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { RefreshCw } from 'lucide-react';
 
-export default function PullToRefresh({ onRefresh, children, className = '', style }) {
+export default function PullToRefresh({ onRefresh, children }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const startYRef = useRef(0);
@@ -48,7 +48,7 @@ export default function PullToRefresh({ onRefresh, children, className = '', sty
   }, [pullDistance, isRefreshing, onRefresh]);
 
   return (
-    <div ref={containerRef} className={`relative overflow-y-auto overscroll-none ${className}`} style={style}>
+    <div ref={containerRef} className="relative overflow-y-auto overscroll-none">
       {/* Pull indicator */}
       {pullDistance > 0 && (
         <div className="absolute top-0 left-0 right-0 flex justify-center items-center h-12 pointer-events-none">

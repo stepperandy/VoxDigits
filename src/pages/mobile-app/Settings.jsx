@@ -2,10 +2,30 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Shield, Bell, Moon, LogOut, ChevronRight,
-  Info, FileText, HelpCircle, Globe, CreditCard, Download, Trash2
+  Info, FileText, HelpCircle, Zap, Lock, Globe, Wifi
 } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
-import PullToRefresh from '@/mobile/PullToRefresh';
+
+function CyberToggle({ value, onChange }) {
+  return (
+    <button onClick={() => onChange(!value)}
+      className="flex-shrink-0 relative transition-all duration-300"
+      style={{ width: 48, height: 26 }}
+    >
+      <div className="absolute inset-0 rounded-full transition-all duration-300"
+        style={{
+          background: value ? 'rgba(0,212,255,0.2)' : 'rgba(255,255,255,0.06)',
+          border: `1px solid ${value ? 'rgba(0,212,255,0.5)' : 'rgba(255,255,255,0.1)'}`,
+          boxShadow: value ? '0 0 12px rgba(0,212,255,0.3)' : 'none',
+        }} />
+      <div className="absolute top-[3px] w-[20px] h-[20px] rounded-full transition-all duration-300"
+        style={{
+          left: value ? 'calc(100% - 23px)' : '3px',
+          background: value ? '#00d4ff' : '#475569',
+          boxShadow: value ? '0 0 8px rgba(0,212,255,0.8)' : 'none',
+        }} />
+    </button>
+  );
+}
 
 function ToggleRow({ icon: Icon, label, desc, value, onChange, iconColor = 'text-cyan-400' }) {
   return (
@@ -18,24 +38,7 @@ function ToggleRow({ icon: Icon, label, desc, value, onChange, iconColor = 'text
         <p className="text-white text-sm font-semibold leading-none">{label}</p>
         {desc && <p className="text-slate-600 text-xs mt-1">{desc}</p>}
       </div>
-      <button
-        onClick={() => onChange(!value)}
-        className="flex-shrink-0 relative transition-all duration-300"
-        style={{ width: 48, height: 26 }}
-      >
-        <div className="absolute inset-0 rounded-full transition-all duration-300"
-          style={{
-            background: value ? 'rgba(0,212,255,0.2)' : 'rgba(255,255,255,0.06)',
-            border: `1px solid ${value ? 'rgba(0,212,255,0.5)' : 'rgba(255,255,255,0.1)'}`,
-            boxShadow: value ? '0 0 12px rgba(0,212,255,0.3)' : 'none',
-          }} />
-        <div className="absolute top-[3px] w-[20px] h-[20px] rounded-full transition-all duration-300"
-          style={{
-            left: value ? 'calc(100% - 23px)' : '3px',
-            background: value ? '#00d4ff' : '#475569',
-            boxShadow: value ? '0 0 8px rgba(0,212,255,0.8)' : 'none',
-          }} />
-      </button>
+      <CyberToggle value={value} onChange={onChange} />
     </div>
   );
 }
@@ -56,35 +59,16 @@ function LinkRow({ icon: Icon, label, color = 'text-slate-400', iconBg = 'rgba(2
 export default function Settings() {
   const navigate = useNavigate();
   const email = localStorage.getItem('vpn_email') || 'Not signed in';
+  const [killSwitch, setKillSwitch] = useState(true);
+  const [autoConnect, setAutoConnect] = useState(false);
+  const [splitTunnel, setSplitTunnel] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(true);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-
-  const handleRefresh = async () => {
-    await new Promise((r) => setTimeout(r, 600));
-  };
 
   const handleLogout = () => {
     localStorage.removeItem('vpn_token');
     localStorage.removeItem('vpn_email');
-    localStorage.removeItem('subscription');
     navigate('/app/login');
-  };
-
-  const handleDeleteAccount = async () => {
-    if (!confirmDelete) {
-      setConfirmDelete(true);
-      return;
-    }
-    setDeleting(true);
-    try {
-      await base44.functions.invoke('deleteUserAccount', {});
-      handleLogout();
-    } catch (error) {
-      setDeleting(false);
-      alert('We could not delete your account. Please contact support.');
-    }
   };
 
   return (
@@ -104,11 +88,11 @@ export default function Settings() {
         </button>
         <div>
           <h1 className="text-white font-black text-xl leading-none">Settings</h1>
-          <p className="text-slate-600 text-xs mt-0.5">Account preferences</p>
+          <p className="text-slate-600 text-xs mt-0.5">Configure your VPN</p>
         </div>
       </div>
 
-      <PullToRefresh onRefresh={handleRefresh} className="flex-1 px-5 pb-8 flex flex-col gap-3 z-10 relative">
+      <div className="flex-1 px-5 pb-8 flex flex-col gap-3 overflow-y-auto z-10 relative">
 
         {/* Account card */}
         <div className="p-4 rounded-3xl" style={card}>
@@ -120,18 +104,23 @@ export default function Settings() {
             <div className="flex-1 min-w-0">
               <p className="text-white font-black text-sm">VoxVPN Account</p>
               <p className="text-slate-500 text-xs truncate mt-0.5">{email}</p>
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" style={{ boxShadow: '0 0 6px #00d4ff' }} />
+                <span className="text-cyan-400 text-[10px] font-bold uppercase tracking-wider">Premium Active</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Subscription & Billing */}
+        {/* VPN Settings */}
         <div className="rounded-3xl" style={card}>
           <div className="px-4 pt-4 pb-1">
-            <p className="text-[10px] text-slate-600 uppercase tracking-[0.2em] font-bold">Subscription</p>
+            <p className="text-[10px] text-slate-600 uppercase tracking-[0.2em] font-bold">VPN Protection</p>
           </div>
           <div className="px-4 pb-3 divide-y" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-            <LinkRow icon={CreditCard} label="About VoxVPN for iOS" color="text-cyan-400" onClick={() => navigate('/app/subscription')} />
-            <LinkRow icon={Download} label="Download Server Configs" color="text-violet-400" onClick={() => navigate('/app/servers')} />
+            <ToggleRow icon={Lock} label="Kill Switch" desc="Block traffic if VPN drops" value={killSwitch} onChange={setKillSwitch} iconColor="text-cyan-400" />
+            <ToggleRow icon={Wifi} label="Auto-Connect" desc="Connect on app launch" value={autoConnect} onChange={setAutoConnect} iconColor="text-violet-400" />
+            <ToggleRow icon={Zap} label="Split Tunneling" desc="Route select apps through VPN" value={splitTunnel} onChange={setSplitTunnel} iconColor="text-amber-400" />
           </div>
         </div>
 
@@ -141,7 +130,7 @@ export default function Settings() {
             <p className="text-[10px] text-slate-600 uppercase tracking-[0.2em] font-bold">App Preferences</p>
           </div>
           <div className="px-4 pb-3 divide-y" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-            <ToggleRow icon={Bell} label="Notifications" desc="Account &amp; renewal alerts" value={notifications} onChange={setNotifications} iconColor="text-emerald-400" />
+            <ToggleRow icon={Bell} label="Notifications" desc="Connection alerts" value={notifications} onChange={setNotifications} iconColor="text-emerald-400" />
             <ToggleRow icon={Moon} label="Dark Mode" value={darkMode} onChange={setDarkMode} iconColor="text-indigo-400" />
           </div>
         </div>
@@ -152,45 +141,11 @@ export default function Settings() {
             <p className="text-[10px] text-slate-600 uppercase tracking-[0.2em] font-bold">About</p>
           </div>
           <div className="px-4 pb-3 divide-y" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-            <LinkRow icon={Info} label="Version 2.124641.4" onClick={() => {}} />
+            <LinkRow icon={Info} label="Version 2.0.0" onClick={() => {}} />
             <LinkRow icon={Globe} label="Privacy Policy" onClick={() => window.open('/privacy-policy', '_blank')} />
             <LinkRow icon={HelpCircle} label="Support" onClick={() => window.open('/contact', '_blank')} />
             <LinkRow icon={FileText} label="Terms of Service" onClick={() => window.open('/terms-of-service', '_blank')} />
           </div>
-        </div>
-
-        {/* Companion app notice */}
-        <div className="p-4 rounded-3xl" style={card}>
-          <div className="flex items-start gap-3">
-            <Info size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
-            <p className="text-slate-400 text-[11px] leading-relaxed">
-              VoxVPN is a companion app for managing your account and downloading OpenVPN
-              configurations. VPN connections require the separate OpenVPN Connect app
-              installed on your device. VoxVPN does not establish the connection itself.
-            </p>
-          </div>
-        </div>
-
-        {/* Account deletion — required in-app for accounts created here */}
-        <div className="rounded-3xl p-4" style={{ ...card, border: '1px solid rgba(239,68,68,0.25)' }}>
-          <div className="flex items-start gap-3">
-            <Trash2 size={17} className="text-red-400 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="text-white text-sm font-bold">Delete account</p>
-              <p className="text-slate-400 text-xs mt-1">Permanently delete your VoxVPN account and associated data.</p>
-            </div>
-          </div>
-          {confirmDelete ? (
-            <div className="mt-3">
-              <p className="text-red-300 text-xs mb-3">This cannot be undone.</p>
-              <div className="flex gap-2">
-                <button onClick={() => setConfirmDelete(false)} className="flex-1 py-2 rounded-xl text-sm font-semibold text-slate-200 bg-slate-700">Cancel</button>
-                <button onClick={handleDeleteAccount} disabled={deleting} className="flex-1 py-2 rounded-xl text-sm font-bold text-white bg-red-600 disabled:opacity-50">{deleting ? 'Deleting…' : 'Confirm Delete'}</button>
-              </div>
-            </div>
-          ) : (
-            <button onClick={handleDeleteAccount} className="mt-3 w-full py-2 rounded-xl text-sm font-bold text-red-300 bg-red-500/10 border border-red-500/25">Delete Account</button>
-          )}
         </div>
 
         {/* Sign out */}
@@ -200,8 +155,8 @@ export default function Settings() {
           <LogOut size={16} /> Sign Out
         </button>
 
-        <p className="text-center text-slate-700 text-xs pb-4">VoxVPN v2.124641.4 · voxvpn.net</p>
-      </PullToRefresh>
+        <p className="text-center text-slate-700 text-xs pb-4">VoxVPN v2.0 · voxdigits.com</p>
+      </div>
     </div>
   );
 }

@@ -5,13 +5,7 @@ const DATA_LIMIT_GB = 50; // default monthly limit per user
 Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
 
-  // Admin subscriptions are exempt from data limits
-  const allUsers = await base44.asServiceRole.entities.User.list();
-  const adminEmails = new Set(
-    allUsers.filter(u => u.role === 'admin' || u.role === 'super_admin').map(u => u.email)
-  );
-  const subscriptions = (await base44.asServiceRole.entities.VPNSubscription.filter({ status: 'active' }))
-    .filter(s => !adminEmails.has(s.user_email));
+  const subscriptions = await base44.asServiceRole.entities.VPNSubscription.filter({ status: 'active' });
 
   const notified = [];
 

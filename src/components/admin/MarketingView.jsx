@@ -12,7 +12,7 @@ const TABS = [
 ];
 
 const PROMPTS = {
-  seo: `You are a VPN SEO expert. Generate SEO content for VoxVPN (www.voxvpn.net), a premium VPN service by VoxDigits Communications LLC.
+  seo: `You are a VPN SEO expert. Generate SEO content for VoxVPN (www.voxvpn.net), a premium VPN service by VoxTelefony Communications LLC.
 Return JSON with:
 - page_title: string (60 chars max, for homepage)
 - meta_description: string (155 chars max)
@@ -28,7 +28,7 @@ Return JSON with:
 - ad_extensions: object with: sitelinks (array of 4 with text and url), callouts (array of 6 short callout strings)
 - recommended_keywords: array of 6 high-intent keywords with match type (exact/phrase/broad)`,
 
-  social: `You are a social media marketing expert. Generate social media content for VoxVPN (www.voxvpn.net), a premium VPN service by VoxDigits Communications LLC.
+  social: `You are a social media marketing expert. Generate social media content for VoxVPN (www.voxvpn.net), a premium VPN service by VoxTelefony Communications LLC.
 Return JSON with:
 - twitter_posts: array of 4 tweets (max 280 chars each, include hashtags)
 - linkedin_post: string (professional tone, 150-200 words)

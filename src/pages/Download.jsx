@@ -293,7 +293,7 @@ export default function DownloadPage() {
                        <Star size={10} /> Official Installer
                      </span>
                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-400 text-xs font-mono">
-                       <Tag size={10} /> v2.5.0
+                       <Tag size={10} /> v3.0.0
                      </span>
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">
                       <CheckCircle2 size={10} /> Latest
@@ -337,7 +337,7 @@ export default function DownloadPage() {
                   {/* Release Notes */}
                   <div className="mt-6 pt-5 border-t border-white/5">
                     <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold mb-3">
-                       <FileText size={12} /> RELEASE NOTES — V2.5.0
+                       <FileText size={12} /> RELEASE NOTES — V3.0.0
                      </div>
                      <ul className="space-y-1.5 text-slate-400 text-xs">
                        {[
@@ -357,7 +357,7 @@ export default function DownloadPage() {
                   </div>
 
                   <p className="text-slate-700 text-xs mt-4 text-center">
-                     Download v2.5.0 directly · No external links required
+                     Download v3.0.0 directly · No external links required
                    </p>
                 </div>
                 </motion.div>
@@ -458,7 +458,7 @@ export default function DownloadPage() {
                           <span>·</span>
                           <span>{p.specs}</span>
                           <span>·</span>
-                          <span>20 Server Locations</span>
+                          <span>20+ Server Locations</span>
                         </div>
 
                         <button

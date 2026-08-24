@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Server, LogOut, Menu, X, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2, Handshake, Globe, Gift, ShieldCheck, Building2, Search, Briefcase, Languages, Mail } from 'lucide-react';
+import { LayoutDashboard, Users, Server, LogOut, Menu, X, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2, Handshake, Globe, Gift, ShieldCheck, Building2, Search, Briefcase } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
@@ -12,16 +12,13 @@ const navItems = [
   { icon: Activity, label: 'Server Status', id: 'server-status', desc: 'All VPN nodes & regions' },
   { icon: BarChart2, label: 'Connections', id: 'connections', desc: 'Connections, bandwidth & export' },
   { icon: Megaphone, label: 'Marketing', id: 'marketing', desc: 'SEO, PPC & AI campaigns' },
-  { icon: Mail, label: 'Broadcast', id: 'broadcast', desc: 'Email all users' },
   { icon: Search, label: 'Search Console', id: 'search-console', desc: 'Google search performance' },
   { icon: TrendingUp, label: 'Performance', id: 'marketing-performance', desc: 'SEO & PPC results by plan' },
   { icon: Handshake, label: 'Affiliates', id: 'affiliates', desc: 'Affiliates & partners' },
   { icon: Globe, label: 'Providers', id: 'providers', desc: 'Hybrid VPN provider APIs' },
   { icon: Users, label: 'Subscribers', id: 'subscribers', desc: 'Stats & download link' },
-  { icon: Mail, label: 'Broadcast Email', id: 'broadcast-email', desc: 'Email all users at once' },
   { icon: Gift, label: 'Grant Subscription', id: 'grant-subscription', desc: 'Manually activate plans' },
   { icon: ShieldCheck, label: 'Secure Files', id: 'secure-files', desc: 'Host installer files privately' },
-  { icon: Languages, label: 'Language Tester', id: 'language-tester', desc: 'Test detection & translations' },
   { icon: Building2, label: 'Agency Dashboard', id: 'agency-dashboard', desc: 'Clients, VPN access & devices' },
 ];
 

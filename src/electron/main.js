@@ -301,9 +301,17 @@ ipcMain.on('tray-update', (_e, { connected }) => {
   trayManager.updateTrayMenu(connected);
 });
 
-// ─── Find openvpn.exe ─────────────────────────────────────────────────────────
+// ─── Find OpenVPN binary ──────────────────────────────────────────────────────
 function findOpenvpn() {
-  const candidates = [
+  const isMac = process.platform === 'darwin';
+  const candidates = isMac ? [
+    '/opt/homebrew/bin/openvpn',          // Apple Silicon Homebrew
+    '/usr/local/bin/openvpn',             // Intel Homebrew
+    '/opt/homebrew/sbin/openvpn',
+    '/usr/local/sbin/openvpn',
+    '/Applications/Tunnelblick.app/Contents/Resources/openvpn/openvpn',
+    path.join(process.resourcesPath || '', 'openvpn', 'openvpn'),
+  ] : [
     'C:\\Program Files\\OpenVPN\\bin\\openvpn.exe',
     'C:\\Program Files (x86)\\OpenVPN\\bin\\openvpn.exe',
     path.join(process.resourcesPath || '', 'openvpn', 'openvpn.exe'),
@@ -399,6 +407,9 @@ function stopVpn() {
     openvpnProcess.kill();
     openvpnProcess = null;
   }
-  exec('taskkill /F /IM openvpn.exe', () => {});
+  const killCmd = process.platform === 'win32'
+    ? 'taskkill /F /IM openvpn.exe'
+    : 'pkill -f openvpn 2>/dev/null';
+  exec(killCmd, () => {});
   trayManager.updateTrayMenu(false);
 }
