@@ -92,6 +92,7 @@ const AccountMobile = lazy(() => import('./pages/AccountMobile.jsx'));
 const DeleteAccount = lazy(() => import('./pages/DeleteAccount.jsx'));
 const DeleteAccountGooglePlay = lazy(() => import('./pages/DeleteAccountGooglePlay.jsx'));
 const PaymentSuccess = lazy(() => import('./pages/PaymentSuccess.jsx'));
+const SetupPaymentSuccess = lazy(() => import('./pages/SetupPaymentSuccess.jsx'));
 const ReviewDemo = lazy(() => import('./pages/ReviewDemo.jsx'));
 const OsSetupGuide = lazy(() => import('./pages/OsSetupGuide.jsx'));
 const VpnLogin = lazy(() => import('./pages/VpnLogin.jsx'));
@@ -228,6 +229,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/delete-account" element={<PageTransition><DeleteAccount /></PageTransition>} />
           <Route path="/delete" element={<PageTransition><DeleteAccountGooglePlay /></PageTransition>} />
           <Route path="/payment-success" element={<PageTransition><PaymentSuccess /></PageTransition>} />
+          <Route path="/setup-payment-success" element={<PageTransition><SetupPaymentSuccess /></PageTransition>} />
           <Route path="/payment-failed" element={<PageTransition><PaymentFailed /></PageTransition>} />
           <Route path="/review" element={<ReviewDemo />} />
           <Route path="/setup-guide" element={<PageTransition><OsSetupGuide /></PageTransition>} />

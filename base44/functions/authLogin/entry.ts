@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const { email, password, device_id, device_name, device_type } = body;
+    const { email, password, device_id, device_name, device_type, device_fingerprint } = body;
 
     if (!email || !password) {
       return new Response(JSON.stringify({
@@ -127,44 +127,47 @@ Deno.serve(async (req) => {
       }), { status: 200, headers: CORS });
     }
 
-    // ── Step 3: Verify the user has an ACTIVE VoxVPN subscription ──
+    // ── Step 3: Device lock — one account per device, no re-registration after free use ──
+    // device_fingerprint is the stable browser/hardware hash from the client. The
+    // device tracker records the first account that claimed free credits on a device
+    // and blocks every other account from using it.
+    const fp = device_fingerprint || device_id;
+    if (fp) {
+      const fpDevices = await base44.asServiceRole.entities.DeviceFingerprint.filter({ fingerprint: fp });
+      const fpRecord = fpDevices && fpDevices[0];
+      if (fpRecord && fpRecord.status === 'blocked') {
+        return new Response(JSON.stringify({
+          success: false,
+          message: 'This device has been blocked. Please contact support.',
+        }), { status: 403, headers: CORS });
+      }
+      if (fpRecord && fpRecord.free_credits_claimed && fpRecord.user_email
+          && fpRecord.user_email.toLowerCase() !== userEmail.toLowerCase()) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: 'This device is already linked to another account and cannot be used here.',
+        }), { status: 403, headers: CORS });
+      }
+    }
+
+    // ── Step 4: Verify the user has an ACTIVE VoxVPN subscription ──
+    // Free access is now a one-time 25-credit allowance, granted only after a $0 card
+    // authorization (setupPaymentAuth + deviceTracker). It is NOT auto-created here.
     const subs = await base44.asServiceRole.entities.VPNSubscription.filter({ user_email: userEmail });
     let activeSub = subs && subs.length > 0
       ? subs.find(s => s.status === 'active' || s.status === 'trial')
       : null;
 
-    // ── Free trial: every new user gets 3 days free ──
-    if (!activeSub) {
-      const alreadyHadTrial = (subs || []).some(s => s.plan === 'Free Trial');
-
-      if (!alreadyHadTrial) {
-        const now = new Date();
-        activeSub = await base44.asServiceRole.entities.VPNSubscription.create({
-          user_email: userEmail,
-          plan: 'Free Trial',
-          status: 'trial',
-          billing_cycle: 'trial',
-          price: 0,
-          start_date: now.toISOString(),
-          renewal_date: new Date(now.getTime() + 3 * 86400000).toISOString(),
-          max_devices: 1,
-        });
-        console.log(`[authLogin] granted 3-day free trial to ${userEmail}`);
-      }
-    }
-
     if (!activeSub) {
       const hasSubRecords = subs && subs.length > 0;
-      const hadTrial = (subs || []).some(s => s.plan === 'Free Trial');
-      const subMsg = hadTrial
-        ? 'Your 3-day free trial has ended. Please choose a plan to continue using VoxVPN.'
-        : hasSubRecords
-          ? 'Your subscription has expired or is not active. Please renew or choose a new plan.'
-          : 'Please choose a plan to activate your VPN access.';
+      const subMsg = hasSubRecords
+        ? 'Your subscription has expired or is not active. Please renew or choose a new plan.'
+        : 'Please add a payment method and activate your 25 free credits to start using VoxVPN.';
       return new Response(JSON.stringify({
         success: false,
         message: subMsg,
-        redirectToPricing: true,
+        redirectToSetup: !hasSubRecords,
+        redirectToPricing: hasSubRecords,
       }), { status: 403, headers: CORS });
     }
 

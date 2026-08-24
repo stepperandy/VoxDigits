@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Eye, EyeOff, Lock, Mail, Zap, ArrowLeft } from 'lucide-react';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 import ChinaAccessNotice from '@/components/auth/ChinaAccessNotice';
+import { getDeviceFingerprint } from '@/lib/deviceFingerprint';
 import { LanguageContext } from '@/lib/LanguageContext';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -34,7 +35,9 @@ export default function AuthLogin() {
         if (!done && (me?.role === 'admin' || me?.role === 'super_admin')) {
           const params = new URLSearchParams(window.location.search);
           const next = params.get('next') || params.get('from_url');
-          window.location.href = next || '/dashboard';
+          // Authenticated admins skip the login screen and land in the admin
+          // panel automatically (unless an explicit redirect target was set).
+          window.location.href = next || '/admin';
           return;
         }
       } catch {
@@ -80,7 +83,8 @@ export default function AuthLogin() {
     setLoading(true);
     setError('');
     try {
-      const response = await base44.functions.invoke('authLogin', { email, password });
+      const fingerprint = await getDeviceFingerprint();
+      const response = await base44.functions.invoke('authLogin', { email, password, device_fingerprint: fingerprint });
       const data = response?.data || response;
 
       if (!data?.success) {

@@ -66,6 +66,34 @@
       "type": "string",
       "description": "Stripe subscription ID for billing"
     },
+    "stripe_customer_id": {
+      "type": "string",
+      "description": "Stripe customer ID created during $0 payment authorization"
+    },
+    "payment_method_id": {
+      "type": "string",
+      "description": "Stripe payment method ID saved during $0 authorization, charged after credits run out"
+    },
+    "payment_authorized": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the user completed the $0 card authorization required before free credits"
+    },
+    "credits_remaining": {
+      "type": "integer",
+      "default": 0,
+      "description": "Free credits remaining (1 credit = 1 VPN connection). 0 means the trial is exhausted."
+    },
+    "credits_total": {
+      "type": "integer",
+      "default": 0,
+      "description": "Total free credits granted for this trial (25)"
+    },
+    "credits_used": {
+      "type": "integer",
+      "default": 0,
+      "description": "Free credits consumed so far"
+    },
     "download_link": {
       "type": "string",
       "description": "Override download URL (admin-configurable)"

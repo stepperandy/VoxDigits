@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 import ChinaAccessNotice from '@/components/auth/ChinaAccessNotice';
+import { getDeviceFingerprint } from '@/lib/deviceFingerprint';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function AuthSignup() {
@@ -50,7 +51,38 @@ export default function AuthSignup() {
 
       if (res.data?.success) {
         setAlreadyRegistered(false);
-        navigate(`/signup-confirmation?email=${encodeURIComponent(email)}`);
+        // Enforce the device lock: a device that already claimed its free credits
+        // cannot register a new account. Then require a $0 card authorization before
+        // granting the 25 free credits.
+        try {
+          const fingerprint = await getDeviceFingerprint();
+          const elig = await base44.functions.invoke('deviceTracker', {
+            action: 'check_eligibility',
+            fingerprint,
+            user_email: email,
+          });
+          if (elig.data?.eligible === false) {
+            const reason = elig.data?.reason;
+            setError(
+              reason === 'device_blocked'
+                ? 'This device has been blocked and cannot create a new account.'
+                : 'This device has already used its free credits and cannot register another account.'
+            );
+            return;
+          }
+          const setup = await base44.functions.invoke('setupPaymentAuth', {
+            action: 'create',
+            customer_email: email,
+            fingerprint,
+          });
+          if (setup.data?.url) {
+            window.location.href = setup.data.url;
+            return;
+          }
+          navigate(`/signup-confirmation?email=${encodeURIComponent(email)}`);
+        } catch (e) {
+          setError(e?.message || 'Could not start payment authorization. Please try signing in.');
+        }
       } else {
         setError(res.data?.error || 'Signup failed');
       }

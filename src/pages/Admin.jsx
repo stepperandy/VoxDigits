@@ -59,6 +59,7 @@ export default function Admin() {
         </div>
       );
       case 'grant-subscription': return <GrantSubscriptionView />;
+      case 'broadcast-email': return <BroadcastEmailView />;
       case 'secure-files': return <SecureFilesView />;
       case 'language-tester': return <LanguageTester />;
       case 'agency-dashboard': return <AgencyDashboard />;
