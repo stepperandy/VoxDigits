@@ -16,6 +16,7 @@ const TEMPLATES = [
 export default function BroadcastEmailView() {
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
+  const [fromName, setFromName] = useState('VoxTelephony');
   const [segment, setSegment] = useState('all');
   const [sending, setSending] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -35,7 +36,12 @@ export default function BroadcastEmailView() {
     setError('');
     setResult(null);
     try {
-      const res = await base44.functions.invoke('broadcastEmail', { subject, body, segment });
+      const res = await base44.functions.invoke('broadcastEmail', {
+        subject,
+        body,
+        segment,
+        from_name: fromName || undefined,
+      });
       if (!res.data?.success) {
         setError(res.data?.error || 'Failed to send broadcast.');
       } else {
@@ -96,6 +102,18 @@ export default function BroadcastEmailView() {
               );
             })}
           </div>
+        </div>
+
+        {/* From name */}
+        <div>
+          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">From name</label>
+          <input
+            type="text"
+            value={fromName}
+            onChange={(e) => setFromName(e.target.value)}
+            placeholder="VoxTelephony"
+            className="w-full bg-[#060910] border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-slate-600 focus:outline-none focus:border-cyan-500/40"
+          />
         </div>
 
         {/* Subject */}
