@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Eye, EyeOff, Lock, Mail, Zap, ArrowLeft } from 'lucide-react';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 import ChinaAccessNotice from '@/components/auth/ChinaAccessNotice';
+import { getDeviceFingerprint } from '@/lib/deviceFingerprint';
 import { LanguageContext } from '@/lib/LanguageContext';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -80,7 +81,8 @@ export default function AuthLogin() {
     setLoading(true);
     setError('');
     try {
-      const response = await base44.functions.invoke('authLogin', { email, password });
+      const fingerprint = await getDeviceFingerprint();
+      const response = await base44.functions.invoke('authLogin', { email, password, device_fingerprint: fingerprint });
       const data = response?.data || response;
 
       if (!data?.success) {
