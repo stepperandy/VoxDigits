@@ -182,7 +182,7 @@ export default function SmsConsentOptIn() {
         </div>
 
         <p className="text-center text-xs text-gray-700 mt-6">
-          © VoxDigits Communications LLC. All rights reserved.
+          © VoxTelefony Communications LLC. All rights reserved.
         </p>
       </div>
     </div>

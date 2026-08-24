@@ -55,7 +55,7 @@ export default function Contact() {
         to: form.email,
         subject: "We received your message — VoxTelefony",
         body: `Hi ${form.name},\n\nThanks for reaching out to VoxTelefony. We've received your message and will get back to you within 4 business hours.\n\nYour topic: ${form.topic || "General Inquiry"}\n\nBest regards,\nThe VoxTelefony Team`,
-        from_name: "VoxDigits Support",
+        from_name: "VoxTelefony Support",
       });
       setSent(true);
       fireConversion("CONTACT");

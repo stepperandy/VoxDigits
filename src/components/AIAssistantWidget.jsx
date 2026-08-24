@@ -279,7 +279,7 @@ export default function AIAssistantWidget({ currentPageName }) {
                     {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                   </button>
                 </div>
-                <p className="text-center text-[10px] text-gray-600 mt-2">Powered by VoxDigits AI</p>
+                <p className="text-center text-[10px] text-gray-600 mt-2">Powered by VoxTelefony AI</p>
               </div>
             </>
           )}

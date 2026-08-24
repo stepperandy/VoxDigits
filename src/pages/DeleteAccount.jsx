@@ -9,7 +9,7 @@ export default function DeleteAccount() {
           {/* Header */}
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold text-white">Delete Your Account</h1>
-            <p className="text-gray-400">To delete your VoxDigits account, please contact our support team.</p>
+            <p className="text-gray-400">To delete your VoxTelefony account, please contact our support team.</p>
           </div>
 
           {/* Instructions */}
@@ -17,7 +17,7 @@ export default function DeleteAccount() {
             <p className="text-white font-semibold text-lg">Email us at:</p>
             
             <a
-              href="mailto:support@voxdigits.com?subject=Delete%20my%20VoxDigits%20account"
+              href="mailto:support@voxdigits.com?subject=Delete%20my%20VoxTelefony%20account"
               className="flex items-center gap-3 p-4 bg-cyan-500/10 border border-cyan-500/30 hover:border-cyan-500/50 rounded-lg transition-colors group"
             >
               <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">

@@ -177,7 +177,7 @@ export default function SupportChatWidget() {
               <HelpCircle className="w-4 h-4 text-cyan-400" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white font-semibold text-sm">VoxDigits Support</p>
+              <p className="text-white font-semibold text-sm">VoxTelefony Support</p>
               {!minimized && <p className="text-xs text-cyan-400/70 truncate">📍 {currentPage}</p>}
             </div>
             <div className="flex items-center gap-1">
@@ -215,7 +215,7 @@ export default function SupportChatWidget() {
                         <Bot className="w-3.5 h-3.5 text-cyan-400" />
                       </div>
                       <div className="bg-[#1a2d45] border border-white/8 rounded-2xl rounded-bl-none px-3.5 py-2.5 text-sm text-gray-200 max-w-[82%]">
-                        <p>Hi! 👋 I'm your VoxDigits support assistant.</p>
+                        <p>Hi! 👋 I'm your VoxTelefony support assistant.</p>
                         <p className="mt-1 text-gray-400 text-xs">I can see you're on <strong className="text-cyan-400">{currentPage}</strong>. How can I help?</p>
                       </div>
                     </div>
@@ -282,7 +282,7 @@ export default function SupportChatWidget() {
                     {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                   </button>
                 </div>
-                <p className="text-center text-[10px] text-gray-600 mt-2">Powered by VoxDigits AI</p>
+                <p className="text-center text-[10px] text-gray-600 mt-2">Powered by VoxTelefony AI</p>
               </div>
             </>
           )}

@@ -176,7 +176,7 @@ Questions and prompts submitted within ChatGPT are processed by OpenAI under Ope
 
 If you have any questions or concerns, contact us:
 
-VoxDigits Communications LLC
+VoxTelefony Communications LLC
 Email: privacy@voxtelefony.com
 Support: support@voxdigits.com
 Phone: +1 207 387 1513
@@ -192,7 +192,7 @@ This Privacy Policy is designed to comply with:
 
 By using VoxTelefony, you acknowledge that you have read and understood this Privacy Policy.`,
 
-    terms: `VoxDigits Communications LLC — Terms of Service
+    terms: `VoxTelefony Communications LLC — Terms of Service
 
 Effective Date: March 2026
 
@@ -255,7 +255,7 @@ The ChatGPT integration cannot access private account information or perform com
 
 For service and legal inquiries, contact: legal@voxtelefony.com or support@voxdigits.com`,
 
-    aup: `VoxDigits Communications LLC — Acceptable Use Policy
+    aup: `VoxTelefony Communications LLC — Acceptable Use Policy
 
 VoxTelefony services must be used responsibly and lawfully.
 
@@ -281,7 +281,7 @@ Contact
 
 For compliance questions: info@voxtelefony.com`,
 
-    refund: `VoxDigits Communications LLC — Refund Policy
+    refund: `VoxTelefony Communications LLC — Refund Policy
 
 Effective Date: March 2026
 
@@ -439,7 +439,7 @@ We may update this Cookie Policy periodically to reflect changes in technology, 
 
 If you have questions about our use of cookies, please contact:
 
-VoxDigits Communications LLC
+VoxTelefony Communications LLC
 Email: privacy@voxtelefony.com
 Website: https://voxtelefony.com
 Address: 16809 Capon Tree Ln, Woodbridge, VA 22191, USA`
@@ -509,7 +509,7 @@ Address: 16809 Capon Tree Ln, Woodbridge, VA 22191, USA`
             </div>
             <div>
               <p className="text-gray-400 mb-1">Company</p>
-              <p>VoxDigits Communications LLC</p>
+              <p>VoxTelefony Communications LLC</p>
             </div>
           </div>
         </div>

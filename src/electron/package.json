@@ -14,7 +14,7 @@
   "build": {
     "appId": "net.voxvpn.shield",
     "productName": "VoxShield",
-    "copyright": "Copyright © 2026 VoxDigits Communications LLC",
+    "copyright": "Copyright © 2026 VoxTelefony Communications LLC",
     "directories": {
       "output": "../installer/voxshield/output"
     },
