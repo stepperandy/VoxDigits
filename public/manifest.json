@@ -2,6 +2,7 @@
   "name": "VoxTelefony",
   "short_name": "VoxTelefony",
   "description": "Global virtual numbers, eSIM data plans, and secure connectivity.",
+  "id": "/",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a1628",
