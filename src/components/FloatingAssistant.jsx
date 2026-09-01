@@ -1,9 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { MessageCircle, X, Send, Loader2, Shield } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, Shield, Globe } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { useLanguage } from '@/lib/LanguageContext';
 
 const AGENT_NAME = 'voxvpn_support';
+
+const LANGUAGES = [
+  { code: 'en', label: 'English', flag: '🇬🇧' },
+  { code: 'es', label: 'Español', flag: '🇪🇸' },
+  { code: 'fr', label: 'Français', flag: '🇫🇷' },
+  { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
+  { code: 'zh', label: '中文', flag: '🇨🇳' },
+  { code: 'ja', label: '日本語', flag: '🇯🇵' },
+  { code: 'ru', label: 'Русский', flag: '🇷🇺' },
+  { code: 'ar', label: 'العربية', flag: '🇸🇦' },
+];
 
 export default function FloatingAssistant() {
   const [open, setOpen] = useState(false);
@@ -15,6 +27,14 @@ export default function FloatingAssistant() {
   const [error, setError] = useState(null);
   const bottomRef = useRef(null);
   const unsubscribeRef = useRef(null);
+  const { language, changeLanguage } = useLanguage();
+  const [langOpen, setLangOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setOpen(true);
+    window.addEventListener('open-voxvpn-assistant', handler);
+    return () => window.removeEventListener('open-voxvpn-assistant', handler);
+  }, []);
 
   useEffect(() => {
     if (open && !conversation && !initializing) {
@@ -75,6 +95,7 @@ export default function FloatingAssistant() {
   };
 
   const handleToggle = () => {
+    setLangOpen(false);
     setOpen((prev) => !prev);
   };
 
@@ -205,6 +226,33 @@ export default function FloatingAssistant() {
       >
         {open ? <X size={22} /> : <MessageCircle size={22} />}
       </button>
+
+      {/* Language switcher */}
+      <div className="relative">
+        {langOpen && (
+          <div className="absolute bottom-full mb-2 right-0 bg-[#0d1120] border border-white/10 rounded-xl shadow-2xl py-1 min-w-44 max-h-80 overflow-y-auto">
+            {LANGUAGES.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => { changeLanguage(lang.code); setLangOpen(false); }}
+                className={`w-full flex items-center gap-2 px-4 py-2 text-sm transition-colors whitespace-nowrap ${
+                  language === lang.code
+                    ? 'bg-cyan-500/10 text-cyan-400'
+                    : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <span>{lang.flag}</span> {lang.label}
+              </button>
+            ))}
+          </div>
+        )}
+        <button
+          onClick={() => setLangOpen((v) => !v)}
+          className="w-14 h-14 rounded-full bg-[#0d1120] hover:bg-[#141a28] border border-white/10 text-white shadow-lg flex items-center justify-center transition-all active:scale-95"
+        >
+          <Globe size={22} />
+        </button>
+      </div>
     </div>
   );
 }

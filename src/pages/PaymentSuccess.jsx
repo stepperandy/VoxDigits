@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { fireConversion } from '@/lib/gads';
 import { CheckCircle2, Download, Loader2, Monitor, Apple, Package, Smartphone, Router, Chrome } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -22,14 +21,8 @@ export default function PaymentSuccess() {
   ];
 
   useEffect(() => {
-    // Fire the PURCHASE conversion, then redirect to the dashboard. The short
-    // delay gives gtag time to send the beacon before the page unloads.
-    const sessionId = searchParams.get('session_id');
-    fireConversion('PURCHASE', sessionId ? { transaction_id: sessionId } : {});
-    const t = setTimeout(() => {
-      window.location.href = '/dashboard?payment=success';
-    }, 600);
-    return () => clearTimeout(t);
+    // Redirect to dashboard with success flag so they see the welcome banner
+    window.location.href = '/dashboard?payment=success';
   }, []);
 
   const handleDownload = async (deviceId) => {

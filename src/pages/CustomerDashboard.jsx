@@ -142,7 +142,7 @@ PersistentKeepalive = 25
     setPortalLoading(true);
     try {
       const res = await base44.functions.invoke('createStripePortal', {});
-      if (res.data?.url) window.open(res.data.url, '_blank');
+      if (res.data?.url) window.location.href = res.data.url;
       else alert(res.data?.error || 'Could not open billing portal. Please contact support.');
     } catch (err) {
       alert('Error: ' + err.message);

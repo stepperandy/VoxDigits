@@ -1,146 +1,122 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.41';
+
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Content-Type': 'application/json',
+};
+
+function isWireGuardPublicKey(value) {
+  if (typeof value !== 'string' || !/^[A-Za-z0-9+/]{43}=$/.test(value)) return false;
+  try {
+    return Uint8Array.from(atob(value), c => c.charCodeAt(0)).length === 32;
+  } catch {
+    return false;
+  }
+}
 
 Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
+
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401, headers: CORS });
 
     const body = await req.json().catch(() => ({}));
-    const { platform = 'windows', device_name, server_id } = body;
+    const { platform = 'ios', server_id = null, client_public_key } = body;
 
-    // Verify active subscription
-    const subs = await base44.entities.VPNSubscription.filter({ user_email: user.email });
-    const activeSub = subs.find(s => s.status === 'active');
-    if (!activeSub) {
-      return Response.json({ error: 'No active VoxVPN subscription found' }, { status: 403 });
+    if (String(platform).toLowerCase() !== 'ios') {
+      return Response.json({ error: 'This endpoint supports the VoxVPN iOS app only' }, { status: 400, headers: CORS });
+    }
+    if (!isWireGuardPublicKey(client_public_key)) {
+      return Response.json({ error: 'A valid WireGuard client public key is required' }, { status: 400, headers: CORS });
     }
 
-    // Check device limit
-    const existingDevices = await base44.entities.LinkedDevice.filter({ subscription_id: activeSub.id });
-    if (existingDevices.length >= (activeSub.max_devices || 2)) {
-      return Response.json({
-        error: `Device limit reached (${activeSub.max_devices} devices max for ${activeSub.plan} plan)`,
-        max_devices: activeSub.max_devices,
-        current_devices: existingDevices.length,
-      }, { status: 403 });
+    const appleEntitlements = await base44.asServiceRole.entities.AppleSubscriptionEntitlement.filter({
+      user_email: user.email,
+      status: 'active',
+    });
+    const activeApple = (appleEntitlements || []).find(item =>
+      item.expires_at && new Date(item.expires_at).getTime() > Date.now()
+    );
+
+    const online = await base44.asServiceRole.entities.VPNServer.filter({ status: 'online' });
+    const eligible = (online || []).filter(s => s.api_token && s.ip_address && s.public_key);
+    if (!eligible.length) {
+      return Response.json({ error: 'No provisionable VPN servers are available' }, { status: 503, headers: CORS });
     }
 
-    // Pick server — use requested server_id or lowest load
-    const servers = await base44.asServiceRole.entities.VPNServer.filter({ status: 'online' });
-    if (!servers || servers.length === 0) {
-      return Response.json({ error: 'No VoxVPN servers available' }, { status: 503 });
-    }
-
-    let server = server_id ? servers.find(s => s.id === server_id) : null;
+    let server = server_id ? eligible.find(s => s.id === server_id) : null;
     if (!server) {
-      server = servers.reduce((best, s) => {
-        const load = (s.active_connections || 0) / (s.max_connections || 100);
+      server = eligible.reduce((best, candidate) => {
+        const candidateLoad = (candidate.active_connections || 0) / (candidate.max_connections || 100);
         const bestLoad = (best.active_connections || 0) / (best.max_connections || 100);
-        return load < bestLoad ? s : best;
+        return candidateLoad < bestLoad ? candidate : best;
       });
     }
 
-    // Generate WireGuard client keypair (Curve25519-clamped)
-    const privateKeyBytes = crypto.getRandomValues(new Uint8Array(32));
-    privateKeyBytes[0] &= 248;
-    privateKeyBytes[31] &= 127;
-    privateKeyBytes[31] |= 64;
-    const privateKey = btoa(String.fromCharCode(...privateKeyBytes));
-
-    // Generate matching public key bytes (used for peer registration)
-    const publicKeyBytes = crypto.getRandomValues(new Uint8Array(32));
-    const clientPublicKey = btoa(String.fromCharCode(...publicKeyBytes));
-
-    // Call the VoxVPN peer API on the Vultr server to register this client
-    let vpnIp;
-    if (server.api_token) {
-      const peerApiUrl = `http://${server.ip_address}:3000/create-peer`;
-      const peerRes = await fetch(peerApiUrl, {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    let peerRes;
+    try {
+      peerRes = await fetch(`http://${server.ip_address}:3000/create-peer`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${server.api_token}`,
         },
-        body: JSON.stringify({ publicKey: clientPublicKey }),
+        body: JSON.stringify({ publicKey: client_public_key }),
+        signal: controller.signal,
       });
-
-      if (!peerRes.ok) {
-        const errText = await peerRes.text();
-        return Response.json({ error: `Peer registration failed: ${errText}` }, { status: 502 });
-      }
-
-      const peerData = await peerRes.json();
-      vpnIp = peerData.ip;
-    } else {
-      // Fallback: assign IP locally if peer API not configured yet
-      let hash = 0;
-      const seed = user.email + Date.now().toString();
-      for (let i = 0; i < seed.length; i++) {
-        hash = ((hash << 5) - hash) + seed.charCodeAt(i);
-        hash |= 0;
-      }
-      vpnIp = `10.8.0.${(Math.abs(hash) % 200) + 10}`;
+    } finally {
+      clearTimeout(timeout);
     }
 
-    // Save linked device
-    const deviceLabel = device_name || `${platform.charAt(0).toUpperCase() + platform.slice(1)} Device`;
-    const device = await base44.entities.LinkedDevice.create({
-      subscription_id: activeSub.id,
-      device_name: deviceLabel,
-      device_type: platform.toLowerCase(),
-      vpn_profile_key: privateKey,
-      ip_address: vpnIp,
-      status: 'active',
-      last_connected: new Date().toISOString(),
-    });
+    if (!peerRes.ok) {
+      const detail = (await peerRes.text()).slice(0, 200);
+      console.error('[vpnProvision] peer registration failed', peerRes.status, detail);
+      return Response.json({ error: 'VPN server could not register this device' }, { status: 502, headers: CORS });
+    }
 
-    // Increment active connections
+    const peer = await peerRes.json();
+    if (typeof peer?.ip !== 'string' || !/^\d{1,3}(\.\d{1,3}){3}$/.test(peer.ip)) {
+      return Response.json({ error: 'VPN server returned an invalid tunnel address' }, { status: 502, headers: CORS });
+    }
+
     await base44.asServiceRole.entities.VPNServer.update(server.id, {
       active_connections: (server.active_connections || 0) + 1,
     });
 
-    // Build WireGuard config
-    const configContent = `[Interface]
-PrivateKey = ${privateKey}
-Address = ${vpnIp}/32
-DNS = 8.8.8.8, 1.1.1.1
-
-[Peer]
-PublicKey = ${server.public_key}
-Endpoint = ${server.ip_address}:${server.port || 51820}
-AllowedIPs = 0.0.0.0/0, ::/0
-PersistentKeepalive = 25
-`;
-
-    // Upload config for download
-    const configFile = new File([configContent], `VoxVPN-${platform}-${user.email}.conf`, { type: 'text/plain' });
-    const uploadRes = await base44.asServiceRole.integrations.Core.UploadFile({ file: configFile });
-
     return Response.json({
       success: true,
-      device_id: device.id,
-      vpn_ip: vpnIp,
+      access: {
+        tier: activeApple ? 'premium' : 'free',
+        status: 'active',
+        product_id: activeApple?.product_id || null,
+        expires_at: activeApple?.expires_at || null,
+      },
       server: {
         id: server.id,
-        name: `VoxVPN ${server.city || server.region}`,
-        region: server.region,
-        ip_address: server.ip_address,
-        port: server.port || 51820,
+        name: `VoxVPN ${server.city || server.region || server.country || 'Server'}`,
+        region: server.region || null,
+        country: server.country || null,
       },
-      config_url: uploadRes.file_url,
-      config_content: configContent,
-      subscription: {
-        plan: activeSub.plan,
-        devices_used: existingDevices.length + 1,
-        max_devices: activeSub.max_devices,
+      tunnel: {
+        address: `${peer.ip}/32`,
+        dns: '1.1.1.1, 1.0.0.1',
+        endpoint: `${server.ip_address}:${server.port || 51820}`,
+        server_public_key: server.public_key,
+        allowed_ips: '0.0.0.0/0, ::/0',
+        persistent_keepalive: 25,
       },
-    });
-
+    }, { headers: CORS });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    const message = error?.name === 'AbortError'
+      ? 'VPN server provisioning timed out'
+      : 'Unable to provision the VPN tunnel';
+    console.error('[vpnProvision]', error?.message || error);
+    return Response.json({ error: message }, { status: 500, headers: CORS });
   }
 });

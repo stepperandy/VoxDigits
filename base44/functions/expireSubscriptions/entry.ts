@@ -29,7 +29,13 @@ Deno.serve(async (req) => {
     // Fetch all active and trial subscriptions
     const activeSubs = await base44.asServiceRole.entities.VPNSubscription.filter({ status: 'active' });
     const trialSubs = await base44.asServiceRole.entities.VPNSubscription.filter({ status: 'trial' });
-    const allSubs = [...activeSubs, ...trialSubs];
+
+    // Admin subscriptions never expire — exclude admin users from the sweep
+    const allUsers = await base44.asServiceRole.entities.User.list();
+    const adminEmails = new Set(
+      allUsers.filter(u => u.role === 'admin' || u.role === 'super_admin').map(u => u.email)
+    );
+    const allSubs = [...activeSubs, ...trialSubs].filter(s => !adminEmails.has(s.user_email));
 
     let expiredCount = 0;
     let devicesDeactivated = 0;

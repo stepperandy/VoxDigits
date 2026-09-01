@@ -61,6 +61,7 @@ Deno.serve(async (req) => {
         role: 'client_admin',
         client_id: client.id,
         is_active: true,
+        is_verified: true,
         phone: contact_phone || null,
         job_title: 'Business Owner',
         last_login: new Date().toISOString(),
