@@ -42,19 +42,23 @@ export default function DownloadsSection({ isAdmin = false }) {
 
   useEffect(() => {
     setLoading(true);
-    base44.entities.Download.list()
-      .then(records => {
-        const active = (records || []).filter(d => d.is_active !== false);
-        let filtered;
-        if (isAdmin) {
-          filtered = active;
-        } else {
-          // Only show installers matching the user's detected OS
-          filtered = active.filter(d => d.platform === detectedPlatform);
-        }
-        setDownloads(filtered);
-      })
-      .catch(() => setDownloads([]))
+    // Business-labeled installers (VoxShield / business_only) are only visible
+    // to users with a business account status or admins.
+    const isBusinessInstaller = (d) => d.business_only === true || /business|shield/i.test(d.name || '');
+    const isBusinessUser = (me) => me && ['admin', 'super_admin', 'agency_admin', 'client_admin'].includes(me.role);
+
+    Promise.all([
+      base44.entities.Download.list().catch(() => []),
+      base44.auth.me().catch(() => null),
+    ]).then(([records, me]) => {
+      const active = (records || []).filter(d => d.is_active !== false);
+      let filtered = active.filter(d => isAdmin || isBusinessUser(me) || !isBusinessInstaller(d));
+      if (!isAdmin) {
+        // Only show installers matching the user's detected OS
+        filtered = filtered.filter(d => d.platform === detectedPlatform);
+      }
+      setDownloads(filtered);
+    })
       .finally(() => setLoading(false));
   }, [isAdmin, detectedPlatform]);
 
