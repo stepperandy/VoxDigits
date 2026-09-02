@@ -46,7 +46,7 @@ export default function InstallerTab({ client, subscriptions }) {
     const init = async () => {
       try {
         const me = await base44.auth.me();
-        setIsAdmin(me?.role === 'admin' || me?.role === 'super_admin');
+        setIsAdmin(['admin', 'super_admin', 'agency_admin', 'client_admin'].includes(me?.role));
       } catch { /* ignore */ }
 
       try {
