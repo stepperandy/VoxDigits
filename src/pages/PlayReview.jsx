@@ -132,7 +132,7 @@ export default function PlayReview() {
                 </a>
               </div>
             </div>
-            <p className="text-slate-300 text-sm font-semibold mt-4">VoxDigits Communications LLC</p>
+            <p className="text-slate-300 text-sm font-semibold mt-4">VoxTelefony Communications LLC</p>
           </div>
         </div>
       </div>

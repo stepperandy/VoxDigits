@@ -5,9 +5,9 @@ const { spawn, exec } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 
-const APP_VERSION = '3.0.0';
-const APP_NAME = 'VoxVPN Shield Agent';
-const BASE44_APP_ID = '69c84f61d5543b54fe26e1e5';
+const APP_VERSION = '1.0.0';
+const APP_NAME = 'VoxTelefony';
+const BASE44_APP_ID = '69b202c06dc5b1988efe9645';
 const BASE_FN = `https://api.base44.com/api/apps/${BASE44_APP_ID}/functions`;
 
 let mainWindow = null;
@@ -20,7 +20,7 @@ let dnsFilterActive = false;
 let dnsBlocklist = [];
 
 // ─── Secure token store (encrypted via OS keychain) ───────────────────────────
-const TOKEN_FILE = path.join(app.getPath('userData'), 'voxvpn_shield.enc');
+const TOKEN_FILE = path.join(app.getPath('userData'), 'voxtelefony.enc');
 
 function saveToken(token) {
   if (!token) return;
@@ -46,7 +46,7 @@ function clearToken() {
 }
 
 // ─── Auto-start with Windows ───────────────────────────────────────────────────
-const AUTOSTART_KEY = 'VoxVPNShieldAgent';
+const AUTOSTART_KEY = 'VoxTelefony';
 
 function enableAutoStart() {
   if (process.platform !== 'win32') return;
@@ -71,8 +71,8 @@ function isAutoStartEnabled() {
 
 // ─── DNS Filtering via Windows hosts file ──────────────────────────────────────
 const HOSTS_FILE = 'C:\\Windows\\System32\\drivers\\etc\\hosts';
-const HOSTS_MARKER_START = '# === VoxVPN Shield DNS Filter Start ===';
-const HOSTS_MARKER_END = '# === VoxVPN Shield DNS Filter End ===';
+const HOSTS_MARKER_START = '# === VoxTelefony DNS Filter Start ===';
+const HOSTS_MARKER_END = '# === VoxTelefony DNS Filter End ===';
 
 function applyDnsFiltering(domains) {
   if (process.platform !== 'win32') return false;
@@ -301,9 +301,17 @@ ipcMain.on('tray-update', (_e, { connected }) => {
   trayManager.updateTrayMenu(connected);
 });
 
-// ─── Find openvpn.exe ─────────────────────────────────────────────────────────
+// ─── Find OpenVPN binary ──────────────────────────────────────────────────────
 function findOpenvpn() {
-  const candidates = [
+  const isMac = process.platform === 'darwin';
+  const candidates = isMac ? [
+    '/opt/homebrew/bin/openvpn',          // Apple Silicon Homebrew
+    '/usr/local/bin/openvpn',             // Intel Homebrew
+    '/opt/homebrew/sbin/openvpn',
+    '/usr/local/sbin/openvpn',
+    '/Applications/Tunnelblick.app/Contents/Resources/openvpn/openvpn',
+    path.join(process.resourcesPath || '', 'openvpn', 'openvpn'),
+  ] : [
     'C:\\Program Files\\OpenVPN\\bin\\openvpn.exe',
     'C:\\Program Files (x86)\\OpenVPN\\bin\\openvpn.exe',
     path.join(process.resourcesPath || '', 'openvpn', 'openvpn.exe'),
@@ -316,10 +324,10 @@ ipcMain.handle('vpn-connect', async (_e, { ovpnContent }) => {
   stopVpn();
 
   const bin = findOpenvpn();
-  if (!bin) return { ok: false, error: 'OpenVPN not found. Please reinstall VoxVPN Shield Agent.' };
+  if (!bin) return { ok: false, error: 'OpenVPN not found. Please reinstall VoxTelefony.' };
 
-  const tmpFile = path.join(os.tmpdir(), 'voxvpn-shield-active.ovpn');
-  const logFile = path.join(os.tmpdir(), 'voxvpn-shield.log');
+  const tmpFile = path.join(os.tmpdir(), 'voxtelefony-active.ovpn');
+  const logFile = path.join(os.tmpdir(), 'voxtelefony.log');
   fs.writeFileSync(tmpFile, ovpnContent, 'utf8');
 
   return new Promise((resolve) => {
@@ -384,7 +392,7 @@ ipcMain.handle('vpn-status', () => ({
 
 // ─── Read last log lines ───────────────────────────────────────────────────────
 ipcMain.handle('vpn-get-log', () => {
-  const logFile = path.join(os.tmpdir(), 'voxvpn-shield.log');
+  const logFile = path.join(os.tmpdir(), 'voxtelefony.log');
   try {
     const content = fs.readFileSync(logFile, 'utf8');
     return content.trim().split('\n').slice(-20).join('\n');
@@ -399,6 +407,9 @@ function stopVpn() {
     openvpnProcess.kill();
     openvpnProcess = null;
   }
-  exec('taskkill /F /IM openvpn.exe', () => {});
+  const killCmd = process.platform === 'win32'
+    ? 'taskkill /F /IM openvpn.exe'
+    : 'pkill -f openvpn 2>/dev/null';
+  exec(killCmd, () => {});
   trayManager.updateTrayMenu(false);
 }

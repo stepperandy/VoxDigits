@@ -312,7 +312,7 @@ export default function DeleteAccountGooglePlay() {
 
         {/* Footer note */}
         <p className="text-center text-slate-600 text-xs mt-10 leading-relaxed max-w-lg mx-auto">
-          VoxVPN is a product of VoxDigits Communications LLC. For questions about data deletion,
+          VoxVPN is a product of VoxTelefony Communications LLC. For questions about data deletion,
           contact <a href="mailto:support@voxdigits.com" className="text-cyan-400 hover:underline">support@voxdigits.com</a>.
           See our <Link to="/privacy-policy" className="text-cyan-400 hover:underline">Privacy Policy</Link> for full details.
         </p>

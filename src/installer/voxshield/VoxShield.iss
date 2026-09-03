@@ -41,7 +41,7 @@ SetupMutex=VoxShieldSetupMutex
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional Icons:"; Flags: checkedonce
+Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional Icons:"; Flags: unchecked
 Name: "startupicon"; Description: "Start {#AppShortName} automatically at login"; GroupDescription: "Additional Icons:"; Flags: checkedonce
 
 [Files]
