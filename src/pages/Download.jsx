@@ -334,6 +334,29 @@ export default function DownloadPage() {
                     </button>
                   </div>
 
+                  {/* Step-by-step install guide */}
+                  <div className="mt-6 pt-5 border-t border-white/5">
+                    <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold mb-3">
+                      <FileText size={12} /> HOW TO INSTALL & VERIFY THE DESKTOP ICON
+                    </div>
+                    <ol className="space-y-2.5">
+                      {[
+                        'Click "Download .exe" above and save the installer to your Downloads folder.',
+                        'Open the downloaded file (VoxVPN Windows Setup) — if Windows SmartScreen appears, click "More info" then "Run anyway".',
+                        'Follow the setup wizard. The "Create desktop icon" option is pre-checked — leave it selected.',
+                        'Click Install and wait for the installation to finish.',
+                        'Once done, look at your desktop — the VoxVPN icon should appear. If it\'s missing, open the Start Menu, right-click "VoxVPN" and choose "Open file location" to drag the shortcut to your desktop.',
+                      ].map((step, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <span className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-black text-black" style={{ background: '#00d4ff', marginTop: '2px' }}>
+                            {i + 1}
+                          </span>
+                          <span className="text-slate-400 text-xs leading-relaxed">{step}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+
                   {/* Release Notes */}
                   <div className="mt-6 pt-5 border-t border-white/5">
                     <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold mb-3">
