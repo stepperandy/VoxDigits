@@ -41,11 +41,15 @@
       "target": [
         { "target": "nsis", "arch": ["x64"] }
       ],
+      "icon": "../installer/windows/assets/icon.ico",
       "requestedExecutionLevel": "requireAdministrator"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
+      "installerIcon": "../installer/windows/assets/icon.ico",
+      "uninstallerIcon": "../installer/windows/assets/icon.ico",
+      "installerHeaderIcon": "../installer/windows/assets/icon.ico",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "runAfterFinish": true
