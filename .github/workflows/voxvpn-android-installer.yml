@@ -52,13 +52,15 @@ jobs:
 
           gradle_file = Path('src/android/app/build.gradle')
           g = gradle_file.read_text(encoding='utf-8')
+          if 'namespace "com.voxvpn.mobile"' not in g:
+              g = g.replace('android {', 'android {\n    namespace "com.voxvpn.mobile"', 1)
           g = re.sub(r'versionCode\s+\d+', 'versionCode 4', g, count=1)
           g = re.sub(r'versionName\s+"[^"]+"', 'versionName "2.5.6"', g, count=1)
           gradle_file.write_text(g, encoding='utf-8')
 
       - name: Build installable APK
         working-directory: src/android
-        run: gradle clean assembleDebug --no-daemon --stacktrace
+        run: gradle clean assembleDebug --no-daemon
 
       - name: Rename APK
         run: |
