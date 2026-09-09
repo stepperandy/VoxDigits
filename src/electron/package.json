@@ -5,30 +5,35 @@
   "main": "main.js",
   "private": true,
   "scripts": {
-    "dev":        "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
-    "build":      "vite build",
-    "build:win":  "electron-builder --win",
-    "build:mac":  "electron-builder --mac",
-    "build:linux":"electron-builder --linux"
+    "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "build": "vite build",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
   },
   "build": {
     "appId": "net.voxvpn.shield",
-    "productName": "VoxShield",
+    "productName": "VoxVPN Shield Agent",
     "copyright": "Copyright © 2026 VoxDigits Communications LLC",
     "directories": {
       "output": "../installer/voxshield/output"
     },
     "files": [
-      "../dist/**/*",
       "main.js",
       "preload.js",
       "api.js",
-      "*.jsx"
+      "*.jsx",
+      "package.json"
     ],
     "extraResources": [
       {
+        "from": "../dist",
+        "to": "dist",
+        "filter": ["**/*"]
+      },
+      {
         "from": "../assets/configs",
-        "to":   "configs",
+        "to": "configs",
         "filter": ["**/*.ovpn"]
       }
     ],
@@ -36,22 +41,17 @@
       "target": [
         { "target": "nsis", "arch": ["x64"] }
       ],
-      "icon": "../installer/windows/assets/icon.ico",
       "requestedExecutionLevel": "requireAdministrator"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "installerIcon": "../installer/windows/assets/icon.ico",
-      "uninstallerIcon": "../installer/windows/assets/icon.ico",
-      "installerHeaderIcon": "../installer/windows/assets/icon.ico",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "runAfterFinish": true
     },
     "mac": {
       "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }],
-      "icon": "../installer/voxshield/assets/icon.icns",
       "category": "public.app-category.utilities",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
@@ -60,7 +60,6 @@
     },
     "linux": {
       "target": [{ "target": "AppImage", "arch": ["x64"] }],
-      "icon": "../installer/voxshield/assets/icon.png",
       "category": "Network"
     }
   },
