@@ -1,4 +1,4 @@
-name: VoxVPN Android v2.5.6 Installer
+name: VoxVPN Android v2.5.6 Production Release
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-apk:
+  build-android-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
         with:
           gradle-version: '8.2.1'
 
-      - name: Apply Android v2.5.6 server list and version
+      - name: Apply Android v2.5.6 release configuration
         shell: python
         run: |
           from pathlib import Path
@@ -60,25 +60,38 @@ jobs:
           g = g.replace("implementation 'androidx.compose.material.icons:material-icons-extended'", "implementation 'androidx.compose.material:material-icons-extended:1.6.1'")
           gradle_file.write_text(g, encoding='utf-8')
 
-          # The Compose MainActivity is the standalone Android app. The separate
-          # VoxVpnPlugin.kt is a Capacitor/OpenVPN bridge that belongs to another
-          # integration and its dependencies are not part of this Gradle project.
           plugin = Path('src/android/app/src/main/java/com/voxvpn/mobile/VoxVpnPlugin.kt')
           if plugin.exists():
               plugin.unlink()
 
-      - name: Build installable APK
-        working-directory: src/android
-        run: gradle clean assembleDebug --no-daemon
+      - name: Decode production signing keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          test -n "$ANDROID_KEYSTORE_BASE64" || (echo "ANDROID_KEYSTORE_BASE64 secret is missing" && exit 1)
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > src/android/app/voxvpn-release.keystore
 
-      - name: Rename APK
+      - name: Build signed release APK and AAB
+        working-directory: src/android
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          test -n "$KEYSTORE_PASSWORD" || (echo "ANDROID_KEYSTORE_PASSWORD secret is missing" && exit 1)
+          test -n "$KEY_PASSWORD" || (echo "ANDROID_KEY_PASSWORD secret is missing" && exit 1)
+          gradle clean assembleRelease bundleRelease --no-daemon
+
+      - name: Prepare release files
         run: |
           mkdir -p dist
-          cp src/android/app/build/outputs/apk/debug/app-debug.apk dist/VoxVPN-Android-v2.5.6-13-Servers.apk
+          cp src/android/app/build/outputs/apk/release/app-release.apk dist/VoxVPN-Android-v2.5.6-13-Servers-Release.apk
+          cp src/android/app/build/outputs/bundle/release/app-release.aab dist/VoxVPN-Android-v2.5.6-13-Servers-PlayStore.aab
+          sha256sum dist/* > dist/SHA256SUMS.txt
 
-      - name: Upload Android installer
+      - name: Upload production Android release
         uses: actions/upload-artifact@v4
         with:
-          name: VoxVPN-Android-v2.5.6-13-Servers
-          path: dist/VoxVPN-Android-v2.5.6-13-Servers.apk
+          name: VoxVPN-Android-v2.5.6-Production
+          path: dist/
           if-no-files-found: error
+          retention-days: 90
