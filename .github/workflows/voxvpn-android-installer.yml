@@ -60,6 +60,13 @@ jobs:
           g = g.replace("implementation 'androidx.compose.material.icons:material-icons-extended'", "implementation 'androidx.compose.material:material-icons-extended:1.6.1'")
           gradle_file.write_text(g, encoding='utf-8')
 
+          # The Compose MainActivity is the standalone Android app. The separate
+          # VoxVpnPlugin.kt is a Capacitor/OpenVPN bridge that belongs to another
+          # integration and its dependencies are not part of this Gradle project.
+          plugin = Path('src/android/app/src/main/java/com/voxvpn/mobile/VoxVpnPlugin.kt')
+          if plugin.exists():
+              plugin.unlink()
+
       - name: Build installable APK
         working-directory: src/android
         run: gradle clean assembleDebug --no-daemon
