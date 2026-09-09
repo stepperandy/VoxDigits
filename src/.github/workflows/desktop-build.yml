@@ -1,31 +1,17 @@
-name: VoxVPN Desktop V2.0 — Build & Release
+name: VoxVPN Desktop V3.0 — Build & Release
 
 on:
+  workflow_dispatch:
   push:
-    branches: [main, develop]
-    tags: ['v*']
-  pull_request:
-    branches: [main]
+    branches: [main, voxvpn-windows-v3-release]
+    tags: ['v3.*']
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        include:
-          - os: windows-latest
-            build_cmd: npm run build:win
-            artifact_name: VoxVPN-2.0-windows-setup
-            artifact_path: installer/windows/output
-          - os: macos-latest
-            build_cmd: npm run build:mac
-            artifact_name: VoxVPN-2.0-macos
-            artifact_path: installer/windows/output
-          - os: ubuntu-latest
-            build_cmd: npm run build:linux
-            artifact_name: VoxVPN-2.0-linux
-            artifact_path: installer/windows/output
-
-    runs-on: ${{ matrix.os }}
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: src
 
     steps:
       - uses: actions/checkout@v4
@@ -34,55 +20,77 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install root dependencies
+        run: npm install
 
-      - name: Build Vite + Electron
-        run: ${{ matrix.build_cmd }}
-        env:
-          BASE44_APP_ID: 69c84f61d5543b54fe26e1e5
-          WIN_SIGNING_CERT:      ${{ secrets.WIN_SIGNING_CERT }}
-          WIN_SIGNING_PASSWORD:  ${{ secrets.WIN_SIGNING_PASSWORD }}
-          APPLE_ID:              ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD:        ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID:         ${{ secrets.APPLE_TEAM_ID }}
+      - name: Build Vite app
+        run: npm run build
 
-      - name: Upload build artifact
+      - name: Install Electron dependencies
+        working-directory: src/electron
+        run: npm install
+
+      - name: Build unpacked Windows Electron app
+        working-directory: src/electron
+        run: npx electron-builder --win --x64 --dir
+
+      - name: Stage Electron output for Inno Setup
+        shell: pwsh
+        run: |
+          $source = "installer/voxshield/output/win-unpacked"
+          $target = "installer/windows/dist/win-unpacked"
+          if (!(Test-Path $source)) { throw "Missing electron-builder output: $source" }
+          New-Item -ItemType Directory -Force -Path $target | Out-Null
+          Copy-Item "$source/*" $target -Recurse -Force
+          if (!(Test-Path "$target/VoxVPN Shield Agent.exe")) { throw "VoxVPN Shield Agent.exe was not produced" }
+
+      - name: Download OpenVPN Community MSI
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "installer/windows/assets" | Out-Null
+          Invoke-WebRequest -Uri "https://swupdate.openvpn.org/community/releases/OpenVPN-2.7.7-I001-amd64.msi" -OutFile "installer/windows/assets/OpenVPN-2.7.7-I001-amd64.msi"
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --no-progress -y
+
+      - name: Compile production installer
+        shell: pwsh
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "installer/windows/VoxVPN.iss"
+          if (!(Test-Path "installer/windows/output/VoxVPN-Shield-Setup-3.0.0.exe")) { throw "Installer was not produced" }
+
+      - name: Upload Windows installer artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact_name }}
-          path: ${{ matrix.artifact_path }}
+          name: VoxVPN-Shield-Setup-3.0.0
+          path: src/installer/windows/output/VoxVPN-Shield-Setup-3.0.0.exe
 
-      - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Publish tagged GitHub release
+        if: startsWith(github.ref, 'refs/tags/v3.')
         uses: softprops/action-gh-release@v2
         with:
           name: VoxVPN ${{ github.ref_name }}
           body: |
-            ## VoxVPN Desktop ${{ github.ref_name }}
+            # VoxVPN Shield Agent ${{ github.ref_name }}
 
-            ### What's new in V2.0
-            - Unified authentication with voxvpn.net (Base44 backend)
-            - OS-encrypted token storage (Windows DPAPI / macOS Keychain)
-            - Auto-update notifications via `latestVersion` endpoint
-            - Heartbeat subscription enforcement
-            - Session lifecycle (start / end / heartbeat) fully wired to live backend
-            - V1.5 local Express proxy server removed
-          files: ${{ matrix.artifact_path }}/**/*
+            Production Windows desktop release.
+
+            ## Included
+            - VoxVPN desktop application for Windows 10/11 x64
+            - OpenVPN Community Edition and required network drivers
+            - VoxVPN account authentication
+            - Dynamic server and OpenVPN profile retrieval from the VoxVPN backend
+            - System tray integration
+            - Kill switch
+            - DNS protection
+            - Auto-start option
+            - Update checking
+
+            Download `VoxVPN-Shield-Setup-3.0.0.exe` below and run it as Administrator.
+          files: src/installer/windows/output/VoxVPN-Shield-Setup-3.0.0.exe
           draft: false
-          prerelease: ${{ contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Notify Slack on failure
-        if: failure()
-        uses: slackapi/slack-github-action@v2
-        with:
-          payload: |
-            {
-              "text": "❌ VoxVPN V2.0 desktop build failed on *${{ matrix.os }}* — <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
