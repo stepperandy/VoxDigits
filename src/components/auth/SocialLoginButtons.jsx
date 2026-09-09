@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Loader2 } from 'lucide-react';
+import { LanguageContext } from '@/lib/LanguageContext';
 
 const GoogleIcon = () => (
   <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
@@ -42,6 +43,8 @@ const PROVIDERS = [
 export default function SocialLoginButtons({ redirectUrl = '/dashboard' }) {
   const [loadingProvider, setLoadingProvider] = useState(null);
   const [error, setError] = useState('');
+  const { language } = useContext(LanguageContext);
+  const inChina = language === 'zh';
 
   const handleSocialLogin = async (providerId) => {
     setLoadingProvider(providerId);
@@ -49,7 +52,10 @@ export default function SocialLoginButtons({ redirectUrl = '/dashboard' }) {
     try {
       await base44.auth.loginWithProvider(providerId, redirectUrl);
     } catch (err) {
-      setError(`${providerId} sign-in failed. Please try again.`);
+      const hint = inChina
+        ? `${providerId} 登录失败 — 该社交平台在中国大陆可能被屏蔽，请改用邮箱登录。`
+        : `${providerId} sign-in failed. Please try again or use email login.`;
+      setError(hint);
       setLoadingProvider(null);
     }
   };
@@ -58,6 +64,11 @@ export default function SocialLoginButtons({ redirectUrl = '/dashboard' }) {
     <div className="space-y-3">
       {error && (
         <p className="text-center text-red-400 text-xs">{error}</p>
+      )}
+      {inChina && (
+        <p className="text-center text-amber-400/80 text-[11px] leading-relaxed">
+          ⚠️ 社交登录在中国大陆可能无法使用，建议使用邮箱登录
+        </p>
       )}
       {PROVIDERS.map(({ id, label, Icon, bg, ring }) => (
         <button

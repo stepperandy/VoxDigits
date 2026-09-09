@@ -70,6 +70,11 @@
       "default": true,
       "description": "Visible to users"
     },
+    "business_only": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, the installer is restricted to business users (agency_admin / client_admin) and admins only \u2014 not shown to consumer users"
+    },
     "payment_link": {
       "type": "string",
       "description": "External payment link (e.g. Stripe, PayPal)"
@@ -92,11 +97,35 @@
     "read": {
       "$or": [
         {
-          "data.is_active": true
+          "$and": [
+            {
+              "data.is_active": true
+            },
+            {
+              "data.business_only": {
+                "$ne": true
+              }
+            }
+          ]
         },
         {
           "user_condition": {
             "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "agency_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "client_admin"
           }
         }
       ]

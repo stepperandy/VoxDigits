@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/lib/LanguageContext';
 
 const TRUST_BADGES = [
-  'No-Logs Policy',
-  'AES-256 Encryption',
-  '60+ Locations',
-  'Kill Switch',
-  '30-Day Money-Back',
-  '24/7 Support',
+  'trustNoLogs',
+  'trustAES',
+  'trustLocations',
+  'trustKillSwitch',
+  'trustMoneyBack',
+  'trustSupport',
 ];
 
 // Floating particles config
@@ -40,6 +41,7 @@ const FLOATERS = [
 ];
 
 export default function Hero() {
+  const { t } = useLanguage();
   return (
     <div
       className="relative min-h-screen flex flex-col items-center justify-start overflow-hidden pt-24"
@@ -232,7 +234,7 @@ export default function Hero() {
             letterSpacing: '-0.02em',
           }}
         >
-          Your Privacy. Fully Protected.
+          {t('heroTitle')}
         </motion.h1>
 
         {/* Gradient underline */}
@@ -256,8 +258,7 @@ export default function Hero() {
           transition={{ delay: 0.35, duration: 0.6 }}
           className="text-slate-300 text-base sm:text-lg leading-relaxed mb-4 max-w-xl"
         >
-          VoxVPN shields your identity with military-grade encryption, a strict
-          no-logs policy, and blazing-fast servers in 60+ countries.
+          {t('heroSubtitle')}
         </motion.p>
 
         {/* Company info bar */}
@@ -267,9 +268,9 @@ export default function Hero() {
           transition={{ delay: 0.4 }}
           className="flex items-center justify-center gap-4 text-slate-500 text-xs mb-8 flex-wrap"
         >
-          <span>Founded 2020</span>
+          <span>{t('founded')}</span>
           <span className="text-slate-700">|</span>
-          <span>VoxTelefony Communications LLC</span>
+          <span>VoxDigits Communications LLC</span>
           <span className="text-slate-700">|</span>
           <span>Woodbridge, VA, USA</span>
         </motion.div>
@@ -289,7 +290,7 @@ export default function Hero() {
               boxShadow: '0 0 20px rgba(124,58,237,0.5)',
             }}
           >
-            Get VoxVPN Now
+            {t('getVoxvpn')}
           </a>
           <button
             onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
@@ -299,7 +300,7 @@ export default function Hero() {
               background: 'rgba(255,255,255,0.05)',
             }}
           >
-            See How It Works
+            {t('seeHowItWorks')}
           </button>
         </motion.div>
 
@@ -312,7 +313,7 @@ export default function Hero() {
         >
           {TRUST_BADGES.map((label, i) => (
             <span key={label} className="flex items-center gap-2">
-              <span>{label}</span>
+              <span>{t(label)}</span>
               {i < TRUST_BADGES.length - 1 && <span className="text-slate-600">|</span>}
             </span>
           ))}
@@ -326,7 +327,7 @@ export default function Hero() {
           transition={{ delay: 0.6 }}
           className="text-slate-500 hover:text-cyan-400 text-xs transition-colors mb-8"
         >
-          Questions? Contact us →
+          {t('questionsContact')}
         </motion.a>
 
         {/* VPN Status Bar */}
@@ -345,16 +346,16 @@ export default function Hero() {
             className="px-6 py-2 text-center text-white font-semibold text-sm border-b"
             style={{ borderColor: 'rgba(255,255,255,0.08)' }}
           >
-            VPN Status Card
+            {t('vpnStatusCard')}
           </div>
           <div className="px-6 py-3 flex items-center justify-center gap-2 text-sm flex-wrap">
-            <span className="font-bold" style={{ color: '#4ade80' }}>Protected</span>
+            <span className="font-bold" style={{ color: '#4ade80' }}>{t('protected')}</span>
             <span className="text-slate-400">·</span>
             <span className="text-white">New York US</span>
             <span className="text-slate-400">·</span>
             <span className="text-slate-300">85 Mbps / 30 Mbps / 12 ms</span>
             <span className="text-slate-400">·</span>
-            <button className="font-bold text-white hover:text-slate-300 transition-colors">Disconnect</button>
+            <button className="font-bold text-white hover:text-slate-300 transition-colors">{t('disconnect')}</button>
           </div>
         </motion.div>
       </div>

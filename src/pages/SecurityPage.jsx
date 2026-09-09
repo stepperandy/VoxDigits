@@ -11,7 +11,7 @@ const SECURITY_FEATURES = [
   { icon: Eye, title: 'DNS Leak Protection', desc: 'All DNS queries are routed through the encrypted VPN tunnel, preventing your ISP or third parties from seeing which websites you visit.' },
   { icon: AlertTriangle, title: 'IPv6 Leak Protection', desc: 'We block and route all IPv6 traffic through the VPN tunnel, preventing IPv6 address leaks that could expose your identity on modern networks.' },
   { icon: Server, title: 'RAM-Only Servers', desc: 'All VPN servers run entirely in RAM. No data is written to disk. When a server reboots, all data is permanently wiped — there is nothing to seize or access.' },
-  { icon: FileCheck, title: 'Strict No-Logs Policy', desc: 'We do not log browsing history, DNS queries, connection timestamps, IP addresses, or bandwidth usage. Independently audited and verified by third-party security firms.' },
+  { icon: FileCheck, title: 'Strict No-Logs Policy', desc: 'We do not log browsing history, DNS queries, connection timestamps, IP addresses, or bandwidth usage. Enforced across our RAM-only server infrastructure.' },
 ];
 
 const PRACTICES = [
@@ -107,7 +107,7 @@ export default function SecurityPage() {
               <Bug size={16} /> Bug Bounty Program
             </a>
             <a href="/security-audit" className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 transition-all text-sm font-semibold">
-              <FileCheck size={16} /> Security Audit Report
+              <FileCheck size={16} /> Security Audit Status
             </a>
           </div>
         </div>
@@ -139,7 +139,7 @@ export default function SecurityPage() {
           <a href="/security-audit" className="p-5 rounded-xl border border-white/5 bg-[#0d1120] hover:border-cyan-500/20 transition-all text-center">
             <FileCheck size={20} className="text-cyan-400 mx-auto mb-2" />
             <h3 className="text-white font-semibold text-sm">Security Audit</h3>
-            <p className="text-slate-500 text-xs mt-1">Independent verification</p>
+            <p className="text-slate-500 text-xs mt-1">Status & commitments</p>
           </a>
           <a href="/transparency-report" className="p-5 rounded-xl border border-white/5 bg-[#0d1120] hover:border-cyan-500/20 transition-all text-center">
             <Eye size={20} className="text-cyan-400 mx-auto mb-2" />

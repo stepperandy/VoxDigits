@@ -1,7 +1,7 @@
 {
-  "name": "voxtelefony-desktop",
-  "version": "1.0.0",
-  "description": "VoxTelefony — private, global communications for Windows",
+  "name": "voxvpn-shield-agent",
+  "version": "3.0.0",
+  "description": "VoxVPN Shield Agent — VPN + DNS Protection",
   "main": "main.js",
   "private": true,
   "scripts": {
@@ -12,11 +12,11 @@
     "build:linux":"electron-builder --linux"
   },
   "build": {
-    "appId": "com.voxtelefony.desktop",
-    "productName": "VoxTelefony",
+    "appId": "net.voxvpn.shield",
+    "productName": "VoxShield",
     "copyright": "Copyright © 2026 VoxDigits Communications LLC",
     "directories": {
-      "output": "../installer/voxtelefony/output"
+      "output": "../installer/voxshield/output"
     },
     "files": [
       "../dist/**/*",

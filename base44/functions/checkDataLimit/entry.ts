@@ -1,48 +1,84 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-const DATA_LIMIT_GB = 50; // default monthly limit per user
+// Automated per-customer data usage alerts.
+// Runs daily via the "Daily Data Limit Email Notifications" scheduled automation.
+// For every eSIM: when usage crosses 80% (warning) or 100% (exhausted) of the
+// plan's data limit, send one email and record a UsageAlert (dedupe: one alert
+// per user + service + threshold, so customers aren't emailed repeatedly).
 
 Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
 
-  const subscriptions = await base44.asServiceRole.entities.VPNSubscription.filter({ status: 'active' });
+  const esims = await base44.asServiceRole.entities.ESim.list();
+
+  // Existing alerts, used to avoid duplicate notifications
+  const existingAlerts = await base44.asServiceRole.entities.UsageAlert.list();
+  const alreadyAlerted = new Set(
+    existingAlerts.map(a => `${a.user_email}|${a.service_id}|${a.alert_type}`)
+  );
 
   const notified = [];
 
-  for (const sub of subscriptions) {
-    const servers = await base44.asServiceRole.entities.VPNServer.list();
-    const totalBandwidth = servers.reduce((sum, s) => sum + (s.bandwidth_used_gb || 0), 0);
+  for (const esim of esims) {
+    if (esim.status !== 'active' && esim.status !== 'pending') continue;
+    const limitGb = esim.data_gb || 0;
+    const usedGb = esim.data_used_gb || 0;
+    if (!limitGb || !esim.user_email || !esim.iccid) continue;
 
-    // Use a per-subscription threshold based on plan
-    const limits = {
-      Basic: 30,
-      Standard: 75,
-      Premium: 150,
-      Advanced: 300,
-      Enterprise: 1000,
-    };
-    const limit = limits[sub.plan] || DATA_LIMIT_GB;
-    const usagePct = (totalBandwidth / limit) * 100;
+    const usagePct = (usedGb / limitGb) * 100;
+    const alertType = usagePct >= 100 ? 'data_100' : usagePct >= 80 ? 'data_80' : null;
+    if (!alertType) continue;
 
-    if (usagePct >= 90) {
+    const dedupeKey = `${esim.user_email}|${esim.iccid}|${alertType}`;
+    if (alreadyAlerted.has(dedupeKey)) continue;
+
+    const serviceName = esim.product_name || `eSIM ${esim.iccid}`;
+
+    if (alertType === 'data_100') {
       await base44.asServiceRole.integrations.Core.SendEmail({
-        to: sub.user_email,
-        subject: `⚠️ VoxVPN: You've used ${Math.round(usagePct)}% of your data limit`,
+        to: esim.user_email,
+        subject: `🚨 VoxVPN: Your ${serviceName} data is used up`,
         body: `
 Hi there,
 
-You've used approximately ${Math.round(usagePct)}% of your monthly data allowance on your VoxVPN ${sub.plan} plan.
+You've used 100% of the data on your ${serviceName} (${usedGb.toFixed(1)} GB of ${limitGb} GB).
 
-Current usage: ${totalBandwidth.toFixed(1)} GB / ${limit} GB
+Your eSIM data is now exhausted. To keep browsing, purchase a new data package from your VoxVPN dashboard.
 
-To avoid service interruption, consider upgrading your plan at https://voxvpn.net/#pricing
-
-Stay protected,
+Stay connected,
 The VoxVPN Team
         `.trim(),
       });
-      notified.push(sub.user_email);
+    } else {
+      await base44.asServiceRole.integrations.Core.SendEmail({
+        to: esim.user_email,
+        subject: `⚠️ VoxVPN: You've used ${Math.round(usagePct)}% of your ${serviceName} data`,
+        body: `
+Hi there,
+
+You've used ${Math.round(usagePct)}% of the data on your ${serviceName}:
+Current usage: ${usedGb.toFixed(1)} GB / ${limitGb} GB
+
+To avoid running out, top up your data package from your VoxVPN dashboard.
+
+Stay connected,
+The VoxVPN Team
+        `.trim(),
+      });
     }
+
+    await base44.asServiceRole.entities.UsageAlert.create({
+      user_email: esim.user_email,
+      alert_type: alertType,
+      service_id: esim.iccid,
+      service_name: serviceName,
+      current_usage: usedGb,
+      limit: limitGb,
+      percentage: Math.round(usagePct),
+      email_sent: true,
+    });
+
+    notified.push({ email: esim.user_email, service: serviceName, type: alertType, pct: Math.round(usagePct) });
   }
 
   return Response.json({ notified, count: notified.length });

@@ -1,18 +1,20 @@
 import { motion } from 'framer-motion';
 import { Lock, Zap, Shield, Globe, AlertCircle, Smartphone, Wifi, GitBranch } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 const features = [
-  { icon: Lock,         title: 'No-Logs Policy',       description: 'We never record your browsing activity, IP address, or DNS queries.',       color: 'text-cyan-400',   bg: 'from-cyan-500/10 to-transparent',   border: 'border-cyan-500/20' },
-  { icon: Zap,          title: 'Lightning Fast',        description: 'Optimized VoxVPN routing ensures minimal speed loss globally.',           color: 'text-amber-400',  bg: 'from-amber-500/10 to-transparent',  border: 'border-amber-500/20' },
-  { icon: Shield,       title: 'AES-256 Encryption',    description: 'Military-grade encryption protects every byte of your data in transit.',    color: 'text-violet-400', bg: 'from-violet-500/10 to-transparent', border: 'border-violet-500/20' },
-  { icon: Globe,        title: 'Bypass Geo-Blocks',     description: 'Access Netflix, BBC iPlayer, Hulu and any geo-restricted content from 20 locations.',         color: 'text-emerald-400',bg: 'from-emerald-500/10 to-transparent',border: 'border-emerald-500/20' },
-  { icon: AlertCircle,  title: 'Kill Switch',           description: 'If your VPN drops, our kill switch instantly cuts your internet.',           color: 'text-rose-400',   bg: 'from-rose-500/10 to-transparent',   border: 'border-rose-500/20' },
-  { icon: Smartphone,   title: 'All Your Devices',      description: 'Windows, macOS, iOS, Android, Linux — connect from 20 global locations.',  color: 'text-blue-400',   bg: 'from-blue-500/10 to-transparent',   border: 'border-blue-500/20' },
-  { icon: Wifi,         title: 'Public WiFi Protection',description: 'Stay safe on coffee shop and airport WiFi automatically.',                   color: 'text-pink-400',   bg: 'from-pink-500/10 to-transparent',   border: 'border-pink-500/20' },
-  { icon: GitBranch,    title: 'Split Tunneling',       description: 'Choose which apps use the VPN and which use your normal connection.',        color: 'text-indigo-400', bg: 'from-indigo-500/10 to-transparent', border: 'border-indigo-500/20' },
+  { icon: Lock,         title: 'featNoLogs',  description: 'featNoLogsDesc',  color: 'text-cyan-400',   bg: 'from-cyan-500/10 to-transparent',   border: 'border-cyan-500/20' },
+  { icon: Zap,          title: 'featFast',    description: 'featFastDesc',    color: 'text-amber-400',  bg: 'from-amber-500/10 to-transparent',  border: 'border-amber-500/20' },
+  { icon: Shield,       title: 'featAes',     description: 'featAesDesc',     color: 'text-violet-400', bg: 'from-violet-500/10 to-transparent', border: 'border-violet-500/20' },
+  { icon: Globe,        title: 'featGeo',     description: 'featGeoDesc',     color: 'text-emerald-400',bg: 'from-emerald-500/10 to-transparent',border: 'border-emerald-500/20' },
+  { icon: AlertCircle,  title: 'featKill',    description: 'featKillDesc',    color: 'text-rose-400',   bg: 'from-rose-500/10 to-transparent',   border: 'border-rose-500/20' },
+  { icon: Smartphone,   title: 'featDevices', description: 'featDevicesDesc', color: 'text-blue-400',   bg: 'from-blue-500/10 to-transparent',   border: 'border-blue-500/20' },
+  { icon: Wifi,         title: 'featWifi',    description: 'featWifiDesc',    color: 'text-pink-400',   bg: 'from-pink-500/10 to-transparent',   border: 'border-pink-500/20' },
+  { icon: GitBranch,    title: 'featSplit',   description: 'featSplitDesc',   color: 'text-indigo-400', bg: 'from-indigo-500/10 to-transparent', border: 'border-indigo-500/20' },
 ];
 
 export default function Features() {
+  const { t } = useLanguage();
   return (
     <section id="features" className="bg-[#06080f] py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background accent */}
@@ -28,13 +30,13 @@ export default function Features() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <p className="text-cyan-400 text-xs font-bold tracking-[0.2em] uppercase mb-3">Why VoxVPN</p>
+          <p className="text-cyan-400 text-xs font-bold tracking-[0.2em] uppercase mb-3">{t('whyVoxvpn')}</p>
           <h2 className="text-4xl sm:text-5xl font-black text-white mb-4 leading-tight">
-            Everything you need.<br />
-            <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Nothing you don't.</span>
+            {t('featuresTitle1')}<br />
+            <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">{t('featuresTitle2')}</span>
           </h2>
           <p className="text-slate-400 max-w-xl mx-auto text-base leading-relaxed">
-            Every feature is designed with one goal: keeping you private, safe, and unrestricted online.
+            {t('featuresSubtitle')}
           </p>
         </motion.div>
 
@@ -56,8 +58,8 @@ export default function Features() {
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 border ${border} bg-[#06080f]`}>
                   <Icon size={20} className={color} />
                 </div>
-                <h3 className="text-white font-bold text-sm mb-2">{title}</h3>
-                <p className="text-slate-400 text-xs leading-relaxed">{description}</p>
+                <h3 className="text-white font-bold text-sm mb-2">{t(title)}</h3>
+                <p className="text-slate-400 text-xs leading-relaxed">{t(description)}</p>
               </div>
             </motion.div>
           ))}
@@ -72,14 +74,14 @@ export default function Features() {
           className="mt-14 p-8 rounded-3xl border border-cyan-500/20 bg-gradient-to-r from-cyan-500/5 via-[#0b1221] to-blue-500/5 flex flex-col sm:flex-row items-center justify-between gap-6"
         >
           <div>
-            <h3 className="text-xl font-black text-white mb-1">Ready to get protected?</h3>
-            <p className="text-slate-400 text-sm">Join 2,500+ users who trust VoxVPN. Plans start at $2.49/mo.</p>
+            <h3 className="text-xl font-black text-white mb-1">{t('readyProtected')}</h3>
+            <p className="text-slate-400 text-sm">{t('joinUsers')}</p>
           </div>
           <a
             href="https://voxvpn.net/#pricing"
             className="flex-shrink-0 px-8 py-3.5 bg-gradient-to-r from-cyan-400 to-cyan-500 hover:from-cyan-300 hover:to-cyan-400 text-black font-black rounded-2xl text-sm transition-all shadow-lg shadow-cyan-500/25 whitespace-nowrap"
           >
-            View Plans →
+            {t('viewPlans')}
           </a>
         </motion.div>
       </div>

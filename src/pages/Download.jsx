@@ -293,7 +293,7 @@ export default function DownloadPage() {
                        <Star size={10} /> Official Installer
                      </span>
                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-400 text-xs font-mono">
-                       <Tag size={10} /> v3.0.0
+                       <Tag size={10} /> v2.5.0
                      </span>
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">
                       <CheckCircle2 size={10} /> Latest
@@ -334,10 +334,33 @@ export default function DownloadPage() {
                     </button>
                   </div>
 
+                  {/* Step-by-step install guide */}
+                  <div className="mt-6 pt-5 border-t border-white/5">
+                    <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold mb-3">
+                      <FileText size={12} /> HOW TO INSTALL & VERIFY THE DESKTOP ICON
+                    </div>
+                    <ol className="space-y-2.5">
+                      {[
+                        'Click "Download .exe" above and save the installer to your Downloads folder.',
+                        'Open the downloaded file (VoxVPN Windows Setup) — if Windows SmartScreen appears, click "More info" then "Run anyway".',
+                        'Follow the setup wizard. The "Create desktop icon" option is pre-checked — leave it selected.',
+                        'Click Install and wait for the installation to finish.',
+                        'Once done, look at your desktop — the VoxVPN icon should appear. If it\'s missing, open the Start Menu, right-click "VoxVPN" and choose "Open file location" to drag the shortcut to your desktop.',
+                      ].map((step, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <span className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-black text-black" style={{ background: '#00d4ff', marginTop: '2px' }}>
+                            {i + 1}
+                          </span>
+                          <span className="text-slate-400 text-xs leading-relaxed">{step}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+
                   {/* Release Notes */}
                   <div className="mt-6 pt-5 border-t border-white/5">
                     <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold mb-3">
-                       <FileText size={12} /> RELEASE NOTES — V3.0.0
+                       <FileText size={12} /> RELEASE NOTES — V2.5.0
                      </div>
                      <ul className="space-y-1.5 text-slate-400 text-xs">
                        {[
@@ -357,7 +380,7 @@ export default function DownloadPage() {
                   </div>
 
                   <p className="text-slate-700 text-xs mt-4 text-center">
-                     Download v3.0.0 directly · No external links required
+                     Download v2.5.0 directly · No external links required
                    </p>
                 </div>
                 </motion.div>
@@ -458,7 +481,7 @@ export default function DownloadPage() {
                           <span>·</span>
                           <span>{p.specs}</span>
                           <span>·</span>
-                          <span>20+ Server Locations</span>
+                          <span>20 Server Locations</span>
                         </div>
 
                         <button
