@@ -5,6 +5,8 @@ on:
   push:
     branches: [main, voxvpn-windows-v3-release]
     tags: ['v3.*']
+  pull_request:
+    branches: [main]
 
 jobs:
   windows:
