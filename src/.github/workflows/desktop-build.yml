@@ -27,6 +27,17 @@ jobs:
       - name: Build Vite app
         run: npm run build
 
+      - name: Prepare VoxVPN Windows icon
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "installer/windows/assets" | Out-Null
+          Invoke-WebRequest -Uri "https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/13431de73_VoxICON.png" -OutFile "installer/windows/assets/VoxICON.png"
+          choco install imagemagick --no-progress -y
+          $magick = (Get-Command magick.exe -ErrorAction SilentlyContinue).Source
+          if (!$magick) { throw "ImageMagick was not installed" }
+          & $magick "installer/windows/assets/VoxICON.png" -background none -define icon:auto-resize=256,128,64,48,32,16 "installer/windows/assets/icon.ico"
+          if (!(Test-Path "installer/windows/assets/icon.ico")) { throw "icon.ico was not produced" }
+
       - name: Install Electron dependencies
         working-directory: src/electron
         run: npm install
@@ -48,8 +59,8 @@ jobs:
       - name: Download OpenVPN Community MSI
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path "installer/windows/assets" | Out-Null
           Invoke-WebRequest -Uri "https://swupdate.openvpn.org/community/releases/OpenVPN-2.7.7-I001-amd64.msi" -OutFile "installer/windows/assets/OpenVPN-2.7.7-I001-amd64.msi"
+          if (!(Test-Path "installer/windows/assets/OpenVPN-2.7.7-I001-amd64.msi")) { throw "OpenVPN MSI download failed" }
 
       - name: Install Inno Setup
         shell: pwsh
