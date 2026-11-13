@@ -6,6 +6,7 @@ import { Eye, EyeOff, Lock, Mail, Zap, ArrowLeft } from 'lucide-react';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 import ChinaAccessNotice from '@/components/auth/ChinaAccessNotice';
 import { LanguageContext } from '@/lib/LanguageContext';
+import { resolveNextPath } from '@/lib/authReturnTo';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function AuthLogin() {
@@ -32,9 +33,7 @@ export default function AuthLogin() {
       try {
         const me = await base44.auth.me();
         if (!done && (me?.role === 'admin' || me?.role === 'super_admin')) {
-          const params = new URLSearchParams(window.location.search);
-          const next = params.get('next') || params.get('from_url');
-          window.location.href = next || '/dashboard';
+          window.location.href = resolveNextPath('/dashboard');
           return;
         }
       } catch {
@@ -104,9 +103,7 @@ export default function AuthLogin() {
       }
 
       await base44.auth.loginViaEmailPassword(email, password);
-      const params = new URLSearchParams(window.location.search);
-      const next = params.get('next') || params.get('from_url');
-      window.location.href = next || '/dashboard';
+      window.location.href = resolveNextPath('/dashboard');
     } catch (err) {
       const backendMsg = err?.response?.data?.message || err?.message || 'Invalid email or password.';
       setError(backendMsg);

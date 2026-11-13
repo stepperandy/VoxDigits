@@ -7,6 +7,7 @@ import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import ChinaAccessNotice from '@/components/auth/ChinaAccessNotice';
 import { LanguageContext } from '@/lib/LanguageContext';
+import { resolveNextPath } from '@/lib/authReturnTo';
 
 const LOGO_URL = 'https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/9d3567c74_image.png';
 
@@ -63,8 +64,7 @@ export default function BusinessLogin() {
       }
 
       await base44.auth.loginViaEmailPassword(email, password);
-      const params = new URLSearchParams(window.location.search);
-      window.location.href = params.get('next') || '/business/dashboard';
+      window.location.href = resolveNextPath('/business/dashboard');
     } catch (err) {
       const backendMsg = err?.response?.data?.message || err?.message || 'Invalid email or password.';
       setError(backendMsg);

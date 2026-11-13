@@ -2,6 +2,46 @@
 // after sign-in, e.g. the MCP OAuth consent page). Keep the redirect
 // validation in one place — it is security-sensitive and easy to drift.
 
+// Validate one redirect target. Only same-origin, absolute application paths
+// survive; anything else returns the fallback.
+//
+// Rejected on purpose:
+//  - any scheme (javascript:, data:, vbscript:, http:, https:, mailto:), which
+//    is how a post-login "next" turns into script execution or an open redirect
+//  - protocol-relative //evil.com and backslash /\evil.com destinations, which
+//    same-origin parsing alone lets through but the browser resolves off-site
+//  - relative values ("dashboard"), malformed URLs, and control-character
+//    smuggling ("java\nscript:...")
+export function sanitizeRedirect(raw, fallback = "/") {
+  if (typeof raw !== "string") return fallback;
+  const value = raw.replace(/[\u0000-\u001F\u007F]/g, "").trim();
+  if (!value) return fallback;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(value)) return fallback;
+  if (!value.startsWith("/") || value.startsWith("//")) return fallback;
+  if (value.includes("\\")) return fallback;
+  try {
+    const url = new URL(value, window.location.origin);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return fallback;
+    if (url.origin !== window.location.origin) return fallback;
+    const path = url.pathname + url.search + url.hash;
+    if (!path.startsWith("/") || path.startsWith("//") || path.includes("\\")) return fallback;
+    return path;
+  } catch {
+    return fallback;
+  }
+}
+
+// Resolve the first present ?next= / ?from_url= target through the validator,
+// else the page's own fallback destination.
+export function resolveNextPath(fallback = "/", paramNames = ["next", "from_url"]) {
+  const search = new URLSearchParams(window.location.search);
+  for (const name of paramNames) {
+    const raw = search.get(name);
+    if (raw) return sanitizeRedirect(raw, fallback);
+  }
+  return fallback;
+}
+
 // Resolve ?returnTo= to a safe same-origin path, else "/".
 //
 // The same-origin check alone is not enough: a value like /.//evil.com or
@@ -20,9 +60,7 @@ export function safeReturnTo() {
     for (const p of ["access_token", "clear_access_token", "app_id", "app_base_url", "functions_version", "from_url"]) {
       url.searchParams.delete(p);
     }
-    const path = url.pathname + url.search;
-    if (!path.startsWith("/") || path.startsWith("//") || path.includes("\\")) return "/";
-    return path;
+    return sanitizeRedirect(url.pathname + url.search, "/");
   } catch {
     return "/";
   }

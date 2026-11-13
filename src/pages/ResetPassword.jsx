@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { resolveNextPath } from '@/lib/authReturnTo';
 import { Mail, ArrowLeft, CheckCircle2, Shield, Lock, Eye, EyeOff, Zap } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -97,8 +98,7 @@ export default function ResetPassword() {
       await base44.auth.resetPassword({ resetToken, newPassword: randomPwd });
       await base44.auth.loginViaEmailPassword(instantEmail.trim(), randomPwd);
       localStorage.removeItem('voxvpn_magic_email');
-      const params = new URLSearchParams(window.location.search);
-      window.location.href = params.get('next') || '/dashboard';
+      window.location.href = resolveNextPath('/dashboard');
     } catch (err) {
       setError(
         err?.response?.data?.detail ||
