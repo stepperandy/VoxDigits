@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { lazy, Suspense, useEffect, useState } from 'react';
 
 // Detects if the app is running inside the native Capacitor shell (Android APK)
@@ -44,8 +44,12 @@ import { TabProvider } from '@/mobile/MobileTabContext';
 import FloatingAssistant from '@/components/FloatingAssistant';
 import { LanguageProvider } from '@/lib/LanguageContext';
 import IOSVPN from './pages/vpn-os/iOSVPN.jsx';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 // Lazy-loaded pages
+const Login = lazy(() => import('./pages/Login.jsx'));
+const Register = lazy(() => import('./pages/Register.jsx'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'));
 const Home = lazy(() => import('./pages/Home'));
 const Admin = lazy(() => import('./pages/Admin.jsx'));
 const CustomerDashboard = lazy(() => import('./pages/CustomerDashboard.jsx'));
@@ -100,6 +104,7 @@ const AuthLogin = lazy(() => import('./pages/AuthLogin.jsx'));
 const AuthSignup = lazy(() => import('./pages/AuthSignup.jsx'));
 const SignupConfirmation = lazy(() => import('./pages/SignupConfirmation.jsx'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword.jsx'));
+const AcceptInvite = lazy(() => import('./pages/AcceptInvite.jsx'));
 const VpnDashboard = lazy(() => import('./pages/VpnDashboard.jsx'));
 const AppSplash = lazy(() => import('./pages/mobile-app/Splash.jsx'));
 const AppLogin = lazy(() => import('./pages/mobile-app/Login.jsx'));
@@ -181,6 +186,13 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
     <AnimatePresence mode="wait">
       <Suspense fallback={<div className="fixed inset-0 flex items-center justify-center"><div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div></div>}>
         <Routes>
+          <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
+          <Route path="/register" element={<PageTransition><Register /></PageTransition>} />
+          <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
+          <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
+          <Route path="/accept-invite" element={<PageTransition><AcceptInvite /></PageTransition>} />
+
+          <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
           <Route path="/" element={<PageTransition><Home /></PageTransition>} />
           <Route path="/admin" element={<PageTransition><Admin /></PageTransition>} />
           <Route path="/customer-dashboard" element={<PageTransition><CustomerDashboard /></PageTransition>} />
@@ -234,11 +246,9 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/vpn-login" element={<PageTransition><VpnLogin /></PageTransition>} />
           <Route path="/vpn-signup" element={<PageTransition><VpnSignup /></PageTransition>} />
           <Route path="/auth-login" element={<PageTransition><AuthLogin /></PageTransition>} />
-          <Route path="/login" element={<PageTransition><AuthLogin /></PageTransition>} />
           <Route path="/auth-signup" element={<PageTransition><AuthSignup /></PageTransition>} />
           <Route path="/signup-confirmation" element={<PageTransition><SignupConfirmation /></PageTransition>} />
           <Route path="/signup" element={<PageTransition><AuthSignup /></PageTransition>} />
-          <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
           <Route path="/vpn-dashboard" element={<PageTransition><VpnDashboard /></PageTransition>} />
           <Route path="/app" element={<AppSplash />} />
           <Route path="/app/login" element={<AppLogin />} />
@@ -292,6 +302,7 @@ const AuthenticatedApp = ({ isMobileDevice }) => {
           <Route path="/mcp" element={<PageTransition><McpHub /></PageTransition>} />
           <Route path="/pitch" element={<PageTransition><PitchDeck /></PageTransition>} />
           <Route path="*" element={<PageNotFound />} />
+          </Route>
         </Routes>
       </Suspense>
     </AnimatePresence>

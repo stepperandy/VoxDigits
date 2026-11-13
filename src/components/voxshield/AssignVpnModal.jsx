@@ -24,8 +24,13 @@ export default function AssignVpnModal({ clients, onClose, onAssigned }) {
       const selectedClient = clients.find((c) => c.id === form.client_id);
       if (!selectedClient) throw new Error('Please select a client');
 
-      // Invite the team member to the app
-      await base44.users.inviteUser(form.email, 'team_member');
+      // Invite the team member to the app (acceptance + password creation via email)
+      await base44.functions.invoke('inviteAppUser', {
+        email: form.email,
+        role: 'team_member',
+        full_name: form.full_name,
+        client_id: selectedClient.id,
+      });
 
       // Create a VPN subscription for this user
       await base44.entities.VPNSubscription.create({

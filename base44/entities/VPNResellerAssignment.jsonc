@@ -1,0 +1,53 @@
+{
+  "name": "VPNResellerAssignment",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "account_id": {
+      "type": "integer"
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "access_until": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "no_expiry": {
+      "type": "boolean",
+      "default": false,
+      "description": "Explicit administrator-approved access without a VoxVPN expiry"
+    }
+  },
+  "required": [
+    "user_email",
+    "account_id",
+    "enabled"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

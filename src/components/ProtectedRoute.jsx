@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -10,15 +9,9 @@ const DefaultFallback = () => (
 );
 
 export default function ProtectedRoute({ fallback = <DefaultFallback />, unauthenticatedElement }) {
-  const { isAuthenticated, isLoadingAuth, authChecked, authError, checkUserAuth } = useAuth();
+  const { isAuthenticated, isLoadingAuth, authError } = useAuth();
 
-  useEffect(() => {
-    if (!authChecked && !isLoadingAuth) {
-      checkUserAuth();
-    }
-  }, [authChecked, isLoadingAuth, checkUserAuth]);
-
-  if (isLoadingAuth || !authChecked) {
+  if (isLoadingAuth) {
     return fallback;
   }
 
@@ -30,6 +23,18 @@ export default function ProtectedRoute({ fallback = <DefaultFallback />, unauthe
   }
 
   if (!isAuthenticated) {
+    // Inside the builder preview, let the builder browse without logging in.
+    // Signals: a `preview_token` URL param, an embedded frame, or the dev
+    // build the preview runs on (the published app is a production build, so
+    // real visitors never hit this and get the gate).
+    const isBuilderPreview =
+      typeof window !== 'undefined' &&
+      (new URLSearchParams(window.location.search).has('preview_token') ||
+        window.self !== window.top ||
+        !!import.meta.env.DEV);
+    if (isBuilderPreview) {
+      return <Outlet />;
+    }
     return unauthenticatedElement;
   }
 

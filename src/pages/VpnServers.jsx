@@ -1,281 +1,56 @@
-import { useState } from 'react';
-import { VPN_SERVERS } from '@/lib/vpnServers';
-import {
-  Shield, Server, FileText, Wifi, WifiOff, Download,
-  AlertCircle, X, Search, CheckCircle2, Info
-} from 'lucide-react';
-
-// Flow states (no longer uses vpnConnectionService simulation)
-const FLOW = {
-  IDLE: 'idle',
-  CONFIG_READY: 'config_ready',
-  DOWNLOADED: 'downloaded',
-  CONNECTED: 'connected',
-  DISCONNECTED: 'disconnected',
-};
-
-function downloadOvpn(server) {
-  const blob = new Blob([server.config], { type: 'application/x-openvpn-profile' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `VoxVPN-${server.name}.ovpn`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-function StatusDot({ isConnected, isSelected }) {
-  if (isConnected) return <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399] flex-shrink-0" />;
-  if (isSelected) return <span className="w-2 h-2 rounded-full bg-cyan-400 flex-shrink-0" />;
-  return <span className="w-2 h-2 rounded-full bg-slate-600 flex-shrink-0" />;
-}
-
-const STATUS_META = {
-  [FLOW.IDLE]:         { label: 'Idle',               color: 'text-slate-400',   bg: 'bg-[#0d1120] border-white/5' },
-  [FLOW.CONFIG_READY]: { label: 'Config Ready',        color: 'text-cyan-300',    bg: 'bg-cyan-500/10 border-cyan-500/20' },
-  [FLOW.DOWNLOADED]:   { label: 'Downloaded',          color: 'text-yellow-300',  bg: 'bg-yellow-500/10 border-yellow-500/20' },
-  [FLOW.CONNECTED]:    { label: 'Connected Externally',color: 'text-emerald-300', bg: 'bg-emerald-500/10 border-emerald-500/20' },
-  [FLOW.DISCONNECTED]: { label: 'Disconnected',        color: 'text-slate-400',   bg: 'bg-[#0d1120] border-white/5' },
-};
+import { useEffect, useState } from 'react';
+import { base44 } from '@/api/base44Client';
 
 export default function VpnServers() {
-  const [selectedServer, setSelectedServer] = useState(null);
-  const [flow, setFlow] = useState(FLOW.IDLE);
+  const [servers, setServers] = useState([]);
   const [search, setSearch] = useState('');
-
-  const filteredServers = VPN_SERVERS.filter(s =>
-    s.name.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const openPanel = (server) => {
-    setSelectedServer(server);
-    if (!selectedServer || selectedServer.id !== server.id) {
-      setFlow(server.config?.trim() ? FLOW.CONFIG_READY : FLOW.IDLE);
-    }
+  const [protocol, setProtocol] = useState('openvpn');
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(null);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const load = async () => {
+    setLoading(true); setError('');
+    try {
+      const { data } = await base44.functions.invoke('vpnResellers', { action: 'servers' });
+      if (data.error) throw new Error(data.error);
+      setServers(data.servers || []);
+    } catch (e) { setError(e.response?.data?.error || e.message || 'Unable to load servers.'); }
+    finally { setLoading(false); }
   };
-
-  const handleDownload = () => {
-    downloadOvpn(selectedServer);
-    setFlow(FLOW.DOWNLOADED);
+  useEffect(() => { load(); }, []);
+  const download = async (server) => {
+    setBusy(server.id); setError(''); setNotice('');
+    try {
+      const { data } = await base44.functions.invoke('vpnResellers', { action: 'config', serverId: server.id, protocol });
+      if (data.error || !data.content) throw new Error(data.error || 'No profile returned.');
+      const url = URL.createObjectURL(new Blob([data.content], { type: 'text/plain' }));
+      const a = document.createElement('a'); a.href = url; a.download = data.filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setNotice(`Profile downloaded for ${server.name}. Import it into ${protocol === 'openvpn' ? 'OpenVPN Connect and enter your assigned VPN username and password' : 'WireGuard'}, then activate the tunnel there. Downloading does not connect your device.`);
+    } catch (e) { setError(e.response?.data?.error || e.message || 'Unable to download profile.'); }
+    finally { setBusy(null); }
   };
-
-  const handleMarkConnected = () => setFlow(FLOW.CONNECTED);
-  const handleDisconnect = () => { setFlow(FLOW.DISCONNECTED); setSelectedServer(null); };
-  const handleReconnect = () => { openPanel(selectedServer); };
-
-  const isConnected = flow === FLOW.CONNECTED && selectedServer;
-  const status = STATUS_META[flow];
-  const configPreview = selectedServer?.config?.split('\n').slice(0, 10).join('\n') ?? '';
-
-  return (
-    <div className="min-h-screen bg-[#060d1a] px-5 pt-14 pb-10">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-5">
-        <img src="https://media.base44.com/images/public/69c84f61d5543b54fe26e1e5/5e71f2d6f_image.png" alt="VoxVPN" className="h-10 w-auto" />
-        <div>
-          <h1 className="text-white font-black text-xl leading-none">VoxVPN Servers</h1>
-          <p className="text-slate-500 text-xs mt-0.5">{VPN_SERVERS.length} secure locations available</p>
-        </div>
+  return <main className="min-h-screen bg-[#060d1a] text-white px-6 py-16">
+    <div className="max-w-3xl mx-auto space-y-6">
+      <h1 className="text-3xl font-bold">VoxVPN servers</h1>
+      <p className="text-slate-300">Download your profile and connect using a VPN application. This page cannot verify or disconnect an external VPN tunnel.</p>
+      <div className="flex flex-wrap gap-3">
+        <input aria-label="Search servers" className="bg-slate-800 rounded-lg p-3 flex-1" placeholder="Search locations" value={search} onChange={e => setSearch(e.target.value)} />
+        <select aria-label="VPN protocol" className="bg-slate-800 rounded-lg p-3" value={protocol} disabled={busy !== null} onChange={e => setProtocol(e.target.value)}>
+          <option value="openvpn">OpenVPN</option><option value="wireguard">WireGuard</option>
+        </select>
+        <button className="p-3 border rounded-lg" disabled={loading || busy !== null} onClick={load}>Refresh</button>
       </div>
-
-      {/* Status banner */}
-      <div className={`mb-5 p-4 rounded-2xl border transition-all ${status.bg}`}>
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0">
-            {flow === FLOW.CONNECTED && <Wifi size={16} className="text-emerald-400" />}
-            {flow === FLOW.DOWNLOADED && <CheckCircle2 size={16} className="text-yellow-400" />}
-            {flow === FLOW.CONFIG_READY && <FileText size={16} className="text-cyan-400" />}
-            {(flow === FLOW.IDLE || flow === FLOW.DISCONNECTED) && <WifiOff size={16} className="text-slate-500" />}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className={`font-bold text-sm ${status.color}`}>{status.label}</p>
-            <p className="text-slate-600 text-xs truncate">
-              {flow === FLOW.CONNECTED && selectedServer ? `VoxVPN connected via ${selectedServer.name}` : `${VPN_SERVERS.length} VoxVPN servers available`}
-            </p>
-          </div>
-          {flow === FLOW.CONNECTED && (
-            <button
-              onClick={handleDisconnect}
-              className="px-3 py-1.5 rounded-xl text-xs font-black bg-rose-500/20 text-rose-400 border border-rose-500/20 hover:bg-rose-500/30 transition-all active:scale-95 flex-shrink-0"
-            >
-              Disconnect
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Search */}
-      <div className="relative mb-4">
-        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-        <input
-          type="text"
-          placeholder="Search servers..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[#0d1120] border border-white/5 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/30 transition-colors"
-        />
-      </div>
-
-      {/* Server list */}
-      <div className="space-y-2.5">
-        {filteredServers.length === 0 && (
-          <p className="text-slate-600 text-sm text-center py-8">No VoxVPN servers match "{search}"</p>
-        )}
-        {filteredServers.map((server) => {
-          const isSel = selectedServer?.id === server.id;
-          const isConn = isConnected && isSel;
-          return (
-            <div
-              key={server.id}
-              onClick={() => setSelectedServer(server)}
-              className={`p-4 rounded-2xl border cursor-pointer transition-all ${
-                isConn
-                  ? 'border-emerald-500/40 bg-emerald-500/5 ring-1 ring-emerald-500/10'
-                  : isSel
-                  ? 'border-cyan-500/40 bg-cyan-500/5 ring-1 ring-cyan-500/10'
-                  : 'border-white/5 bg-[#0d1120] hover:border-white/10'
-              }`}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <StatusDot isSelected={isSel} isConnected={isConn} />
-                  <div className="min-w-0">
-                    <p className={`font-bold text-sm ${isConn || isSel ? 'text-white' : 'text-slate-200'}`}>
-                      {server.name}
-                    </p>
-                    <div className="flex items-center gap-1.5 text-slate-600 text-xs mt-0.5">
-                      <FileText size={10} />
-                      <span className="font-mono truncate">VoxVPN-{server.name}.ovpn</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${
-                    isConn ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-white/5 text-slate-500 border-white/10'
-                  }`}>
-                    {isConn ? 'Connected' : 'Ready'}
-                  </span>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); openPanel(server); }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all active:scale-95 whitespace-nowrap ${
-                      isConn
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 hover:bg-emerald-500/30'
-                        : isSel
-                        ? 'bg-cyan-400 hover:bg-cyan-300 text-black'
-                        : 'bg-white/10 hover:bg-white/15 text-white border border-white/10'
-                    }`}
-                  >
-                    {isConn ? 'Manage' : 'Connect'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Server Details Panel */}
-      {selectedServer && (
-        <div className="mt-6 rounded-2xl border border-white/10 bg-[#0d1120] p-5 space-y-4">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                <Server size={16} className="text-cyan-400" />
-              </div>
-              <div>
-                <p className="text-white font-black text-base leading-none">{selectedServer.name}</p>
-                <p className="text-slate-500 text-xs mt-0.5">VoxVPN Secure Access</p>
-              </div>
-            </div>
-            <button onClick={() => setSelectedServer(null)} className="text-slate-500 hover:text-white transition-colors p-1">
-              <X size={18} />
-            </button>
-          </div>
-
-          {/* Info rows */}
-          <div className="space-y-2.5">
-            {/* Status */}
-            <div className="flex items-center justify-between py-2.5 border-b border-white/5">
-              <span className="text-slate-500 text-xs uppercase tracking-wider">Status</span>
-              <div className="flex items-center gap-1.5">
-                <span className={`w-1.5 h-1.5 rounded-full ${flow === FLOW.CONNECTED ? 'bg-emerald-400' : 'bg-cyan-400'}`} />
-                <span className={`text-xs font-bold ${STATUS_META[flow].color}`}>{STATUS_META[flow].label}</span>
-              </div>
-            </div>
-
-            {/* Config file */}
-            <div className="flex items-center justify-between py-2.5 border-b border-white/5">
-              <span className="text-slate-500 text-xs uppercase tracking-wider">Config File</span>
-              <div className="flex items-center gap-1.5">
-                <FileText size={12} className="text-slate-400" />
-                <span className="text-slate-200 text-xs font-mono">VoxVPN-{selectedServer.name}.ovpn</span>
-              </div>
-            </div>
-
-            {/* Config available */}
-            <div className="flex items-center justify-between py-2.5 border-b border-white/5">
-              <span className="text-slate-500 text-xs uppercase tracking-wider">Config Available</span>
-              {selectedServer.config?.trim() ? (
-                <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-400">
-                  <CheckCircle2 size={13} /> Yes
-                </span>
-              ) : (
-                <span className="flex items-center gap-1.5 text-xs font-bold text-rose-400">
-                  <AlertCircle size={13} /> Not loaded
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Usage hint */}
-          <div className="flex items-start gap-3 p-3 rounded-xl bg-cyan-500/5 border border-cyan-500/15">
-            <Info size={14} className="text-cyan-400 flex-shrink-0 mt-0.5" />
-            <p className="text-cyan-200/70 text-xs leading-relaxed">
-              Download your VoxVPN profile to connect to this server securely.
-            </p>
-          </div>
-
-          {/* Actions */}
-          {selectedServer.config?.trim() ? (
-            <div className="space-y-2">
-              <button
-                onClick={handleDownload}
-                className="w-full py-3 bg-cyan-400 hover:bg-cyan-300 text-black font-black rounded-xl text-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-              >
-                <Download size={15} />
-                {flow === FLOW.DOWNLOADED ? 'Re-download VoxVPN Profile' : 'Download VoxVPN Profile'}
-              </button>
-
-              {flow === FLOW.DOWNLOADED && (
-                <button
-                  onClick={handleMarkConnected}
-                  className="w-full py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 font-black rounded-xl text-sm transition-all active:scale-[0.98]"
-                >
-                  ✓ I'm Connected
-                </button>
-              )}
-
-              {flow === FLOW.CONNECTED && (
-                <button
-                  onClick={handleDisconnect}
-                  className="w-full py-3 bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/20 font-black rounded-xl text-sm transition-all active:scale-[0.98]"
-                >
-                  Disconnect
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
-              <AlertCircle size={14} className="text-rose-400 flex-shrink-0 mt-0.5" />
-              <p className="text-rose-300 text-xs">VoxVPN profile not available for this server yet.</p>
-            </div>
-          )}
-        </div>
-      )}
+      {error && <p role="alert" className="p-4 bg-red-950 rounded-lg">{error}</p>}
+      {notice && <p role="status" className="p-4 bg-cyan-950 rounded-lg">{notice}</p>}
+      {loading ? <p>Loading available servers…</p> : <ul className="space-y-3">
+        {servers.filter(s => s.name.toLowerCase().includes(search.toLowerCase())).map(s => <li key={s.id} className="flex justify-between items-center gap-4 p-4 bg-slate-900 rounded-xl">
+          <span>{s.name}</span><button disabled={busy !== null} className="bg-cyan-400 text-black px-4 py-2 rounded-lg disabled:opacity-50" onClick={() => download(s)}>{busy === s.id ? 'Preparing…' : 'Download profile'}</button>
+        </li>)}
+        {!servers.length && <li>No servers are available. Check provider setup or retry.</li>}
+      </ul>}
     </div>
-  );
+  </main>;
 }

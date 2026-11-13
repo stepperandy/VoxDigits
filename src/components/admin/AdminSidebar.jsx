@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Server, LogOut, Menu, X, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2, Handshake, Globe, Gift, ShieldCheck, Building2, Search, Briefcase, Languages } from 'lucide-react';
+import { LayoutDashboard, Users, Server, LogOut, Menu, X, ChevronRight, Home, Download, Link, Radio, TrendingUp, Megaphone, Activity, BarChart2, Handshake, Globe, Gift, ShieldCheck, Building2, Search, Briefcase, Languages, Mail } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
@@ -21,6 +21,7 @@ const navItems = [
   { icon: ShieldCheck, label: 'Secure Files', id: 'secure-files', desc: 'Host installer files privately' },
   { icon: Languages, label: 'Language Tester', id: 'language-tester', desc: 'Test detection & translations' },
   { icon: Building2, label: 'Agency Dashboard', id: 'agency-dashboard', desc: 'Clients, VPN access & devices' },
+  { icon: Mail, label: 'Email Blaster', id: 'email-blaster', desc: 'AI email/image/video blasts' },
 ];
 
 export default function AdminSidebar({ activePage, onNavigate, onLogout }) {

@@ -44,8 +44,6 @@ async function fetchProviderServers(provider) {
     connect_endpoint: provider.api_base_url
       ? provider.api_base_url.replace(/\/$/, '') + (provider.connect_endpoint || '')
       : '',
-    api_key: provider.api_key || '',
-    auth_header: provider.auth_header || 'Authorization',
   }));
 }
 
@@ -53,9 +51,9 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Auth check (allow unauthenticated for demo — remove if you want auth-only)
-    // const user = await base44.auth.me();
-    // if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    // Require authentication; never return provider credentials.
+    const user = await base44.auth.me();
+    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const [providers, ownServers] = await Promise.allSettled([
       base44.asServiceRole.entities.VPNProvider.filter({ status: 'active', type: 'white_label' }),
@@ -82,7 +80,6 @@ Deno.serve(async (req) => {
           port: s.port,
           proto: s.proto,
           ca_cert: s.ca_cert,
-          tls_auth_key: s.tls_auth_key,
           public_key: s.public_key,
         });
       }

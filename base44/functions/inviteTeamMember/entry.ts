@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
+import { sendInviteAcceptanceEmail } from '../../shared/inviteAcceptance.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -71,7 +72,18 @@ Deno.serve(async (req) => {
       });
     }
 
-    return Response.json({ success: true, message: 'Team member invited', action: 'invited' });
+    // Send the acceptance email — the user must accept from their inbox to
+    // create their password (they are never sent straight to login/homepage).
+    await sendInviteAcceptanceEmail(base44, {
+      email,
+      full_name: full_name || null,
+      role: member_role || 'team_member',
+      client_id: clientId,
+      invited_by: user.email,
+      team_name: client.name,
+    });
+
+    return Response.json({ success: true, message: 'Team member invited — they must accept the invitation from their email to create a password', action: 'invited' });
   } catch (error) {
     console.error('inviteTeamMember error:', error.message);
     return Response.json({ error: error.message }, { status: 500 });

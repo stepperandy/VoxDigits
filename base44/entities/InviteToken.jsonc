@@ -1,0 +1,72 @@
+{
+  "name": "InviteToken",
+  "type": "object",
+  "properties": {
+    "email": {
+      "type": "string",
+      "description": "Email of the invited user"
+    },
+    "token": {
+      "type": "string",
+      "description": "Secure acceptance token sent in the invite email"
+    },
+    "role": {
+      "type": "string",
+      "description": "App role assigned to the invited user"
+    },
+    "client_id": {
+      "type": "string",
+      "description": "Business/client the invite belongs to (optional)"
+    },
+    "invited_by": {
+      "type": "string",
+      "description": "Email of the admin who sent the invite"
+    },
+    "team_name": {
+      "type": "string",
+      "description": "Team/organization name shown in the invite email"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Invitation expiry"
+    },
+    "accepted": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the invitation has been accepted"
+    },
+    "accepted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the invitation was accepted"
+    }
+  },
+  "required": [
+    "email",
+    "token",
+    "expires_at"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

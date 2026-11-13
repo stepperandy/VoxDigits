@@ -1,8 +1,11 @@
 import React from "react";
 
-export default function AuthLayout({ icon: Icon, title, subtitle, footer, children }) {
+export default function AuthLayout({ icon: Icon, title, subtitle, footer, children, light = false }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div
+      className={`min-h-screen flex items-center justify-center px-4 ${light ? "auth-light" : "bg-background"}`}
+      style={light ? { background: "linear-gradient(160deg, #f2f8fc 0%, #e9f3f8 60%, #f6fafd 100%)" } : undefined}
+    >
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary mb-4">

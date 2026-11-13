@@ -95,7 +95,7 @@ export default function VpnDashboard() {
 
   const handleConnect = () => {
     // Redirect to the setup portal to download VoxVPN configs.
-    window.location.href = '/setup';
+    window.location.href = '/vpn-servers';
   };
 
   if (loadingInit) {

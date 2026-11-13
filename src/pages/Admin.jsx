@@ -23,6 +23,7 @@ import GrantSubscriptionView from '@/components/admin/GrantSubscriptionView';
 import SecureFilesView from '@/components/admin/SecureFilesView';
 import LanguageTester from '@/components/admin/LanguageTester';
 import AgencyDashboard from '@/pages/voxshield/AgencyDashboard';
+import EmailBlasterView from '@/components/admin/EmailBlasterView';
 
 export default function Admin() {
   const [activePage, setActivePage] = useState('dashboard');
@@ -60,6 +61,7 @@ export default function Admin() {
       case 'secure-files': return <SecureFilesView />;
       case 'language-tester': return <LanguageTester />;
       case 'agency-dashboard': return <AgencyDashboard />;
+      case 'email-blaster': return <EmailBlasterView />;
       default: return <DashboardView />;
     }
   };

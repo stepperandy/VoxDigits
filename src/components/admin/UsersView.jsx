@@ -43,12 +43,12 @@ export default function UsersView() {
    setInviting(true);
    setInviteMsg({ type: '', text: '' });
    try {
-     await base44.users.inviteUser(inviteEmail, inviteRole);
-     setInviteMsg({ type: 'success', text: `Invitation sent to ${inviteEmail}` });
+     await base44.functions.invoke('inviteAppUser', { email: inviteEmail, role: inviteRole });
+     setInviteMsg({ type: 'success', text: `Invitation sent to ${inviteEmail} — they must accept it from their email to create a password.` });
      setInviteEmail('');
      setTimeout(() => loadUsers(), 500);
    } catch (err) {
-     setInviteMsg({ type: 'error', text: 'Failed: ' + err.message });
+     setInviteMsg({ type: 'error', text: 'Failed: ' + (err?.response?.data?.error || err.message) });
    } finally {
      setInviting(false);
    }
@@ -64,6 +64,23 @@ export default function UsersView() {
      setUsers(prevUsers);
      alert('Failed to update user');
    }
+  };
+
+  const [resetSending, setResetSending] = useState(null); // email currently being sent a reset
+  const [resetNotice, setResetNotice] = useState('');
+
+  const handleSendReset = async (email) => {
+    if (!window.confirm(`Send a password reset link to ${email}?`)) return;
+    setResetSending(email);
+    setResetNotice('');
+    try {
+      await base44.functions.invoke('forgotPassword', { email });
+      setResetNotice(`Password reset link sent to ${email} — open it to set a new password.`);
+    } catch (err) {
+      setResetNotice('Failed to send reset link: ' + (err?.response?.data?.message || err.message));
+    } finally {
+      setResetSending(null);
+    }
   };
 
   const toggleSelect = (id) => {
@@ -232,6 +249,12 @@ export default function UsersView() {
         </div>
       )}
 
+      {resetNotice && (
+        <div className="px-4 py-3 rounded-xl bg-cyan-500/5 border border-cyan-500/20 text-sm text-cyan-300">
+          {resetNotice}
+        </div>
+      )}
+
       {/* Table */}
       <div className="rounded-2xl border border-white/5 bg-[#0d1120] overflow-hidden">
         {loading ? (
@@ -294,11 +317,12 @@ export default function UsersView() {
                     <td className="px-5 py-4 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
-                          onClick={() => { if (window.confirm(`Send password reset to ${u.email}?`)) {} }}
-                          title="Send email"
-                          className="p-1.5 rounded-lg hover:bg-white/5 text-slate-600 hover:text-cyan-400 transition-colors"
+                          onClick={() => handleSendReset(u.email)}
+                          disabled={resetSending === u.email}
+                          title="Send password reset link"
+                          className="p-1.5 rounded-lg hover:bg-white/5 text-slate-600 hover:text-cyan-400 disabled:opacity-50 transition-colors"
                         >
-                          <Mail size={14} />
+                          {resetSending === u.email ? <Loader2 size={14} className="animate-spin text-cyan-400" /> : <Mail size={14} />}
                         </button>
                         {u.role !== 'admin' && (
                           <button

@@ -1,0 +1,106 @@
+{
+  "name": "EmailBlast",
+  "type": "object",
+  "properties": {
+    "subject": {
+      "type": "string",
+      "description": "Email subject line"
+    },
+    "body": {
+      "type": "string",
+      "description": "Email message body text"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Image included in the email (AI-generated or uploaded)"
+    },
+    "video_url": {
+      "type": "string",
+      "description": "Video included as a link in the email (AI-generated or uploaded)"
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Call-to-action links included in the email"
+    },
+    "recipient_mode": {
+      "type": "string",
+      "enum": [
+        "all_users",
+        "custom_emails"
+      ],
+      "default": "all_users",
+      "description": "Whether to send to registered app users or a custom email list"
+    },
+    "custom_emails": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Custom recipient email addresses (used when recipient_mode is custom_emails)"
+    },
+    "ai_generated": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the content was AI-generated"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "sending",
+        "sent",
+        "failed"
+      ],
+      "default": "draft"
+    },
+    "total_recipients": {
+      "type": "number",
+      "default": 0
+    },
+    "sent_count": {
+      "type": "number",
+      "default": 0
+    },
+    "failed_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "subject",
+    "body"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

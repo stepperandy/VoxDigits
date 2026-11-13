@@ -66,7 +66,7 @@ export default function ResetPassword() {
     try {
       await base44.auth.resetPassword({ resetToken, newPassword });
       setDone(true);
-      setTimeout(() => navigate('/auth-login'), 2500);
+      setTimeout(() => navigate('/login'), 2500);
     } catch (err) {
       setError(err?.message || 'Failed to reset password. The link may have expired.');
     } finally {
@@ -289,7 +289,7 @@ export default function ResetPassword() {
                 </button>
               </p>
               <Link
-                to="/auth-login"
+                to="/login"
                 className="inline-flex items-center gap-2 text-cyan-600 hover:text-cyan-700 font-semibold text-sm transition-colors"
               >
                 <ArrowLeft size={16} /> Back to sign in
@@ -337,7 +337,7 @@ export default function ResetPassword() {
           {(!isTokenMode && !sent) && (
             <div className="mt-6 text-center">
               <Link
-                to="/auth-login"
+                to="/login"
                 className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors"
               >
                 <ArrowLeft size={16} /> Back to sign in

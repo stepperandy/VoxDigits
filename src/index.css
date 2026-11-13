@@ -161,6 +161,29 @@
 .theme-light .border-white\/10 { border-color: rgba(0,0,0,0.12) !important; }
 .theme-light nav.bg-\[\#080c18\]\/95, .theme-light header { background-color: rgba(255,255,255,0.95) !important; border-bottom-color: rgba(0,0,0,0.1) !important; }
 
+/* Force a light surface for the auth pages regardless of system/app theme */
+.auth-light {
+  --background: 210 40% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 190 100% 32%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 47% 11%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 45%;
+  --accent: 190 60% 95%;
+  --accent-foreground: 222 47% 11%;
+  --destructive: 0 72% 45%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 32% 89%;
+  --input: 214 32% 89%;
+  --ring: 190 100% 32%;
+}
+
 @layer components {
   /* Safe area utilities for notch/safe area insets */
   .safe-area-bottom {
